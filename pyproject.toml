@@ -10,7 +10,9 @@ python = "^3.12"
 numpy = "^2.0.0"
 pandas = "^2.2.2"
 yfinance = "^0.2.40"
-matplotlib = "^3.9.1"
+pybind11 = "^3.0.0"
+cvxpy = "^1.7.1"
+riskfolio-lib = "^7.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
