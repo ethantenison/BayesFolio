@@ -6,13 +6,14 @@ authors = ["ethantenison <tenison.ethan@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.14"
 numpy = "^2.0.0"
 pandas = "^2.2.2"
 yfinance = "^0.2.40"
 pybind11 = "^3.0.0"
 cvxpy = "^1.7.1"
 riskfolio-lib = "^7.0.1"
+mosek = "11.0.27"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -131,10 +131,7 @@ files = [
 ]
 
 [package.dependencies]
-cffi = [
-    {version = ">=1.0.1", markers = "python_version < \"3.14\""},
-    {version = ">=2.0.0b1", markers = "python_version >= \"3.14\""},
-]
+cffi = {version = ">=1.0.1", markers = "python_version < \"3.14\""}
 
 [[package]]
 name = "arrow"
@@ -1867,6 +1864,23 @@ files = [
     {file = "mistune-3.1.3-py3-none-any.whl", hash = "sha256:1a32314113cff28aa6432e99e522677c8587fd83e3d51c29b82a52409c842bd9"},
     {file = "mistune-3.1.3.tar.gz", hash = "sha256:a7035c21782b2becb6be62f8f25d3df81ccb4d6fa477a6525b15af06539f02a0"},
 ]
+
+[[package]]
+name = "mosek"
+version = "11.0.27"
+description = "Python API for Mosek"
+optional = false
+python-versions = "<3.14,>=3.9"
+groups = ["main"]
+files = [
+    {file = "mosek-11.0.27-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:1f587643c18d74dbc816678df8f7564d244b556170673ff8423a79ae42754237"},
+    {file = "mosek-11.0.27-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:f9dfc824e4f1894e56e1ae7bb80a642dceeab1c2e5b8d8e27af475935d6bb805"},
+    {file = "mosek-11.0.27-cp39-abi3-manylinux_2_29_aarch64.whl", hash = "sha256:56260bf51499cd3e3d95b08b796bc25169ea64ffe0fc123bdc08387fe5371a05"},
+    {file = "mosek-11.0.27-cp39-abi3-win_amd64.whl", hash = "sha256:67657b34c3a1e1edc94b2c91f6718179d24c366a5c58fc3f624c355ae2d43f78"},
+]
+
+[package.dependencies]
+numpy = "*"
 
 [[package]]
 name = "multitasking"
@@ -3887,5 +3901,5 @@ repair = ["scipy (>=1.6.3)"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = "^3.12"
-content-hash = "2c93cdffda3faa84487498749781e93abfc50538976a1f26db013415cba76f03"
+python-versions = ">=3.12,<3.14"
+content-hash = "12cc59a6db7d5ce02df3dfca0eb1824c3f18c17b9357b55d2d627bc94ca156c3"
