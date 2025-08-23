@@ -14,6 +14,8 @@ pybind11 = "^3.0.0"
 cvxpy = "^1.7.1"
 riskfolio-lib = "^7.0.1"
 mosek = "11.0.27"
+plotly = "6.3.0"
+seaborn = "^0.13.2"
 
 
 [tool.poetry.group.dev.dependencies]
