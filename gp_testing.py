@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.3}'.format
 
 # Date range
-start = '2018-01-01'
+start = '2019-06-28'
 end = get_current_date()
 interval = "1d"  # Daily data
 
@@ -190,6 +190,7 @@ df = build_long_panel(TICKERS, START, END, horizon=HORIZON, fixed_h_days=FIXED_H
 
 # Filter the DataFrame for the "ESGD" asset
 esgd_data = df[df['asset_id'] == 'ESGD'].reset_index(drop=True)
+snpe_data = df[df['asset_id'] == 'SNPE'].reset_index(drop=True)
 
 # Plot the line graph
 plt.figure(figsize=(10, 6))
@@ -207,35 +208,48 @@ plt.show()
 
 # take esgd and add the index as a column
 esgd = esgd_data.reset_index()
+snpe = snpe_data.reset_index()
 
 esgd = esgd[['index', 'y_excess_lead']]
+snpe = snpe[['index', 'y_excess_lead']]
 X = esgd[['index']]
 y = esgd[['y_excess_lead']]
+y2 = snpe[['y_excess_lead']]
 
 # create a test train split 
 from sklearn.model_selection import train_test_split
-n_month = 3
+n_month = 2
 X_train = X[:-n_month]
 X_test = X[-n_month:]
 y_train = y[:-n_month]
 y_test = y[-n_month:]
 
+y_train2 = y2[:-n_month]
+y_test2 = y2[-n_month:]
+
 # use a minmax scaler from sklearn to scale the X and a zscore to scale the y 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 scaler_X = MinMaxScaler()
 scaler_y = StandardScaler()
+scaler_y2 = StandardScaler()
 scaler_X.fit(X)
 scaler_y.fit(y)
+scaler_y2.fit(y2)
 X_scaled = scaler_X.transform(X_train)
 y_scaled = scaler_y.transform(y_train)
+y2_scaled = scaler_y2.transform(y_train2)
 train_x = torch.tensor(X_scaled, dtype=torch.float64)
 train_y = torch.tensor(y_scaled, dtype=torch.float64).flatten()
+train_y2 = torch.tensor(y2_scaled, dtype=torch.float64).flatten()
 
 X_test_scaled = scaler_X.transform(X_test)
 test_x = torch.tensor(X_test_scaled, dtype=torch.float64)
 y_test_scaled = scaler_y.transform(y_test)
+y_test_scaled2 = scaler_y2.transform(y_test2)
 test_y = torch.tensor(y_test_scaled, dtype=torch.float64).flatten()
+test_y2 = torch.tensor(y_test_scaled2, dtype=torch.float64).flatten()
 
+##################Single Task GP######################
 from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel
 from gpytorch.likelihoods import GaussianLikelihood
 from gpytorch.models import ExactGP
@@ -261,11 +275,11 @@ class ExactGPModel(ExactGP):
             lengthscale_prior=lengthscale_prior,
             lengthscale_constraint=lengthscale_constraint
              ) + PeriodicKernel(
-                period_length_prior=LogNormalPrior(loc=0.0, scale=1.5),
+                period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
                 lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
         kernel_scale = ScaleKernel(kernel)
-        kernel_scale.base_kernel.kernels[1].initialize(period_length=12.0)
-        self.covar_module = ScaleKernel(kernel)
+        kernel_scale.base_kernel.kernels[1].initialize(period_length=1.0)
+        self.covar_module = ScaleKernel(kernel_scale)
 
     def forward(self, x):
         mean_x = self.mean_module(x)
@@ -309,11 +323,11 @@ for i in range(training_iter):
     # Calc loss and backprop gradients
     loss = -mll(output, train_y)
     loss.backward()
-    print('Iter %d/%d - Loss: %.3f   lengthscalerbf: %.3f noise: %.3f' % (
+    print('Iter %d/%d - Loss: %.3f    noise: %.3f' % ( #lengthscalerbf: %.3f periodlength: %.3f
         i + 1, training_iter, loss.item(),
         #model.covar_module.base_kernel.lengthscale.item(),
-        model.covar_module.base_kernel.kernels[0].lengthscale.item(),
-        # model.covar_module.base_kernel.kernels[1].lengthscale.item(),
+        #model.covar_module.base_kernel.kernels[0].lengthscale.item(),
+        #model.covar_module.base_kernel.kernels[1].period_length.item(),
         model.likelihood.noise.item()
     ))
     optimizer.step()
@@ -358,4 +372,159 @@ with torch.no_grad():
     ax.fill_between(test_x.flatten().numpy(), lower.numpy(), upper.numpy(), alpha=0.5)
     ax.set_ylim([-3, 3])
     ax.legend(['Observed Data', 'Mean', 'Confidence'])
+    
+    
+############## Multitask GP     ######################
+class MultitaskGPModel(ExactGP):
+    def __init__(self, train_x, train_y, likelihood):
+        super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.ConstantMean()
+        kernel = MaternKernel(
+            nu=0.5,
+            lengthscale_prior=lengthscale_prior,
+            lengthscale_constraint=lengthscale_constraint
+             ) + PeriodicKernel(
+                period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
+                lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
+        kernel_scale = ScaleKernel(kernel)
+        self.covar_module = ScaleKernel(kernel_scale)
+        
+        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=2, rank=1)
 
+    def forward(self,x,i):
+        mean_x = self.mean_module(x)
+
+        # Get input-input covariance
+        covar_x = self.covar_module(x)
+        # Get task-task covariance
+        covar_i = self.task_covar_module(i)
+        # Multiply the two together to get the covariance we want
+        covar = covar_x.mul(covar_i)
+
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar)
+    
+# initialize likelihood and model
+noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
+likelihood =  GaussianLikelihood(
+        noise_prior=noise_prior,
+        noise_constraint=GreaterThan(
+            MIN_INFERRED_NOISE_LEVEL,
+            initial_value=noise_prior.mode,
+        ),
+)
+
+train_i_task1 = torch.full((train_x.shape[0],1), dtype=torch.long, fill_value=0)
+train_i_task2 = torch.full((train_x.shape[0],1), dtype=torch.long, fill_value=1)
+full_train_x = torch.cat([train_x, train_x])
+full_train_i = torch.cat([train_i_task1, train_i_task2])
+full_train_y = torch.cat([train_y, train_y2])
+model = MultitaskGPModel((full_train_x, full_train_i), full_train_y, likelihood)
+model.likelihood.noise_covar.register_constraint("raw_noise", GreaterThan(MIN_INFERRED_NOISE_LEVEL))
+
+# traing the model
+training_iter = 500 
+model.train()
+likelihood.train()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.1)  # Includes GaussianLikelihood parameters
+mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+# Early stopping variables
+best_loss = float("inf")
+patience_counter = 0
+patience = 10
+
+for i in range(training_iter):
+    optimizer.zero_grad()
+    output = model(full_train_x, full_train_i)
+    loss = -mll(output, full_train_y)
+    loss.backward()
+    print('Iter %d/500 - Loss: %.3f' % (i + 1, loss.item()))
+    optimizer.step()
+
+    # Early stopping logic
+    if loss.item() < best_loss:
+        best_loss = loss.item()
+        patience_counter = 0  # Reset patience counter if improvement
+    else:
+        patience_counter += 1  # Increment patience counter if no improvement
+
+    if patience_counter >= patience:
+        break  # Stop training early if patience is exceeded
+
+# make predictions
+
+# Initialize plots1
+model.eval()
+likelihood.eval()
+f, (y1_ax, y2_ax) = plt.subplots(1, 2, figsize=(12, 5))
+
+
+X_full = scaler_X.transform(X)
+x_tensor = torch.tensor(X_full, dtype=torch.float64)
+test_i_task1 = torch.full((x_tensor.shape[0],1), dtype=torch.long, fill_value=0)
+test_i_task2 = torch.full((x_tensor.shape[0],1), dtype=torch.long, fill_value=1)
+y_full = scaler_y.transform(y)
+y_full2 = scaler_y2.transform(y2)
+y_tensor = torch.tensor(y_full, dtype=torch.float64).flatten()
+y_tensor2 = torch.tensor(y_full2, dtype=torch.float64).flatten()
+
+
+# Make predictions - one task at a time
+# We control the task we cae about using the indices
+
+# The gpytorch.settings.fast_pred_var flag activates LOVE (for fast variances)
+# See https://arxiv.org/abs/1803.06058
+with torch.no_grad(), gpytorch.settings.fast_pred_var():
+    observed_pred_y1 = likelihood(model(x_tensor, test_i_task1))
+    observed_pred_y2 = likelihood(model(x_tensor, test_i_task2))
+    
+# Define plotting function
+def ax_plot(ax, train_y, train_x, rand_var, title):
+    # Get lower and upper confidence bounds
+    lower, upper = rand_var.confidence_region()
+    # Plot training data as black stars
+    ax.plot(train_x.detach().flatten().numpy(), train_y.detach().numpy(), 'k*')
+    # Predictive mean as blue line
+    ax.plot(train_x.detach().flatten().numpy(), rand_var.mean.detach().numpy(), 'b')
+    # Shade in confidence
+    ax.fill_between(train_x.detach().flatten().numpy(), lower.detach().numpy(), upper.detach().numpy(), alpha=0.5)
+    ax.set_ylim([-3, 3])
+    ax.legend(['Observed Data', 'Mean', 'Confidence'])
+    ax.set_title(title)
+
+# Plot both tasks
+ax_plot(y1_ax, y_tensor, x_tensor, observed_pred_y1, 'Observed Values (Likelihood)')
+ax_plot(y2_ax, y_tensor2, x_tensor, observed_pred_y2, 'Observed Values (Likelihood)')
+
+
+# together
+y1	y1_pred	y2	y2_pred
+0	-0.541	-0.481	0.137	0.0768
+1	-0.479	-0.493	-0.576	-0.545
+2	0.495	0.464	0.145	0.164
+3	0.599	0.546	0.188	0.234
+4	0.0647	0.138	0.509	0.442
+...	...	...	...	...
+69	0.552	0.478	-0.624	-0.552
+70	0.75	0.78	0.827	0.783
+71	0.332	0.381	0.869	0.822
+72	-0.65	0.299	0.2	0.582
+73	1.08	0.243	0.228	0.426
+
+
+#the scale for y1 y1_pred was different but the multitask still beat out the singletask
+# Old y2 y2_pred with just singletask
+# Obs	Pred
+# 0	0.137	0.134
+# 1	-0.576	-0.571
+# 2	0.145	0.143
+# 3	0.188	0.188
+# 4	0.509	0.507
+# ...	...	...
+# 69	-0.624	-0.621
+# 70	0.827	0.822
+# 71	0.869	0.868
+# 72	0.2	0.616
+# 73	0.228	0.466
+
+# TAKE AWAY: The multitask is 10% better for y2
