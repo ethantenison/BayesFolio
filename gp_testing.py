@@ -10,6 +10,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import gpytorch
+from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel
+from gpytorch.likelihoods import GaussianLikelihood
+from gpytorch.models import ExactGP
+from math import sqrt, log
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+torch.set_default_dtype(torch.float64)
+
 
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.3}'.format
@@ -206,6 +214,20 @@ plt.grid(True)
 # Show the plot
 plt.show()
 
+# Plot the line graph
+plt.figure(figsize=(10, 6))
+plt.plot(snpe_data['date'], snpe_data['y_excess_lead'], label='SNPE', color='blue')
+
+# Add labels and title
+plt.xlabel('Date')
+plt.ylabel('Value')
+plt.title('Line Graph of SNPE Asset')
+plt.legend()
+plt.grid(True)
+
+# Show the plot
+plt.show()
+
 # take esgd and add the index as a column
 esgd = esgd_data.reset_index()
 snpe = snpe_data.reset_index()
@@ -250,13 +272,6 @@ test_y = torch.tensor(y_test_scaled, dtype=torch.float64).flatten()
 test_y2 = torch.tensor(y_test_scaled2, dtype=torch.float64).flatten()
 
 ##################Single Task GP######################
-from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel
-from gpytorch.likelihoods import GaussianLikelihood
-from gpytorch.models import ExactGP
-from math import sqrt, log
-from gpytorch.priors import LogNormalPrior
-from gpytorch.constraints import GreaterThan
-torch.set_default_dtype(torch.float64)
 
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -376,6 +391,12 @@ with torch.no_grad():
     
 ############## Multitask GP     ######################
 class MultitaskGPModel(ExactGP):
+    """
+    Multitask GP with Hadamard kernel for combining task and input covariances.
+    
+    Notes: 	The Hadamard (Linear Model of Coregionalization, LMC) generalizes this:
+    multiple latent kernels + task mixing, which lets different tasks have different smoothness / lengthscales.
+    """
     def __init__(self, train_x, train_y, likelihood):
         super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
         self.mean_module = gpytorch.means.ConstantMean()
@@ -497,21 +518,121 @@ ax_plot(y1_ax, y_tensor, x_tensor, observed_pred_y1, 'Observed Values (Likelihoo
 ax_plot(y2_ax, y_tensor2, x_tensor, observed_pred_y2, 'Observed Values (Likelihood)')
 
 
-# together
-y1	y1_pred	y2	y2_pred
-0	-0.541	-0.481	0.137	0.0768
-1	-0.479	-0.493	-0.576	-0.545
-2	0.495	0.464	0.145	0.164
-3	0.599	0.546	0.188	0.234
-4	0.0647	0.138	0.509	0.442
-...	...	...	...	...
-69	0.552	0.478	-0.624	-0.552
-70	0.75	0.78	0.827	0.783
-71	0.332	0.381	0.869	0.822
-72	-0.65	0.299	0.2	0.582
-73	1.08	0.243	0.228	0.426
+#calculating results
+y_full = scaler_y.transform(y)
+y_full2 = scaler_y2.transform(y2)
+y1_scaled = pd.DataFrame(y_full, columns=['y1'])
+y2_scaled = pd.DataFrame(y_full2, columns=['y2'])
+y1_pred = pd.DataFrame(observed_pred_y1.mean.numpy().reshape(-1, 1), columns=['y1_pred'])
+y2_pred = pd.DataFrame(observed_pred_y2.mean.numpy().reshape(-1, 1), columns=['y2_pred'])
+y_all = pd.concat([y1_scaled, y1_pred, y2_scaled, y2_pred], axis=1)
+y_all
+
+##################### Kronecker Multitask GP ######################
+class MultitaskGPModel(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood):
+        super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.MultitaskMean(
+            gpytorch.means.ConstantMean(), num_tasks=2
+        )
+        kernel = MaternKernel(
+            nu=0.5,
+            lengthscale_prior=lengthscale_prior,
+            lengthscale_constraint=lengthscale_constraint
+             ) + PeriodicKernel(
+                period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
+                lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
+        self.covar_module = gpytorch.kernels.MultitaskKernel(
+            kernel, num_tasks=2, rank=1
+        )
+
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return gpytorch.distributions.MultitaskMultivariateNormal(mean_x, covar_x)
+
+train_y_comb = torch.stack([train_y, train_y2], -1)
+likelihood = gpytorch.likelihoods.MultitaskGaussianLikelihood(num_tasks=2)
+model = MultitaskGPModel(train_x, train_y_comb, likelihood)
+# model.likelihood.noise_covar.register_constraint("raw_noise", GreaterThan(MIN_INFERRED_NOISE_LEVEL))
+
+# Find optimal model hyperparameters
+model.train()
+likelihood.train()
+training_iter =500
+# Use the adam optimizer
+optimizer = torch.optim.Adam(model.parameters(), lr=0.1)  # Includes GaussianLikelihood parameters
+
+# "Loss" for GPs - the marginal log likelihood
+mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+# Early stopping variables
+best_loss = float("inf")
+patience_counter = 0
+patience = 10
+
+for i in range(training_iter):
+    optimizer.zero_grad()
+    output = model(train_x)
+    loss = -mll(output, train_y_comb)
+    loss.backward()
+    print('Iter %d/%d - Loss: %.3f' % (i + 1, training_iter, loss.item()))
+    optimizer.step()
+    
+    # Early stopping logic
+    if loss.item() < best_loss:
+        best_loss = loss.item()
+        patience_counter = 0  # Reset patience counter if improvement
+    else:
+        patience_counter += 1  # Increment patience counter if no improvement
+
+    if patience_counter >= patience:
+        break  # Stop training early if patience is exceeded
+
+    
+model.eval()
+likelihood.eval()
+f, (y1_ax, y2_ax) = plt.subplots(1, 2, figsize=(12, 5))
+
+X_full = scaler_X.transform(X)
+x_tensor = torch.tensor(X_full, dtype=torch.float64)
+y_full = scaler_y.transform(y)
+y_full2 = scaler_y2.transform(y2)
+y_tensor = torch.tensor(y_full, dtype=torch.float64).flatten()
+y_tensor2 = torch.tensor(y_full2, dtype=torch.float64).flatten()
+y_tensor_comb = torch.stack([y_tensor, y_tensor2], -1)
+
+# Make predictions
+# This contains predictions for both tasks, flattened out
+# The first half of the predictions is for the first task
+# The second half is for the second task
+with torch.no_grad(), gpytorch.settings.fast_pred_var():
+    predictions = likelihood(model(x_tensor))
+    mean = predictions.mean
+    lower, upper = predictions.confidence_region()
+    
+# Plot training data as black stars
+y1_ax.plot(x_tensor.detach().flatten().numpy(), y_tensor_comb[:, 0].detach().numpy(), 'k*')
+# Predictive mean as blue line
+y1_ax.plot(x_tensor.flatten().numpy(), mean[:, 0].numpy(), 'b')
+# Shade in confidence
+y1_ax.fill_between(x_tensor.flatten().numpy(), lower[:, 0].numpy(), upper[:, 0].numpy(), alpha=0.5)
+y1_ax.set_ylim([-3, 3])
+y1_ax.legend(['Observed Data', 'Mean', 'Confidence'])
+y1_ax.set_title('Observed Values (Likelihood)')
+
+# Plot training data as black stars
+y2_ax.plot(x_tensor.detach().flatten().numpy(), y_tensor_comb[:, 1].detach().numpy(), 'k*')
+# Predictive mean as blue line
+y2_ax.plot(x_tensor.flatten().numpy(), mean[:, 1].numpy(), 'b')
+# Shade in confidence
+y2_ax.fill_between(x_tensor.flatten().numpy(), lower[:, 1].numpy(), upper[:, 1].numpy(), alpha=0.5)
+y2_ax.set_ylim([-3, 3])
+y2_ax.legend(['Observed Data', 'Mean', 'Confidence'])
+y2_ax.set_title('Observed Values (Likelihood)')
 
 
+# Single task need to be updated. 
 #the scale for y1 y1_pred was different but the multitask still beat out the singletask
 # Old y2 y2_pred with just singletask
 # Obs	Pred
@@ -527,4 +648,39 @@ y1	y1_pred	y2	y2_pred
 # 72	0.2	0.616
 # 73	0.228	0.466
 
+# together #hadamard results 
+	y1	y1_pred	y2	y2_pred
+0	-0.539	-0.463	0.138	0.0617
+1	-0.476	-0.493	-0.575	-0.538
+2	0.501	0.46	0.147	0.172
+3	0.605	0.54	0.189	0.247
+4	0.0689	0.158	0.511	0.429
+...	...	...	...	...
+69	0.558	0.464	-0.623	-0.532
+70	0.757	0.794	0.828	0.773
+71	0.338	0.401	0.87	0.809
+72	-0.649	0.313	0.201	0.572
+73	0.793	0.252	0.14	0.418
+
+
 # TAKE AWAY: The multitask is 10% better for y2
+
+### krokecker results 
+
+y1	y1_pred	y2	y2_pred
+0	-0.539	-0.489	0.138	-0.423
+1	-0.476	-0.477	-0.575	-0.413
+2	0.501	0.467	0.147	0.4
+3	0.605	0.571	0.189	0.488
+4	0.0689	0.113	0.511	0.0952
+...	...	...	...	...
+69	0.558	0.467	-0.623	0.397
+70	0.757	0.761	0.828	0.651
+71	0.338	0.386	0.87	0.329
+72	-0.649	0.328	0.201	0.279
+73	0.793	0.292	0.14	0.248
+
+#Takeaway comparing the Hadamard vs the Krokecker:
+# Kronecker Slightly better for y1, Kronecker WAYY better for y2 66% better. 
+# Kronecker more realistically displays accurate uncertainty. SNPE does infact vary
+# quite a bit more than ESGD. 
