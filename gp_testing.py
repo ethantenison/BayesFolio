@@ -2,9 +2,11 @@
 Testing out a GP for time series data.
 
 """
+from types import CapsuleType
 import pandas as pd
 import yfinance as yf
 import warnings
+import marketmaven
 from marketmaven.utils import get_current_date
 import numpy as np
 import matplotlib.pyplot as plt
@@ -684,3 +686,23 @@ y1	y1_pred	y2	y2_pred
 # Kronecker Slightly better for y1, Kronecker WAYY better for y2 66% better. 
 # Kronecker more realistically displays accurate uncertainty. SNPE does infact vary
 # quite a bit more than ESGD. 
+
+
+###### Next steps 
+"""
+- add small Caps
+- add byld and emerging market
+
+Review paper "Portfolio Constraints: An Empirical Analysis"
+- takeaways: for long-term portfolios, min sample time window of 60 months
+they use an out-of-sample window of 12 months
+-THey used a rolling window
+-Metrics: Sharpe ratio, variance, turnover, certainty-equivalent returns, and short interest.
+-Sharpe, vol, turnover, CEQ, sometimes max drawdown, and compare to 1/N and market-cap benchmarks.
+-Transaction costs are a huge limiting factor 
+Investors should choose models based on objectives:
+
+If minimizing risk → GMV with constraints.
+
+If maximizing efficiency → MSR with TEV or equal-weight bounds.
+"""
