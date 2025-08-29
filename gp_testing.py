@@ -201,41 +201,47 @@ df = build_long_panel(TICKERS, START, END, horizon=HORIZON, fixed_h_days=FIXED_H
 # Filter the DataFrame for the "ESGD" asset
 esgd_data = df[df['asset_id'] == 'ESGD'].reset_index(drop=True)
 snpe_data = df[df['asset_id'] == 'SNPE'].reset_index(drop=True)
+byld_data = df[df['asset_id'] == 'BYLD'].reset_index(drop=True)
+avem_data = df[df['asset_id'] == 'AVEM'].reset_index(drop=True)
+vbk_data = df[df['asset_id'] == 'VBK'].reset_index(drop=True)
 
-# Plot the line graph
-plt.figure(figsize=(10, 6))
-plt.plot(esgd_data['date'], esgd_data['y_excess_lead'], label='ESGD', color='blue')
 
-# Add labels and title
-plt.xlabel('Date')
-plt.ylabel('Value')
-plt.title('Line Graph of ESGD Asset')
-plt.legend()
-plt.grid(True)
-
-# Show the plot
-plt.show()
-
-# Plot the line graph
-plt.figure(figsize=(10, 6))
-plt.plot(snpe_data['date'], snpe_data['y_excess_lead'], label='SNPE', color='blue')
-
-# Add labels and title
-plt.xlabel('Date')
-plt.ylabel('Value')
-plt.title('Line Graph of SNPE Asset')
-plt.legend()
-plt.grid(True)
-
-# Show the plot
-plt.show()
+def plot_asset_data(asset_data, asset_name):
+    plt.figure(figsize=(10, 6))
+    plt.plot(asset_data['date'], asset_data['y_excess_lead'], label=asset_name, color='blue')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.title(f'Line Graph of {asset_name} Asset')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+assets = [('ESGD', esgd_data), ('SNPE', snpe_data), ('BYLD', byld_data), ('AVEM', avem_data), ('VBK', vbk_data)]
+for asset_name, asset_data in assets:
+    plot_asset_data(asset_data, asset_name)
+    
 
 # take esgd and add the index as a column
 esgd = esgd_data.reset_index()
 snpe = snpe_data.reset_index()
+byld = byld_data.reset_index()
+avem = avem_data.reset_index()
+vbk = vbk_data.reset_index()
 
 esgd = esgd[['index', 'y_excess_lead']]
 snpe = snpe[['index', 'y_excess_lead']]
+byld = byld[['index', 'y_excess_lead']]
+avem = avem[['index', 'y_excess_lead']]
+vbk = vbk[['index', 'y_excess_lead']]
+both = pd.concat([esgd, snpe, byld, avem, vbk], axis=1)
+both.columns = ['index', 'esgd', 'index2', 'snpe', 'index3', 'byld', 'index4', 'avem', 'index5', 'vbk']
+
+both = both[['esgd', 'snpe', 'byld', 'avem', 'vbk']]
+print(f'Correlation Matrix\n: {both.corr()}')
+
+##### Need to compute the rolling correlation and volitility 
+#INcrease rank for modeling more complex relationships
+
 X = esgd[['index']]
 y = esgd[['y_excess_lead']]
 y2 = snpe[['y_excess_lead']]
