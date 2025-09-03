@@ -6,7 +6,8 @@ from types import CapsuleType
 import pandas as pd
 import yfinance as yf
 import warnings
-import marketmaven
+from marketmaven.asset_prices import build_long_panel
+from marketmaven.market_fundamentals import fetch_vix_term_structure
 from marketmaven.utils import get_current_date
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,160 +43,8 @@ FIXED_H_DAYS = 5          # only used if HORIZON == "fixed"
 
 # ==== CODE ====
 
-def fetch_prices(tickers, start, end=None):
-    """
-    Returns a tidy df with MultiIndex (date, ticker) and column 'Adj Close'.
-    Adjusted Close includes dividends & splits => total-return compatible.
-    """
-    px = yf.download(
-        tickers=tickers, start=start, end=end, interval="1d",
-        group_by="ticker", auto_adjust=False, progress=False
-    )
-    # Normalize shape across yfinance versions
-    if isinstance(px.columns, pd.MultiIndex):
-        # Multi-index columns: level 0 = ticker, level 1 = field
-        adj = []
-        for tk in tickers:
-            if (tk, 'Adj Close') in px.columns:
-                s = px[(tk, 'Adj Close')].rename(tk)
-                adj.append(s)
-        adj = pd.concat(adj, axis=1)
-    else:
-        # Single-index columns: use 'Adj Close' directly (single ticker)
-        adj = px[['Adj Close']].rename(columns={'Adj Close': tickers[0]})
-    adj = adj.dropna(how="all")
-    adj.index = pd.to_datetime(adj.index)
-    return adj
-
-def fetch_rf_daily(start, end=None):
-    """
-    Fetch ^IRX (13-week T-bill), robust to MultiIndex columns and auto_adjust True/False.
-    Returns a daily series of *continuous* daily rate ≈ (annual_fraction / 252).
-    """
-    rf = yf.download("^IRX", start=start, end=end, interval="1d", progress=False, auto_adjust=False)
-
-    if rf.empty:
-        raise RuntimeError("Could not download ^IRX. Try expanding the date range.")
-
-    # Handle both single-index and MultiIndex column shapes
-    if isinstance(rf.columns, pd.MultiIndex):
-        col = None
-        candidates = [
-            ("Adj Close", "^IRX"), ("Close", "^IRX"),
-            ("^IRX", "Adj Close"), ("^IRX", "Close")
-        ]
-        for c in candidates:
-            if c in rf.columns:
-                col = rf.loc[:, c].astype(float)
-                break
-        if col is None:
-            # Fallback: slice by level name, then pick the first column
-            if "Adj Close" in rf.columns.get_level_values(0):
-                col = rf.xs("Adj Close", level=0, axis=1).iloc[:, 0].astype(float)
-            else:
-                col = rf.xs("Close", level=0, axis=1).iloc[:, 0].astype(float)
-    else:
-        if "Adj Close" in rf.columns:
-            col = rf["Adj Close"].astype(float)
-        elif "Close" in rf.columns:
-            col = rf["Close"].astype(float)
-        else:
-            raise KeyError(f"^IRX: Neither 'Adj Close' nor 'Close' in columns: {rf.columns.tolist()}")
-
-    # Convert annualized percent -> fraction
-    ann_frac = col / 100.0
-    rf_daily_cont = ann_frac / 252.0
-    rf_daily_cont.index = pd.to_datetime(rf_daily_cont.index)
-
-    # Fill to business-day grid and forward-fill small gaps
-    all_bd = pd.date_range(rf_daily_cont.index.min(), rf_daily_cont.index.max(), freq="B")
-    rf_daily_cont = rf_daily_cont.reindex(all_bd).ffill()
-    rf_daily_cont.name = "rf_daily_cont"
-    return rf_daily_cont
-
-def compute_excess_future_return_calendar(adj_close: pd.Series,
-                                          rf_daily_cont: pd.Series,
-                                          freq: str = "W-FRI"):
-    """
-    Calendar-aligned future excess return for one asset.
-    y_excess = exp( log(P_{t1}) - log(P_t) - ∑_{(t,t1]} rf_daily_cont ) - 1
-    Returns a Series indexed by the start-of-period date t.
-    """
-    # Resample to period-end closes
-    px_period = adj_close.resample(freq).last().dropna()
-    period_end = px_period.index
-    px_fwd = px_period.shift(-1)
-
-    # Price log-return for t -> t1
-    log_r_price = (np.log(px_fwd) - np.log(px_period)).iloc[:-1]
-
-    # Integrate RF over (t, t1] by summing continuous daily rates
-    rf_log = []
-    for t, t1 in zip(period_end[:-1], period_end[1:]):
-        days = rf_daily_cont.loc[(rf_daily_cont.index > t) & (rf_daily_cont.index <= t1)]
-        rf_log.append(days.sum() if not days.empty else 0.0)
-    rf_log = pd.Series(rf_log, index=log_r_price.index)
-
-    # Use numpy arrays to avoid dtype gotchas, then rebuild Series
-    delta = (log_r_price.values - rf_log.values)
-    y_excess_vals = np.exp(delta) - 1.0
-    y_excess = pd.Series(y_excess_vals, index=log_r_price.index, name="y_excess_lead")
-    return y_excess
-
-def compute_excess_future_return_fixed(adj_close: pd.Series,
-                                       rf_daily_cont: pd.Series,
-                                       h_days: int = 5):
-    """
-    Fixed trading-day horizon (t -> t+h).
-    y_excess = exp( log(P_{t+h}) - log(P_t) - sum_{k=0..h-1} rf_daily_cont[t+k] ) - 1
-    """
-    # Ensure we have RF on the same business-day index
-    s = adj_close.dropna()
-    idx = s.index
-    rf_on_px = rf_daily_cont.reindex(idx).ffill()
-
-    log_p = np.log(s)
-    log_r_price = log_p.shift(-h_days * -1) - log_p  # log(P_{t+h}) - log(P_t); shift(-h) forward
-    # Sum RF daily cont rates over next h days, aligned at t
-    rf_log = rf_on_px.shift(-h_days + 1).rolling(h_days).sum()  # sum of future h days
-    # Target
-    y_excess = np.exp(log_r_price - rf_log) - 1.0
-    y_excess = y_excess.iloc[:-h_days]  # drop last h because of lookahead
-    y_excess.name = "y_excess_lead"
-    return y_excess
-
-def build_long_panel(tickers, start, end=None, horizon="weekly", fixed_h_days=5):
-    prices = fetch_prices(tickers, start, end)
-    rf_daily_cont = fetch_rf_daily(start, end)
-
-    # Choose calendar frequency
-    if horizon.lower() == "weekly":
-        freq = "W-FRI"
-        compute_fn = lambda s: compute_excess_future_return_calendar(s, rf_daily_cont, freq=freq)
-    elif horizon.lower() == "monthly":
-        freq = "BM" # Business Month-end
-        compute_fn = lambda s: compute_excess_future_return_calendar(s, rf_daily_cont, freq=freq)
-    elif horizon.lower() == "fixed":
-        compute_fn = lambda s: compute_excess_future_return_fixed(s, rf_daily_cont, h_days=fixed_h_days)
-    else:
-        raise ValueError("horizon must be one of {'weekly','monthly','fixed'}")
-
-    rows = []
-    for tk in prices.columns:
-        try:
-            y_excess = compute_fn(prices[tk].dropna())
-            df_tk = y_excess.to_frame()
-            df_tk["asset_id"] = tk
-            df_tk = df_tk.rename_axis("date").reset_index()[["date", "asset_id", "y_excess_lead"]]
-            rows.append(df_tk)
-        except Exception as e:
-            print(f"[WARN] Skipping {tk}: {e}")
-
-    panel = pd.concat(rows, axis=0).sort_values(["date", "asset_id"]).reset_index(drop=True)
-    return panel
 
 df = build_long_panel(TICKERS, START, END, horizon=HORIZON, fixed_h_days=FIXED_H_DAYS)
-
 
 
 # Filter the DataFrame for the "ESGD" asset
@@ -204,6 +53,7 @@ snpe_data = df[df['asset_id'] == 'SNPE'].reset_index(drop=True)
 byld_data = df[df['asset_id'] == 'BYLD'].reset_index(drop=True)
 avem_data = df[df['asset_id'] == 'AVEM'].reset_index(drop=True)
 vbk_data = df[df['asset_id'] == 'VBK'].reset_index(drop=True)
+iscf_data = df[df['asset_id'] == 'ISCF'].reset_index(drop=True)
 
 
 def plot_asset_data(asset_data, asset_name):
@@ -216,7 +66,7 @@ def plot_asset_data(asset_data, asset_name):
     plt.grid(True)
     plt.show()
     
-assets = [('ESGD', esgd_data), ('SNPE', snpe_data), ('BYLD', byld_data), ('AVEM', avem_data), ('VBK', vbk_data)]
+assets = [('ESGD', esgd_data), ('SNPE', snpe_data), ('BYLD', byld_data), ('AVEM', avem_data), ('VBK', vbk_data), ('ISCF', iscf_data)]
 for asset_name, asset_data in assets:
     plot_asset_data(asset_data, asset_name)
     
@@ -227,20 +77,28 @@ snpe = snpe_data.reset_index()
 byld = byld_data.reset_index()
 avem = avem_data.reset_index()
 vbk = vbk_data.reset_index()
+iscf = iscf_data.reset_index()
 
 esgd = esgd[['index', 'y_excess_lead']]
 snpe = snpe[['index', 'y_excess_lead']]
 byld = byld[['index', 'y_excess_lead']]
 avem = avem[['index', 'y_excess_lead']]
 vbk = vbk[['index', 'y_excess_lead']]
-both = pd.concat([esgd, snpe, byld, avem, vbk], axis=1)
-both.columns = ['index', 'esgd', 'index2', 'snpe', 'index3', 'byld', 'index4', 'avem', 'index5', 'vbk']
+iscf = iscf[['index', 'y_excess_lead']]
+both = pd.concat([esgd, snpe, byld, avem, vbk, iscf], axis=1)
+both.columns = ['index', 'esgd', 'index2', 'snpe', 'index3', 'byld', 'index4', 'avem', 'index5', 'vbk', 'index6', 'iscf']
 
-both = both[['esgd', 'snpe', 'byld', 'avem', 'vbk']]
+both = both[['esgd', 'snpe', 'byld', 'avem', 'vbk', 'iscf']]
 print(f'Correlation Matrix\n: {both.corr()}')
+#Take away: AVEM is highly uncorrelated with the others. 
 
 ##### Need to compute the rolling correlation and volitility 
 #INcrease rank for modeling more complex relationships
+
+
+##### VIX market data #####
+#Chatgpt: 🔮 For a 1-month ahead excess returns model, I’d recommend adding vix_ts_level and vix as your core features, and optionally vix_ts_chg_1m if you want to capture regime dynamics.
+vix = fetch_vix_term_structure(start=START, end=END, freq="BM")
 
 X = esgd[['index']]
 y = esgd[['y_excess_lead']]
@@ -398,12 +256,84 @@ with torch.no_grad():
     
     
 ############## Multitask GP     ######################
+
 class MultitaskGPModel(ExactGP):
     """
-    Multitask GP with Hadamard kernel for combining task and input covariances.
-    
-    Notes: 	The Hadamard (Linear Model of Coregionalization, LMC) generalizes this:
-    multiple latent kernels + task mixing, which lets different tasks have different smoothness / lengthscales.
+    Intrinsic Coregionalization Model (ICM) Multi-task GP with Hadamard structure.
+
+    Overview
+    --------
+    This model implements a multi-task GP where the covariance between two *tasked*
+    observations ((x, i), (x', j)) factorizes as a Hadamard (elementwise) product:
+
+        k( (x,i), (x',j) ) = k_X(x, x') * B[i, j]
+
+    • k_X(x, x') is the **data kernel** over inputs (here: Matern(ν=1/2) + Periodic,
+      wrapped in ScaleKernel).  
+    • B is the **task covariance matrix** learned by an IndexKernel with low rank
+      (rank=1 in this example).
+
+    This is the classic **Intrinsic Coregionalization Model (ICM)**. It assumes all
+    tasks share the same input kernel shape (lengthscales etc.), while the IndexKernel
+    captures how strongly tasks correlate (and their relative marginal variances).
+
+    Why ICM / Hadamard?
+    -------------------
+    • Simple and data-efficient: few extra parameters, good when tasks are
+      moderately to highly correlated and you expect *shared smoothness/periodicity*.
+    • Stable & fast: Kronecker-free (no large Kronecker algebra), works well with
+      mid-sized panels.  
+    • If you need *task-specific* input kernels or multiple latent processes mixed
+      per task, consider upgrading to an **LCM** (Linear Coregionalization Model).
+
+    Inputs & Shapes
+    ---------------
+    We pass a tuple of inputs to the model:
+      - x:  Tensor of shape [N, D]   (features / time index, etc.)
+      - i:  LongTensor of shape [N, 1] with task IDs in [0, num_tasks-1]
+      - y:  Tensor of shape [N]
+
+    For two tasks with aligned inputs, you can stack like:
+      full_x = concat([x_task0, x_task1])      -> [2N, D]
+      full_i = concat([zeros(N,1), ones(N,1)]) -> [2N, 1]
+      full_y = concat([y_task0,   y_task1])    -> [2N]
+
+    Kernels & Priors
+    ----------------
+    Data kernel:  k_X = Scale(Matern(ν=1/2) + Periodic) wrapped again in ScaleKernel.
+    Task kernel:  IndexKernel(num_tasks=2, rank=1) learns B ≽ 0 (task variances +
+                  correlations). rank controls the capacity of inter-task structure:
+                  rank=1 is ICM with one latent coregionalization component.
+
+    Likelihood
+    ----------
+    GaussianLikelihood with LogNormal prior and positivity constraint on noise.
+    You can:
+      • Provide fixed noise (known observation noise), or
+      • Infer homoskedastic noise (as done here), or
+      • Extend to task-specific noise using MultitaskGaussianLikelihood.
+
+    Training
+    --------
+    We optimize the Exact Marginal Log-Likelihood (mll) with Adam. Early stopping
+    is optional; it’s helpful if the loss plateaus.
+
+    Notes & Tips
+    ------------
+    • Standardize targets per task (zero mean, unit variance) for stable fits.
+    • Normalize inputs (e.g., to [0,1]) so lengthscale priors are well-behaved.
+    • If tasks are weakly related or have different smoothness, consider:
+        – Increasing IndexKernel rank (>=2), or
+        – LCM with multiple latent kernels, or
+        – KroneckerMultiTaskGP when inputs are shared on a grid and you want
+          exact Kronecker algebra speedups.
+    • PeriodicKernel period prior (LogNormal(0, 0.5)) implies a median period ≈ exp(0)=1
+      in input units — adjust to match your calendar (e.g., monthly seasonality).
+
+    Returns
+    -------
+    MultivariateNormal over full stacked observations; predictions for each task
+    can be obtained by passing the corresponding (x, i) pairs.
     """
     def __init__(self, train_x, train_y, likelihood):
         super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
@@ -538,6 +468,108 @@ y_all
 
 ##################### Kronecker Multitask GP ######################
 class MultitaskGPModel(gpytorch.models.ExactGP):
+    """
+    Multi-task GP (ICM, Kronecker-structured) with Matern+Periodic data kernel
+
+    What this is
+    ------------
+    A 2-task Intrinsic Coregionalization Model (ICM) implemented via
+    `gpytorch.kernels.MultitaskKernel`. The full covariance factorizes as:
+
+        K( (x, t), (x', t') ) = B[t, t'] ⊗ K_X(x, x')
+
+    where:
+      - K_X is the input (data) kernel: Matern(ν=0.5) + Periodic
+      - B is a learned task covariance (low-rank + diagonal; controlled by `rank`)
+      - ⊗ denotes the Kronecker product
+
+    This is the standard “ICM with Kronecker structure” used in GPyTorch’s
+    multitask stack (paired with MultitaskMean and MultitaskGaussianLikelihood).
+
+    When to use this model
+    ----------------------
+    - Tasks share the *same* input locations (aligned panel): same timestamps or
+      feature vectors for every task. This enables Kronecker structure internally.
+    - You expect tasks to be correlated (learned by the low-rank coregionalization B).
+    - You want per-task noise handled natively (`MultitaskGaussianLikelihood`).
+
+    When NOT to use this model
+    --------------------------
+    - Tasks are observed on *different* input grids (missing / misaligned data).
+      In that case, prefer the Hadamard ICM with `IndexKernel` and stacking (x, task_id).
+    - You need different data kernels per task or significantly different smoothness
+      per task. Then consider an LCM (Q > 1) or separate single-task GPs.
+
+    Data / Target shapes
+    --------------------
+    - train_x : Tensor[N, D]
+    - train_y : Tensor[N, T]  (T = num_tasks, here 2)
+    - likelihood : MultitaskGaussianLikelihood(num_tasks=T)
+
+    Model parts
+    -----------
+    mean_module:
+        MultitaskMean(ConstantMean(), num_tasks=T)
+        One mean per task.
+
+    covar_module:
+        MultitaskKernel(
+            base_kernel = MaternKernel(nu=0.5, ...) + PeriodicKernel(...),
+            num_tasks = T,
+            rank = 1,
+        )
+        - `rank` controls the rank of the task mixing (B ≈ W W^T + diag(τ)).
+          rank=1 is ICM with a single latent function; increase for richer
+          inter-task structure (at computational / statistical cost).
+
+    likelihood:
+        MultitaskGaussianLikelihood(num_tasks=T)
+        - Learns per-task homoskedastic noise.
+
+    Priors / constraints (recommended)
+    ----------------------------------
+    - Lengthscale priors for both Matern and Periodic (e.g., LogNormal)
+    - Period-length prior for Periodic (e.g., LogNormal centered at a plausible cycle)
+    - Outputscale prior / constraints (ScaleKernel) if you find amplitude drifting
+    - Consider standardizing inputs to [0,1]^D and targets to zero-mean, unit-variance
+
+    Training tips
+    -------------
+    - Normalize features and standardize each task column of train_y. Undo at inference.
+    - Start with moderate LR (e.g., 0.05–0.1) and 200–500 iters; add early stopping if needed.
+    - Watch the learned task covariance B: `model.covar_module.task_covar_module.covar_matrix`
+      should become positive-definite with sensible off-diagonals (not all ~0).
+    - If tasks are strongly correlated, rank=1 often suffices; if residual correlation remains
+      unexplained, try rank=2.
+    - If you see underfitting (over-smoothing), check lengthscales (too large) or allow
+      a LinearKernel addend for trend; if overfitting, use stronger priors / increase noise.
+
+    Forecasting / inference
+    -----------------------
+    - At prediction, pass a test_x of shape [M, D]; the model returns a
+      MultitaskMultivariateNormal with mean of shape [M, T].
+    - You can request only one task’s marginal by indexing the output:
+        preds.mean[:, task_idx]
+    - If you standardized y, re-scale predictions back to original units.
+
+    Pros vs the Hadamard (IndexKernel) version
+    ------------------------------------------
+    + Efficient Kronecker algebra on aligned inputs
+    + Clean per-task noise via MultitaskGaussianLikelihood
+    − Requires aligned inputs across tasks
+    − Less flexible for irregular, sparse multi-task panels
+
+    Extending the model
+    -------------------
+    - Richer inter-task: increase `rank` (ICM→LCM-like as rank grows)
+    - Different smoothness regimes: replace Matern ν, add LinearKernel, or use spectral mixtures
+    - Seasonality: keep PeriodicKernel; consider multiple periodic components if needed
+
+    References
+    ----------
+    - ICM / Coregionalization: Bonilla et al., 2008; Álvarez et al., 2012 (GPs for multi-output)
+    - GPyTorch MultitaskKernel docs
+    """
     def __init__(self, train_x, train_y, likelihood):
         super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
         self.mean_module = gpytorch.means.MultitaskMean(
