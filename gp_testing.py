@@ -46,6 +46,16 @@ FIXED_H_DAYS = 5          # only used if HORIZON == "fixed"
 
 df = build_long_panel(TICKERS, START, END, horizon=HORIZON, fixed_h_days=FIXED_H_DAYS)
 
+##### VIX market data #####
+#Chatgpt: 🔮 For a 1-month ahead excess returns model, I’d recommend adding vix_ts_level and vix as your
+# core features, and optionally vix_ts_chg_1m if you want to capture regime dynamics.
+vix = fetch_vix_term_structure(start=START, end=END, freq="BM")
+vix_core = vix[['Date', 'vix', 'vix_ts_level']]
+
+
+df = df.merge(vix_core, left_on='date', right_on='Date', how='left')
+df = df.drop(columns=['Date'])
+
 
 # Filter the DataFrame for the "ESGD" asset
 esgd_data = df[df['asset_id'] == 'ESGD'].reset_index(drop=True)
@@ -79,30 +89,53 @@ avem = avem_data.reset_index()
 vbk = vbk_data.reset_index()
 iscf = iscf_data.reset_index()
 
-esgd = esgd[['index', 'y_excess_lead']]
-snpe = snpe[['index', 'y_excess_lead']]
-byld = byld[['index', 'y_excess_lead']]
-avem = avem[['index', 'y_excess_lead']]
-vbk = vbk[['index', 'y_excess_lead']]
-iscf = iscf[['index', 'y_excess_lead']]
-both = pd.concat([esgd, snpe, byld, avem, vbk, iscf], axis=1)
-both.columns = ['index', 'esgd', 'index2', 'snpe', 'index3', 'byld', 'index4', 'avem', 'index5', 'vbk', 'index6', 'iscf']
+vars = ['index','vix', 'vix_ts_level', 'y_excess_lead']
 
-both = both[['esgd', 'snpe', 'byld', 'avem', 'vbk', 'iscf']]
-print(f'Correlation Matrix\n: {both.corr()}')
+# esgd = esgd[['index', 'y_excess_lead']]
+# snpe = snpe[['index', 'y_excess_lead']]
+# byld = byld[['index', 'y_excess_lead']]
+# avem = avem[['index', 'y_excess_lead']]
+# vbk = vbk[['index', 'y_excess_lead']]
+# iscf = iscf[['index', 'y_excess_lead']]
+# both = pd.concat([esgd, snpe, byld, avem, vbk, iscf], axis=1)
+# both.columns = ['index', 'esgd', 'index2', 'snpe', 'index3', 'byld', 'index4', 'avem', 'index5', 'vbk', 'index6', 'iscf']
+
+# both = both[['esgd', 'snpe', 'byld', 'avem', 'vbk', 'iscf']]
+# print(f'Correlation Matrix\n: {both.corr()}')
+# Correlation Matrix
+# :         esgd    snpe    byld     avem      vbk    iscf
+# esgd     1.0   0.828   0.751  -0.0462    0.748   0.945
+# snpe   0.828     1.0   0.716  -0.0199    0.869   0.841
+# byld   0.751   0.716     1.0  -0.0284    0.707   0.768
+# avem -0.0462 -0.0199 -0.0284      1.0 -0.00115 -0.0398
+# vbk    0.748   0.869   0.707 -0.00115      1.0   0.801
+# iscf   0.945   0.841   0.768  -0.0398    0.801     1.0
+
 #Take away: AVEM is highly uncorrelated with the others. 
+esgd = esgd[vars]
+snpe = snpe[vars]
+byld = byld[vars]
+avem = avem[vars]
+vbk = vbk[vars]
+iscf = iscf[vars]
+
+
 
 ##### Need to compute the rolling correlation and volitility 
 #INcrease rank for modeling more complex relationships
 
+##### Input variables #####
+input_vars = vars[:-1]
+output_var = vars[-1]
 
-##### VIX market data #####
-#Chatgpt: 🔮 For a 1-month ahead excess returns model, I’d recommend adding vix_ts_level and vix as your core features, and optionally vix_ts_chg_1m if you want to capture regime dynamics.
-vix = fetch_vix_term_structure(start=START, end=END, freq="BM")
+X = esgd[input_vars]
 
-X = esgd[['index']]
-y = esgd[['y_excess_lead']]
-y2 = snpe[['y_excess_lead']]
+
+
+
+##### Output Task variables #####
+y = esgd[output_var]
+y2 = snpe[output_var]
 
 # create a test train split 
 from sklearn.model_selection import train_test_split
