@@ -2,7 +2,6 @@
 Testing out a GP for time series data.
 
 """
-from types import CapsuleType
 import pandas as pd
 import yfinance as yf
 import warnings
@@ -27,7 +26,7 @@ pd.options.display.float_format = '{:.3}'.format
 
 # Date range
 start = '2019-06-28'
-end = get_current_date()
+end = '2025-09-01' #get_current_date() need to set so results are consistent
 interval = "1d"  # Daily data
 
 # Tickers of assets 
@@ -37,7 +36,7 @@ TICKERS.sort()
 # ==== CONFIG ====
 
 START = start     # adjust as needed
-END = get_current_date()                # None = up to today
+END = end #get_current_date()                # None = up to today
 HORIZON = "monthly"        # options: "weekly", "monthly", or "fixed"
 FIXED_H_DAYS = 5          # only used if HORIZON == "fixed"
 
@@ -134,8 +133,8 @@ X = esgd[input_vars]
 
 
 ##### Output Task variables #####
-y = esgd[output_var]
-y2 = snpe[output_var]
+y = esgd[[output_var]]
+y2 = snpe[[output_var]]
 
 # create a test train split 
 from sklearn.model_selection import train_test_split
@@ -175,7 +174,7 @@ test_y2 = torch.tensor(y_test_scaled2, dtype=torch.float64).flatten()
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
-ard_num_dims = 1
+ard_num_dims = 3
 lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
 lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
 MIN_INFERRED_NOISE_LEVEL = 1e-4  # Minimum noise level to avoid numerical issues
@@ -279,11 +278,11 @@ with torch.no_grad():
     # Get upper and lower confidence bounds
     lower, upper = observed_pred.confidence_region()
     # Plot training data as black stars
-    ax.plot(x_tensor.numpy(), y_tensor.numpy().flatten(), 'k*')
+    ax.plot(x_tensor[:, 0].numpy(), y_tensor.numpy().flatten(), 'k*')
     # Plot predictive means as blue line
-    ax.plot(test_x.numpy(), observed_pred.mean.numpy(), 'b')
+    ax.plot(test_x[:, 0].numpy(), observed_pred.mean.numpy(), 'b')
     # Shade between the lower and upper confidence bounds
-    ax.fill_between(test_x.flatten().numpy(), lower.numpy(), upper.numpy(), alpha=0.5)
+    ax.fill_between(test_x[:, 0].flatten().numpy(), lower.numpy(), upper.numpy(), alpha=0.5)
     ax.set_ylim([-3, 3])
     ax.legend(['Observed Data', 'Mean', 'Confidence'])
     
@@ -475,11 +474,11 @@ def ax_plot(ax, train_y, train_x, rand_var, title):
     # Get lower and upper confidence bounds
     lower, upper = rand_var.confidence_region()
     # Plot training data as black stars
-    ax.plot(train_x.detach().flatten().numpy(), train_y.detach().numpy(), 'k*')
+    ax.plot(train_x[:, 0].detach().flatten().numpy(), train_y.detach().numpy(), 'k*')
     # Predictive mean as blue line
-    ax.plot(train_x.detach().flatten().numpy(), rand_var.mean.detach().numpy(), 'b')
+    ax.plot(train_x[:, 0].detach().flatten().numpy(), rand_var.mean.detach().numpy(), 'b')
     # Shade in confidence
-    ax.fill_between(train_x.detach().flatten().numpy(), lower.detach().numpy(), upper.detach().numpy(), alpha=0.5)
+    ax.fill_between(train_x[:, 0].detach().flatten().numpy(), lower.detach().numpy(), upper.detach().numpy(), alpha=0.5)
     ax.set_ylim([-3, 3])
     ax.legend(['Observed Data', 'Mean', 'Confidence'])
     ax.set_title(title)
@@ -685,24 +684,34 @@ with torch.no_grad(), gpytorch.settings.fast_pred_var():
     lower, upper = predictions.confidence_region()
     
 # Plot training data as black stars
-y1_ax.plot(x_tensor.detach().flatten().numpy(), y_tensor_comb[:, 0].detach().numpy(), 'k*')
+y1_ax.plot(x_tensor[:, 0].detach().flatten().numpy(), y_tensor_comb[:, 0].detach().numpy(), 'k*')
 # Predictive mean as blue line
-y1_ax.plot(x_tensor.flatten().numpy(), mean[:, 0].numpy(), 'b')
+y1_ax.plot(x_tensor[:, 0].flatten().numpy(), mean[:, 0].numpy(), 'b')
 # Shade in confidence
-y1_ax.fill_between(x_tensor.flatten().numpy(), lower[:, 0].numpy(), upper[:, 0].numpy(), alpha=0.5)
+y1_ax.fill_between(x_tensor[:, 0].flatten().numpy(), lower[:, 0].numpy(), upper[:, 0].numpy(), alpha=0.5)
 y1_ax.set_ylim([-3, 3])
 y1_ax.legend(['Observed Data', 'Mean', 'Confidence'])
 y1_ax.set_title('Observed Values (Likelihood)')
 
 # Plot training data as black stars
-y2_ax.plot(x_tensor.detach().flatten().numpy(), y_tensor_comb[:, 1].detach().numpy(), 'k*')
+y2_ax.plot(x_tensor[:, 0].detach().flatten().numpy(), y_tensor_comb[:, 1].detach().numpy(), 'k*')
 # Predictive mean as blue line
-y2_ax.plot(x_tensor.flatten().numpy(), mean[:, 1].numpy(), 'b')
+y2_ax.plot(x_tensor[:, 0].flatten().numpy(), mean[:, 1].numpy(), 'b')
 # Shade in confidence
-y2_ax.fill_between(x_tensor.flatten().numpy(), lower[:, 1].numpy(), upper[:, 1].numpy(), alpha=0.5)
+y2_ax.fill_between(x_tensor[:, 0].flatten().numpy(), lower[:, 1].numpy(), upper[:, 1].numpy(), alpha=0.5)
 y2_ax.set_ylim([-3, 3])
 y2_ax.legend(['Observed Data', 'Mean', 'Confidence'])
 y2_ax.set_title('Observed Values (Likelihood)')
+
+#calculating results
+y_full = scaler_y.transform(y)
+y_full2 = scaler_y2.transform(y2)
+y1_scaled = pd.DataFrame(y_full, columns=['y1'])
+y2_scaled = pd.DataFrame(y_full2, columns=['y2'])
+y1_pred = pd.DataFrame(mean[:, 0].numpy().reshape(-1, 1), columns=['y1_pred'])
+y2_pred = pd.DataFrame(mean[:, 1].numpy().reshape(-1, 1), columns=['y2_pred'])
+y_all = pd.concat([y1_scaled, y1_pred, y2_scaled, y2_pred], axis=1)
+y_all
 
 
 # Single task need to be updated. 
@@ -735,6 +744,20 @@ y2_ax.set_title('Observed Values (Likelihood)')
 72	-0.649	0.313	0.201	0.572
 73	0.793	0.252	0.14	0.418
 
+#hadamard results with vix, better but need to fix dates actually. 
+	y1	y1_pred	y2	y2_pred
+0	-0.54	-0.524	0.14	0.124
+1	-0.477	-0.476	-0.578	-0.576
+2	0.509	0.498	0.148	0.155
+3	0.614	0.6	0.191	0.201
+4	0.0733	0.0827	0.514	0.504
+...	...	...	...	...
+70	0.767	0.769	0.834	0.825
+71	0.344	0.353	0.877	0.861
+72	-0.65	-0.63	0.203	0.184
+73	0.648	-0.0952	0.203	0.018
+74	-0.127	-0.17	-0.0999	-0.0639
+
 
 # TAKE AWAY: The multitask is 10% better for y2
 
@@ -757,6 +780,23 @@ y1	y1_pred	y2	y2_pred
 # Kronecker Slightly better for y1, Kronecker WAYY better for y2 66% better. 
 # Kronecker more realistically displays accurate uncertainty. SNPE does infact vary
 # quite a bit more than ESGD. 
+
+#Kronecker results
+
+y1	y1_pred	y2	y2_pred
+0	-0.54	0.091	0.14	0.0942
+1	-0.477	-0.442	-0.578	-0.557
+2	0.509	0.154	0.148	0.157
+3	0.614	0.197	0.191	0.217
+4	0.0733	0.398	0.514	0.473
+...	...	...	...	...
+70	0.767	0.698	0.834	0.821
+71	0.344	0.695	0.877	0.829
+72	-0.65	0.13	0.203	0.15
+73	0.648	0.202	0.203	0.232
+74	-0.127	0.15	-0.0999	0.17
+
+# After adding in vix Hadamard better
 
 
 ###### Next steps 
