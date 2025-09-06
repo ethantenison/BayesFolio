@@ -20,6 +20,9 @@ xgboost = "3.0.4"
 optuna = "4.5.0"
 torch = "^2.8.0"
 gpytorch = "1.14"
+mlflow = "^3.3.2"
+pydantic = "^2.11.7"
+botorch = "^0.15.1"
 
 
 [tool.poetry.group.dev.dependencies]

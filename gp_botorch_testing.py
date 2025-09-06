@@ -24,14 +24,18 @@ from pydantic import BaseModel, Field
 from typing import List, Literal
 from datetime import date
 import mlflow
+import botorch
+import seaborn as sns
+
+from itertools import cycle
 
 # MLFlow Configuration
 MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
 EXPERIMENT_NAME = "GP_Model_Experiments"
 
 # Set up MLFlow tracking
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-mlflow.set_experiment(EXPERIMENT_NAME)
+# mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+# mlflow.set_experiment(EXPERIMENT_NAME)
 
 
 warnings.filterwarnings("ignore")
@@ -52,13 +56,14 @@ class TestingConfig(BaseModel):
 
 # Example usage
 config = TestingConfig(
-    start_date="2019-06-28",
+    start_date="2019-09-30",
     end_date="2025-09-01",
     interval="1d",
-    tickers=["AVEM", "XMMO", "ESGD", "BYLD", "ISCF", "HYEM", "VNQI", "VNQ", "SNPE", "IEF", "VBK"],
+    tickers=["AVEM", "ESGD", "ISCF", "VNQI", "VNQ", "SNPE", "VBK"], #"XMMO", "BYLD", leaving out "HYEM", just to reduce space, taking out "IEF" cause it is not correlated
     horizon="monthly",
     fixed_h_days=5
 )
+#Take away: IEF is highly uncorrelated with the others. 
 # ==== CODE ====
 
 df = build_long_panel(config.tickers, config.start_date, config.end_date, horizon=config.horizon, fixed_h_days=config.fixed_h_days)
@@ -74,118 +79,290 @@ df = df.merge(vix_core, left_on='date', right_on='Date', how='left')
 df = df.drop(columns=['Date'])
 
 
-# Filter the DataFrame for the "ESGD" asset
-esgd_data = df[df['asset_id'] == 'ESGD'].reset_index(drop=True)
-snpe_data = df[df['asset_id'] == 'SNPE'].reset_index(drop=True)
-byld_data = df[df['asset_id'] == 'BYLD'].reset_index(drop=True)
-avem_data = df[df['asset_id'] == 'AVEM'].reset_index(drop=True)
-vbk_data = df[df['asset_id'] == 'VBK'].reset_index(drop=True)
-iscf_data = df[df['asset_id'] == 'ISCF'].reset_index(drop=True)
+# Create separate dataframes for each asset
+def create_asset_df(df, asset_ids):
+    asset_df_dict = {}
+    for asset_id in asset_ids:
+        asset_df = df[df['asset_id'] == asset_id].reset_index(drop=True)
+        asset_df = asset_df.reset_index()
+        asset_df = asset_df[['index', 'date', 'y_excess_lead']]
+        asset_df_dict[asset_id] = asset_df
+    return asset_df_dict
+
+asset_dict = create_asset_df(df, config.tickers)
 
 
-def plot_asset_data(asset_data, asset_name):
-    plt.figure(figsize=(10, 6))
-    plt.plot(asset_data['date'], asset_data['y_excess_lead'], label=asset_name, color='blue')
-    plt.xlabel('Date')
-    plt.ylabel('Value')
-    plt.title(f'Line Graph of {asset_name} Asset')
-    plt.legend()
-    plt.grid(True)
+def plot_all_assets(asset_dict: dict[str, "pd.DataFrame"]):
+    """
+    Plots y_excess_lead for each asset on the same line plot, with different colors.
+
+    Args:
+        asset_dict: dictionary mapping asset_id -> dataframe 
+                    Each dataframe must have 'date' and 'y_excess_lead' columns.
+    """
+    plt.figure(figsize=(12, 7))
+
+    # cycle through matplotlib default colors
+    color_cycler = cycle(plt.rcParams["axes.prop_cycle"].by_key()["color"])
+
+    for asset_id, asset_df in asset_dict.items():
+        color = next(color_cycler)
+        plt.plot(
+            asset_df["date"], 
+            asset_df["y_excess_lead"], 
+            label=asset_id, 
+            color=color
+        )
+
+    plt.xlabel("Date")
+    plt.ylabel("Excess Returns (lead)")
+    plt.title("Asset Excess Returns Over Time")
+    plt.legend(loc="best", ncol=2, fontsize=9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
     plt.show()
     
-assets = [('ESGD', esgd_data), ('SNPE', snpe_data), ('BYLD', byld_data), ('AVEM', avem_data), ('VBK', vbk_data), ('ISCF', iscf_data)]
-for asset_name, asset_data in assets:
-    plot_asset_data(asset_data, asset_name)
-    
+plot_all_assets(asset_dict)   
 
-# take esgd and add the index as a column
-esgd = esgd_data.reset_index()
-snpe = snpe_data.reset_index()
-byld = byld_data.reset_index()
-avem = avem_data.reset_index()
-vbk = vbk_data.reset_index()
-iscf = iscf_data.reset_index()
+def create_correlation_heatmap(asset_dict: dict[str, pd.DataFrame]) -> None:
+    """
+    Creates and plots a heatmap of the correlation matrix of y_excess_lead for each asset.
 
-vars = ['index','vix', 'vix_ts_level', 'y_excess_lead']
+    Args:
+        asset_dict: dictionary mapping asset_id -> dataframe 
+                    Each dataframe must have 'date' and 'y_excess_lead' columns.
+    """
+    combined_df = pd.DataFrame()
 
-# esgd = esgd[['index', 'y_excess_lead']]
-# snpe = snpe[['index', 'y_excess_lead']]
-# byld = byld[['index', 'y_excess_lead']]
-# avem = avem[['index', 'y_excess_lead']]
-# vbk = vbk[['index', 'y_excess_lead']]
-# iscf = iscf[['index', 'y_excess_lead']]
-# both = pd.concat([esgd, snpe, byld, avem, vbk, iscf], axis=1)
-# both.columns = ['index', 'esgd', 'index2', 'snpe', 'index3', 'byld', 'index4', 'avem', 'index5', 'vbk', 'index6', 'iscf']
+    for asset_id, asset_df in asset_dict.items():
+        temp_df = asset_df[['date', 'y_excess_lead']].copy()
+        temp_df.rename(columns={'y_excess_lead': asset_id}, inplace=True)
+        if combined_df.empty:
+            combined_df = temp_df
+        else:
+            combined_df = combined_df.merge(temp_df, on='date', how='outer')
 
-# both = both[['esgd', 'snpe', 'byld', 'avem', 'vbk', 'iscf']]
-# print(f'Correlation Matrix\n: {both.corr()}')
-# Correlation Matrix
-# :         esgd    snpe    byld     avem      vbk    iscf
-# esgd     1.0   0.828   0.751  -0.0462    0.748   0.945
-# snpe   0.828     1.0   0.716  -0.0199    0.869   0.841
-# byld   0.751   0.716     1.0  -0.0284    0.707   0.768
-# avem -0.0462 -0.0199 -0.0284      1.0 -0.00115 -0.0398
-# vbk    0.748   0.869   0.707 -0.00115      1.0   0.801
-# iscf   0.945   0.841   0.768  -0.0398    0.801     1.0
+    combined_df.set_index('date', inplace=True)
+    correlation_matrix = combined_df.corr()
 
-#Take away: AVEM is highly uncorrelated with the others. 
-esgd = esgd[vars]
-snpe = snpe[vars]
-byld = byld[vars]
-avem = avem[vars]
-vbk = vbk[vars]
-iscf = iscf[vars]
+    # Plot the heatmap
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+    plt.title("Correlation Matrix Heatmap of Assets (y_excess_lead)")
+    plt.show()
 
 
+create_correlation_heatmap(asset_dict)
+#Notes for optimization, it is better to include more pure equity or more pure bond funds to get a better spread of correlations.
+#blended ones like XMMO and BYLD are more correlated to both sides and make it harder to differentiate.
 
-##### Need to compute the rolling correlation and volitility 
-#INcrease rank for modeling more complex relationships
+X = df[['date', 'vix', 'vix_ts_level']].drop_duplicates().reset_index(drop=True)
+X = X.reset_index()
+X = X[['index', 'vix', 'vix_ts_level']]
 
-##### Input variables #####
-input_vars = vars[:-1]
-output_var = vars[-1]
+#Create multi column y dataframe
+output_names = list(asset_dict.keys())
+y = pd.DataFrame()
+for name in output_names:
+    temp = asset_dict[name][['index', 'y_excess_lead']].copy()
+    temp.rename(columns={'y_excess_lead': name}, inplace=True)
+    if y.empty:
+        y = temp
+    else:
+        y = y.merge(temp, on='index', how='outer')
 
-X = esgd[input_vars]
+y = y.iloc[:, 1:]  # drop index column
+
+# ML config
+
+class MLConfig(BaseModel):
+    hold_out_index: int = Field(2, description="Index to split train/test data")
+    model_type: Literal["single", "multi_hadamard", "multi_kronecker"] = Field("multi_hadamard", description="Type of GP model to use")
+
+# Example usage
+config = MLConfig(
+    hold_out_index = 2,
+    model_type = "multi_kronecker"
+)
 
 
+X_train = X[:-config.hold_out_index]
+X_test = X[-config.hold_out_index:]
+y_train = y[:-config.hold_out_index]
+y_test = y[-config.hold_out_index:]
 
-
-##### Output Task variables #####
-y = esgd[[output_var]]
-y2 = snpe[[output_var]]
-
-# create a test train split 
-from sklearn.model_selection import train_test_split
-n_month = 2
-X_train = X[:-n_month]
-X_test = X[-n_month:]
-y_train = y[:-n_month]
-y_test = y[-n_month:]
-
-y_train2 = y2[:-n_month]
-y_test2 = y2[-n_month:]
-
-# use a minmax scaler from sklearn to scale the X and a zscore to scale the y 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-scaler_X = MinMaxScaler()
-scaler_y = StandardScaler()
-scaler_y2 = StandardScaler()
-scaler_X.fit(X)
-scaler_y.fit(y)
-scaler_y2.fit(y2)
-X_scaled = scaler_X.transform(X_train)
-y_scaled = scaler_y.transform(y_train)
-y2_scaled = scaler_y2.transform(y_train2)
-train_x = torch.tensor(X_scaled, dtype=torch.float64)
-train_y = torch.tensor(y_scaled, dtype=torch.float64).flatten()
-train_y2 = torch.tensor(y2_scaled, dtype=torch.float64).flatten()
 
-X_test_scaled = scaler_X.transform(X_test)
-test_x = torch.tensor(X_test_scaled, dtype=torch.float64)
-y_test_scaled = scaler_y.transform(y_test)
-y_test_scaled2 = scaler_y2.transform(y_test2)
-test_y = torch.tensor(y_test_scaled, dtype=torch.float64).flatten()
-test_y2 = torch.tensor(y_test_scaled2, dtype=torch.float64).flatten()
+
+# Fit scaler on train only
+scaler_X = MinMaxScaler()
+X_train_scaled = torch.Tensor(scaler_X.fit_transform(X_train))
+X_test_scaled = torch.Tensor(scaler_X.transform(X_test))
+
+scaler_y = StandardScaler()
+y_train_scaled = torch.Tensor(scaler_y.fit_transform(y_train))
+y_test_scaled = torch.Tensor(scaler_y.transform(y_test))
+
+# Botorch multitask
+from botorch.models import KroneckerMultiTaskGP
+from gpytorch.mlls import ExactMarginalLogLikelihood
+from botorch.fit import fit_gpytorch_mll
+
+device = torch.device("cpu")
+dtype = torch.double
+
+
+
+
+model = KroneckerMultiTaskGP(
+    train_X=X_train_scaled,
+    train_Y=y_train_scaled,  
+    input_transform=None,
+    outcome_transform=None,
+    eta=0.1,
+)
+mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
+fit_gpytorch_mll(mll)  # optimizes kernel + likelihood params
+
+
+model.eval()
+model.likelihood.eval()
+with torch.no_grad():
+    post = model.posterior(X_test_scaled)
+    y_pred = post.mean.cpu().numpy()     
+    y_var  = post.variance.cpu().numpy()  
+    
+y_pred_rescaled = scaler_y.inverse_transform(y_pred)
+
+# Compare predictions to actuals
+results = pd.DataFrame(y_pred_rescaled, columns=[f"{name}_pred" for name in output_names])
+
+import numpy as np
+import pandas as pd
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from scipy.stats import spearmanr
+from typing import Dict, Tuple
+
+def evaluate_multioutput(
+    y_test: pd.DataFrame,
+    y_pred: pd.DataFrame,
+    weights: Dict[str, float] = None,
+    aggregate: str = "macro",
+) -> Tuple[pd.DataFrame, dict]:
+    """
+    Evaluate multi-output predictions with per-task & aggregated metrics.
+
+    Parameters
+    ----------
+    y_test : pd.DataFrame
+        True values, shape (n_samples, n_tasks). Columns = task names.
+    y_pred : pd.DataFrame
+        Predicted values, shape (n_samples, n_tasks). Same columns/index as y_test.
+    weights : dict[str, float], optional
+        Optional task weights for weighted aggregation, e.g. {"ESGD":0.5, "SNPE":0.5}.
+        If provided, will be normalized to sum to 1 over intersecting tasks.
+    aggregate : {"macro","weighted","flat"}
+        - "macro": unweighted average of per-task metrics.
+        - "weighted": weighted average using `weights`.
+        - "flat": compute metrics on all stacked values (implicitly weights by task scale & sample count).
+
+    Returns
+    -------
+    per_task : pd.DataFrame
+        Index = task names, columns = ["RMSE","MAE","R2","Spearman"].
+    summary : dict
+        Aggregated scores under keys:
+        - "RMSE_agg", "MAE_agg", "R2_agg", "Spearman_agg"
+        - "mode": aggregation mode used
+        - "n_tasks", "n_samples"
+    """
+    # Align on intersection of rows/columns (no leakage across misaligned dates/tasks)
+    y_true = y_test.copy().reset_index(drop=True)
+    common_cols = list(y_test.columns)
+    y_hat  = y_pred.copy()
+    y_hat.columns = y_true.columns
+
+    # Safety check
+    if not y_true.index.equals(y_hat.index):
+        # Force align on common index
+        common_idx = y_true.index.intersection(y_hat.index)
+        y_true = y_true.loc[common_idx]
+        y_hat  = y_hat.loc[common_idx]
+
+    tasks = list(common_cols)
+    per_task_rows = []
+
+    # Compute per-task metrics with pairwise NaN handling
+    for t in tasks:
+        yt = y_true[t]
+        yp = y_hat[t]
+        mask = yt.notna() & pd.notna(yp)
+        if mask.sum() == 0:
+            per_task_rows.append([t, np.nan, np.nan, np.nan, np.nan])
+            continue
+
+        yt_m, yp_m = yt[mask].values, yp[mask].values
+        rmse = np.sqrt(mean_squared_error(yt_m, yp_m))
+        mae  = mean_absolute_error(yt_m, yp_m)
+        r2   = r2_score(yt_m, yp_m) if len(yt_m) > 1 else np.nan
+        spr  = spearmanr(yt_m, yp_m, nan_policy="omit").correlation
+
+        per_task_rows.append([t, rmse, mae, r2, spr])
+
+    per_task = pd.DataFrame(per_task_rows, columns=["task","RMSE","MAE","R2","Spearman"]).set_index("task")
+
+    # Aggregations
+    agg_mode = aggregate.lower()
+    if agg_mode == "flat":
+        # Stack all tasks & rows (pairwise NaN drop)
+        yt_all = []
+        yp_all = []
+        for t in tasks:
+            m = y_true[t].notna() & y_hat[t].notna()
+            yt_all.append(y_true.loc[m, t].values)
+            yp_all.append(y_hat.loc[m, t].values)
+        yt_all = np.concatenate(yt_all) if yt_all else np.array([])
+        yp_all = np.concatenate(yp_all) if yp_all else np.array([])
+        if yt_all.size == 0:
+            rmse_agg = mae_agg = r2_agg = spr_agg = np.nan
+        else:
+            rmse_agg = np.sqrt(mean_squared_error(yt_all, yp_all))
+            mae_agg  = mean_absolute_error(yt_all, yp_all)
+            r2_agg   = r2_score(yt_all, yp_all) if yt_all.size > 1 else np.nan
+            spr_agg  = spearmanr(yt_all, yp_all, nan_policy="omit").correlation
+
+    elif agg_mode == "weighted":
+        if not weights:
+            raise ValueError("aggregate='weighted' requires a weights dict.")
+        w = pd.Series(weights, dtype=float).reindex(tasks).fillna(0.0)
+        if w.sum() == 0:
+            raise ValueError("Provided weights do not overlap tasks or sum to zero.")
+        w = w / w.sum()
+        rmse_agg = np.nansum(w * per_task["RMSE"])
+        mae_agg  = np.nansum(w * per_task["MAE"])
+        # For R2 and Spearman, weighted mean is common (but note: not strictly proper)
+        r2_agg   = np.nansum(w * per_task["R2"])
+        spr_agg  = np.nansum(w * per_task["Spearman"])
+    else:  # "macro"
+        rmse_agg = per_task["RMSE"].mean()
+        mae_agg  = per_task["MAE"].mean()
+        r2_agg   = per_task["R2"].mean()
+        spr_agg  = per_task["Spearman"].mean()
+
+    summary = {
+        "RMSE_agg": rmse_agg,
+        "MAE_agg": mae_agg,
+        "R2_agg": r2_agg,
+        "Spearman_agg": spr_agg,
+        "mode": agg_mode,
+        "n_tasks": len(tasks),
+        "n_samples": len(y_true),
+    }
+    return per_task, summary
+
+per_task, summary = evaluate_multioutput(y_test, results, aggregate="macro")
+print(per_task)
+print(summary)
 
 ##################Single Task GP######################
 
@@ -305,7 +482,7 @@ with torch.no_grad():
     ax.legend(['Observed Data', 'Mean', 'Confidence'])
     
     
-############## Multitask GP     ######################
+############## Multitask GP Hadamard    ######################
 
 class MultitaskGPModel(ExactGP):
     """
