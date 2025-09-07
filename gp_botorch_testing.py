@@ -26,6 +26,12 @@ from datetime import date
 import mlflow
 import botorch
 import seaborn as sns
+import numpy as np
+import pandas as pd
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from scipy.stats import spearmanr
+from typing import Dict, Tuple
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from itertools import cycle
 
@@ -185,23 +191,21 @@ config = MLConfig(
     model_type = "multi_kronecker"
 )
 
-
-X_train = X[:-config.hold_out_index]
-X_test = X[-config.hold_out_index:]
+scaler_x = MinMaxScaler()
+X_scaled = scaler_x.fit_transform(X)
+X_train = X_scaled[:-config.hold_out_index]
+X_test = X_scaled[-config.hold_out_index:]
 y_train = y[:-config.hold_out_index]
 y_test = y[-config.hold_out_index:]
 
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
 # Fit scaler on train only
-scaler_X = MinMaxScaler()
-X_train_scaled = torch.Tensor(scaler_X.fit_transform(X_train))
-X_test_scaled = torch.Tensor(scaler_X.transform(X_test))
+X_train_tensor = torch.Tensor(X_train)
+X_test_tensor = torch.Tensor(X_test)
 
-scaler_y = StandardScaler()
-y_train_scaled = torch.Tensor(scaler_y.fit_transform(y_train))
-y_test_scaled = torch.Tensor(scaler_y.transform(y_test))
+y_train_tensor = torch.Tensor(y_train.values)
+y_test_tensor = torch.Tensor(y_test.values)
 
 # Botorch multitask
 from botorch.models import KroneckerMultiTaskGP
@@ -212,15 +216,41 @@ device = torch.device("cpu")
 dtype = torch.double
 
 
+# Creating a specialized covar module because periodic kernel is needed:
+from botorch.models.transforms import Normalize, Standardize
+SQRT2 = sqrt(2)
+SQRT3 = sqrt(3)
+ard_num_dims = X_train.shape[1]
 
+active_dims_matern = list(range(X_train.shape[-1]))
+ard_num_dims = len(active_dims_matern)
+lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
+lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+
+kernel = MaternKernel(
+    nu=0.5,
+    lengthscale_prior=lengthscale_prior,
+    lengthscale_constraint=lengthscale_constraint,
+    active_dims=active_dims_matern,
+    ard_num_dims=ard_num_dims,
+) + PeriodicKernel(
+    period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
+    lengthscale_prior=lengthscale_prior,
+    lengthscale_constraint=lengthscale_constraint,
+    active_dims=active_dims_matern,
+    ard_num_dims=ard_num_dims,
+)
+kernel.kernels[1].initialize(period_length=0.3)
 
 model = KroneckerMultiTaskGP(
-    train_X=X_train_scaled,
-    train_Y=y_train_scaled,  
+    train_X=X_train_tensor,
+    train_Y=y_train_tensor,  
     input_transform=None,
-    outcome_transform=None,
-    eta=0.1,
+    output_transform=Standardize(m=y_train.shape[1]),
+    data_covar_module=kernel,
+    rank=5,
 )
+model = model.to(device=device, dtype=dtype)
 mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
 fit_gpytorch_mll(mll)  # optimizes kernel + likelihood params
 
@@ -228,20 +258,14 @@ fit_gpytorch_mll(mll)  # optimizes kernel + likelihood params
 model.eval()
 model.likelihood.eval()
 with torch.no_grad():
-    post = model.posterior(X_test_scaled)
+    post = model.posterior(X_test_tensor)
     y_pred = post.mean.cpu().numpy()     
     y_var  = post.variance.cpu().numpy()  
     
-y_pred_rescaled = scaler_y.inverse_transform(y_pred)
 
 # Compare predictions to actuals
-results = pd.DataFrame(y_pred_rescaled, columns=[f"{name}_pred" for name in output_names])
+results = pd.DataFrame(y_pred, columns=[f"{name}_pred" for name in output_names])
 
-import numpy as np
-import pandas as pd
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from scipy.stats import spearmanr
-from typing import Dict, Tuple
 
 def evaluate_multioutput(
     y_test: pd.DataFrame,
