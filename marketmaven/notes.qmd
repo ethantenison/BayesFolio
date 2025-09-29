@@ -50,8 +50,16 @@ For your ETF case, these three metrics still make sense:
 
 -   **IC:** Can your predictions rank ETFs well enough to form a smarter portfolio?
 
-Sep 27, 2025
+**Sep 27, 2025**
 
 -Looked at rolling window, helpful but I think I need to use my own kernel and not rely on botorch which is having issues and is less flexible. Probably should use the Haadamard kernel, Pooled R squared and the other metrics for the paper. Need to try out zero mean. Maybe include some liquidity feature and macro features.
 
 IC is more important than R2 pooled because it can tell us the best combo of etfs
+
+**September 29th**
+
+-Created configs
+
+-Created KernelFactory
+
+-Keep trying to build mlflow testing framework that is config and pydantic enabled.

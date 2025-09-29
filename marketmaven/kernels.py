@@ -17,23 +17,11 @@ from gpytorch.kernels import (
     SpectralMixtureKernel,
 )
 from gpytorch.priors import LogNormalPrior
-from enum import StrEnum
 from math import sqrt, log
 
 torch.set_default_dtype(torch.float64)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
-
-
-class KernelType(StrEnum):
-    """Supported Gaussian Process kernels."""
-
-    MATERN = "matern"
-    LINEAR = "linear"
-    RQ = "rq"
-    RBF = "rbf"
-    PERIODIC = "periodic"
-    SPECTRAL_MIXTURE = "spectralmixture"
 
 
 
