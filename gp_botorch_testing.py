@@ -7,7 +7,8 @@ import pandas as pd
 import yfinance as yf
 import warnings
 from marketmaven.asset_prices import build_long_panel
-from marketmaven.market_fundamentals import fetch_vix_term_structure
+from marketmaven.market_fundamentals import fetch_vix_term_structure, fetch_macro_features
+from marketmaven.evaluate import evaluate_asset_pricing
 from marketmaven.utils import get_current_date
 import numpy as np
 import matplotlib.pyplot as plt
@@ -32,8 +33,12 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from scipy.stats import spearmanr
 from typing import Dict, Tuple
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-
+import numpy as np
+import pandas as pd
+from sklearn.metrics import r2_score
+from scipy.stats import spearmanr
 from itertools import cycle
+from marketmaven.configs import TestingConfig, Interval, Horizon
 
 # MLFlow Configuration
 MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
@@ -51,39 +56,32 @@ pd.options.display.float_format = '{:.3}'.format
 # 1. Configuration Class
 # -------------------------
 
-class TestingConfig(BaseModel):
-    start_date: date = Field(..., description="Start date for the data range")
-    end_date: date = Field(..., description="End date for the data range")
-    interval: Literal["1d", "1w", "1m"] = Field("1d", description="Data frequency")
-    tickers: List[str] = Field(..., description="List of asset tickers")
-    horizon: Literal["weekly", "monthly", "fixed"] = Field("monthly", description="Prediction horizon")
-    fixed_h_days: int = Field(5, description="Fixed horizon days (if horizon is 'fixed')")
-
-
 # Example usage
 config = TestingConfig(
     start_date="2019-09-30",
     end_date="2025-09-01",
-    interval="1d",
-    tickers=["AVEM", "ESGD", "ISCF", "VNQI", "VNQ", "SNPE", "VBK"], #"XMMO", "BYLD", leaving out "HYEM", just to reduce space, taking out "IEF" cause it is not correlated
-    horizon="monthly",
-    fixed_h_days=5
+    interval=Interval.DAILY,
+    tickers=[ "ESGD", "ISCF", "VNQ", "SNPE", "VBK"], #"XMMO", "BYLD", leaving out "HYEM", just to reduce space, taking out "IEF" cause it is not correlated, "AVEM","VNQI"
+    horizon=Horizon.MONTHLY,
 )
 #Take away: IEF is highly uncorrelated with the others. 
 # ==== CODE ====
 
-df = build_long_panel(config.tickers, config.start_date, config.end_date, horizon=config.horizon, fixed_h_days=config.fixed_h_days)
+df = build_long_panel(config.tickers, config.start_date, config.end_date, horizon=config.horizon)
 
 ##### VIX market data #####
 #Chatgpt: 🔮 For a 1-month ahead excess returns model, I’d recommend adding vix_ts_level and vix as your
 # core features, and optionally vix_ts_chg_1m if you want to capture regime dynamics.
-vix = fetch_vix_term_structure(start=config.start_date, end=config.end_date, freq="BM")
-vix_core = vix[['Date', 'vix', 'vix_ts_level']]
+# vix = fetch_vix_term_structure(start=config.start_date, end=config.end_date, freq="BM")
+# vix_core = vix[['Date', 'vix', 'vix_ts_level']]
 
 
-df = df.merge(vix_core, left_on='date', right_on='Date', how='left')
+# df = df.merge(vix_core, left_on='date', right_on='Date', how='left')
+# df = df.drop(columns=['Date'])
+
+macro_features = fetch_macro_features(start=config.start_date, end=config.end_date)
+df = df.merge(macro_features, left_on='date', right_on='Date', how='left')
 df = df.drop(columns=['Date'])
-
 
 # Create separate dataframes for each asset
 def create_asset_df(df, asset_ids):
@@ -153,7 +151,7 @@ def create_correlation_heatmap(asset_dict: dict[str, pd.DataFrame]) -> None:
 
     # Plot the heatmap
     plt.figure(figsize=(10, 8))
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, vmin=0, vmax=1)
     plt.title("Correlation Matrix Heatmap of Assets (y_excess_lead)")
     plt.show()
 
@@ -162,9 +160,17 @@ create_correlation_heatmap(asset_dict)
 #Notes for optimization, it is better to include more pure equity or more pure bond funds to get a better spread of correlations.
 #blended ones like XMMO and BYLD are more correlated to both sides and make it harder to differentiate.
 
-X = df[['date', 'vix', 'vix_ts_level']].drop_duplicates().reset_index(drop=True)
+# X = df[['date', 'vix', 'vix_ts_level']].drop_duplicates().reset_index(drop=True)
+# X = X.reset_index()
+# X = X[['index', 'vix', 'vix_ts_level']]
+X = df[['date',  'vix_ts_level', 'vix_ts_z_12m', 'term_spread',
+       'credit_spread', 'credit_spread_chg_1p', 'dxy', 'yc_pc1',
+       'yc_pc2', 'yc_pc3']].drop_duplicates().reset_index(drop=True)
 X = X.reset_index()
-X = X[['index', 'vix', 'vix_ts_level']]
+
+X = X[['index', 'vix_ts_level', 'vix_ts_z_12m', 'term_spread',
+       'credit_spread', 'credit_spread_chg_1p', 'dxy', 'yc_pc1',
+       'yc_pc2', 'yc_pc3']]
 
 #Create multi column y dataframe
 output_names = list(asset_dict.keys())
@@ -182,21 +188,23 @@ y = y.iloc[:, 1:]  # drop index column
 # ML config
 
 class MLConfig(BaseModel):
-    hold_out_index: int = Field(2, description="Index to split train/test data")
+    hold_out_index: int = Field(3, description="Index to split train/test data")
     model_type: Literal["single", "multi_hadamard", "multi_kronecker"] = Field("multi_hadamard", description="Type of GP model to use")
 
 # Example usage
 config = MLConfig(
-    hold_out_index = 2,
+    hold_out_index = 1,
     model_type = "multi_kronecker"
 )
 
 scaler_x = MinMaxScaler()
+scaler_y = StandardScaler()
 X_scaled = scaler_x.fit_transform(X)
+y_scaled = scaler_y.fit_transform(y)
 X_train = X_scaled[:-config.hold_out_index]
 X_test = X_scaled[-config.hold_out_index:]
-y_train = y[:-config.hold_out_index]
-y_test = y[-config.hold_out_index:]
+y_train = y_scaled[:-config.hold_out_index]
+y_test = y_scaled[-config.hold_out_index:]
 
 
 
@@ -204,8 +212,8 @@ y_test = y[-config.hold_out_index:]
 X_train_tensor = torch.Tensor(X_train)
 X_test_tensor = torch.Tensor(X_test)
 
-y_train_tensor = torch.Tensor(y_train.values)
-y_test_tensor = torch.Tensor(y_test.values)
+y_train_tensor = torch.Tensor(y_train)
+y_test_tensor = torch.Tensor(y_test)
 
 # Botorch multitask
 from botorch.models import KroneckerMultiTaskGP
@@ -248,7 +256,7 @@ model = KroneckerMultiTaskGP(
     input_transform=None,
     output_transform=Standardize(m=y_train.shape[1]),
     data_covar_module=kernel,
-    rank=5,
+    rank=2,
 )
 model = model.to(device=device, dtype=dtype)
 mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
@@ -266,6 +274,10 @@ with torch.no_grad():
 # Compare predictions to actuals
 results = pd.DataFrame(y_pred, columns=[f"{name}_pred" for name in output_names])
 
+
+summary = evaluate_asset_pricing(pd.DataFrame(y_test), results)
+print('Summary of Asset Pricing Metrics:')
+print(summary)
 
 def evaluate_multioutput(
     y_test: pd.DataFrame,
@@ -387,6 +399,125 @@ def evaluate_multioutput(
 per_task, summary = evaluate_multioutput(y_test, results, aggregate="macro")
 print(per_task)
 print(summary)
+
+
+##### rolling forecast
+from sklearn.preprocessing import MinMaxScaler
+import math
+import torch
+import numpy as np
+import pandas as pd
+
+from botorch.models import KroneckerMultiTaskGP
+from botorch.fit import fit_gpytorch_mll
+from gpytorch.mlls import ExactMarginalLogLikelihood
+from botorch.models.transforms import Standardize
+
+# NEW: imports for priors/constraints/likelihood/kernels
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+from gpytorch.likelihoods import MultitaskGaussianLikelihood
+def rolling_forecast(X: pd.DataFrame, y: pd.DataFrame, window: int, horizon: int = 1, time_dim: int = 0):
+    """
+    Rolling forecast with KroneckerMultiTaskGP.
+    - Fits MinMaxScaler on X_train only (no leakage).
+    - Lets the GP handle Y standardization via outcome_transform=Standardize(...).
+    - Uses a custom likelihood with a proper (invertible) positive constraint to avoid
+      'Must provide inverse transform to be able to sample from prior.' errors.
+    """
+    preds, actuals = [], []
+    device, dtype = torch.device("cpu"), torch.double
+
+    for start in range(0, len(X) - window - horizon + 1):
+        end = start + window
+
+        # Split
+        X_train = X.iloc[start:end].values
+        y_train = y.iloc[start:end].values
+        X_test  = X.iloc[end:end+horizon].values
+        y_test  = y.iloc[end:end+horizon].values
+
+        # --- Scale X on train only ---
+        scaler_x = MinMaxScaler()
+        X_train_scaled = scaler_x.fit_transform(X_train)
+        X_test_scaled  = scaler_x.transform(X_test)
+
+        # --- Tensors ---
+        X_train_tensor = torch.tensor(X_train_scaled, dtype=dtype, device=device)
+        y_train_tensor = torch.tensor(y_train,       dtype=dtype, device=device)
+        X_test_tensor  = torch.tensor(X_test_scaled, dtype=dtype, device=device)
+
+        # --- Kernels (Matern across all feats + Periodic on time only is usually better) ---
+        n_features = X_train_tensor.shape[-1]
+        active_dims_all = list(range(n_features))
+
+        SQRT2 = math.sqrt(2.0)
+        SQRT3 = math.sqrt(3.0)
+        lengthscale_prior = LogNormalPrior(loc=SQRT2 + math.log(n_features)*0.5, scale=SQRT3)
+        lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+
+        matern = MaternKernel(
+            nu=1.5,  # a bit smoother than 0.5; often works better for monthly returns
+            ard_num_dims=n_features,
+            active_dims=active_dims_all,
+            lengthscale_prior=lengthscale_prior,
+            lengthscale_constraint=lengthscale_constraint,
+        )
+
+        # Periodic ONLY on time dim (if you want seasonality)
+        T = torch.unique(X_train_tensor[:, time_dim]).numel()
+        period_norm = max(12.0 / max(T - 1, 1), 1e-3)  # annual-ish period on minmaxed time
+        periodic = PeriodicKernel(
+            ard_num_dims=1,
+            active_dims=[time_dim],
+            period_length_prior=LogNormalPrior(loc=math.log(period_norm), scale=0.5),
+            lengthscale_prior=LogNormalPrior(loc=SQRT2 + math.log(1.0)*0.5, scale=SQRT3),
+            lengthscale_constraint=GreaterThan(2.5e-2),
+        )
+        periodic.initialize(period_length=period_norm)
+
+        data_covar_module = matern * periodic  # product usually better than sum for seasonality
+
+        # --- CUSTOM likelihood with invertible constraint (key fix) ---
+        noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
+        likelihood = MultitaskGaussianLikelihood(
+            num_tasks=y_train.shape[1],
+            noise_prior=noise_prior,
+            # DO NOT set transform=None here; keep default positive transform
+            noise_constraint=GreaterThan(1e-6),  # Softplus-based constraint (invertible)
+        )
+
+        # --- Model ---
+        model = KroneckerMultiTaskGP(
+            train_X=X_train_tensor,
+            train_Y=y_train_tensor,
+            likelihood=likelihood,                        # << use our likelihood
+            outcome_transform=Standardize(m=y_train.shape[1]),  # GP standardizes Y internally
+            input_transform=None,
+            data_covar_module=data_covar_module,
+            rank=2,
+        ).to(device=device, dtype=dtype)
+
+        mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
+        fit_gpytorch_mll(mll)  # will now be able to sample from priors
+
+        # --- Forecast (posterior already unstandardized by the outcome_transform) ---
+        model.eval(); model.likelihood.eval()
+        with torch.no_grad():
+            post = model.posterior(X_test_tensor)
+            y_pred = post.mean.cpu().numpy()
+
+        preds.append(y_pred)
+        actuals.append(y_test)
+
+    preds = np.vstack(preds)
+    actuals = np.vstack(actuals)
+
+    preds_df   = pd.DataFrame(preds,   columns=[f"{c}_pred" for c in y.columns])
+    actuals_df = pd.DataFrame(actuals, columns=y.columns)
+    return preds_df, actuals_df
+
+
 
 ##################Single Task GP######################
 
@@ -1036,3 +1167,331 @@ If minimizing risk → GMV with constraints.
 
 If maximizing efficiency → MSR with TEV or equal-weight bounds.
 """
+
+
+
+###### This was the best combination!!!!!
+from joblib import Parallel, delayed
+
+
+from sklearn.preprocessing import MinMaxScaler
+import math
+import torch
+import numpy as np
+import pandas as pd
+
+from botorch.models import KroneckerMultiTaskGP
+from botorch.fit import fit_gpytorch_mll
+from gpytorch.mlls import ExactMarginalLogLikelihood
+from botorch.models.transforms import Standardize
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+from gpytorch.likelihoods import MultitaskGaussianLikelihood
+from gpytorch.kernels import MaternKernel, PeriodicKernel, RQKernel, ProductKernel,SpectralMixtureKernel
+
+def _fit_and_forecast(X, y, start, window, horizon, time_dim=0, device=torch.device("cpu"), dtype=torch.double):
+    """Helper for one rolling step."""
+
+    torch.manual_seed(1)
+    np.random.seed(1)
+    end = start + window
+    X_train = X.iloc[start:end].values
+    y_train = y.iloc[start:end].values
+    X_test  = X.iloc[end:end+horizon].values
+    y_test  = y.iloc[end:end+horizon].values
+
+    # Scale X on train only
+    scaler_x = MinMaxScaler()
+    X_train_scaled = scaler_x.fit_transform(X_train)
+    X_test_scaled  = scaler_x.transform(X_test)
+
+    # Tensors
+    X_train_tensor = torch.tensor(X_train_scaled, dtype=dtype, device=device)
+    y_train_tensor = torch.tensor(y_train,       dtype=dtype, device=device)
+    X_test_tensor  = torch.tensor(X_test_scaled, dtype=dtype, device=device)
+
+    # Kernels
+    n_features = X_train_tensor.shape[-1]
+    active_dims_all = list(range(n_features))
+    SQRT2, SQRT3 = math.sqrt(2.0), math.sqrt(3.0)
+    lengthscale_prior = LogNormalPrior(loc=SQRT2 + math.log(n_features)*0.5, scale=SQRT3)
+    lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+
+    matern = MaternKernel(
+        nu=0.5,
+        ard_num_dims=n_features,
+        active_dims=active_dims_all,
+        lengthscale_prior=lengthscale_prior,
+        lengthscale_constraint=lengthscale_constraint,
+    )
+    rq = RQKernel(ard_num_dims=n_features,
+        active_dims=active_dims_all,
+        lengthscale_prior=lengthscale_prior,
+        lengthscale_constraint=lengthscale_constraint)
+    # # Periodic on time only
+    # T = torch.unique(X_train_tensor[:, time_dim]).numel()
+    # period_norm = max(12.0 / max(T - 1, 1), 1e-3)
+    # periodic = PeriodicKernel(
+    #     ard_num_dims=1,
+    #     active_dims=[time_dim],
+    #     period_length_prior=LogNormalPrior(loc=math.log(period_norm), scale=0.5),
+    #     lengthscale_prior=LogNormalPrior(loc=SQRT2 + math.log(1.0)*0.5, scale=SQRT3),
+    #     lengthscale_constraint=GreaterThan(2.5e-2),
+    # )
+    # periodic.initialize(period_length=period_norm)
+        # Replace Periodic with Spectral Mixture (2 components on time dimension)
+    sm = SpectralMixtureKernel(
+        num_mixtures=8,
+        ard_num_dims=1,
+        active_dims=[time_dim]
+    )
+    sm.initialize_from_data(X_train_tensor[:, [time_dim]], y_train_tensor)
+
+    # data_covar_module = matern * periodic
+    #data_covar_module = ProductKernel(matern, rq)
+    #data_covar_module = matern * rq + periodic
+
+    #data_covar_module = ProductKernel(matern, rq, sm)
+    data_covar_module = matern * rq + sm
+
+
+    # Model
+    model = KroneckerMultiTaskGP(
+        train_X=X_train_tensor,
+        train_Y=y_train_tensor,
+        outcome_transform=Standardize(m=y_train.shape[1]),
+        input_transform=None,
+        data_covar_module=data_covar_module,
+        rank=2,
+    ).to(device=device, dtype=dtype)
+
+    mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
+    fit_gpytorch_mll(mll)
+
+    # Forecast
+    model.eval(); model.likelihood.eval()
+    with torch.no_grad():
+        post = model.posterior(X_test_tensor)
+        y_pred = post.mean.cpu().numpy()
+
+    return y_pred, y_test
+
+
+def rolling_forecast_parallel(X: pd.DataFrame, y: pd.DataFrame, window: int, horizon: int = 1, n_jobs: int = -1):
+    """Parallel rolling forecast with joblib."""
+    tasks = range(0, len(X) - window - horizon + 1)
+
+    results = Parallel(n_jobs=n_jobs)(
+        delayed(_fit_and_forecast)(X, y, start, window, horizon) for start in tasks
+    )
+
+    preds, actuals = zip(*results)
+    preds = np.vstack(preds)
+    actuals = np.vstack(actuals)
+
+    preds_df   = pd.DataFrame(preds,   columns=[f"{c}_pred" for c in y.columns])
+    actuals_df = pd.DataFrame(actuals, columns=y.columns)
+    return preds_df, actuals_df
+    
+y_true_all, y_pred_all = rolling_forecast_parallel(X, y, window=60, horizon=1)
+summary = evaluate_asset_pricing(y_true_all, y_pred_all)
+print('Summary of Asset Pricing Metrics:')
+print(summary)
+
+
+""" 
+Interpreting results september 27 from the above
+
+Summary of Asset Pricing Metrics:
+{'R2_pooled': np.float64(-6.35103948118288), 'R2_avg': np.float64(-6.799840352064019), 'IC': np.float64(0.29090909090909084)}
+⸻
+
+📊 Metrics You Reported
+	•	R²_pooled = –6.35
+	•	R²_avg = –6.80
+	•	IC = 0.291
+
+⸻
+
+🔎 Interpretation
+
+1. R²_pooled and R²_avg (both large negative)
+	•	Negative R² means your point predictions for returns are worse than simply predicting the mean.
+	•	A value like –6 is very poor in terms of fitting actual magnitudes.
+	•	This is common in financial return prediction — absolute returns are dominated by noise, so R² often looks terrible.
+	•	Takeaway: Your model struggles to predict levels of returns accurately.
+
+⸻
+
+2. IC = 0.291 (~29%)
+	•	This is very strong rank correlation between predicted and realized returns.
+	•	In quant finance, an IC of 0.05–0.1 is already considered good.
+	•	At 0.29, your model is capturing a highly tradable signal in the ordering of assets, even though the magnitudes are off.
+
+⸻
+
+⚖️ Reconciling the two
+	•	Bad R², good IC means:
+	•	You can’t predict the exact return size (too noisy).
+	•	But you can predict which ETFs will relatively outperform vs. underperform.
+	•	This is exactly why many quant funds don’t care about R² and optimize for IC instead.
+
+⸻
+
+✅ Bottom line
+	•	IC = 0.291 → excellent signal.
+	•	Negative R² → don’t trust the raw return magnitudes, but do trust the rankings.
+	•	In practice: build a long-short ETF strategy (long top-ranked, short bottom-ranked) rather than betting on exact return forecasts.
+
+⸻
+
+⚡ If you can sustain IC ~0.29 out-of-sample, that’s institutional-grade predictive power.
+
+Do you want me to show you how to turn these predictions into a portfolio backtest (e.g., top-quintile long vs. bottom-quintile short) so you can see how tradable that IC is?
+
+
+By dividing the etfs into quintiles you should by the long top quintiles and short the bottom quintiles.
+"""
+
+
+#### Hadamard ####
+from sklearn.preprocessing import MinMaxScaler
+import math
+import torch
+import numpy as np
+import pandas as pd
+
+from botorch.models import MultiTaskGP
+from botorch.fit import fit_gpytorch_mll
+from gpytorch.mlls import ExactMarginalLogLikelihood
+from botorch.models.transforms import Standardize
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+from gpytorch.likelihoods import GaussianLikelihood
+from gpytorch.kernels import MaternKernel, RQKernel, SpectralMixtureKernel
+
+def _to_icm_design(X_np, Y_np, task_col_idx=-1):
+    """
+    X_np: (n, d) features (no task yet)
+    Y_np: (n, m) targets (wide, columns=tasks)
+    Returns:
+      X_icm: (n*m, d+1) with task index in last column
+      Y_icm: (n*m, 1)
+    """
+    n, d = X_np.shape
+    m = Y_np.shape[1]
+    # repeat X for each task
+    X_rep = np.repeat(X_np, m, axis=0)  # (n*m, d)
+    # task index column
+    task_idx = np.concatenate([np.full(n, t, dtype=np.int64) for t in range(m)]).reshape(-1, 1)
+    # stack X and task
+    X_icm = np.hstack([X_rep, task_idx])
+    # flatten Y column-wise to match the same order
+    Y_icm = Y_np.reshape(-1, 1, order="F")  # first all rows of task0, then task1, ...
+    return X_icm, Y_icm
+
+def _fit_and_forecast_multitaskgp(
+    X, y, start, window, horizon, time_dim=0, device=torch.device("cpu"), dtype=torch.double
+):
+    # split
+    end = start + window
+    X_train = X.iloc[start:end].values
+    y_train = y.iloc[start:end].values  # (n, m)
+    X_test  = X.iloc[end:end+horizon].values
+    y_test  = y.iloc[end:end+horizon].values  # (h, m)
+
+    # scale X on train only
+    scaler_x = MinMaxScaler()
+    X_train_scaled = scaler_x.fit_transform(X_train)
+    X_test_scaled  = scaler_x.transform(X_test)
+
+    # ---- Convert to ICM block design ----
+    # NOTE: task feature will be appended as last column
+    X_icm, Y_icm = _to_icm_design(X_train_scaled, y_train, task_col_idx=-1)
+
+    # tensors
+    X_icm_t = torch.tensor(X_icm, dtype=dtype, device=device)
+    Y_icm_t = torch.tensor(Y_icm, dtype=dtype, device=device)
+
+    # ----- Kernel over NON-task features (i.e., first d columns) -----
+    d = X_train_scaled.shape[1]               # number of non-task features
+    task_feature = d                          # last column is task idx
+
+    SQRT2, SQRT3 = math.sqrt(2.0), math.sqrt(3.0)
+    lengthscale_prior = LogNormalPrior(loc=SQRT2 + math.log(d)*0.5, scale=SQRT3)
+    lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+
+    matern = MaternKernel(
+        nu=0.5, ard_num_dims=d, active_dims=list(range(d)),
+        lengthscale_prior=lengthscale_prior,
+        lengthscale_constraint=lengthscale_constraint,
+    )
+    rq = RQKernel(
+        ard_num_dims=d, active_dims=list(range(d)),
+        lengthscale_prior=lengthscale_prior,
+        lengthscale_constraint=lengthscale_constraint,
+    )
+
+    # Spectral Mixture on the time feature ONLY (still in the non-task slice)
+    # time_dim is the index inside the non-task part (same as your original X columns)
+    sm = SpectralMixtureKernel(num_mixtures=8, ard_num_dims=1, active_dims=[time_dim])
+    # initialize from data (needs 1D inputs, so slice the time column)
+    sm.initialize_from_data(
+        train_x=X_icm_t[:, [time_dim]],  # only the time feature
+        train_y=Y_icm_t.squeeze(-1)      # 1D target
+    )
+
+    data_covar_module = matern * rq + sm
+
+
+    # model: MultiTaskGP expects train_X shape (n*, d+1) and train_Y shape (n*, 1)
+    # outcome_transform standardizes that single output; task structure handled internally
+    model = MultiTaskGP(
+        train_X=X_icm_t,
+        train_Y=Y_icm_t,
+        task_feature=task_feature,
+        covar_module=data_covar_module,
+        outcome_transform=Standardize(m=1),  # single output per row
+    ).to(device=device, dtype=dtype)
+
+    mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
+    fit_gpytorch_mll(mll)
+
+    # ---- Build test design for ALL tasks at the horizon ----
+    m = y_train.shape[1]
+    # Repeat each X_test row m times and append task indices
+    Xtest_rep = np.repeat(X_test_scaled, m, axis=0)                  # (h*m, d)
+    t_idx = np.concatenate([np.full(horizon, t) for t in range(m)]).reshape(-1, 1)
+    Xtest_icm = np.hstack([Xtest_rep, t_idx])
+    Xtest_icm_t = torch.tensor(Xtest_icm, dtype=dtype, device=device)
+
+    model.eval(); model.likelihood.eval()
+    with torch.no_grad():
+        post = model.posterior(Xtest_icm_t)   # already unstandardized by outcome_transform
+        y_pred_flat = post.mean.cpu().numpy().reshape(-1)  # (h*m,)
+    # reshape back to (h, m) in the same order we constructed Xtest_icm (task major)
+    y_pred = y_pred_flat.reshape(m, horizon).T  # (h, m)
+
+    return y_pred, y_test
+
+
+def rolling_forecast_parallel(X: pd.DataFrame, y: pd.DataFrame, window: int, horizon: int = 1, n_jobs: int = -1):
+    """Parallel rolling forecast with joblib."""
+    tasks = range(0, len(X) - window - horizon + 1)
+
+    results = Parallel(n_jobs=n_jobs)(
+        delayed(_fit_and_forecast_multitaskgp)(X, y, start, window, horizon) for start in tasks
+    )
+
+    preds, actuals = zip(*results)
+    preds = np.vstack(preds)
+    actuals = np.vstack(actuals)
+
+    preds_df   = pd.DataFrame(preds,   columns=[f"{c}_pred" for c in y.columns])
+    actuals_df = pd.DataFrame(actuals, columns=y.columns)
+    return preds_df, actuals_df
+    
+y_true_all, y_pred_all = rolling_forecast_parallel(X, y, window=60, horizon=1)
+summary = evaluate_asset_pricing(y_true_all, y_pred_all)
+print('Summary of Asset Pricing Metrics:')
+print(summary)

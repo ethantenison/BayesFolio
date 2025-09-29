@@ -5,15 +5,15 @@ Module to fetch asset prices and compute future excess returns over risk-free ra
 import yfinance as yf
 import pandas as pd
 import numpy as np
+from marketmaven.configs import Interval, Horizon
 
-
-def fetch_prices(tickers, start, end=None):
+def fetch_prices(tickers, start, end=None, interval: Interval = Interval.DAILY):
     """
     Returns a tidy df with MultiIndex (date, ticker) and column 'Adj Close'.
     Adjusted Close includes dividends & splits => total-return compatible.
     """
     px = yf.download(
-        tickers=tickers, start=start, end=end, interval="1d",
+        tickers=tickers, start=start, end=end, interval=interval,
         group_by="ticker", auto_adjust=False, progress=False
     )
     # Normalize shape across yfinance versions
@@ -32,12 +32,12 @@ def fetch_prices(tickers, start, end=None):
     adj.index = pd.to_datetime(adj.index)
     return adj
 
-def fetch_rf_daily(start, end=None):
+def fetch_rf_daily(start, end=None, interval: Interval = Interval.DAILY):
     """
     Fetch ^IRX (13-week T-bill), robust to MultiIndex columns and auto_adjust True/False.
     Returns a daily series of *continuous* daily rate ≈ (annual_fraction / 252).
     """
-    rf = yf.download("^IRX", start=start, end=end, interval="1d", progress=False, auto_adjust=False)
+    rf = yf.download("^IRX", start=start, end=end, interval=interval, progress=False, auto_adjust=False)
 
     if rf.empty:
         raise RuntimeError("Could not download ^IRX. Try expanding the date range.")
@@ -80,14 +80,14 @@ def fetch_rf_daily(start, end=None):
 
 def compute_excess_future_return_calendar(adj_close: pd.Series,
                                           rf_daily_cont: pd.Series,
-                                          freq: str = "W-FRI"):
+                                          horizon: Horizon= Horizon.MONTHLY):
     """
     Calendar-aligned future excess return for one asset.
     y_excess = exp( log(P_{t1}) - log(P_t) - ∑_{(t,t1]} rf_daily_cont ) - 1
     Returns a Series indexed by the start-of-period date t.
     """
     # Resample to period-end closes
-    px_period = adj_close.resample(freq).last().dropna()
+    px_period = adj_close.resample(horizon).last().dropna()
     period_end = px_period.index
     px_fwd = px_period.shift(-1)
 
@@ -107,43 +107,14 @@ def compute_excess_future_return_calendar(adj_close: pd.Series,
     y_excess = pd.Series(y_excess_vals, index=log_r_price.index, name="y_excess_lead")
     return y_excess
 
-def compute_excess_future_return_fixed(adj_close: pd.Series,
-                                       rf_daily_cont: pd.Series,
-                                       h_days: int = 5):
-    """
-    Fixed trading-day horizon (t -> t+h).
-    y_excess = exp( log(P_{t+h}) - log(P_t) - sum_{k=0..h-1} rf_daily_cont[t+k] ) - 1
-    """
-    # Ensure we have RF on the same business-day index
-    s = adj_close.dropna()
-    idx = s.index
-    rf_on_px = rf_daily_cont.reindex(idx).ffill()
 
-    log_p = np.log(s)
-    log_r_price = log_p.shift(-h_days * -1) - log_p  # log(P_{t+h}) - log(P_t); shift(-h) forward
-    # Sum RF daily cont rates over next h days, aligned at t
-    rf_log = rf_on_px.shift(-h_days + 1).rolling(h_days).sum()  # sum of future h days
-    # Target
-    y_excess = np.exp(log_r_price - rf_log) - 1.0
-    y_excess = y_excess.iloc[:-h_days]  # drop last h because of lookahead
-    y_excess.name = "y_excess_lead"
-    return y_excess
-
-def build_long_panel(tickers, start, end=None, horizon="weekly", fixed_h_days=5):
+def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHLY):
     prices = fetch_prices(tickers, start, end)
     rf_daily_cont = fetch_rf_daily(start, end)
 
     # Choose calendar frequency
-    if horizon.lower() == "weekly":
-        freq = "W-FRI"
-        compute_fn = lambda s: compute_excess_future_return_calendar(s, rf_daily_cont, freq=freq)
-    elif horizon.lower() == "monthly":
-        freq = "BM" # Business Month-end
-        compute_fn = lambda s: compute_excess_future_return_calendar(s, rf_daily_cont, freq=freq)
-    elif horizon.lower() == "fixed":
-        compute_fn = lambda s: compute_excess_future_return_fixed(s, rf_daily_cont, h_days=fixed_h_days)
-    else:
-        raise ValueError("horizon must be one of {'weekly','monthly','fixed'}")
+    def compute_fn(s):
+        return compute_excess_future_return_calendar(s, rf_daily_cont, horizon=horizon)
 
     rows = []
     for tk in prices.columns:

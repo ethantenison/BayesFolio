@@ -1,0 +1,57 @@
+**"Portfolio Constraints: An Empirical Analysis"**
+
+-   takeaways: for long-term portfolios, min sample time window of 60 months they use an out-of-sample window of 12 months
+
+-   THey used a rolling window -Metrics: Sharpe ratio, variance, turnover, certainty-equivalent returns, and short interest.
+
+-   Sharpe, vol, turnover, CEQ, sometimes max drawdown, and compare to 1/N and market-cap benchmarks.
+
+-   Transaction costs are a huge limiting factor Investors should choose models based on objectives:
+
+If minimizing risk → GMV with constraints.
+
+If maximizing efficiency → MSR with TEV or equal-weight bounds. """
+
+**Empirical Asset Pricing via Ensemble Gaussian Process Regression**
+
+Takeaways:
+
+-   Exponential Gamma worked better than matern or rbf
+
+    -   Maybe periodic isn't a good idea because it would enforce cycles, when there are not any true cycles really in financial data such that exists with changes in temperature, daylight, or bioloical rhythms.
+
+-   they used several different evaluation methods
+
+-   relevant features were liquidity, momentum, macro-level predictors
+
+-   Used a zero mean function.
+
+    -   we assume that the baseline is zero and wont shift form that except when the actual trend is strong enough.
+
+| **Metric** | **Definition** | **Interpretation** |
+|------------------|------------------------|------------------------------|
+| **Out-of-Sample Pooled R²** | ( R\^2\_{pooled} = 1 - \frac{\sum_{i,t}(r_{i,t+1} - \hat{r}_{i,t+1})^2}{\sum_{i,t}(r_{i,t+1} - \bar{r}_i)^2} ) where (r\_{i,t+1}) is realized excess return, (\hat{r}\_{i,t+1}) is the predicted excess return, and (\bar{r}\_i) is the mean return of asset (i). | Measures overall forecasting accuracy across the **entire cross-section and time series**. Positive means the model beats the historical mean benchmark. |
+| **Out-of-Sample Average R²** | Average of (R\^2_i) across assets: ( R\^2\_{avg} = \frac{1}{N}\sum\_i \Big( 1 - \frac{\sum_t (r_{i,t+1} - \hat{r}_{i,t+1})^2}{\sum_t (r_{i,t+1} - \bar{r}_i)^2} \Big) ) | Captures how well the model works **per asset on average**. More sensitive to heterogeneous performance (e.g., good for some assets, poor for others). |
+| **Information Coefficient (IC)** | Average of cross-sectional Spearman correlations between predictions and realized returns: ( IC_t = \rho*s(*\hat{r}{:,t+1}, r\_{:,t+1}) ), then average across all test periods (t). | Focuses on **ranking ability** (can the model correctly rank which assets will do better/worse next period?). IC \> 0 means useful for relative performance/portfolio tilts. |
+
+🔑 **Why these three?**
+
+-   Pooled R\^2: Tests if model is globally useful.
+
+-   Average R\^2: Tests if model is robust across assets.
+
+-   Information Coefficient: Tests if model is good for **portfolio allocation** (ranking winners vs losers) even if raw return predictions are noisy.
+
+For your ETF case, these three metrics still make sense:
+
+-   **Pooled** R\^2**:** Are your predictions better than just assuming each ETF earns its average monthly excess return?
+
+-   **Average** R\^2**:** Are you consistently adding value across ETFs?
+
+-   **IC:** Can your predictions rank ETFs well enough to form a smarter portfolio?
+
+Sep 27, 2025
+
+-Looked at rolling window, helpful but I think I need to use my own kernel and not rely on botorch which is having issues and is less flexible. Probably should use the Haadamard kernel, Pooled R squared and the other metrics for the paper. Need to try out zero mean. Maybe include some liquidity feature and macro features.
+
+IC is more important than R2 pooled because it can tell us the best combo of etfs

@@ -18,6 +18,9 @@ from gpytorch.likelihoods import GaussianLikelihood
 from gpytorch.models import ExactGP
 from math import sqrt, log
 from gpytorch.priors import LogNormalPrior
+from gpytorch.priors.lkj_prior import LKJCovariancePrior
+from gpytorch.priors.smoothed_box_prior import SmoothedBoxPrior
+import math
 from gpytorch.constraints import GreaterThan
 torch.set_default_dtype(torch.float64)
 from pydantic import BaseModel, Field
@@ -26,12 +29,12 @@ from datetime import date
 import mlflow
 
 # MLFlow Configuration
-MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
-EXPERIMENT_NAME = "GP_Model_Experiments"
+# MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
+# EXPERIMENT_NAME = "GP_Model_Experiments"
 
-# Set up MLFlow tracking
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-mlflow.set_experiment(EXPERIMENT_NAME)
+# # Set up MLFlow tracking
+# mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+# mlflow.set_experiment(EXPERIMENT_NAME)
 
 
 warnings.filterwarnings("ignore")
@@ -516,6 +519,7 @@ y2_pred = pd.DataFrame(observed_pred_y2.mean.numpy().reshape(-1, 1), columns=['y
 y_all = pd.concat([y1_scaled, y1_pred, y2_scaled, y2_pred], axis=1)
 y_all
 
+num_tasks = 2
 ##################### Kronecker Multitask GP ######################
 class MultitaskGPModel(gpytorch.models.ExactGP):
     """
@@ -620,20 +624,22 @@ class MultitaskGPModel(gpytorch.models.ExactGP):
     - ICM / Coregionalization: Bonilla et al., 2008; Álvarez et al., 2012 (GPs for multi-output)
     - GPyTorch MultitaskKernel docs
     """
-    def __init__(self, train_x, train_y, likelihood):
+    def __init__(self, train_x, train_y, likelihood, num_tasks):
         super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
         self.mean_module = gpytorch.means.MultitaskMean(
-            gpytorch.means.ConstantMean(), num_tasks=2
+            gpytorch.means.ConstantMean(), num_tasks=num_tasks
         )
         kernel = MaternKernel(
             nu=0.5,
             lengthscale_prior=lengthscale_prior,
             lengthscale_constraint=lengthscale_constraint
-             ) + PeriodicKernel(
+             ) + PeriodicKernel( #using the active dimensions for the the time index really helped.
                 period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
                 lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
         self.covar_module = gpytorch.kernels.MultitaskKernel(
-            kernel, num_tasks=2, rank=1
+            kernel, num_tasks=num_tasks, rank=1, task_covar_prior=LKJCovariancePrior(
+                n=num_tasks, eta=1.5, sd_prior=SmoothedBoxPrior(math.exp(-6), math.exp(1.25), 0.05)
+            )
         )
 
     def forward(self, x):
@@ -642,8 +648,8 @@ class MultitaskGPModel(gpytorch.models.ExactGP):
         return gpytorch.distributions.MultitaskMultivariateNormal(mean_x, covar_x)
 
 train_y_comb = torch.stack([train_y, train_y2], -1)
-likelihood = gpytorch.likelihoods.MultitaskGaussianLikelihood(num_tasks=2)
-model = MultitaskGPModel(train_x, train_y_comb, likelihood)
+likelihood = gpytorch.likelihoods.MultitaskGaussianLikelihood(num_tasks=num_tasks)
+model = MultitaskGPModel(train_x, train_y_comb, likelihood, num_tasks)
 # model.likelihood.noise_covar.register_constraint("raw_noise", GreaterThan(MIN_INFERRED_NOISE_LEVEL))
 
 # Find optimal model hyperparameters
