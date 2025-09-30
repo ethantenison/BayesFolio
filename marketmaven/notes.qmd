@@ -63,3 +63,11 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 -Created KernelFactory
 
 -Keep trying to build mlflow testing framework that is config and pydantic enabled.
+
+**September 30th**
+- Looked at a 96 week rolling window based on the GP ensemble paper. It didn't really improve relative to the 60 month window. However, I probably need to tune the hyperparameters more.
+
+-Another thing to try is the weight ensemble method in the paper that uses subsets rolling windows to capture the different regimes and then uses a calibration method 
+to weight the different models in an ensemble.
+
+-First I really need to setup a good mlflow framework to track all the different experiments.

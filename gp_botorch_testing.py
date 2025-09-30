@@ -7,14 +7,13 @@ import pandas as pd
 import yfinance as yf
 import warnings
 from marketmaven.asset_prices import build_long_panel
-from marketmaven.market_fundamentals import fetch_vix_term_structure, fetch_macro_features
+from marketmaven.market_fundamentals import fetch_macro_features
 from marketmaven.evaluate import evaluate_asset_pricing
 from marketmaven.utils import get_current_date
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import gpytorch
-from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel
 from gpytorch.likelihoods import GaussianLikelihood
 from gpytorch.models import ExactGP
 from math import sqrt, log
@@ -23,9 +22,6 @@ from gpytorch.constraints import GreaterThan
 torch.set_default_dtype(torch.float64)
 from pydantic import BaseModel, Field
 from typing import List, Literal
-from datetime import date
-import mlflow
-import botorch
 import seaborn as sns
 import numpy as np
 import pandas as pd
@@ -39,6 +35,20 @@ from sklearn.metrics import r2_score
 from scipy.stats import spearmanr
 from itertools import cycle
 from marketmaven.configs import TestingConfig, Interval, Horizon
+from joblib import Parallel, delayed
+from sklearn.preprocessing import MinMaxScaler
+import math
+import torch
+import numpy as np
+import pandas as pd
+from botorch.models import KroneckerMultiTaskGP
+from botorch.fit import fit_gpytorch_mll
+from gpytorch.mlls import ExactMarginalLogLikelihood
+from botorch.models.transforms import Standardize
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+from gpytorch.likelihoods import MultitaskGaussianLikelihood
+from gpytorch.kernels import MaternKernel, PeriodicKernel, RQKernel, ProductKernel,SpectralMixtureKernel, RBFKernel, ScaleKernel
 
 # MLFlow Configuration
 MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
@@ -58,7 +68,7 @@ pd.options.display.float_format = '{:.3}'.format
 
 # Example usage
 config = TestingConfig(
-    start_date="2019-09-30",
+    start_date="2016-09-30",
     end_date="2025-09-01",
     interval=Interval.DAILY,
     tickers=[ "ESGD", "ISCF", "VNQ", "SNPE", "VBK"], #"XMMO", "BYLD", leaving out "HYEM", just to reduce space, taking out "IEF" cause it is not correlated, "AVEM","VNQI"
@@ -176,14 +186,17 @@ X = X[['index', 'vix_ts_level', 'vix_ts_z_12m', 'term_spread',
 output_names = list(asset_dict.keys())
 y = pd.DataFrame()
 for name in output_names:
-    temp = asset_dict[name][['index', 'y_excess_lead']].copy()
+    temp = asset_dict[name][['date', 'y_excess_lead']].copy()
     temp.rename(columns={'y_excess_lead': name}, inplace=True)
     if y.empty:
         y = temp
     else:
-        y = y.merge(temp, on='index', how='outer')
+        y = y.merge(temp, on='date', how='left')
 
 y = y.iloc[:, 1:]  # drop index column
+
+#fill na values in y dataframe
+y = y.fillna(0)
 
 # ML config
 
@@ -1171,23 +1184,6 @@ If maximizing efficiency → MSR with TEV or equal-weight bounds.
 
 
 ###### This was the best combination!!!!!
-from joblib import Parallel, delayed
-
-
-from sklearn.preprocessing import MinMaxScaler
-import math
-import torch
-import numpy as np
-import pandas as pd
-
-from botorch.models import KroneckerMultiTaskGP
-from botorch.fit import fit_gpytorch_mll
-from gpytorch.mlls import ExactMarginalLogLikelihood
-from botorch.models.transforms import Standardize
-from gpytorch.priors import LogNormalPrior
-from gpytorch.constraints import GreaterThan
-from gpytorch.likelihoods import MultitaskGaussianLikelihood
-from gpytorch.kernels import MaternKernel, PeriodicKernel, RQKernel, ProductKernel,SpectralMixtureKernel
 
 def _fit_and_forecast(X, y, start, window, horizon, time_dim=0, device=torch.device("cpu"), dtype=torch.double):
     """Helper for one rolling step."""
