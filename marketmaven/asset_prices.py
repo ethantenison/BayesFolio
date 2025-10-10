@@ -221,7 +221,7 @@ def fetch_etf_features(
 
         # Rolling volatility
         data["vol_1m"] = data["log_ret"].rolling(21).std()
-        
+
         # --- Approximate Bid-Ask Spread (Corwin-Schultz 2012) ---
         if ('High', ticker) in df.columns and ('Low', ticker) in df.columns:
             high = df[('High', ticker)]
@@ -234,14 +234,15 @@ def fetch_etf_features(
 
         if high is not None and low is not None:
             log_hl = np.log(high / low)
-            beta = (log_hl.rolling(2).sum() ** 2).mean()
+            beta = (log_hl.rolling(2).sum() ** 2).rolling(21).mean()
             alpha = (np.sqrt(2 * beta) - np.sqrt(beta)) / (3 - 2 * np.sqrt(2))
             data["baspread"] = 2 * (np.exp(alpha) - 1) / (1 + np.exp(alpha))
+            data["baspread"] = data["baspread"].fillna(method="bfill").fillna(0)
         else:
-            data["baspread"] = 0.0
+            data["baspread"] = 0.0  # Default if High/Low not available
 
-        # Resample (monthly, weekly, etc.)
-        data = data.resample(horizon).last()
+            # Resample (monthly, weekly, etc.)
+            data = data.resample(horizon).last()
 
         # Fill missing with 0 (neutral imputation, paper-style)
         data = data.fillna(0)

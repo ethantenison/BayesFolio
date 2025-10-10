@@ -81,3 +81,17 @@ esgd_data
 
 ```
 
+Plot the correlation matrix
+
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+correlation_matrix = esgd_data.corr()
+
+# Plot the heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, vmin=0, vmax=1)
+plt.title("Correlation Matrix Heatmap of Assets (y_excess_lead)")
+plt.show()
+```
