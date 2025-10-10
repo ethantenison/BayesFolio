@@ -32,7 +32,7 @@ Takeaways:
 |------------------|------------------------|------------------------------|
 | **Out-of-Sample Pooled R²** | ( R\^2\_{pooled} = 1 - \frac{\sum_{i,t}(r_{i,t+1} - \hat{r}_{i,t+1})^2}{\sum_{i,t}(r_{i,t+1} - \bar{r}_i)^2} ) where (r\_{i,t+1}) is realized excess return, (\hat{r}\_{i,t+1}) is the predicted excess return, and (\bar{r}\_i) is the mean return of asset (i). | Measures overall forecasting accuracy across the **entire cross-section and time series**. Positive means the model beats the historical mean benchmark. |
 | **Out-of-Sample Average R²** | Average of (R\^2_i) across assets: ( R\^2\_{avg} = \frac{1}{N}\sum\_i \Big( 1 - \frac{\sum_t (r_{i,t+1} - \hat{r}_{i,t+1})^2}{\sum_t (r_{i,t+1} - \bar{r}_i)^2} \Big) ) | Captures how well the model works **per asset on average**. More sensitive to heterogeneous performance (e.g., good for some assets, poor for others). |
-| **Information Coefficient (IC)** | Average of cross-sectional Spearman correlations between predictions and realized returns: ( IC_t = \rho*s(*\hat{r}{:,t+1}, r\_{:,t+1}) ), then average across all test periods (t). | Focuses on **ranking ability** (can the model correctly rank which assets will do better/worse next period?). IC \> 0 means useful for relative performance/portfolio tilts. |
+| **Information Coefficient (IC)** | Average of cross-sectional Spearman correlations between predictions and realized returns: ( IC_t = \rho\*s(\*\hat{r}{:,t+1}, r\_{:,t+1}) ), then average across all test periods (t). | Focuses on **ranking ability** (can the model correctly rank which assets will do better/worse next period?). IC \> 0 means useful for relative performance/portfolio tilts. |
 
 🔑 **Why these three?**
 
@@ -64,10 +64,19 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 
 -Keep trying to build mlflow testing framework that is config and pydantic enabled.
 
-**September 30th**
-- Looked at a 96 week rolling window based on the GP ensemble paper. It didn't really improve relative to the 60 month window. However, I probably need to tune the hyperparameters more.
+**September 30th** - Looked at a 96 week rolling window based on the GP ensemble paper. It didn't really improve relative to the 60 month window. However, I probably need to tune the hyperparameters more.
 
--Another thing to try is the weight ensemble method in the paper that uses subsets rolling windows to capture the different regimes and then uses a calibration method 
-to weight the different models in an ensemble.
+-Another thing to try is the weight ensemble method in the paper that uses subsets rolling windows to capture the different regimes and then uses a calibration method to weight the different models in an ensemble.
 
 -First I really need to setup a good mlflow framework to track all the different experiments.
+
+**October 10th**
+
+-   From the asset pricing paper, the most important predictors they found were:\
+    \
+    "We find that the most important features are related to liquidity, which includes variables such
+    as bid-ask spread (baspread), dollar volume (dolvol), turnover volatility (SD turn), Amihud illiquidity (ill), and recent price trends, including short-term reversal (mom1m and mom6m), stock momentum (mom12m), momentum change (chmom), and long-term reversal (mom36m). "\
+
+    -   Rereading the paper I realize that they make pooling the asset data work, but utilizing the macroeconomic data (that doesn't change in a period), and they taking the Kroneecker P
+
+-   Remember that the y excess return is actually the excess return starting from date of the row across the next month. So that if the date for the row is 2016-09-30 with y_excess_lead of -0.026, than it is saying that starting at the end of september to the end of october the assets excess return was -2.6%

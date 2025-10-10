@@ -250,7 +250,7 @@ def fetch_yield_curve_pcs(start="2010-01-01", end=None, horizon: Horizon = Horiz
     pcs = pca.fit_transform(df.values)
     pcs_df = pd.DataFrame(pcs, index=df.index, columns=[f"yc_pc{i+1}" for i in range(pcs.shape[1])])
 
-    return pcs_df.reset_index().rename(columns={"DATE": "Date"})
+    return pcs_df.reset_index().rename(columns={"DATE": "date"})
 
 def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
@@ -281,15 +281,26 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     yc_df    = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
 
 
-    # Sort and forward-fill small gaps (e.g., missing DXY data)
-        # Merge on date
+    # Merge on date
     dfs = [vix_df, term_df, cred_df, tbill_df, dxy_df, yc_df]
+
+    # Ensure all have lowercase column names and 'date'
+    for i, df in enumerate(dfs):
+        df.columns = [str(c).lower() for c in df.columns]
+        if "date" not in df.columns:
+            if "Date" in df.columns:
+                df = df.rename(columns={"Date": "date"})
+            elif "DATE" in df.columns:
+                df = df.rename(columns={"DATE": "date"})
+            else:
+                df = df.reset_index().rename(columns={df.index.name or "index": "date"})
+        dfs[i] = df
     merged = dfs[0]
     for df in dfs[1:]:
-        print(df.head(2))
-        merged = pd.merge(merged, df, on="Date", how="left")
+
+        merged = pd.merge(merged, df, on="date", how="left")
 
     # Sort and forward-fill small gaps (e.g., missing DXY data)
-    merged = merged.sort_values("Date").ffill().fillna(0)
+    merged = merged.sort_values("date").ffill().fillna(0)
 
     return merged

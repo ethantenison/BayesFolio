@@ -1,0 +1,83 @@
+---
+title: "Predicting with ETF Level"
+author: Ethan Tenison
+date: now
+date-format: short
+---
+
+Let's do ESGD, which is the International Developed Market ETF.
+
+
+```{python}
+from marketmaven.configs import TestingConfig, Interval, Horizon
+from marketmaven.asset_prices import build_long_panel, fetch_etf_features
+from marketmaven.market_fundamentals import fetch_macro_features
+import yfinance as yf
+import numpy as np
+import pandas as pd
+
+
+config = TestingConfig(
+    start_date="2016-09-01",
+    end_date="2025-10-01",
+    interval=Interval.DAILY,
+    tickers=[ "ESGD", "ISCF" ],  # ESGD is the iShares ESG Developed Markets ETF, ISCF is the iShares MSCI USA ESG Select ETF
+    horizon=Horizon.MONTHLY,
+)
+
+return_data = build_long_panel(config.tickers, config.start_date, config.end_date, horizon=config.horizon)
+
+return_data
+
+```
+
+Distribution
+
+```{python}
+
+# distribution for ESGD and ISCF 
+for ticker in config.tickers:
+    return_data[return_data['asset_id'] == ticker]['y_excess_lead'].hist(bins=50, alpha=0.5, label=ticker)
+
+
+```
+
+Market Level Features 
+
+```{python}
+macro_features = fetch_macro_features(start=config.start_date, end=config.end_date)
+macro_features.hist()
+
+
+```
+
+ETF price features
+
+```{python}
+
+etf_features = fetch_etf_features(config.tickers, config.start_date, config.end_date, config.horizon)
+etf_features
+```
+
+Combine features to one dataframe
+
+```{python}
+
+df = (
+    return_data
+    .merge(etf_features, on=['asset_id', 'date'], how='left')
+    .merge(macro_features, on='date', how='left')
+)
+
+```
+
+Let's look at just the ESGD ETF
+
+```{python}
+esgd_data = df[df['asset_id'] == 'ESGD']
+esgd_data = esgd_data.reset_index(drop=True)
+esgd_data = esgd_data.drop(columns=['asset_id'])
+esgd_data
+
+```
+

@@ -129,3 +129,144 @@ def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHL
 
     panel = pd.concat(rows, axis=0).sort_values(["date", "asset_id"]).reset_index(drop=True)
     return panel
+
+
+def fetch_etf_features(
+    tickers: list[str],
+    start: str,
+    end: str = None,
+    horizon: Horizon = Horizon.MONTHLY,
+):
+    """
+    Fetch ETF-level features (liquidity, momentum, volatility, etc.) for one or more tickers.
+
+    Parameters
+    ----------
+    tickers : list[str]
+        List of ETF tickers (e.g., ["SPY", "QQQ", "ESGD"])
+    start : str
+        Start date for fetching data.
+    end : str, optional
+        End date (default: today).
+    horizon : Horizon
+        Resampling frequency (e.g., Horizon.MONTHLY or Horizon.WEEKLY).
+
+    Returns
+    -------
+    pd.DataFrame
+        Long-format DataFrame with columns:
+        ['Date', 'asset_id', 'price', 'volume', 'log_ret', 'mom1m', 'mom6m', 'mom12m',
+         'mom36m', 'chmom', 'dolvol', 'turnover', 'sd_turn', 'ill', 'vol_1m']
+        Missing values are filled with 0 (neutral imputation) as in the Ensemble GP paper.
+    """
+
+    if isinstance(tickers, str):
+        tickers = [tickers]
+
+    # Download all tickers together for efficiency
+    df_raw = yf.download(
+        tickers,
+        start=start,
+        end=end,
+        interval=Interval.DAILY,
+        progress=False,
+        group_by="ticker",
+    )
+    print(f"\n>>> Columns: {df_raw.columns.tolist()[:8]} ...")  # Debug check
+
+    def _extract_single_ticker_features(df, ticker):
+        """Extract and compute features for one ticker."""
+        px, vol = None, None
+        if isinstance(df.columns, pd.MultiIndex):
+            # Try both (field, ticker) and (ticker, field) orders
+            if ("Adj Close", ticker) in df.columns:
+                px = df[("Adj Close", ticker)]
+            elif ("Close", ticker) in df.columns:
+                px = df[("Close", ticker)]
+            elif (ticker, "Adj Close") in df.columns:
+                px = df[(ticker, "Adj Close")]
+            elif (ticker, "Close") in df.columns:
+                px = df[(ticker, "Close")]
+
+            if ("Volume", ticker) in df.columns:
+                vol = df[("Volume", ticker)]
+            elif (ticker, "Volume") in df.columns:
+                vol = df[(ticker, "Volume")]
+        else:
+            # Single ticker fallback
+            base = "Adj Close" if "Adj Close" in df.columns else "Close"
+            px = df[base]
+            vol = df["Volume"]
+
+        if px is None or vol is None:
+            raise ValueError(f"Could not extract price/volume for {ticker}")
+
+        # Compute features
+        data = pd.concat({"price": px, "volume": vol}, axis=1).dropna()
+        data.index = pd.to_datetime(data.index)
+        data["log_ret"] = np.log(data["price"]).diff()
+
+        # Momentum (price trends)
+        data["mom1m"] = data["price"].pct_change(21)
+        data["mom6m"] = data["price"].pct_change(126)
+        data["mom12m"] = data["price"].pct_change(252)
+        data["mom36m"] = data["price"].pct_change(756)
+        data["chmom"] = data["mom12m"] - data["mom6m"]
+
+        # Liquidity metrics
+        data["dolvol"] = data["price"] * data["volume"]
+        data["turnover"] = data["volume"] / data["volume"].rolling(21).mean() - 1
+        data["sd_turn"] = data["turnover"].rolling(63).std()
+        data["ill"] = data["log_ret"].abs() / data["dolvol"]
+
+        # Rolling volatility
+        data["vol_1m"] = data["log_ret"].rolling(21).std()
+        
+        # --- Approximate Bid-Ask Spread (Corwin-Schultz 2012) ---
+        if ('High', ticker) in df.columns and ('Low', ticker) in df.columns:
+            high = df[('High', ticker)]
+            low = df[('Low', ticker)]
+        elif (ticker, 'High') in df.columns and (ticker, 'Low') in df.columns:
+            high = df[(ticker, 'High')]
+            low = df[(ticker, 'Low')]
+        else:
+            high = low = None
+
+        if high is not None and low is not None:
+            log_hl = np.log(high / low)
+            beta = (log_hl.rolling(2).sum() ** 2).mean()
+            alpha = (np.sqrt(2 * beta) - np.sqrt(beta)) / (3 - 2 * np.sqrt(2))
+            data["baspread"] = 2 * (np.exp(alpha) - 1) / (1 + np.exp(alpha))
+        else:
+            data["baspread"] = 0.0
+
+        # Resample (monthly, weekly, etc.)
+        data = data.resample(horizon).last()
+
+        # Fill missing with 0 (neutral imputation, paper-style)
+        data = data.fillna(0)
+
+        # Metadata
+        data = data.reset_index().rename(columns={data.index.name or "index": "date"})
+        data.columns = [c.lower() for c in data.columns]  # normalize column names
+        data["asset_id"] = ticker
+        return data
+
+    # Compute for all tickers
+    results = []
+    for tk in tickers:
+        try:
+            res = _extract_single_ticker_features(df_raw, tk)
+            results.append(res)
+        except Exception as e:
+            print(f"[WARN] Skipping {tk}: {e}")
+
+    # Combine into one long DataFrame
+    df_all = (
+        pd.concat(results, axis=0)
+        .sort_values(["date", "asset_id"])
+        .reset_index(drop=True)
+    )
+
+    return df_all
+
