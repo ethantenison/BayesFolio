@@ -1487,7 +1487,12 @@ def rolling_forecast_parallel(X: pd.DataFrame, y: pd.DataFrame, window: int, hor
     actuals_df = pd.DataFrame(actuals, columns=y.columns)
     return preds_df, actuals_df
     
+# !: I'm pretty sure y_true and y_pred are switcheD!    
 y_true_all, y_pred_all = rolling_forecast_parallel(X, y, window=60, horizon=1)
 summary = evaluate_asset_pricing(y_true_all, y_pred_all)
 print('Summary of Asset Pricing Metrics:')
 print(summary)
+
+
+import xgboost as xgb
+model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)

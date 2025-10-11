@@ -74,9 +74,10 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 
 -   From the asset pricing paper, the most important predictors they found were:\
     \
-    "We find that the most important features are related to liquidity, which includes variables such
-    as bid-ask spread (baspread), dollar volume (dolvol), turnover volatility (SD turn), Amihud illiquidity (ill), and recent price trends, including short-term reversal (mom1m and mom6m), stock momentum (mom12m), momentum change (chmom), and long-term reversal (mom36m). "\
+    "We find that the most important features are related to liquidity, which includes variables such as bid-ask spread (baspread), dollar volume (dolvol), turnover volatility (SD turn), Amihud illiquidity (ill), and recent price trends, including short-term reversal (mom1m and mom6m), stock momentum (mom12m), momentum change (chmom), and long-term reversal (mom36m). "\
 
     -   Rereading the paper I realize that they make pooling the asset data work, but utilizing the macroeconomic data (that doesn't change in a period), and they taking the Kroneecker P
 
--   Remember that the y excess return is actually the excess return starting from date of the row across the next month. So that if the date for the row is 2016-09-30 with y_excess_lead of -0.026, than it is saying that starting at the end of september to the end of october the assets excess return was -2.6%
+-   Remember that the y excess return is actually the excess return starting from date of the row across the next month. So that if the date for the row is 2016-09-30 with y_excess_lead of -0.026, than it is saying that starting at the end of september to the end of october the assets excess return was -2.6%\
+
+-   Attempted Relevant Pursuit GP from botorch, but it still wasn't that great....

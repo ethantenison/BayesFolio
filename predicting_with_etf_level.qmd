@@ -95,3 +95,295 @@ sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidt
 plt.title("Correlation Matrix Heatmap of Assets (y_excess_lead)")
 plt.show()
 ```
+
+Now create the gp using gpytorch
+
+```{python}
+import torch 
+import gpytorch
+from joblib import Parallel, delayed
+from sklearn.preprocessing import MinMaxScaler
+import math
+import torch
+import numpy as np
+import pandas as pd
+from botorch.models import SingleTaskGP
+from botorch.fit import fit_gpytorch_mll
+from botorch.models.transforms import Standardize
+from gpytorch.mlls import ExactMarginalLogLikelihood
+from gpytorch.kernels import MaternKernel, RQKernel, SpectralMixtureKernel
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+from gpytorch.means import ZeroMean
+
+
+def _fit_and_forecast_gp_single(
+    X: pd.DataFrame,
+    y: pd.DataFrame,         # shape (n, m) — m assets
+    start: int,
+    window: int,
+    horizon: int = 1,
+    time_dim: int = 0,       # index of the time feature in X
+    device: torch.device = torch.device("cpu"),
+    dtype: torch.dtype = torch.double,
+):
+    """
+    Fit a separate SingleTaskGP for each target column in y on the rolling window
+    and forecast the next `horizon` steps.
+    """
+    end = start + window
+    X_train = X.iloc[start:end].values            # (n, d)
+    X_test  = X.iloc[end:end+horizon].values      # (h, d)
+    y_train = y.iloc[start:end].values            # (n, m)
+    y_test  = y.iloc[end:end+horizon].values      # (h, m)
+
+    # Scale X on train only (no leakage)
+    scaler_x = MinMaxScaler()
+    X_train_scaled = scaler_x.fit_transform(X_train)
+    X_test_scaled  = scaler_x.transform(X_test)
+
+    # Torch tensors for X
+    Xtr_t = torch.tensor(X_train_scaled, dtype=dtype, device=device)
+    Xte_t = torch.tensor(X_test_scaled,  dtype=dtype, device=device)
+
+
+    # Kernel pieces shared across tasks (constructed per task for safety, but same hyperprior setup)
+    d = X_train_scaled.shape[1]
+    SQRT2, SQRT3 = math.sqrt(2.0), math.sqrt(3.0)
+    lengthscale_prior = LogNormalPrior(loc=SQRT2 + math.log(d)*0.5, scale=SQRT3)
+    lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+
+    def make_covar():
+        matern = MaternKernel(
+            nu=0.5,
+            ard_num_dims=d,
+            active_dims=list(range(d)),
+            lengthscale_prior=lengthscale_prior,
+            lengthscale_constraint=lengthscale_constraint,
+        )
+        rq = RQKernel(
+            ard_num_dims=d,
+            active_dims=list(range(d)),
+            lengthscale_prior=lengthscale_prior,
+            lengthscale_constraint=lengthscale_constraint,
+        )
+        # Spectral Mixture on just the time dim
+        sm = SpectralMixtureKernel(
+            num_mixtures=8,
+            ard_num_dims=1,
+            active_dims=[time_dim],
+        )
+
+        test_y = torch.tensor(y_train.reshape(-1,1), dtype=dtype, device=device)
+        test_y = test_y.squeeze(-1)
+        # Init SM from the time column only
+        sm.initialize_from_data(
+            train_x=Xtr_t,  # pass full X
+            train_y=test_y,
+        )
+        return matern * rq + sm
+
+    m = y_train.shape[1]
+    preds = np.zeros((horizon, m))
+    # Fit a separate GP for each output column
+    for j in range(m):
+        # Mask NaNs per target (if any)
+        mask = np.isfinite(y_train[:, j])
+        Xtr_j = Xtr_t[mask]
+        ytr_j = torch.tensor(y_train[mask, j][:, None], dtype=dtype, device=device)  # (n_eff, 1)
+
+        covar_module = make_covar()
+        model = SingleTaskGP(
+            train_X=Xtr_j,
+            train_Y=ytr_j,
+            covar_module=covar_module,
+            mean_module=ZeroMean(),
+
+            outcome_transform=Standardize(m=1),
+        ).to(device=device, dtype=dtype)
+
+        mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
+        fit_gpytorch_mll(mll)
+
+        model.eval(); model.likelihood.eval()
+        with torch.no_grad():
+            post = model.posterior(Xte_t)
+            preds[:, j] = post.mean.cpu().numpy().reshape(-1)
+
+    return preds, y_test
+
+
+def rolling_forecast_parallel_single(
+    X: pd.DataFrame,
+    y: pd.DataFrame,
+    window: int,
+    horizon: int = 1,
+    n_jobs: int = -1,
+    time_dim: int = 0,    # index of the time feature in X
+):
+    """Parallel rolling forecast with per-asset SingleTaskGPs."""
+    tasks = range(0, len(X) - window - horizon + 1)
+    results = Parallel(n_jobs=n_jobs)(
+        delayed(_fit_and_forecast_gp_single)(X, y, start, window, horizon, time_dim) for start in tasks
+    )
+    preds, actuals = zip(*results)
+    preds = np.vstack(preds)
+    actuals = np.vstack(actuals)
+
+    preds_df   = pd.DataFrame(preds,   columns=[f"{c}_pred" for c in y.columns])
+    actuals_df = pd.DataFrame(actuals, columns=y.columns)
+    return preds_df, actuals_df
+
+```
+
+Setting up data for gp
+
+```{python}
+# 1) Build a numeric time feature
+esgd_data = esgd_data.sort_values("date").reset_index(drop=True)
+esgd_data["t_months"] = np.arange(len(esgd_data))              # 0,1,2,... monthly steps
+# or: esgd_data["t_years"] = (esgd_data["date"] - esgd_data["date"].min()).dt.days / 365.25
+
+# 2) Define X / y
+y = esgd_data[["y_excess_lead"]]
+X = esgd_data.drop(columns=["date", "y_excess_lead"])
+X = X.fillna(0.0)  # simple imputation for demo purposes only
+
+# 3) Tell your kernel which column is time
+time_dim = X.columns.get_loc("t_months")  # or "t_years"
+
+```
+
+Run the rolling forecast
+
+```{python}
+from marketmaven.evaluate import evaluate_asset_pricing
+# pass time_dim into your rolling GP function that builds SM/Periodic on that dim
+preds_df, actuals_df = rolling_forecast_parallel_single(
+    X=X, y=y, window=90, horizon=1, n_jobs=-1, time_dim=time_dim
+)
+
+summary = evaluate_asset_pricing(actuals_df,preds_df)
+print('Summary of Asset Pricing Metrics:')
+print(summary)
+
+```
+
+
+<!-- Failed code by for reference:
+from gpytorch.kernels import RBFKernel, MaternKernel, RQKernel, LinearKernel, ScaleKernel, IndexKernel
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+import math
+import torch
+from sklearn.preprocessing import MinMaxScaler
+
+# --- Data prep ---
+dtype = torch.double
+device = torch.device("cpu")
+horizon = 2
+X_train = X[:-horizon]
+X_test = X[-horizon:]
+y_train = y[:-horizon]
+y_test = y[-horizon:]
+
+scaler_x = MinMaxScaler()
+X_train_scaled = scaler_x.fit_transform(X_train)
+X_test_scaled  = scaler_x.transform(X_test)
+
+Xtrain_t = torch.tensor(X_train_scaled, dtype=dtype, device=device)
+Xtest_t = torch.tensor(X_test_scaled, dtype=dtype, device=device)
+ytrain_t = torch.tensor(y_train.values, dtype=dtype, device=device)
+
+# --- Covariance function ---
+def make_covar(Xtrain_t, ytrain_t):
+    feature_names = X.columns
+    idx = {n: i for i, n in enumerate(feature_names)}
+    time_dim = idx.get("t_months", None)
+
+    # --- Economic feature groups ---
+    market_idx = [idx[k] for k in ['price','log_ret','mom1m','mom6m','mom12m',
+                                   'mom36m','vol_1m','vix','vix3m',
+                                   'vix_ts_level','vix_ts_z_12m'] if k in idx]
+    liq_idx    = [idx[k] for k in ['volume','dolvol','turnover','sd_turn','ill','baspread'] if k in idx]
+    rates_idx  = [idx[k] for k in ['tnote10y','tbill3m_x','term_spread','credit_spread',
+                                   'tbill3m_y','dxy','yc_pc1','yc_pc2','yc_pc3'] if k in idx]
+    linear_idx = [idx[k] for k in ['chmom','vix_ts_chg_1m','credit_spread_chg_1p'] if k in idx]
+
+    combined_index = market_idx + liq_idx + rates_idx
+    # --- Priors & constraints for normalized data ---
+    ls_prior = LogNormalPrior(loc=math.log(0.3), scale=0.5)
+    ls_con   = GreaterThan(1e-3)
+
+
+    # --- Base block kernels ---
+    K_mkt   = RQKernel(ard_num_dims=len(market_idx), active_dims=market_idx,
+                       lengthscale_prior=ls_prior, lengthscale_constraint=ls_con)
+    K_liq   = MaternKernel(nu=0.5, ard_num_dims=len(liq_idx), active_dims=liq_idx,
+                           lengthscale_prior=ls_prior, lengthscale_constraint=ls_con)
+    K_rates = MaternKernel(nu=2.5, ard_num_dims=len(rates_idx), active_dims=rates_idx,
+                           lengthscale_prior=ls_prior, lengthscale_constraint=ls_con)
+    # matern = MaternKernel(
+    #         nu=0.5,
+    #         ard_num_dims=len(combined_index),
+    #         active_dims=combined_index,
+    #         lengthscale_prior=lengthscale_prior,
+    #         lengthscale_constraint=lengthscale_constraint,
+    #     )
+    # rq = RQKernel(
+    #         ard_num_dims=len(combined_index),
+    #         active_dims=combined_index,
+    #         lengthscale_prior=lengthscale_prior,
+    #         lengthscale_constraint=lengthscale_constraint,
+    #     )
+    K_lin   = LinearKernel(ard_num_dims=len(linear_idx), active_dims=linear_idx)
+
+    # --- Time kernel ---
+    if time_dim is not None:
+        # IndexKernel is used for discrete/categorical-like time indices
+        # num_tasks = number of unique t_months values in the training data
+        num_tasks = len(torch.unique(Xtrain_t[:, time_dim]))
+        K_time = IndexKernel(num_tasks=num_tasks, rank=1)
+    else:
+        K_time = None
+
+    # --- Core structure ---
+    K_core = K_mkt + K_liq + K_rates + K_lin
+    #K_core = matern + rq + K_lin
+
+    # --- Combine ---
+    if K_time is not None:
+        # Modulate by time as additive interaction
+        print('add additive time')
+        covar = ScaleKernel(K_core)  + ScaleKernel(K_core * K_time)
+
+    else:
+        covar = ScaleKernel(K_core)
+
+    return covar
+
+
+covar_module = make_covar(Xtrain_t, ytrain_t)
+
+# --- Fit model ---
+model = RobustRelevancePursuitSingleTaskGP(
+    train_X=Xtrain_t,
+    train_Y=ytrain_t,
+    covar_module=covar_module,
+    mean_module=ZeroMean(),
+    prior_mean_of_support=10.0,
+).to(device=device, dtype=dtype)
+
+mll = ExactMarginalLogLikelihood(model.likelihood, model).to(device, dtype)
+fit_gpytorch_mll(
+    mll,
+    reset_parameters=False,
+    relevance_pursuit_optimizer=forward_relevance_pursuit,
+)
+
+# --- Predict ---
+model.eval(); model.likelihood.eval()
+with torch.no_grad():
+    post = model.posterior(Xtest_t)
+    preds = post.mean.cpu().numpy().reshape(-1)
+preds -->
