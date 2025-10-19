@@ -347,8 +347,8 @@ def backtest_portfolio(
 
     # === Schwab-aligned benchmark ===
     schwab_weights = pd.Series({
-        "AVEM": 0.04, "BCD": 0.02, "BYLD": 0.03, "ESGD": 0.07, "HYEM": 0.02,
-        "IEF": 0.08, "ISCF": 0.04, "SNPE": 0.15, "VBK": 0.08, "VNQ": 0.04,
+        "AVEM": 0.04, "BCD": 0.02, "BYLD": 0.03, "ESGD": 0.2, "HYEM": 0.00,
+        "IEF": 0.08, "ISCF": 0.04, "SNPE": 0.37, "VBK": 0.08, "VNQ": 0.028,
         "VNQI": 0.02, "VWOB": 0.03
     })
     schwab_weights = schwab_weights.reindex(y.columns).fillna(0)
