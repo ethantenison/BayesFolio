@@ -23,6 +23,7 @@ gpytorch = "1.14"
 mlflow = "^3.3.2"
 pydantic = "^2.11.7"
 botorch = "^0.15.1"
+vectorbt = "0.28.1"
 
 
 [tool.poetry.group.dev.dependencies]

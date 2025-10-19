@@ -34,7 +34,7 @@ import pandas as pd
 from sklearn.metrics import r2_score
 from scipy.stats import spearmanr
 from itertools import cycle
-from marketmaven.configs import TestingConfig, Interval, Horizon
+from marketmaven.configs import TickerConfig, Interval, Horizon
 from joblib import Parallel, delayed
 from sklearn.preprocessing import MinMaxScaler
 import math
@@ -67,7 +67,7 @@ pd.options.display.float_format = '{:.3}'.format
 # -------------------------
 
 # Example usage
-config = TestingConfig(
+config = TickerConfig(
     start_date="2016-09-30",
     end_date="2025-09-01",
     interval=Interval.DAILY,

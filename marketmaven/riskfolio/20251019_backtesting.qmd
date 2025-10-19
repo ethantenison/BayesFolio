@@ -1,0 +1,452 @@
+---
+title: "Implementing Backtesting in Riskfolio-Lib"
+date: now
+date-format: short
+author: Ethan Tenison
+title-block-banner: "#4A9EDC"
+---
+
+# Initial Data Processing 
+
+```{python}
+
+import numpy as np
+import pandas as pd
+import yfinance as yf
+import warnings
+from marketmaven.configs import TickerConfig, Interval, Horizon
+from marketmaven.asset_prices import build_long_panel, fetch_etf_features
+from marketmaven.market_fundamentals import fetch_macro_features
+import riskfolio as rp
+from marketmaven.configs import (
+    RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
+warnings.filterwarnings("ignore")
+import matplotlib.pyplot as plt
+# pd.options.display.float_format = '{:.4%}'.format
+
+
+
+# Tickers of assets 
+assets = ['ESGD', 'ISCF', 'HYEM', 'SNPE', "VBK", "IEF", 'AVEM','VWOB','VNQI', 'VNQ','BYLD'] # , 'AGEPX', 'SWSSX', 'SWVXX' mutual funds, non tested 'XMMO', 'XMMO'
+assets.sort()
+
+ticker_config = TickerConfig(
+    start_date="2019-10-18",
+    end_date="2025-10-18",
+    interval=Interval.DAILY,
+    tickers=assets,  
+    horizon=Horizon.MONTHLY,
+)
+
+df = build_long_panel(ticker_config.tickers, ticker_config.start_date, ticker_config.end_date, horizon=ticker_config.horizon)
+# Pivot to wide format: rows = date, columns = asset_id, values = y_excess_lead
+y = (
+    df.pivot_table(
+        index='date',
+        columns='asset_id',
+        values='y_excess_lead'
+    )
+    .sort_index()
+)
+
+# Optional: remove column index name and return to a regular column layout
+y.columns.name = None
+y = y.reset_index()
+y.index = y['date']
+y = y.drop(columns=['date'])
+
+y.head(10)
+
+```
+
+# EDA
+
+```{python}
+import plotly.express as px
+
+# Compute the correlation matrix
+corr_matrix = y.corr()
+
+# Create a heatmap using Plotly
+fig = px.imshow(
+    corr_matrix,
+    labels=dict(color="Correlation"),
+    x=corr_matrix.columns,
+    y=corr_matrix.columns,
+    color_continuous_scale="RdYlBu",
+    title="Correlation Heatmap",
+    zmin=-1,
+    zmax=1,
+)
+
+fig.update_layout(width=600, height=600)
+fig.show()
+
+```
+
+# Single Optimization 
+
+```{python}
+
+risk_config = RiskfolioConfig(
+    model=OptModel.CLASSIC,
+    rm=RiskMeasure.CVaR,
+    obj=Objective.SHARPE,
+    method_mu=MuEstimator.EWMA2,
+    method_cov=CovEstimator.GERBER1,
+
+)
+
+# Build portfolio
+port = rp.Portfolio(returns=y)
+
+# Estimate stats (you can pass decay d for EWMA or shrinkage)
+port.assets_stats(method_mu=risk_config.method_mu, method_cov=risk_config.method_cov)
+
+# Constraints
+port.upperlng = 0.35  # max per asset
+port.card = None      # no strict cardinality selection
+port.nea = 6          # desired effective assets (soft)
+
+
+
+# Optimize (mean-variance / Sharpe)
+w = port.optimization(
+    model=risk_config.model,
+    rm=risk_config.rm,
+    obj=risk_config.obj,
+    rf=risk_config.rf,
+    l=risk_config.ra,
+    hist=risk_config.hist  # MV does not need scenario risk
+)
+
+print("Weights:")
+display(w.T)
+
+# Diagnostics
+print("Mu (monthly):")
+print(port.mu)
+
+# Plotting the composition of the portfolio
+
+ax = rp.plot_pie(w=w, title='Sharpe Mean Variance', others=0.05, nrow=25, cmap = "tab20",
+                 height=6, width=10, ax=None)
+
+points = 50 # Number of points of the frontier
+
+frontier = port.efficient_frontier(model=risk_config.model, rm=risk_config.rm, points=points, rf=risk_config.rf, hist=risk_config.hist)
+
+display(frontier.T.head())
+
+
+
+
+```
+
+# Plotting the efficient frontier
+```{python}
+
+# Plotting the efficient frontier
+
+label = 'Max Risk Adjusted Return Portfolio' # Title of point
+mu = port.mu # Expected returns
+cov = port.cov # Covariance matrix
+returns = port.returns # Returns of the assets
+
+ax = rp.plot_frontier(w_frontier=frontier, mu=mu, cov=cov, returns=returns, rm=risk_config.rm, rf=risk_config.rf, alpha=0.05, cmap='viridis', w=w, label=label,marker='*', s=16, c='r', height=6, width=10, ax=None)
+```
+
+
+# Backtesting Setup
+
+```{python}
+import vectorbt as vbt
+
+def summarize_backtest(bt_df: pd.DataFrame):
+    """Compute summary performance metrics for the backtest."""
+    ret = bt_df["net_return"].dropna()
+    if len(ret) == 0:
+        return {}
+
+    cagr = (1 + ret).prod() ** (12 / len(ret)) - 1
+    vol = ret.std() * np.sqrt(12)
+    sharpe = cagr / vol if vol > 0 else np.nan
+    sortino = cagr / (ret[ret < 0].std() * np.sqrt(12)) if (ret < 0).any() else np.nan
+    dd = (bt_df["cum_return"].cummax() - bt_df["cum_return"]) / bt_df["cum_return"].cummax()
+    max_dd = dd.max()
+    calmar = cagr / max_dd if max_dd > 0 else np.nan
+    return {
+        "CAGR": cagr,
+        "Volatility": vol,
+        "Sharpe": sharpe,
+        "Sortino": sortino,
+        "MaxDrawdown": max_dd,
+        "Calmar": calmar,
+        "MeanTurnover": bt_df["turnover"].mean(),
+    }
+
+def opt_weights(excess_returns, risk_config):
+    # Initialize Riskfolio portfolio
+    port = rp.Portfolio(returns=excess_returns)
+    port.assets_stats(
+        method_mu=risk_config.method_mu,
+        method_cov=risk_config.method_cov
+    )
+    port.upperlng = risk_config.upperlng
+    port.nea = risk_config.nea  # Update to use risk_config.nea
+
+    # Optimize portfolio
+    weights = port.optimization(
+        model=risk_config.model,
+        rm=risk_config.rm,
+        obj=risk_config.obj,
+        rf=risk_config.rf,
+        l=risk_config.ra,
+        hist=risk_config.hist
+    )
+    weights = np.ravel(w.to_numpy())
+    print(weights)
+    shp = rp.Sharpe(w=w, mu=port.mu,
+                    cov=port.cov,
+                    returns=excess_returns,
+                    rm=risk_config.rm,
+                    rf=risk_config.rf)
+
+    return shp, weights
+
+def backtest_portfolio(
+    y: pd.DataFrame,
+    ticker_config,
+    risk_config,
+    window: int = 24,
+    cost_rate: float = 0.0
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series]:
+    """
+    Config-driven backtest for Riskfolio portfolios.
+
+    Parameters
+    ----------
+    y : pd.DataFrame
+        Asset returns, indexed by date (aligned to ticker_config.horizon)
+    ticker_config : TickerConfig
+        Contains start_date, end_date, interval, tickers, and horizon (e.g., 'BM')
+    risk_config : RiskfolioConfig
+        Contains optimization and risk parameters for portfolio construction
+    window : int
+        Lookback window (in periods, matching y's frequency)
+    cost_rate : float
+        Proportional transaction cost per unit turnover (e.g., 0.001 = 10bps)
+
+    Returns
+    -------
+    bt_results : pd.DataFrame
+        Monthly portfolio performance and turnover
+    weights_df : pd.DataFrame
+        Asset weights per rebalance period
+    final_weights : pd.Series
+        Suggested portfolio for next period
+    """
+
+    # Ensure data integrity
+    y = y.copy()
+    y.index = pd.to_datetime(y.index)
+    y = y.sort_index().apply(pd.to_numeric, errors="coerce")
+
+    # Align frequency to data horizon (BM, W-FRI, etc.)
+    freq = getattr(ticker_config.horizon, "value", "BM")
+    y = y.asfreq(freq).dropna(how="all")
+    rebal_dates = y.index[window:]
+
+    results = []
+    weights_over_time = []
+    w_prev = None
+
+    for date in rebal_dates:
+        try:
+            # Rolling training window
+            train = y.loc[:date].iloc[-window:]
+            train = train.dropna(axis=1, how="any")
+            if train.empty:
+                continue
+
+            # Initialize Riskfolio portfolio
+            port = rp.Portfolio(returns=train)
+            port.assets_stats(
+                method_mu=risk_config.method_mu,
+                method_cov=risk_config.method_cov
+            )
+            port.upperlng = risk_config.upperlng
+            port.nea = risk_config.nea  # Update to use risk_config.nea
+
+            # Optimize portfolio
+            w = port.optimization(
+                model=risk_config.model,
+                rm=risk_config.rm,
+                obj=risk_config.obj,
+                rf=risk_config.rf,
+                l=risk_config.ra,
+                hist=risk_config.hist
+            )
+
+            # Handle failed optimizations
+            if w is None or w.empty:
+                w = pd.Series(1 / len(train.columns), index=train.columns)
+            else:
+                w = w.squeeze()  # Convert DataFrame to Series
+                w = w.reindex(train.columns).fillna(0)
+
+            # Store weights
+            weights_over_time.append(w.rename(date))
+
+            # Ensure next-period returns exist
+            if date not in y.index:
+                continue
+            next_ret = y.loc[date].reindex(w.index).fillna(0)
+
+            # Compute portfolio return
+            port_ret = float(np.dot(next_ret, w))
+
+            # Transaction cost and turnover
+            if w_prev is not None:
+                common = w.index.intersection(w_prev.index)
+                turnover = float((w.loc[common] - w_prev.loc[common]).abs().sum())
+                cost = turnover * cost_rate
+            else:
+                turnover, cost = np.nan, 0.0
+
+            net_ret = port_ret - cost
+            results.append({
+                "date": date,
+                "portfolio_return": port_ret,
+                "net_return": net_ret,
+                "turnover": turnover,
+                "n_assets": len(train.columns)
+            })
+
+            w_prev = w.copy()
+
+        except Exception as e:
+            print(f"[WARN] Skipping {date.date()} due to {type(e).__name__}: {e}")
+            continue
+
+    # Build DataFrames
+    bt_results = pd.DataFrame(results).set_index("date")
+    bt_results["cum_return"] = (1 + bt_results["net_return"]).cumprod()
+
+    weights_df = pd.DataFrame(weights_over_time)
+    weights_df.index.name = "date"
+
+    print('weights', weights_df)
+
+    # Equal-weight benchmark
+    eq_w = pd.Series(1 / y.shape[1], index=y.columns)
+    print('equal weights', eq_w)
+    eq_returns = (y @ eq_w).loc[bt_results.index]
+    bt_results["benchmark"] = (1 + eq_returns).cumprod()
+
+
+    # === Schwab-aligned benchmark ===
+    schwab_weights = pd.Series({
+        "AVEM": 0.04, "BCD": 0.02, "BYLD": 0.03, "ESGD": 0.07, "HYEM": 0.02,
+        "IEF": 0.08, "ISCF": 0.04, "SNPE": 0.15, "VBK": 0.08, "VNQ": 0.04,
+        "VNQI": 0.02, "VWOB": 0.03
+    })
+    schwab_weights = schwab_weights.reindex(y.columns).fillna(0)
+    schwab_weights /= schwab_weights.sum()  # normalize
+
+    schwab_returns = (y @ schwab_weights).loc[bt_results.index]
+    bt_results["benchmark_schwab"] = (1 + schwab_returns).cumprod()
+
+    bt_results["excess_return"] = bt_results["cum_return"] - bt_results["benchmark"]
+
+    # Final weights (suggested next portfolio)
+    final_weights = weights_df.iloc[-1].sort_values(ascending=False)
+
+    return bt_results, weights_df, final_weights
+
+
+# bt_results = backtest_portfolio(y, ticker_config, risk_config, window=48)
+
+# # 3. View results
+# print(bt_results.tail())
+# bt_results["cum_return"].plot(title="Riskfolio Backtest (BM-aligned)", figsize=(10,6))
+```
+
+
+### Further testing
+
+```{python}
+
+
+# 1. Define configs
+assets = ['ESGD', 'ISCF', 'HYEM', 'SNPE', "VBK", "IEF", 'AVEM', 'VWOB', 'VNQI', 'VNQ', 'BYLD', 'BCD']
+assets.sort()
+
+ticker_config = TickerConfig(
+    start_date="2019-10-18",
+    end_date="2025-10-18",
+    interval=Interval.DAILY,
+    tickers=assets,  
+    horizon=Horizon.MONTHLY,
+)
+
+df = build_long_panel(
+    ticker_config.tickers,
+    ticker_config.start_date,
+    ticker_config.end_date,
+    horizon=ticker_config.horizon
+)
+
+y = (
+    df.pivot_table(
+        index='date',
+        columns='asset_id',
+        values='y_excess_lead'
+    )
+    .sort_index()
+)
+y.columns.name = None
+y = y.reset_index()
+y.index = y['date']
+y = y.drop(columns=['date'])
+
+
+risk_config = RiskfolioConfig(
+    model=OptModel.CLASSIC,
+    rm=RiskMeasure.CVaR,
+    obj=Objective.SHARPE,
+    method_mu=MuEstimator.EWMA2,
+    method_cov=CovEstimator.GERBER1,
+    nea=7,
+    upperlng=0.4,
+)
+
+# 2. Run backtest
+bt_results, weights_df, next_portfolio = backtest_portfolio(y, ticker_config, risk_config, window=60, cost_rate=0.001)
+
+# 3. Summarize
+metrics = summarize_backtest(bt_results)
+print("Backtest Metrics:")
+print(metrics)
+
+# 4. Plot performance
+plt.figure(figsize=(10,6))
+plt.plot(bt_results["cum_return"], label="Riskfolio Portfolio")
+plt.plot(bt_results["benchmark"], label="Equal-Weight Benchmark", linestyle="--")
+plt.plot(bt_results["benchmark_schwab"], label="Schwab Target Benchmark", linestyle=":")
+plt.title("Riskfolio Backtest (with Schwab & Equal-Weight Benchmarks)")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+# 5. Suggested allocation for next month
+print("\nSuggested Portfolio for Next Month:")
+
+print(pd.DataFrame(next_portfolio.round(4)))
+
+# pie chart 
+ax = rp.plot_pie(w=next_portfolio, title='Sharpe Mean Variance', others=0.05, nrow=25, cmap = "tab20",
+                 height=6, width=10, ax=None)
+
+```

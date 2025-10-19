@@ -44,7 +44,7 @@ pd.options.display.float_format = '{:.3}'.format
 # 1. Configuration Class
 # -------------------------
 
-class TestingConfig(BaseModel):
+class TickerConfig(BaseModel):
     start_date: date = Field(..., description="Start date for the data range")
     end_date: date = Field(..., description="End date for the data range")
     interval: Literal["1d", "1w", "1m"] = Field("1d", description="Data frequency")
@@ -54,7 +54,7 @@ class TestingConfig(BaseModel):
 
 
 # Example usage
-config = TestingConfig(
+config = TickerConfig(
     start_date="2019-06-28",
     end_date="2025-09-01",
     interval="1d",

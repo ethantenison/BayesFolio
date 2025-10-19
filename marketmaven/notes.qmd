@@ -81,3 +81,13 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 -   Remember that the y excess return is actually the excess return starting from date of the row across the next month. So that if the date for the row is 2016-09-30 with y_excess_lead of -0.026, than it is saying that starting at the end of september to the end of october the assets excess return was -2.6%\
 
 -   Attempted Relevant Pursuit GP from botorch, but it still wasn't that great....
+
+**Oct 18th**
+
+-Riskfolio day
+-Small λ_min / huge κ amplify estimation noise, leading to extreme or unstable MV / Sharpe weights
+-now i need to backtest the riskfolio portfolios with the GP predictions
+
+** Oct 19th**
+- Added schwab target banchmark and equal weight. schwab only slightly did better than equal weight, but riskfolio using cvar and EMWA2 did much better. 
+- Now need to test factor model. 

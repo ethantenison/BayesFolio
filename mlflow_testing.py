@@ -42,7 +42,7 @@ pd.options.display.float_format = '{:.3}'.format
 # 1. Configuration Class
 # -------------------------
 
-class TestingConfig(BaseModel):
+class TickerConfig(BaseModel):
     start_date: date = Field(..., description="Start date for the data range")
     end_date: date = Field(..., description="End date for the data range")
     interval: Literal["1d", "1w", "1m"] = Field("1d", description="Data frequency")
@@ -52,7 +52,7 @@ class TestingConfig(BaseModel):
 
 
 # Example usage
-config = TestingConfig(
+config = TickerConfig(
     start_date="2019-06-28",
     end_date="2025-09-01",
     interval="1d",
@@ -65,7 +65,7 @@ config = TestingConfig(
 # -------------------------
 # 2. Data Loading
 # -------------------------
-def load_data(config: TestingConfig) -> pd.DataFrame:
+def load_data(config: TickerConfig) -> pd.DataFrame:
     """Load and preprocess data."""
     df = build_long_panel(config.tickers, config.start_date, config.end_date, horizon=config.horizon, fixed_h_days=config.fixed_h_days)
     vix = fetch_vix_term_structure(start=config.start_date, end=config.end_date, freq="BM")
@@ -114,7 +114,7 @@ def train_test_split_data(X: np.ndarray, y: np.ndarray, n_month: int) -> Tuple[n
 # -------------------------
 # 7. MLflow Experiment Logging
 # -------------------------
-def log_experiment(config: TestingConfig, model, metrics: dict, scaler_X, scaler_y):
+def log_experiment(config: TickerConfig, model, metrics: dict, scaler_X, scaler_y):
     """Log configuration, model, and metrics to MLflow."""
     with mlflow.start_run():
         # Log configuration
