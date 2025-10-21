@@ -276,13 +276,13 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     vix_df   = fetch_vix_term_structure(start=start, end=end, horizon=horizon)
     term_df  = fetch_term_spread(start=start, end=end, horizon=horizon)
     cred_df  = fetch_credit_spread(start=start, end=end, horizon=horizon)
-    tbill_df = fetch_tbill_rate(start=start, end=end, horizon=horizon)
+    #tbill_df = fetch_tbill_rate(start=start, end=end, horizon=horizon)
     dxy_df   = fetch_dxy(start=start, end=end, horizon=horizon)
     yc_df    = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
 
 
     # Merge on date
-    dfs = [vix_df, term_df, cred_df, tbill_df, dxy_df, yc_df]
+    dfs = [vix_df, term_df, cred_df, dxy_df, yc_df] #tbill_df,
 
     # Ensure all have lowercase column names and 'date'
     for i, df in enumerate(dfs):

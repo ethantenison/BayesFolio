@@ -95,3 +95,5 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 - FM was actually worse 
 - Next try again with modeling without the time feature
 
+**Oct 21st**
+- Tried out new hadamard. took a while. Need to do a test train split now with NLPD

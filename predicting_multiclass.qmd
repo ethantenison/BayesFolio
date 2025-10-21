@@ -5,7 +5,12 @@ date: now
 date-format: short
 ---
 
-Let's do ESGD, which is the International Developed Market ETF.
+Hadamard kernel testing 
+
+EFA = International Big Cap
+SCZ = International Small Cap
+SPY = US Large Cap
+SCHA = US Small Cap
 
 
 ```{python}
@@ -18,10 +23,10 @@ import pandas as pd
 
 
 config = TickerConfig(
-    start_date="2016-09-01",
+    start_date="2008-01-01",
     end_date="2025-10-01",
     interval=Interval.DAILY,
-    tickers=[ "ESGD", "ISCF" ],  # ESGD is the iShares ESG Developed Markets ETF, ISCF is the iShares MSCI USA ESG Select ETF
+    tickers=[ "EFA", "SCZ" , "SPY", "SCHA"],  # ESGD is the iShares ESG Developed Markets ETF, ISCF is the iShares MSCI USA ESG Select ETF
     horizon=Horizon.MONTHLY,
 )
 
@@ -62,7 +67,7 @@ etf_features
 Combine features to one dataframe
 
 ```{python}
-
+from sklearn.preprocessing import StandardScaler
 df = (
     return_data
     .merge(etf_features, on=['asset_id', 'date'], how='left')
@@ -70,17 +75,31 @@ df = (
 )
 
 # drop some columns like "volume" which is redundant
-df = df.drop(columns=['volume'])
+df = df.drop(columns=['volume', 'yc_pc1',
+       'yc_pc2', 'yc_pc3', 'vix'])
 
-```
 
-Let's look at just the ESGD ETF
 
-```{python}
-esgd_data = df[df['asset_id'] == 'ESGD']
-esgd_data = esgd_data.reset_index(drop=True)
-esgd_data = esgd_data.drop(columns=['asset_id'])
-esgd_data
+feature_cols = ['price', 'log_ret', 'mom1m',
+       'mom6m', 'mom12m', 'mom36m', 'chmom', 'dolvol', 'turnover', 'sd_turn',
+       'ill', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level', 'vix_ts_chg_1m',
+       'vix_ts_z_12m', 'tnote10y', 'tbill3m', 'term_spread', 'credit_spread',
+       'credit_spread_chg_1p', 'dxy']
+
+scaler_x = StandardScaler()
+X_scaled = scaler_x.fit_transform(df[feature_cols])
+df[feature_cols] = X_scaled
+
+#remove rows with NaN
+df = df.dropna().reset_index(drop=True)
+
+# --- Scale outputs per task ---
+scalers_y = {}
+for asset in df['asset_id'].unique():
+    mask = df['asset_id'] == asset
+    scaler_y = StandardScaler()
+    df.loc[mask, 'y_excess_lead'] = scaler_y.fit_transform(df.loc[mask, ['y_excess_lead']])
+    scalers_y[asset] = scaler_y
 
 ```
 
@@ -88,15 +107,147 @@ Plot the correlation matrix
 
 ```{python}
 from marketmaven.visualization.eda import correlation_matrix
-import seaborn as sns
-import matplotlib.pyplot as plt
 
-fig = correlation_matrix(esgd_data)
+fig = correlation_matrix(df)
 fig.show()
 ```
 
+Setting up training 
+```{python}
+import torch
 
-Now create the gp using gpytorch
+df1 = df[df['asset_id'] == 'EFA']
+df1 = df1.reset_index(drop=True)
+df1 = df1.drop(columns=['asset_id', 'date'])
+df1_tensor = torch.tensor(df1.values, dtype=torch.float64)
+train_x1 = df1_tensor[:, 1:]
+train_f1 = df1_tensor[:, 0]
+
+    
+
+df2 = df[df['asset_id'] == 'SCZ']
+df2 = df2.reset_index(drop=True)
+df2 = df2.drop(columns=['asset_id', 'date'])
+df2_tensor = torch.tensor(df2.values, dtype=torch.float64)
+train_x2 = df2_tensor[:, 1:]  # Updated to use df2_tensor
+train_f2 = df2_tensor[:, 0]    # Updated to use df2_tensor
+
+
+df3 = df[df['asset_id'] == 'SPY']
+df3 = df3.reset_index(drop=True)
+df3 = df3.drop(columns=['asset_id', 'date'])
+df3_tensor = torch.tensor(df3.values, dtype=torch.float64)
+train_x3 = df3_tensor[:, 1:]  # Updated to use df3_tensor
+train_f3 = df3_tensor[:, 0]    # Updated to use df3_tensor
+
+
+df4 = df[df['asset_id'] == 'SCHA']
+df4 = df4.reset_index(drop=True)
+df4 = df4.drop(columns=['asset_id', 'date'])  # Updated to drop 'date' as well
+df4_tensor = torch.tensor(df4.values, dtype=torch.float64)
+train_x4 = df4_tensor[:, 1:]  # Updated to use df4_tensor
+train_f4 = df4_tensor[:, 0]    # Updated to use df4_tensor
+
+
+train_i_task1 = torch.full((train_x1.shape[0],1), dtype=torch.float64, fill_value=0)
+train_i_task2 = torch.full((train_x2.shape[0],1), dtype=torch.float64, fill_value=1)
+train_i_task3 = torch.full((train_x3.shape[0],1), dtype=torch.float64, fill_value=2)
+train_i_task4 = torch.full((train_x4.shape[0],1), dtype=torch.float64, fill_value=3)
+
+full_train_x = torch.cat([train_x1, train_x2, train_x3, train_x4])
+full_train_i = torch.cat([train_i_task1, train_i_task2, train_i_task3, train_i_task4])
+full_train_y = torch.cat([train_f1, train_f2, train_f3, train_f4])
+
+```
+
+
+# Setup Hadamard GP
+
+
+```{python}
+import gpytorch
+training_iterations = 500
+class MultitaskGPModel(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood):
+        super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.ConstantMean()
+        self.covar_module = gpytorch.kernels.RBFKernel()
+
+        # We learn an IndexKernel for 4 tasks
+        # (so we'll actually learn 4x4=16 tasks with correlations)
+        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=4, rank=1)
+
+    def forward(self,x,i):
+        mean_x = self.mean_module(x)
+
+        # Get input-input covariance
+        covar_x = self.covar_module(x)
+        # Get task-task covariance
+        covar_i = self.task_covar_module(i)
+        # Multiply the two together to get the covariance we want
+        covar = covar_x.mul(covar_i)
+
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar)
+
+```
+
+
+```{python}
+
+
+# We define the training loop in a function, which will let us use
+# it again later for a different likelihood.
+def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood]):
+    likelihood = likelihood_cls(num_tasks=2)
+    (train_x, train_i), train_y = train_data
+    # Here we have two terms that we're passing in as train_inputs
+    model = MultitaskGPModel((train_x, train_i), train_y, likelihood)
+    # Find optimal model hyperparameters
+    model.train()
+    likelihood.train()
+
+    # Use the adam optimizer
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)  # Includes GaussianLikelihood parameters
+
+    # "Loss" for GPs - the marginal log likelihood
+    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+    # implement early stopping with patience
+     # Early stopping variables
+    best_loss = float("inf")
+    patience_counter = 0
+    patience = 50
+
+    for i in range(training_iterations):
+        optimizer.zero_grad()
+        output = model(train_x, train_i)
+        loss = -mll(output, train_y, [train_i])
+        loss.backward()
+        if (i + 1) % 25 == 0:
+            print(f'Iter {i+1}/{training_iterations} - Loss: {loss.item():.3f}')
+        optimizer.step()
+
+        # Early stopping logic
+        if loss.item() < best_loss:
+            best_loss = loss.item()
+            patience_counter = 0  # Reset patience counter if improvement
+        else:
+            patience_counter += 1  # Increment patience counter if no improvement
+
+        if patience_counter >= patience:
+            break
+
+    # Set into eval mode
+    model.eval()
+    likelihood.eval()
+
+    return model, likelihood
+
+model, likelihood = train_model(
+    ((full_train_x, full_train_i), full_train_y),
+    gpytorch.likelihoods.GaussianLikelihood
+)
+```
 
 ```{python}
 import torch 
