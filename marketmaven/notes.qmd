@@ -97,3 +97,9 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 
 **Oct 21st**
 - Tried out new hadamard. took a while. Need to do a test train split now with NLPD
+
+**Oct 22nd**
+- Tried autogluon temporal fusion transformer was the best. Need to do more research on the best way to use it. Perhaps autogluon is not the right package to use. 
+-maybe take a look at their expanding window splitter 
+-pursue Pytorch Forecasting 
+
