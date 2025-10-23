@@ -103,3 +103,5 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 -maybe take a look at their expanding window splitter 
 -pursue Pytorch Forecasting 
 
+**Oct 23rd**
+- Created function to create dataset for hadamard GP multitask
