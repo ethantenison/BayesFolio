@@ -105,3 +105,9 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 
 **Oct 23rd**
 - Created function to create dataset for hadamard GP multitask
+
+**Oct 24th**
+- found major bug in etf features that should've been mean instead of last
+- issues with new hadamard gp testing
+- think I need to separate the tasks for predicting with hadamard. 
+- make sure that the cols are all float64

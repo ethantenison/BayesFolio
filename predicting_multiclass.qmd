@@ -26,7 +26,7 @@ config = TickerConfig(
     start_date="2008-01-01",
     end_date="2025-10-05",
     interval=Interval.DAILY,
-    tickers=[ "EFA", "SCZ" , "SPY", "SCHA"],  # ESGD is the iShares ESG Developed Markets ETF, ISCF is the iShares MSCI USA ESG Select ETF
+    tickers=[ "EFA", "SCZ" , "SPY"],  # ESGD is the iShares ESG Developed Markets ETF, ISCF is the iShares MSCI USA ESG Select ETF # "SCHA" isn't complete 
     horizon=Horizon.MONTHLY,
 )
 
@@ -86,20 +86,6 @@ feature_cols = ['price', 'log_ret', 'mom1m',
        'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y', 'tbill3m', 'term_spread',
        'credit_spread', 'credit_spread_chg_1p', 'dxy']
 
-# scaler_x = StandardScaler()
-# X_scaled = scaler_x.fit_transform(df[feature_cols])
-# df[feature_cols] = X_scaled
-
-#remove rows with NaN
-df = df.dropna().reset_index(drop=True)
-
-# # --- Scale outputs per task ---
-# scalers_y = {}
-# for asset in df['asset_id'].unique():
-#     mask = df['asset_id'] == asset
-#     scaler_y = StandardScaler()
-#     df.loc[mask, 'y_excess_lead'] = scaler_y.fit_transform(df.loc[mask, ['y_excess_lead']])
-#     scalers_y[asset] = scaler_y
 
 ```
 
@@ -112,6 +98,82 @@ fig = correlation_matrix(df)
 fig.show()
 ```
 
+# Setup Hadamard GP
+
+
+```{python}
+import gpytorch
+training_iterations = 500
+
+def as_task_col(i: torch.Tensor) -> torch.Tensor:
+    """Make sure task indices are (N,1) long (for likelihood)."""
+    if i.dim() == 1:
+        i = i.unsqueeze(-1)
+    return i.to(torch.long)
+
+def as_task_vec(i: torch.Tensor) -> torch.Tensor:
+    """Make sure task indices are (N,) long (for IndexKernel)."""
+    return i.view(-1).to(torch.long)
+
+class MultitaskGPModel(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood, num_tasks, rank):
+        super().__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.ConstantMean()
+        self.covar_module = gpytorch.kernels.RBFKernel()
+        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
+
+    def forward(self, x, i):
+        mean_x  = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        i_vec   = as_task_vec(i)                      # ✅ (N,) long for IndexKernel
+        covar_i = self.task_covar_module(i_vec)
+        covar   = covar_x.mul(covar_i)
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar)
+
+# We define the training loop in a function, which will let us use
+# it again later for a different likelihood.
+def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood], num_tasks=3, rank=1):
+    likelihood = likelihood_cls(num_tasks=num_tasks)
+    (train_x, train_i), train_y = train_data
+
+    train_i_col = as_task_col(train_i)               # ✅ (N,1) long for likelihood
+    model = MultitaskGPModel((train_x, train_i_col), train_y, likelihood,
+                             num_tasks=num_tasks, rank=rank)
+
+    model.train(); likelihood.train()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+    best_loss = float("inf"); patience = 50; patience_counter = 0
+    for it in range(training_iterations):
+        optimizer.zero_grad()
+        output = model(train_x, train_i_col)         # model will squeeze internally
+        loss = -mll(output, train_y, [train_i_col])  # ✅ tutorial style: list of (N,1)
+        loss.backward(); optimizer.step()
+
+        if loss.item() + 1e-4 < best_loss:
+            best_loss = loss.item(); patience_counter = 0
+        else:
+            patience_counter += 1
+        if patience_counter >= patience:
+            break
+
+    model.eval(); likelihood.eval()
+    return model, likelihood
+
+# model, likelihood = train_model(
+#     ((full_train_x, full_train_i), full_train_y),
+#     gpytorch.likelihoods.GaussianLikelihood
+# )
+
+
+# model_hd, likelihood_hd = train_model(
+#     ((full_train_x, full_train_i), full_train_y), 
+#     gpytorch.likelihoods.HadamardGaussianLikelihood
+# )
+```
+
+
 Setting up training 
 ```{python}
 
@@ -119,54 +181,89 @@ Setting up training
 def fit_eval_split(
     model_fn,
     X: torch.Tensor, I: torch.Tensor, y: torch.Tensor,
-    train_idx: np.ndarray, test_idx: np.ndarray,
-    scale_y: bool = True,
+    train_idx, test_idx,
+    scale_y: str = "global",   # "global" | "per_task" | "none"
     eps: float = 1e-8,
 ):
-    # 1️⃣ Slice the train/test sets
-    tr_x, tr_i, tr_y = X[train_idx], I[train_idx], y[train_idx]
-    te_x, te_i, te_y = X[test_idx], I[test_idx], y[test_idx]
+    # Slice
+    X_tr, I_tr, y_tr = X[train_idx], I[train_idx], y[train_idx]
+    X_te, I_te, y_te = X[test_idx], I[test_idx], y[test_idx]
 
-    # 2️⃣ Scale X on train only
-    mu_x = tr_x.mean(0, keepdim=True)
-    sd_x = tr_x.std(0, unbiased=False, keepdim=True).clamp_min(eps)
-    tr_xs = (tr_x - mu_x) / sd_x
-    te_xs = (te_x - mu_x) / sd_x
+    # print('I_tr before long',I_tr, I_tr.dtype, I_tr.shape, I_tr.dim(),'\nie: ', I_te.dtype, I_te.shape, I_te.dim())
 
-    # 3️⃣ Optionally scale Y on train only
-    if scale_y:
-        mu_y = tr_y.mean()
-        sd_y = tr_y.std(unbiased=False).clamp_min(eps)
-        tr_ys = (tr_y - mu_y) / sd_y
+
+    # ---- 1) Feature scaling (train-only) ----
+    x_mean = X_tr.mean(0, keepdim=True)
+    x_std  = X_tr.std(0, unbiased=False, keepdim=True).clamp_min(eps)
+    X_trs = (X_tr - x_mean) / x_std
+    X_tes = (X_te - x_mean) / x_std
+
+    # ---- 2) Target scaling (train-only) ----
+    if scale_y == "global":
+        y_mean = y_tr.mean()
+        y_std  = y_tr.std(unbiased=False).clamp_min(eps)
+        y_trs  = (y_tr - y_mean) / y_std
+        inv_y  = lambda yhat, ysd: yhat * y_std + y_mean
+        inv_std= lambda s: s * y_std
+    elif scale_y == "per_task":
+        # compute per-task stats on train
+        y_trs = torch.empty_like(y_tr)
+        task_vals = I_tr.view(-1).to(torch.long)
+        y_mean_k = {}
+        y_std_k  = {}
+        for k in torch.unique(task_vals):
+            k_mask = (task_vals == k)
+            mu = y_tr[k_mask].mean()
+            sd = y_tr[k_mask].std(unbiased=False).clamp_min(eps)
+            y_trs[k_mask] = (y_tr[k_mask] - mu) / sd
+            y_mean_k[int(k.item())] = mu
+            y_std_k[int(k.item())]  = sd
+        def inv_y(yhat, task_idx):
+            mu = torch.tensor([y_mean_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
+            sd = torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
+            return yhat * sd + mu
+        inv_std = lambda s, task_idx: s * torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=s.dtype, device=s.device)
     else:
-        tr_ys, mu_y, sd_y = tr_y, 0.0, 1.0
+        y_trs = y_tr
+        inv_y  = lambda yhat, *_: yhat
+        inv_std= lambda s, *_: s
 
-    # Ensure correct dtype for IndexKernel
-    tr_i_long = tr_i.view(-1).to(torch.long)
-    te_i_long = te_i.view(-1).to(torch.long)
+    # Ensure IndexKernel gets longs
+    I_tr_long = I_tr#.view(-1).to(torch.long)
+    I_te_long = I_te#.view(-1).to(torch.long)
 
-    # 4️⃣ Train model
-    model, likelihood = model_fn(((tr_xs, tr_i_long), tr_ys),
-                                 gpytorch.likelihoods.HadamardGaussianLikelihood)
+    print('I_tr_long', I_tr_long, I_tr_long.dtype, I_tr_long.shape, I_tr_long.dim(),'\nie: ', I_te_long.dtype, I_te_long.shape, I_te_long.dim())
 
-    # 5️⃣ Predict and invert scaling
+    # ---- 3) Train 
+    model, likelihood = model_fn(((X_trs, I_tr_long), y_trs), gpytorch.likelihoods.HadamardGaussianLikelihood, num_tasks=len(torch.unique(I)), rank=1)
+
+    # ---- 4) Predict (and invert scaling)
     model.eval(); likelihood.eval()
     with torch.no_grad(), gpytorch.settings.fast_pred_var():
-        pred = model(te_xs, te_i_long)
+        print('I_te_long before pred', I_te_long, I_te_long.dtype, I_te_long.shape, I_te_long.dim())
+        print('X_tes before pred', X_tes, X_tes.dtype, X_tes.shape, X_tes.dim())
+        pred = likelihood(model(X_tes, I_te_long), [I_te_long])
         mean_s = pred.mean
-        std_s = pred.variance.sqrt()
+        std_s  = pred.variance.sqrt()
 
-    mean = mean_s * sd_y + mu_y
-    std = std_s * sd_y
+    # Invert target scaling
+    if scale_y == "per_task":
+        y_hat = inv_y(mean_s, I_te_long)
+        y_std = inv_std(std_s, I_te_long)
+    elif scale_y == "global":
+        y_hat = inv_y(mean_s, None)
+        y_std = inv_std(std_s)
+    else:
+        y_hat, y_std = mean_s, std_s
 
-    return te_y.cpu(), mean.cpu(), std.cpu()
+    return y_te, y_hat, y_std
 ```
 
 Automating dataset creation 
 
 ```{python}
 from marketmaven.gp_data_prep import prepare_multitask_gp_data
-from marketmaven.models.cv import rolling_time_splits
+from marketmaven.models.cv import rolling_time_splits_multitask
 
 
 # 1. Prepare tensors for multitask GP
@@ -176,16 +273,12 @@ full_train_x, full_train_i, full_train_y, task_map = prepare_multitask_gp_data(
     asset_col="asset_id",
     drop_cols=["date", "asset_id"]
 )
-print('Task map: ', task_map)
-print('Shapes', full_train_x.shape, full_train_i.shape, full_train_y.shape)
-
-# Optional: keep the time index for rolling splits
-time_index = pd.DatetimeIndex(pd.to_datetime(df['date'].unique())).sort_values()
-
 # 2. Define rolling splits
-splits = rolling_time_splits(
-    dates=time_index,
-    train_min=120,     # or whatever minimum history you want
+splits = rolling_time_splits_multitask(
+    df,
+    date_col="date",
+    asset_col="asset_id",
+    train_min=60,
     step=1,
     horizon=1,
     embargo=0
@@ -193,108 +286,33 @@ splits = rolling_time_splits(
 
 
 
+# 3. Loop over splits and evaluate
+results = []
+for tr_idx, te_idx in splits:
+    y_true, y_pred, y_std = fit_eval_split(
+        train_model,
+        full_train_x,
+        full_train_i,
+        full_train_y,
+        tr_idx,
+        te_idx
+    )
+    results.append({
+        "date": time_index[te_idx[0]],
+        "mae": float((y_true - y_pred).abs().mean()),
+        "rmse": float(torch.sqrt(((y_true - y_pred) ** 2).mean())),
+        "coverage_90": float(((y_true >= y_pred - 1.64 * y_std) & (y_true <= y_pred + 1.64 * y_std)).float().mean())
+    })
+
+results_df = pd.DataFrame(results).set_index("date")
+
 
 ```
 
-# Setup Hadamard GP
 
 
-```{python}
-import gpytorch
-training_iterations = 500
-class MultitaskGPModel(gpytorch.models.ExactGP):
-    def __init__(self, train_x, train_y, likelihood):
-        super(MultitaskGPModel, self).__init__(train_x, train_y, likelihood)
-        self.mean_module = gpytorch.means.ConstantMean()
-        self.covar_module = gpytorch.kernels.RBFKernel()
-
-        # We learn an IndexKernel for 4 tasks
-        # (so we'll actually learn 4x4=16 tasks with correlations)
-        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=4, rank=2)
-
-    def forward(self,x,i):
-        mean_x = self.mean_module(x)
-
-        # Get input-input covariance
-        covar_x = self.covar_module(x)
-        # Get task-task covariance
-        covar_i = self.task_covar_module(i)
-        # Multiply the two together to get the covariance we want
-        covar = covar_x.mul(covar_i)
-
-        return gpytorch.distributions.MultivariateNormal(mean_x, covar)
-
-```
-
-Regular Gaussian Likelihood 
-
-```{python}
 
 
-# We define the training loop in a function, which will let us use
-# it again later for a different likelihood.
-def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood]):
-    likelihood = likelihood_cls(num_tasks=4)
-    (train_x, train_i), train_y = train_data
-    # Here we have two terms that we're passing in as train_inputs
-    model = MultitaskGPModel((train_x, train_i), train_y, likelihood)
-    # Find optimal model hyperparameters
-    model.train()
-    likelihood.train()
-
-    # Use the adam optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)  # Includes GaussianLikelihood parameters
-
-    # "Loss" for GPs - the marginal log likelihood
-    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
-
-    # implement early stopping with patience
-     # Early stopping variables
-    best_loss = float("inf")
-    patience_counter = 0
-    patience = 50
-
-    for i in range(training_iterations):
-        optimizer.zero_grad()
-        output = model(train_x, train_i)
-        loss = -mll(output, train_y, [train_i])
-        loss.backward()
-        if (i + 1) % 25 == 0:
-            print(f'Iter {i+1}/{training_iterations} - Loss: {loss.item():.3f}')
-        optimizer.step()
-
-        min_delta = 1e-4  # or smaller
-        if loss.item() < best_loss - min_delta:
-            best_loss = loss.item()
-            patience_counter = 0
-        else:
-            patience_counter += 1
-
-        if patience_counter >= patience:
-            break
-
-    # Set into eval mode
-    model.eval()
-    likelihood.eval()
-
-    return model, likelihood
-
-model, likelihood = train_model(
-    ((full_train_x, full_train_i), full_train_y),
-    gpytorch.likelihoods.GaussianLikelihood
-)
-```
-
-
-Hadamard Likelihood
-
-```{python}
-model_hd, likelihood_hd = train_model(
-    ((full_train_x, full_train_i), full_train_y), 
-    gpytorch.likelihoods.HadamardGaussianLikelihood
-)
-
-```
 
 
 ```{python}
