@@ -18,7 +18,7 @@ class Horizon(StrEnum):
     """Supported prediction horizons."""
     DAILY = "B" # Business day
     WEEKLY = "W-FRI" # Friday is often considered end of trading week
-    MONTHLY = "BM" # Business month end, aligns with last trading day of the month
+    MONTHLY = "BME" # Business month end, aligns with last trading day of the month
     QUARTERLY = "BQ" # Business quarter end
     YEARLY = "BA" # Business year end
 

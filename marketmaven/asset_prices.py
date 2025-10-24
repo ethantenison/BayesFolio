@@ -159,6 +159,24 @@ def fetch_etf_features(
          'mom36m', 'chmom', 'dolvol', 'turnover', 'sd_turn', 'ill', 'vol_1m']
         Missing values are filled with 0 (neutral imputation) as in the Ensemble GP paper.
     """
+    
+    # --- Resample (monthly, weekly, etc.) with feature-specific rules ---
+    agg_map = {
+        "price": "last",
+        "log_ret": "sum",
+        "mom1m": "last",
+        "mom6m": "last",
+        "mom12m": "last",
+        "mom36m": "last",
+        "chmom": "last",
+        "volume": "sum",
+        "dolvol": "sum",
+        "turnover": "mean",
+        "sd_turn": "mean",
+        "ill": "mean",
+        "vol_1m": "mean",
+        "baspread": "mean",
+    }
 
     if isinstance(tickers, str):
         tickers = [tickers]
@@ -241,8 +259,8 @@ def fetch_etf_features(
         else:
             data["baspread"] = 0.0  # Default if High/Low not available
 
-            # Resample (monthly, weekly, etc.)
-            data = data.resample(horizon).last()
+        # Resample (monthly, weekly, etc.)
+        data = data.resample(horizon).agg(agg_map)
 
         # Fill missing with 0 (neutral imputation, paper-style)
         data = data.fillna(0)
