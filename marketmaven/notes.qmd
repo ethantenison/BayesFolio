@@ -111,3 +111,6 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 - issues with new hadamard gp testing
 - think I need to separate the tasks for predicting with hadamard. 
 - make sure that the cols are all float64
+
+**Oct 25th**
+- finally got hadamard gp to work. still need to do hyperparameter tuning

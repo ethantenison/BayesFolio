@@ -103,6 +103,13 @@ fig.show()
 
 ```{python}
 import gpytorch
+from gpytorch.kernels import MaternKernel, RQKernel, SpectralMixtureKernel
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+from gpytorch.means import ZeroMean
+import math
+
+
 training_iterations = 500
 
 def as_task_col(i: torch.Tensor) -> torch.Tensor:
@@ -118,27 +125,48 @@ def as_task_vec(i: torch.Tensor) -> torch.Tensor:
 class MultitaskGPModel(gpytorch.models.ExactGP):
     def __init__(self, train_x, train_y, likelihood, num_tasks, rank):
         super().__init__(train_x, train_y, likelihood)
-        self.mean_module = gpytorch.means.ConstantMean()
-        self.covar_module = gpytorch.kernels.RBFKernel()
+
+        d = train_x[0].shape[1]
+        SQRT2, SQRT3 = math.sqrt(2.0), math.sqrt(3.0)
+        lengthscale_prior = LogNormalPrior(loc=SQRT2 + math.log(d)*0.5, scale=SQRT3)
+        lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+
+        def make_covar():
+            matern = MaternKernel(
+                nu=0.5,
+                ard_num_dims=d,
+                active_dims=list(range(d)),
+                lengthscale_prior=lengthscale_prior,
+                lengthscale_constraint=lengthscale_constraint,
+            )
+            sm = SpectralMixtureKernel(
+                num_mixtures=5,
+                ard_num_dims=d,
+                active_dims=list(range(d)),
+            )
+            return matern
+
+        self.mean_module = ZeroMean()#gpytorch.means.ConstantMean()
+        self.covar_module = make_covar()
         self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
 
     def forward(self, x, i):
         mean_x  = self.mean_module(x)
         covar_x = self.covar_module(x)
-        i_vec   = as_task_vec(i)                      # ✅ (N,) long for IndexKernel
+        i_vec   = as_task_vec(i)                   
         covar_i = self.task_covar_module(i_vec)
         covar   = covar_x.mul(covar_i)
         return gpytorch.distributions.MultivariateNormal(mean_x, covar)
 
-# We define the training loop in a function, which will let us use
-# it again later for a different likelihood.
-def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood], num_tasks=3, rank=1):
-    likelihood = likelihood_cls(num_tasks=num_tasks)
-    (train_x, train_i), train_y = train_data
 
-    train_i_col = as_task_col(train_i)               # ✅ (N,1) long for likelihood
-    model = MultitaskGPModel((train_x, train_i_col), train_y, likelihood,
-                             num_tasks=num_tasks, rank=rank)
+def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood], rank):
+
+    (train_x, train_i), train_y = train_data
+    train_i_col = as_task_col(train_i)        
+
+    num_tasks = len(torch.unique(train_i))
+    likelihood = likelihood_cls(num_tasks=num_tasks, task_feature_index=1)
+    model = MultitaskGPModel((train_x, train_i_col), train_y, likelihood, num_tasks, rank)
 
     model.train(); likelihood.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
@@ -149,7 +177,10 @@ def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood
         optimizer.zero_grad()
         output = model(train_x, train_i_col)         # model will squeeze internally
         loss = -mll(output, train_y, [train_i_col])  # ✅ tutorial style: list of (N,1)
-        loss.backward(); optimizer.step()
+        loss.backward()
+        if (it + 1) % 25 == 0:
+            print(f'Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}')
+        optimizer.step()
 
         if loss.item() + 1e-4 < best_loss:
             best_loss = loss.item(); patience_counter = 0
@@ -161,18 +192,196 @@ def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood
     model.eval(); likelihood.eval()
     return model, likelihood
 
-# model, likelihood = train_model(
-#     ((full_train_x, full_train_i), full_train_y),
-#     gpytorch.likelihoods.GaussianLikelihood
-# )
 
-
-# model_hd, likelihood_hd = train_model(
-#     ((full_train_x, full_train_i), full_train_y), 
-#     gpytorch.likelihoods.HadamardGaussianLikelihood
-# )
 ```
 
+
+testing outside of cross validation 
+
+```{python}
+
+from marketmaven.gp_data_prep import prepare_multitask_gp_data
+from marketmaven.models.cv import rolling_time_splits_multitask
+X, I, y, task_map = prepare_multitask_gp_data(
+    df,
+    target_col="y_excess_lead",
+    asset_col="asset_id",
+    drop_cols=["date", "asset_id"]
+)
+index = -12
+scale_y="per_task"
+eps=1e-8
+X_tr, I_tr, y_tr = X[:index], I[:index], y[:index]
+X_te, I_te, y_te = X[index:], I[index:], y[index:]
+
+# ---- 1) Feature scaling (train-only) ----
+x_mean = X_tr.mean(0, keepdim=True)
+x_std  = X_tr.std(0, unbiased=False, keepdim=True).clamp_min(eps)
+X_trs = (X_tr - x_mean) / x_std
+X_tes = (X_te - x_mean) / x_std
+
+# ---- 2) Target scaling (train-only) ----
+if scale_y == "global":
+    y_mean = y_tr.mean()
+    y_std  = y_tr.std(unbiased=False).clamp_min(eps)
+    y_trs  = (y_tr - y_mean) / y_std
+    inv_y  = lambda yhat, ysd: yhat * y_std + y_mean
+    inv_std= lambda s: s * y_std
+elif scale_y == "per_task":
+    # compute per-task stats on train
+    y_trs = torch.empty_like(y_tr)
+    task_vals = I_tr.view(-1).to(torch.long)
+    y_mean_k = {}
+    y_std_k  = {}
+    for k in torch.unique(task_vals):
+        k_mask = (task_vals == k)
+        mu = y_tr[k_mask].mean()
+        sd = y_tr[k_mask].std(unbiased=False).clamp_min(eps)
+        y_trs[k_mask] = (y_tr[k_mask] - mu) / sd
+        y_mean_k[int(k.item())] = mu
+        y_std_k[int(k.item())]  = sd
+    def inv_y(yhat, task_idx):
+        mu = torch.tensor([y_mean_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
+        sd = torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
+        return yhat * sd + mu
+    inv_std = lambda s, task_idx: s * torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=s.dtype, device=s.device)
+else:
+    y_trs = y_tr
+    inv_y  = lambda yhat, *_: yhat
+    inv_std= lambda s, *_: s
+
+    # Ensure IndexKernel gets longs
+I_tr_long = I_tr
+I_te_long = I_te
+
+
+model, likelihood = train_model(((X_trs, I_tr_long), y_trs), gpytorch.likelihoods.HadamardGaussianLikelihood, rank=1)
+
+```
+
+
+### Predicting 
+
+```{python}
+import torch
+
+# Flatten task to 1-D
+task_flat = I_te.view(-1).long()
+
+# Boolean masks
+mask0 = task_flat == 0
+mask1 = task_flat == 1
+mask2 = task_flat == 2
+
+X_test_1 = X_tes[mask0]  # rows where task == 0
+X_test_2 = X_tes[mask1]  # rows where task == 1
+X_test_3 = X_tes[mask2]  # rows where task == 2
+I_test_1 = I_te_long[mask0]
+I_test_2 = I_te_long[mask1]
+I_test_3 = I_te_long[mask2]
+y_test_1 = y_te[mask0]  
+y_test_2 = y_te[mask1]
+y_test_3 = y_te[mask2]
+
+model.eval(); likelihood.eval()
+with torch.no_grad(), gpytorch.settings.fast_pred_var():
+    pred1 = likelihood(model(X_test_1, I_test_1), [I_test_1])
+    pred2 = likelihood(model(X_test_2, I_test_2), [I_test_2])
+    pred3 = likelihood(model(X_test_3, I_test_3), [I_test_3])
+
+
+def unscale(pred, I_task):
+    m_std = pred.mean
+    s_std = pred.variance.sqrt()
+    if scale_y == "per_task":
+        return inv_y(m_std, I_task), inv_std(s_std, I_task)
+    elif scale_y == "global":
+        return inv_y(m_std, None), inv_std(s_std)
+    else:
+        return m_std, s_std
+
+yhat1, ystd1 = unscale(pred1, I_test_1)
+yhat2, ystd2 = unscale(pred2, I_test_2)
+yhat3, ystd3 = unscale(pred3, I_test_3)
+
+print("Task0 raw mean:", yhat1)
+print("Task1 raw mean:", yhat2)
+print("Task2 raw mean:", yhat3)
+
+# --- Metrics: NLPD (Gaussian) and MSE / RMSE per task and overall ---
+
+
+import math
+
+def gaussian_nlpd(y_true: torch.Tensor, y_mean: torch.Tensor, y_std: torch.Tensor, eps: float = 1e-12) -> float:
+    var = (y_std.clamp_min(eps))**2
+    return float(0.5 * ( ((y_true - y_mean)**2) / var + torch.log(2 * torch.pi * var) ).mean())
+
+def mse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
+    return float(((y_true - y_mean)**2).mean())
+
+def rmse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
+    return float(torch.sqrt(((y_true - y_mean)**2).mean()))
+
+# Per-task
+metrics = []
+for label, yt, ym, ys in [
+    ("Task0", y_test_1, yhat1, ystd1),
+    ("Task1", y_test_2, yhat2, ystd2),
+    ("Task2", y_test_3, yhat3, ystd3),
+]:
+    metrics.append({
+        "task": label,
+        "mse": mse(yt, ym),
+        "rmse": rmse(yt, ym),
+        "nlpd": gaussian_nlpd(yt, ym, ys)
+    })
+
+# Overall (concatenate)
+y_true_all = torch.cat([y_test_1, y_test_2, y_test_3])
+y_mean_all = torch.cat([yhat1, yhat2, yhat3])
+y_std_all  = torch.cat([ystd1, ystd2, ystd3])
+
+overall = {
+    "task": "ALL",
+    "mse": mse(y_true_all, y_mean_all),
+    "rmse": rmse(y_true_all, y_mean_all),
+    "nlpd": gaussian_nlpd(y_true_all, y_mean_all, y_std_all)
+}
+
+# Display
+print("Per-task metrics:")
+for m in metrics:
+    print(f"{m['task']}: MSE={m['mse']:.6f} RMSE={m['rmse']:.6f} NLPD={m['nlpd']:.6f}")
+print(f"Overall: MSE={overall['mse']:.6f} RMSE={overall['rmse']:.6f} NLPD={overall['nlpd']:.6f}")
+
+```
+
+```{python}
+
+# Initialize plots
+f, (y1_ax, y2_ax) = plt.subplots(1, 2, figsize=(8, 3))
+
+# Define plotting function
+def ax_plot(ax, train_y, train_x, rand_var, title):
+    # Get lower and upper confidence bounds
+    lower, upper = rand_var.confidence_region()
+    # Plot training data as black stars
+    ax.plot(train_x.detach().numpy(), train_y.detach().numpy(), 'k*')
+    # Predictive mean as blue line
+    ax.plot(test_x.detach().numpy(), rand_var.mean.detach().numpy(), 'b')
+    # Shade in confidence
+    ax.fill_between(test_x.detach().numpy(), lower.detach().numpy(), upper.detach().numpy(), alpha=0.5)
+    ax.set_ylim([-3, 3])
+    ax.legend(['Observed Data', 'Mean', 'Confidence'])
+    ax.set_title(title)
+
+# Plot both tasks
+
+ax_plot(y1_ax, train_y1, train_x1, observed_pred_y1, fr'Task 1 ($\sigma_y^2 = {TASK_NOISES[0]}$)')
+ax_plot(y2_ax, train_y2, train_x2, observed_pred_y2, fr'Task 2 ($\sigma_y^2 = {TASK_NOISES
+
+```
 
 Setting up training 
 ```{python}
