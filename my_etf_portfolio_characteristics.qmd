@@ -1,0 +1,129 @@
+---
+title: "ETF selection"
+format: html
+---
+
+# What should my ETF portfolio look like?
+
+1.  Diversify Across uncorrelated exposures
+2.  Must be broad low-cost
+3.  Consider Factor Tilt
+    1.  Value vs momentum
+    2.  Inflation Hedge
+4.  ETFs should be highly liquid
+5.  Priority should be placed on "Diversified Portfolio" classification
+6.  ETF should not be new. I need a history of returns.
+7.  Mix exposures like:
+    1.  US vs International Equities
+    2.  Stocks vs bonds
+    3.  Growth vs Value
+    4.  Developed vs Emerging Markets
+    5.  Equities vs Real Estate (REITS, Commodities, TIPS)
+
+### Why should they be diversified?
+
+Diversified portfolios reduce noise because random events in one company wont cause massive impact on the entire ETF mix. Firm-level noise is averaged out. This can lead to higher predictive power and higher R Squared.
+
+### Why should they be de-correlated?
+
+If the ETFs you select all move together exactly, your total risk does not fall. That's why correlation structure is the true driver for how many ETFs you need, not just some random number.
+
+One caveat is that this correlation structure breakdown during crises or regime changes. DCC-GARCH are regime-dependent correlation modeling
+
+**DECORRELATION** equals information efficiency
+
+> 🧩 In information-theoretic terms, decorrelation **maximizes mutual information between features and the target**.
+
+Decorrelation also removes non-systemtic risk. This is the risk of one particular sector, company, or asset.
+
+# Diversified ETF Portfolio
+
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Category                      | Ticker                                   | ETF Name                                    | Rationale                                                                 |
++:==============================+:=========================================+:============================================+:==========================================================================+
+| US Equities                   | SPY                                      | SPDR^®^ S&P 500^®^ ETF TRUST                | US Big cap, diversified, long history                                     |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| US Equities                   | VTV                                      | Vanguard Value ETF                          | Value tilt; offsets growth bias                                           |
+|                               |                                          |                                             |                                                                           |
+|                               | (Maybeeee.....strong wallmart exxon etc) |                                             |                                                                           |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| US Equities                   | IJR, or SCHA                             | iShares Core S&P Small-Cap                  | Adds size premium; higher expected return                                 |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| US REITs                      | VNQ                                      | Vanguard Real Estate ETF                    | Real-asset hedge; inflation sensitivity                                   |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| International Equities        | VEA (ESGD is out)                        | Vanguard FTSE Developed Markets             | Developed ex-US equity diversification                                    |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| International Equities        | VWO, AVEM Newer                          | Vanguard FTSE Emerging Markets              | Emerging markets growth exposure                                          |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| International Equities        | VSS, ISCF Newer                          | Vanguard FTSE All-World ex-US Small Cap     | Small-cap diversification abroad                                          |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Fixed Income                  | BND (Better than AGG)                    | Vanguard Total Bond Market                  | Broad U.S. bond market exposure                                           |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Fixed Income                  | BNDX                                     | Vanguard Total International Bond           | Hedged global sovereign & corporate bonds                                 |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Fixed Income                  | LQD                                      | iShares Investment Grade Corporate Bond     | Credit spread exposure; higher yield                                      |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Fixed Income                  | IEF                                      | Long Government                             | Tends to output perform where growth slows or inflation expectations fall |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Fixed Income                  | HYG                                      | iShares High Yield Corporate Bond           | Equity-like returns; diversifies duration risk                            |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Fixed Income                  | TIP (Naw)                                | iShares TIPS Bond                           | Inflation protection via real yields                                      |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Real Assets / Inflation Hedge | PDBC (Naw)                               | Invesco Optimum Yield Diversified Commodity | Commodity-based inflation hedge                                           |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+| Cash / Short Duration         | BIL (Naw)                                | SPDR 1–3 Month T-Bill ETF                   | Cash-like liquidity and stability                                         |
++-------------------------------+------------------------------------------+---------------------------------------------+---------------------------------------------------------------------------+
+
+### Setup
+
+```{python}
+from marketmaven.configs import TickerConfig, Interval, Horizon
+from marketmaven.asset_prices import build_long_panel, fetch_etf_features
+from marketmaven.market_fundamentals import fetch_macro_features
+import yfinance as yf
+import numpy as np
+import pandas as pd
+import torch
+
+etf_tickers = [
+    "SPY",
+    "VTV",
+    "IJR",
+    "VNQ",
+    "VEA",
+    "VWO",
+    "AVEM",
+    "VSS",
+    "ISCF",
+    "BND",
+    "IEF",
+    "BNDX",
+    "LQD",
+    "HYG",
+    "TIP",
+    "PDBC",
+    
+]
+
+config = TickerConfig(
+    start_date="2007-01-01",
+    end_date="2025-10-27",
+    interval=Interval.DAILY,
+    tickers=etf_tickers,
+    horizon=Horizon.MONTHLY,
+)
+
+return_data = build_long_panel(config.tickers, config.start_date, config.end_date, horizon=config.horizon)
+
+pivoted_returns = return_data.pivot(index="date", columns="asset_id", values="y_excess_lead")
+
+```
+
+# ETF Correlation
+
+```{python}
+from marketmaven.visualization.eda import correlation_matrix
+
+fig = correlation_matrix(pivoted_returns)
+fig.show()
+```

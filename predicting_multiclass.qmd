@@ -5,13 +5,9 @@ date: now
 date-format: short
 ---
 
-Hadamard kernel testing 
+Hadamard kernel testing
 
-EFA = International Big Cap
-SCZ = International Small Cap
-SPY = US Large Cap
-SCHA = US Small Cap
-
+EFA = International Big Cap SCZ = International Small Cap SPY = US Large Cap SCHA = US Small Cap
 
 ```{python}
 from marketmaven.configs import TickerConfig, Interval, Horizon
@@ -26,7 +22,7 @@ config = TickerConfig(
     start_date="2008-01-01",
     end_date="2025-10-05",
     interval=Interval.DAILY,
-    tickers=[ "EFA", "SCZ" , "SPY"],  # ESGD is the iShares ESG Developed Markets ETF, ISCF is the iShares MSCI USA ESG Select ETF # "SCHA" isn't complete 
+    tickers=[ "EFA", "SCZ" , "SPY"],
     horizon=Horizon.MONTHLY,
 )
 
@@ -47,7 +43,7 @@ for ticker in config.tickers:
 
 ```
 
-Market Level Features 
+Market Level Features
 
 ```{python}
 macro_features = fetch_macro_features(start=config.start_date, end=config.end_date)
@@ -99,7 +95,6 @@ fig.show()
 ```
 
 # Setup Hadamard GP
-
 
 ```{python}
 import gpytorch
@@ -195,8 +190,7 @@ def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood
 
 ```
 
-
-testing outside of cross validation 
+testing outside of cross validation
 
 ```{python}
 
@@ -259,8 +253,7 @@ model, likelihood = train_model(((X_trs, I_tr_long), y_trs), gpytorch.likelihood
 
 ```
 
-
-### Predicting 
+### Predicting
 
 ```{python}
 import torch
@@ -383,7 +376,8 @@ ax_plot(y2_ax, train_y2, train_x2, observed_pred_y2, fr'Task 2 ($\sigma_y^2 = {T
 
 ```
 
-Setting up training 
+Setting up training
+
 ```{python}
 
 
@@ -468,7 +462,7 @@ def fit_eval_split(
     return y_te, y_hat, y_std
 ```
 
-Automating dataset creation 
+Automating dataset creation
 
 ```{python}
 from marketmaven.gp_data_prep import prepare_multitask_gp_data
@@ -517,12 +511,6 @@ results_df = pd.DataFrame(results).set_index("date")
 
 
 ```
-
-
-
-
-
-
 
 ```{python}
 import torch 
@@ -695,7 +683,7 @@ print(summary)
 
 ```
 
-
+```{=html}
 <!-- Failed code by for reference:
 from gpytorch.kernels import RBFKernel, MaternKernel, RQKernel, LinearKernel, ScaleKernel, IndexKernel
 from gpytorch.priors import LogNormalPrior
@@ -813,3 +801,4 @@ with torch.no_grad():
     post = model.posterior(Xtest_t)
     preds = post.mean.cpu().numpy().reshape(-1)
 preds -->
+```

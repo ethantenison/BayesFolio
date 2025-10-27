@@ -114,3 +114,6 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 
 **Oct 25th**
 - finally got hadamard gp to work. still need to do hyperparameter tuning
+
+**Oct 26th**
+- Created list of decorrelated and diversified assets in `my_etf_portfolio_characteristcis.qmd`
