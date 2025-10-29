@@ -117,3 +117,6 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 
 **Oct 26th**
 - Created list of decorrelated and diversified assets in `my_etf_portfolio_characteristcis.qmd`
+
+**Oct 27th**
+- Looked at backtesting, need to create schwab benchmark with new etf list
