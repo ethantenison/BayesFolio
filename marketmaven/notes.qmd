@@ -120,3 +120,18 @@ IC is more important than R2 pooled because it can tell us the best combo of etf
 
 **Oct 27th**
 - Looked at backtesting, need to create schwab benchmark with new etf list
+
+**Oct 30th**
+- Looked at HRP portfolio method in riskfolio. Seemds to be good when the issue is asset preservation. 
+
+- NEXT TO TEST: test forecast model and evaluate it based on: Information Coefficient (IC), Information Ratio (IR) for time series consistency, hit-ratio directional accuracy, Portfolio backtest metrics such as
+Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
+
+- Alpha = your model’s true value-add — the part of returns that comes from skill, not exposure.
+
+- MTGP, try one for all fifteen, one for just bonds, one for just equities plus HYG, Possibly leave out VNQ and PDBC 
+- test out mean, linear, and zero mean function (momentum features could possibly utilize linear mean function)
+- try matern for time kernel
+- try differen mean functions for multitask mean 
+- set low row with task prior to regularize task covariance
+- try a separate model for noise heteroskedasticity
