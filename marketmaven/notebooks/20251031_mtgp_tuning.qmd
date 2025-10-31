@@ -1,0 +1,351 @@
+---
+title: "Tuning MTGP for portoflio predictions"
+format: html
+---
+
+
+### Setup
+
+```{python}
+from marketmaven.configs import TickerConfig, Interval, Horizon
+from marketmaven.asset_prices import build_long_panel, fetch_etf_features
+from marketmaven.market_fundamentals import fetch_macro_features
+import yfinance as yf
+import numpy as np
+import pandas as pd
+import torch
+import riskfolio as rp
+from marketmaven.configs import (
+    RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
+from marketmaven.visualization.eda import correlation_matrix
+from sklearn.preprocessing import StandardScaler
+
+# etf_tickers = [
+#     "SPY",
+#     #"VTV",
+#     "IJR",
+#     "VNQ",
+#     "VNQI",
+#     "VEA",
+#     "VWO",
+#     #"AVEM",
+#     "VSS",
+#     #"ISCF",
+#     "BND",
+#     "IEF",
+#     "BNDX",
+#     "LQD",
+#     "HYG",
+#     "TIP",
+#     #"PDBC", # leaving this out because it is totally separate and uncorrelated
+#     #"BIL",
+    
+# ]
+# A shortered list for testing 
+etf_tickers = [
+    "SPY",
+    "IJR",
+    #"VNQ",
+    #"VNQI",
+    "VEA",
+    "VWO",
+    #"VSS",
+    "BND",
+    #"IEF",
+    #"BNDX",
+    #"LQD",
+    #"HYG",
+    "TIP",
+    #"PDBC", # leaving this out because it is totally separate and uncorrelated
+    #"BIL",
+    
+]
+
+config = TickerConfig(
+    start_date="2007-01-01",
+    end_date="2025-10-31",
+    interval=Interval.DAILY,
+    tickers=etf_tickers,
+    horizon=Horizon.MONTHLY,
+)
+
+return_data = build_long_panel(config.tickers, config.start_date, config.end_date, horizon=config.horizon)
+
+
+pivoted_returns = return_data.pivot(index="date", columns="asset_id", values="y_excess_lead")
+
+pivoted_returns = pivoted_returns.dropna().sort_index()
+
+display(pivoted_returns.head())
+
+y = (
+    pivoted_returns
+)
+
+# Optional: remove column index name and return to a regular column layout
+y.columns.name = None
+y = y.reset_index()
+y.index = y['date']
+y = y.drop(columns=['date'])
+
+y.head(10)
+
+fig = correlation_matrix(pivoted_returns)
+
+fig.show()
+
+```
+
+# Factors 
+
+```{python}
+#Market Level Features
+macro_features = fetch_macro_features(start=config.start_date, end=config.end_date)
+macro_features.hist()
+
+#ETF price features
+
+etf_features = fetch_etf_features(config.tickers, config.start_date, config.end_date, config.horizon)
+etf_features
+
+
+#combine all factor columns
+df = (
+    return_data
+    .merge(etf_features, on=['asset_id', 'date'], how='left')
+    .merge(macro_features, on='date', how='left')
+)
+
+# drop some columns like "volume" which is redundant
+df = df.drop(columns=[ 'yc_pc1', 
+       'yc_pc2', 'yc_pc3', 'vix'])
+
+
+feature_cols = ['price', 'log_ret', 'mom1m',
+       'mom6m', 'mom12m', 'mom36m', 'chmom', 'volume', 'dolvol', 'turnover',
+       'sd_turn', 'ill', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level',
+       'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y', 'tbill3m', 'term_spread',
+       'credit_spread', 'credit_spread_chg_1p', 'dxy']
+
+fig = correlation_matrix(df)
+fig.show()
+```
+
+
+# Setup Hadamard GP
+
+```{python}
+import gpytorch
+from gpytorch.kernels import MaternKernel, RQKernel, SpectralMixtureKernel
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+from gpytorch.means import ZeroMean
+import math
+
+###### TODO SWITCH OUT HADAMARD GP 
+training_iterations = 500
+
+def as_task_col(i: torch.Tensor) -> torch.Tensor:
+    """Make sure task indices are (N,1) long (for likelihood)."""
+    if i.dim() == 1:
+        i = i.unsqueeze(-1)
+    return i.to(torch.long)
+
+def as_task_vec(i: torch.Tensor) -> torch.Tensor:
+    """Make sure task indices are (N,) long (for IndexKernel)."""
+    return i.view(-1).to(torch.long)
+
+class MultitaskGPModel(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood, num_tasks, rank):
+        super().__init__(train_x, train_y, likelihood)
+
+        d = train_x[0].shape[1]
+        SQRT2, SQRT3 = math.sqrt(2.0), math.sqrt(3.0)
+        lengthscale_prior = LogNormalPrior(loc=SQRT2 + math.log(d)*0.5, scale=SQRT3)
+        lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+
+        def make_covar():
+            matern = MaternKernel(
+                nu=0.5,
+                ard_num_dims=d,
+                active_dims=list(range(d)),
+                lengthscale_prior=lengthscale_prior,
+                lengthscale_constraint=lengthscale_constraint,
+            )
+            sm = SpectralMixtureKernel(
+                num_mixtures=5,
+                ard_num_dims=d,
+                active_dims=list(range(d)),
+            )
+            return matern
+
+        self.mean_module = ZeroMean()
+        self.covar_module = make_covar()
+        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
+
+    def forward(self, x, i):
+        mean_x  = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        i_vec   = as_task_vec(i)                   
+        covar_i = self.task_covar_module(i_vec)
+        covar   = covar_x.mul(covar_i)
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar)
+
+
+def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood], rank):
+
+    (train_x, train_i), train_y = train_data
+    train_i_col = as_task_col(train_i)        
+
+    num_tasks = len(torch.unique(train_i))
+    likelihood = likelihood_cls(num_tasks=num_tasks, task_feature_index=1)
+    model = MultitaskGPModel((train_x, train_i_col), train_y, likelihood, num_tasks, rank)
+
+    model.train(); likelihood.train()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+    best_loss = float("inf"); patience = 50; patience_counter = 0
+    for it in range(training_iterations):
+        optimizer.zero_grad()
+        output = model(train_x, train_i_col)         # model will squeeze internally
+        loss = -mll(output, train_y, [train_i_col])  # ✅ tutorial style: list of (N,1)
+        loss.backward()
+        if (it + 1) % 25 == 0:
+            print(f'Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}')
+        optimizer.step()
+
+        if loss.item() + 1e-4 < best_loss:
+            best_loss = loss.item(); patience_counter = 0
+        else:
+            patience_counter += 1
+        if patience_counter >= patience:
+            break
+
+    model.eval(); likelihood.eval()
+    return model, likelihood
+
+
+```
+
+testing outside of cross validation
+
+```{python}
+
+from marketmaven.gp_data_prep import prepare_multitask_gp_data
+from marketmaven.models.cv import rolling_time_splits_multitask
+X, I, y, task_map = prepare_multitask_gp_data(
+    df,
+    target_col="y_excess_lead",
+    asset_col="asset_id",
+    drop_cols=["date", "asset_id"]
+)
+index = -1 * len(task_map) *3 
+scale_y="per_task"
+eps=1e-8
+X_tr, I_tr, y_tr = X[:index], I[:index], y[:index]
+X_te, I_te, y_te = X[index:], I[index:], y[index:]
+
+# ---- 1) Feature scaling (train-only) ----
+x_mean = X_tr.mean(0, keepdim=True)
+x_std  = X_tr.std(0, unbiased=False, keepdim=True).clamp_min(eps)
+X_trs = (X_tr - x_mean) / x_std
+X_tes = (X_te - x_mean) / x_std
+
+# ---- 2) Target scaling (train-only) ----
+if scale_y == "global":
+    y_mean = y_tr.mean()
+    y_std  = y_tr.std(unbiased=False).clamp_min(eps)
+    y_trs  = (y_tr - y_mean) / y_std
+    inv_y  = lambda yhat, ysd: yhat * y_std + y_mean
+    inv_std= lambda s: s * y_std
+elif scale_y == "per_task":
+    # compute per-task stats on train
+    y_trs = torch.empty_like(y_tr)
+    task_vals = I_tr.view(-1).to(torch.long)
+    y_mean_k = {}
+    y_std_k  = {}
+    for k in torch.unique(task_vals):
+        k_mask = (task_vals == k)
+        mu = y_tr[k_mask].mean()
+        sd = y_tr[k_mask].std(unbiased=False).clamp_min(eps)
+        y_trs[k_mask] = (y_tr[k_mask] - mu) / sd
+        y_mean_k[int(k.item())] = mu
+        y_std_k[int(k.item())]  = sd
+    def inv_y(yhat, task_idx):
+        mu = torch.tensor([y_mean_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
+        sd = torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
+        return yhat * sd + mu
+    inv_std = lambda s, task_idx: s * torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=s.dtype, device=s.device)
+else:
+    y_trs = y_tr
+    inv_y  = lambda yhat, *_: yhat
+    inv_std= lambda s, *_: s
+
+
+
+model, likelihood = train_model(((X_trs, I_tr), y_trs), gpytorch.likelihoods.HadamardGaussianLikelihood, rank=1)
+
+```
+
+### Predicting
+
+```{python}
+import torch
+
+
+model.eval(); likelihood.eval()
+with torch.no_grad(), gpytorch.settings.fast_pred_var():
+    pred = likelihood(model(X_te, I_te), [I_te])
+
+
+def unscale(pred, I_task):
+    m_std = pred.mean
+    s_std = pred.variance.sqrt()
+    if scale_y == "per_task":
+        return inv_y(m_std, I_task), inv_std(s_std, I_task)
+    elif scale_y == "global":
+        return inv_y(m_std, None), inv_std(s_std)
+    else:
+        return m_std, s_std
+
+yhat, ystd = unscale(pred, I_te)
+
+
+# --- Metrics: NLPD (Gaussian) and MSE / RMSE per task and overall ---
+
+
+import math
+
+def gaussian_nlpd(y_true: torch.Tensor, y_mean: torch.Tensor, y_std: torch.Tensor, eps: float = 1e-12) -> float:
+    var = (y_std.clamp_min(eps))**2
+    return float(0.5 * ( ((y_true - y_mean)**2) / var + torch.log(2 * torch.pi * var) ).mean())
+
+def mse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
+    return float(((y_true - y_mean)**2).mean())
+
+def rmse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
+    return float(torch.sqrt(((y_true - y_mean)**2).mean()))
+
+def r2_score(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
+    y_bar = y_true.mean()
+    ss_tot = ((y_true - y_bar)**2).sum()
+    ss_res = ((y_true - y_mean)**2).sum()
+    return float(1 - ss_res / ss_tot)
+
+# Per-task
+
+# Use task indices to separate predictions
+task_vals = I_te.view(-1).to(torch.long)
+for k in torch.unique(task_vals):
+    k_mask = (task_vals == k)
+    y_true_k = y_te[k_mask]
+    y_mean_k = yhat[k_mask]
+    y_std_k  = ystd[k_mask]
+    nlpd_k = gaussian_nlpd(y_true_k, y_mean_k, y_std_k)
+    mse_k  = mse(y_true_k, y_mean_k)
+    rmse_k = rmse(y_true_k, y_mean_k)
+    r2_k   = r2_score(y_true_k, y_mean_k)
+    print(f'Task {int(k.item())}: NLPD={nlpd_k:.3f}, MSE={mse_k:.3f}, RMSE={rmse_k:.3f}, R2={r2_k:.3f}')
+
+```

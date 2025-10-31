@@ -5,6 +5,7 @@ from gpytorch.models import ExactGP
 from math import sqrt, log
 from gpytorch.priors import LogNormalPrior
 from gpytorch.constraints import GreaterThan
+import torch
 
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -35,7 +36,10 @@ class ExactGPModel(ExactGP):
         covar_x = self.covar_module(x)
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
     
-    
+def as_task_vec(i: torch.Tensor) -> torch.Tensor:
+  """Make sure task indices are (N,) long (for IndexKernel)."""
+  return i.view(-1).to(torch.long)
+
 class HadamardModel(ExactGP):
     """
     Intrinsic Coregionalization Model (ICM) Multi-task GP with Hadamard structure.
@@ -114,20 +118,24 @@ class HadamardModel(ExactGP):
     MultivariateNormal over full stacked observations; predictions for each task
     can be obtained by passing the corresponding (x, i) pairs.
     """
-    def __init__(self, train_x, train_y, likelihood):
+    def __init__(self, train_x, train_y, likelihood, num_tasks, rank):
         super(HadamardModel, self).__init__(train_x, train_y, likelihood)
-        self.mean_module = gpytorch.means.ConstantMean()
+        d = train_x[0].shape[1]
+        self.mean_module = gpytorch.means.ZeroMean()
         kernel = MaternKernel(
             nu=0.5,
             lengthscale_prior=lengthscale_prior,
-            lengthscale_constraint=lengthscale_constraint
+            lengthscale_constraint=lengthscale_constraint,
+            ard_num_dims=d,
+            active_dims=list(range(d)),
              ) + PeriodicKernel(
                 period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
-                lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
-        kernel_scale = ScaleKernel(kernel)
-        self.covar_module = ScaleKernel(kernel_scale)
+                lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint,
+                            ard_num_dims=d,
+            active_dims=list(range(d)))
+        self.covar_module = kernel
         
-        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=2, rank=1)
+        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
 
     def forward(self,x,i):
         mean_x = self.mean_module(x)
@@ -135,11 +143,13 @@ class HadamardModel(ExactGP):
         # Get input-input covariance
         covar_x = self.covar_module(x)
         # Get task-task covariance
-        covar_i = self.task_covar_module(i)
+        i_vec   = as_task_vec(i)                   
+        covar_i = self.task_covar_module(i_vec)
         # Multiply the two together to get the covariance we want
         covar = covar_x.mul(covar_i)
 
         return gpytorch.distributions.MultivariateNormal(mean_x, covar)
+      
     
     
 class KroneckerModel(gpytorch.models.ExactGP):
