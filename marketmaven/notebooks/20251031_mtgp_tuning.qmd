@@ -49,12 +49,12 @@ etf_tickers = [
     #"VNQI",
     "VEA",
     "VWO",
-    #"VSS",
+    "VSS",
     "BND",
-    #"IEF",
-    #"BNDX",
-    #"LQD",
-    #"HYG",
+    "IEF",
+   #"BNDX",
+    "LQD",
+    "HYG",
     "TIP",
     #"PDBC", # leaving this out because it is totally separate and uncorrelated
     #"BIL",
@@ -62,8 +62,8 @@ etf_tickers = [
 ]
 
 config = TickerConfig(
-    start_date="2007-01-01",
-    end_date="2025-10-31",
+    start_date="2009-05-01",
+    end_date="2025-11-01",
     interval=Interval.DAILY,
     tickers=etf_tickers,
     horizon=Horizon.MONTHLY,
@@ -99,6 +99,7 @@ fig.show()
 # Factors 
 
 ```{python}
+from marketmaven.utils import check_equal_occurrences
 #Market Level Features
 macro_features = fetch_macro_features(start=config.start_date, end=config.end_date)
 macro_features.hist()
@@ -118,117 +119,185 @@ df = (
 
 # drop some columns like "volume" which is redundant
 df = df.drop(columns=[ 'yc_pc1', 
-       'yc_pc2', 'yc_pc3', 'vix'])
+       'yc_pc2', 'yc_pc3', 'vix', 'log_ret', 'dxy'])
 
+all_assets_occur = check_equal_occurrences(df, 'asset_id')
+print('Did all assets occur equally often?', all_assets_occur)
 
-feature_cols = ['price', 'log_ret', 'mom1m',
+df["t_index"] = df.groupby("asset_id").cumcount()
+
+feature_cols = ["t_index", 'price', 'mom1m',
        'mom6m', 'mom12m', 'mom36m', 'chmom', 'volume', 'dolvol', 'turnover',
        'sd_turn', 'ill', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level',
        'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y', 'tbill3m', 'term_spread',
-       'credit_spread', 'credit_spread_chg_1p', 'dxy']
+       'credit_spread', 'credit_spread_chg_1p']
+
+# Move column t_index to the first column position 
+cols = df.columns.tolist()       
+cols.insert(0, cols.pop(cols.index("t_index")))
+
+df = df[cols]
 
 fig = correlation_matrix(df)
 fig.show()
 ```
 
 
-# Setup Hadamard GP
-
 ```{python}
-import gpytorch
-from gpytorch.kernels import MaternKernel, RQKernel, SpectralMixtureKernel
-from gpytorch.priors import LogNormalPrior
-from gpytorch.constraints import GreaterThan
-from gpytorch.means import ZeroMean
-import math
+from typing import Optional
 
-###### TODO SWITCH OUT HADAMARD GP 
-training_iterations = 500
+class MultitaskScaler:
+    """
+    Reusable scaler for multitask Gaussian Process training and inference.
 
-def as_task_col(i: torch.Tensor) -> torch.Tensor:
-    """Make sure task indices are (N,1) long (for likelihood)."""
-    if i.dim() == 1:
-        i = i.unsqueeze(-1)
-    return i.to(torch.long)
+    Handles:
+      • Input feature scaling (optionally excluding time column)
+      • Output target scaling (global or per-task)
+      • Inverse transforms for predictions and standard deviations
 
-def as_task_vec(i: torch.Tensor) -> torch.Tensor:
-    """Make sure task indices are (N,) long (for IndexKernel)."""
-    return i.view(-1).to(torch.long)
+    Parameters
+    ----------
+    scale_y : {"none", "global", "per_task"}
+        Type of target scaling to apply.
+    eps : float, default=1e-8
+        Numerical stability term to prevent division by zero.
+    exclude_time_col : bool, default=True
+        If True, the first column of X (time) is *not* scaled.
 
-class MultitaskGPModel(gpytorch.models.ExactGP):
-    def __init__(self, train_x, train_y, likelihood, num_tasks, rank):
-        super().__init__(train_x, train_y, likelihood)
+    Attributes
+    ----------
+    x_mean : torch.Tensor
+        Mean of training inputs (used for feature scaling)
+    x_std : torch.Tensor
+        Standard deviation of training inputs
+    y_mean : torch.Tensor
+        Global target mean (if global scaling used)
+    y_std : torch.Tensor
+        Global target std (if global scaling used)
+    y_mean_k : dict[int, torch.Tensor]
+        Per-task means (if per_task scaling used)
+    y_std_k : dict[int, torch.Tensor]
+        Per-task stds (if per_task scaling used)
+    """
 
-        d = train_x[0].shape[1]
-        SQRT2, SQRT3 = math.sqrt(2.0), math.sqrt(3.0)
-        lengthscale_prior = LogNormalPrior(loc=SQRT2 + math.log(d)*0.5, scale=SQRT3)
-        lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+    def __init__(self, scale_y: str = "per_task", eps: float = 1e-8, exclude_time_col: bool = False):
+        self.scale_y = scale_y
+        self.eps = eps
+        self.exclude_time_col = exclude_time_col
 
-        def make_covar():
-            matern = MaternKernel(
-                nu=0.5,
-                ard_num_dims=d,
-                active_dims=list(range(d)),
-                lengthscale_prior=lengthscale_prior,
-                lengthscale_constraint=lengthscale_constraint,
-            )
-            sm = SpectralMixtureKernel(
-                num_mixtures=5,
-                ard_num_dims=d,
-                active_dims=list(range(d)),
-            )
-            return matern
+        # containers
+        self.x_mean: Optional[torch.Tensor] = None
+        self.x_std: Optional[torch.Tensor] = None
+        self.y_mean = None
+        self.y_std = None
+        self.y_mean_k = {}
+        self.y_std_k = {}
+        self.global_mu = None
+        self.global_sd = None
 
-        self.mean_module = ZeroMean()
-        self.covar_module = make_covar()
-        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
-
-    def forward(self, x, i):
-        mean_x  = self.mean_module(x)
-        covar_x = self.covar_module(x)
-        i_vec   = as_task_vec(i)                   
-        covar_i = self.task_covar_module(i_vec)
-        covar   = covar_x.mul(covar_i)
-        return gpytorch.distributions.MultivariateNormal(mean_x, covar)
-
-
-def train_model(train_data, likelihood_cls: type[gpytorch.likelihoods.Likelihood], rank):
-
-    (train_x, train_i), train_y = train_data
-    train_i_col = as_task_col(train_i)        
-
-    num_tasks = len(torch.unique(train_i))
-    likelihood = likelihood_cls(num_tasks=num_tasks, task_feature_index=1)
-    model = MultitaskGPModel((train_x, train_i_col), train_y, likelihood, num_tasks, rank)
-
-    model.train(); likelihood.train()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
-    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
-
-    best_loss = float("inf"); patience = 50; patience_counter = 0
-    for it in range(training_iterations):
-        optimizer.zero_grad()
-        output = model(train_x, train_i_col)         # model will squeeze internally
-        loss = -mll(output, train_y, [train_i_col])  # ✅ tutorial style: list of (N,1)
-        loss.backward()
-        if (it + 1) % 25 == 0:
-            print(f'Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}')
-        optimizer.step()
-
-        if loss.item() + 1e-4 < best_loss:
-            best_loss = loss.item(); patience_counter = 0
+    # -----------------------------------------------
+    # Feature scaling
+    # -----------------------------------------------
+    def fit_x(self, X: torch.Tensor) -> None:
+        """Compute mean/std for inputs, optionally excluding the first (time) column."""
+        if self.exclude_time_col and X.shape[1] > 1:
+            feat_mask = torch.arange(X.shape[1]) != 0
+            self.x_mean = X[:, feat_mask].mean(0, keepdim=True)
+            self.x_std  = X[:, feat_mask].std(0, unbiased=False, keepdim=True).clamp_min(self.eps)
         else:
-            patience_counter += 1
-        if patience_counter >= patience:
-            break
+            self.x_mean = X.mean(0, keepdim=True)
+            self.x_std  = X.std(0, unbiased=False, keepdim=True).clamp_min(self.eps)
 
-    model.eval(); likelihood.eval()
-    return model, likelihood
+    def transform_x(self, X: torch.Tensor) -> torch.Tensor:
+        """Scale features using previously fitted statistics."""
+        if self.x_mean is None:
+            raise RuntimeError("Must call fit_x() before transform_x().")
 
+        Xs = X.clone()
+        if self.exclude_time_col and X.shape[1] > 1:
+            feat_mask = torch.arange(X.shape[1]) != 0
+            Xs[:, feat_mask] = (X[:, feat_mask] - self.x_mean) / self.x_std
+        else:
+            Xs = (X - self.x_mean) / self.x_std
+        return Xs
+
+    # -----------------------------------------------
+    # Target scaling
+    # -----------------------------------------------
+    def fit_y(self, y: torch.Tensor, I: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """Compute target scaling (global or per task)."""
+        if self.scale_y == "none":
+            return y
+
+        if self.scale_y == "global":
+            self.y_mean = y.mean()
+            self.y_std = y.std(unbiased=False).clamp_min(self.eps)
+            return (y - self.y_mean) / self.y_std
+
+        elif self.scale_y == "per_task":
+            if I is None:
+                raise ValueError("Must pass task indices I for per-task scaling.")
+
+            y_scaled = torch.empty_like(y)
+            task_vals = I.view(-1).to(torch.long)
+            for k in torch.unique(task_vals):
+                mask = task_vals == k
+                mu = y[mask].mean()
+                sd = y[mask].std(unbiased=False).clamp_min(self.eps)
+                y_scaled[mask] = (y[mask] - mu) / sd
+                self.y_mean_k[int(k.item())] = mu
+                self.y_std_k[int(k.item())] = sd
+
+            # global fallback for unseen tasks
+            self.global_mu = y.mean()
+            self.global_sd = y.std(unbiased=False).clamp_min(self.eps)
+            return y_scaled
+
+        else:
+            raise ValueError(f"Unknown scale_y type: {self.scale_y}")
+
+    # -----------------------------------------------
+    # Inverse transforms
+    # -----------------------------------------------
+    def inverse_y(self, yhat: torch.Tensor, I: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """Inverse transform predictions back to original target space."""
+        if self.scale_y == "none":
+            return yhat
+
+        if self.scale_y == "global":
+            return yhat * self.y_std + self.y_mean
+
+        elif self.scale_y == "per_task":
+            if I is None:
+                raise ValueError("Must pass task indices I for per-task inverse transform.")
+            mu = torch.tensor(
+                [self.y_mean_k.get(int(t), self.global_mu) for t in I.view(-1).tolist()],
+                dtype=yhat.dtype, device=yhat.device
+            )
+            sd = torch.tensor(
+                [self.y_std_k.get(int(t), self.global_sd) for t in I.view(-1).tolist()],
+                dtype=yhat.dtype, device=yhat.device
+            )
+            return yhat * sd + mu
+
+    def inverse_std(self, s: torch.Tensor, I: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """Inverse transform predicted standard deviations."""
+        if self.scale_y == "none":
+            return s
+        if self.scale_y == "global":
+            return s * self.y_std
+        elif self.scale_y == "per_task":
+            if I is None:
+                raise ValueError("Must pass task indices I for per-task inverse transform.")
+            sd = torch.tensor(
+                [self.y_std_k.get(int(t), self.global_sd) for t in I.view(-1).tolist()],
+                dtype=s.dtype, device=s.device
+            )
+            return s * sd
 
 ```
 
-testing outside of cross validation
+# Data transformation for MTGP
 
 ```{python}
 
@@ -240,51 +309,144 @@ X, I, y, task_map = prepare_multitask_gp_data(
     asset_col="asset_id",
     drop_cols=["date", "asset_id"]
 )
-index = -1 * len(task_map) *3 
+index = -1 * len(task_map) *4 
 scale_y="per_task"
 eps=1e-8
 X_tr, I_tr, y_tr = X[:index], I[:index], y[:index]
 X_te, I_te, y_te = X[index:], I[index:], y[index:]
 
-# ---- 1) Feature scaling (train-only) ----
-x_mean = X_tr.mean(0, keepdim=True)
-x_std  = X_tr.std(0, unbiased=False, keepdim=True).clamp_min(eps)
-X_trs = (X_tr - x_mean) / x_std
-X_tes = (X_te - x_mean) / x_std
+# Initialize and fit
+scaler = MultitaskScaler(scale_y="per_task", exclude_time_col=False)
+scaler.fit_x(X_tr)
+X_trs = scaler.transform_x(X_tr)
+X_tes = scaler.transform_x(X_te)
 
-# ---- 2) Target scaling (train-only) ----
-if scale_y == "global":
-    y_mean = y_tr.mean()
-    y_std  = y_tr.std(unbiased=False).clamp_min(eps)
-    y_trs  = (y_tr - y_mean) / y_std
-    inv_y  = lambda yhat, ysd: yhat * y_std + y_mean
-    inv_std= lambda s: s * y_std
-elif scale_y == "per_task":
-    # compute per-task stats on train
-    y_trs = torch.empty_like(y_tr)
-    task_vals = I_tr.view(-1).to(torch.long)
-    y_mean_k = {}
-    y_std_k  = {}
-    for k in torch.unique(task_vals):
-        k_mask = (task_vals == k)
-        mu = y_tr[k_mask].mean()
-        sd = y_tr[k_mask].std(unbiased=False).clamp_min(eps)
-        y_trs[k_mask] = (y_tr[k_mask] - mu) / sd
-        y_mean_k[int(k.item())] = mu
-        y_std_k[int(k.item())]  = sd
-    def inv_y(yhat, task_idx):
-        mu = torch.tensor([y_mean_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
-        sd = torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=yhat.dtype, device=yhat.device)
-        return yhat * sd + mu
-    inv_std = lambda s, task_idx: s * torch.tensor([y_std_k[int(t)] for t in task_idx.view(-1).tolist()], dtype=s.dtype, device=s.device)
-else:
-    y_trs = y_tr
-    inv_y  = lambda yhat, *_: yhat
-    inv_std= lambda s, *_: s
+y_trs = scaler.fit_y(y_tr, I_tr)
+
+```
+
+```{python}
+from marketmaven.models.gp import train_model_hadamard
+from gpytorch.means import ConstantMean, ZeroMean, LinearMean
+from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel, SpectralMixtureKernel, RQKernel
+
+idx = {c:i for i,c in enumerate(feature_cols)}
+
+TIME   = [idx["t_index"]]                                  # [0]
+PRICE  = [idx["price"]]                                    # [1]
+
+MOM    = [idx[c] for c in ["mom1m","mom6m","mom12m","mom36m","chmom"]]  # [2..6]
+LIQVOL = [idx[c] for c in ["volume","dolvol","turnover","sd_turn","ill","vol_1m","baspread"]]  # [7..13]
+VIX    = [idx[c] for c in ["vix3m","vix_ts_level","vix_ts_chg_1m","vix_ts_z_12m"]]             # [14..17]
+RATES  = [idx[c] for c in ["tnote10y","tbill3m","term_spread","credit_spread","credit_spread_chg_1p"]]  # [18..22]
+ls_prior = LogNormalPrior(loc=0.0, scale=0.5)   # lengthscale ~1 as prior mode
+ls_constraint = GreaterThan(1e-3)
+
+def make_grouped_kernel():
+    # --- Group kernels (additive) ---
+    k_mom = MaternKernel(nu=0.5, ard_num_dims=len(MOM), active_dims=MOM,
+                         lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
+
+    k_liq_smooth = RBFKernel(ard_num_dims=len(LIQVOL), active_dims=LIQVOL,
+                             lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
+    k_liq_lin    = LinearKernel(active_dims=LIQVOL)
+    k_liq = k_liq_smooth + k_liq_lin
+
+    k_vix = RQKernel(ard_num_dims=len(VIX), active_dims=VIX, lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
+
+    k_rates_lin  = LinearKernel(active_dims=RATES)
+    k_rates_smoo = RBFKernel(ard_num_dims=len(RATES), active_dims=RATES,
+                             lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
+    k_rates = k_rates_lin + k_rates_smoo
+
+    k_price = LinearKernel(active_dims=PRICE)  # keep simple to avoid leakage-y curves
+
+    k_features = k_mom + k_liq + k_vix + k_rates + k_price
+
+    # --- Time kernel (1D) ---
+    k_time = MaternKernel(nu=1.5, ard_num_dims=1, active_dims=TIME,
+                          lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
+
+    # Recommend product: covariance high only if close in time AND features
+    k_total = k_features * k_time
+    return k_total
+
+
+```
+
+# Setup Hadamard GP
+
+```{python}
+
+
+from math import sqrt, log
+from gpytorch.priors import LogNormalPrior
+from gpytorch.constraints import GreaterThan
+import torch
+
+SQRT2 = sqrt(2)
+SQRT3 = sqrt(3)
+# set seed torch for reproducibility
+torch.manual_seed(42)
+
+ard_num_dims = len(feature_cols) -1
+lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
+lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+lengthscale_prior_time = LogNormalPrior(loc=SQRT2 + log(1) * 0.5, scale=SQRT3)
+lengthscale_constraint_time = GreaterThan(2.5e-2, initial_value=lengthscale_prior_time.mode)
+
+def adaptive_lengthscale_prior(num_dims:int):
+    return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.5, scale=SQRT3)
+def adaptive_lengthscale_constraint(num_dims:int):
+    return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior(num_dims).mode)
+
+
+MIN_INFERRED_NOISE_LEVEL = 1e-4  # Minimum noise level to avoid numerical issues
+
+mean_f = ZeroMean()
+kernel_f = MaternKernel(
+    nu=1.5,
+    ard_num_dims=ard_num_dims,
+    lengthscale_prior=adaptive_lengthscale_prior(ard_num_dims),
+    lengthscale_constraint=adaptive_lengthscale_constraint(ard_num_dims),
+    active_dims=list(range(1, ard_num_dims + 1)),
+)
 
 
 
-model, likelihood = train_model(((X_trs, I_tr), y_trs), gpytorch.likelihoods.HadamardGaussianLikelihood, rank=1)
+total_months = (int((df['date'].max().to_period('M') - df['date'].min().to_period('M')).n) + 1)-4
+scaled_period = 12.0 / total_months  # annual
+k_per = PeriodicKernel(active_dims=[0], period_length=scaled_period,             period_length_prior=LogNormalPrior(loc=0.0, scale=0.3),
+    lengthscale_prior=adaptive_lengthscale_prior(1),
+    lengthscale_constraint=adaptive_lengthscale_constraint(1),)
+
+kernel_t = MaternKernel(
+    nu=1.5,
+    ard_num_dims=1,
+    lengthscale_prior=adaptive_lengthscale_prior(1),
+    lengthscale_constraint=adaptive_lengthscale_constraint(1),
+    active_dims=[0],
+) + k_per
+
+kernel_total = kernel_f * kernel_t
+
+# MaternKernel(
+#     nu=1.5,
+#     ard_num_dims=1,
+#     lengthscale_prior=lengthscale_prior_time,
+#     lengthscale_constraint=lengthscale_constraint_time,
+#     active_dims=[0],
+# )
+
+# SpectralMixtureKernel(
+#             num_mixtures=5,
+#             ard_num_dims=1,
+#             active_dims=[0],
+#         )
+
+model, likelihood = train_model_hadamard(((X_trs, I_tr), y_trs), rank=2, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50)
+
+
 
 ```
 
@@ -292,27 +454,18 @@ model, likelihood = train_model(((X_trs, I_tr), y_trs), gpytorch.likelihoods.Had
 
 ```{python}
 import torch
+from scipy.stats import spearmanr
+import gpytorch
+
 
 
 model.eval(); likelihood.eval()
 with torch.no_grad(), gpytorch.settings.fast_pred_var():
-    pred = likelihood(model(X_te, I_te), [I_te])
+    pred = likelihood(model(X_tes, I_te), [I_te])
 
 
-def unscale(pred, I_task):
-    m_std = pred.mean
-    s_std = pred.variance.sqrt()
-    if scale_y == "per_task":
-        return inv_y(m_std, I_task), inv_std(s_std, I_task)
-    elif scale_y == "global":
-        return inv_y(m_std, None), inv_std(s_std)
-    else:
-        return m_std, s_std
-
-yhat, ystd = unscale(pred, I_te)
-
-
-# --- Metrics: NLPD (Gaussian) and MSE / RMSE per task and overall ---
+yhat = scaler.inverse_y(pred.mean, I_te)
+ystd = scaler.inverse_std(pred.variance.sqrt(), I_te)
 
 
 import math
@@ -337,6 +490,7 @@ def r2_score(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
 
 # Use task indices to separate predictions
 task_vals = I_te.view(-1).to(torch.long)
+ic_values = []
 for k in torch.unique(task_vals):
     k_mask = (task_vals == k)
     y_true_k = y_te[k_mask]
@@ -347,5 +501,27 @@ for k in torch.unique(task_vals):
     rmse_k = rmse(y_true_k, y_mean_k)
     r2_k   = r2_score(y_true_k, y_mean_k)
     print(f'Task {int(k.item())}: NLPD={nlpd_k:.3f}, MSE={mse_k:.3f}, RMSE={rmse_k:.3f}, R2={r2_k:.3f}')
+
+#### additional metrics 
+from marketmaven.evaluate import evaluate_asset_pricing
+
+y_pred = yhat.numpy()
+y_pred = y_pred.reshape(4, len(task_map))
+y_pred = pd.DataFrame(y_pred, columns=task_map.values())
+y_pred
+
+y_true = y_te.numpy()
+y_true = y_true.reshape(4, len(task_map))
+y_true = pd.DataFrame(y_true, columns=task_map.values())
+y_true
+
+results = evaluate_asset_pricing(y_true, y_pred)
+results
+
+```
+
+
+```{python}
+
 
 ```

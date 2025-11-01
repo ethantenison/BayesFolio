@@ -141,3 +141,8 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 - Need to upgrade to gpu version of pytorch
 - refere back to different things to try for tomorrow. 
 - Need to add the metrics to stop focusing on R2 
+
+**November 1st**
+- Added IC and IR metrics to evaluate model performance.
+- refactor hadamard kernel 
+-

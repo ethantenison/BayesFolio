@@ -1,6 +1,6 @@
 import gpytorch
 from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel
-from gpytorch.likelihoods import GaussianLikelihood
+from gpytorch.likelihoods import GaussianLikelihood, HadamardGaussianLikelihood
 from gpytorch.models import ExactGP
 from math import sqrt, log
 from gpytorch.priors import LogNormalPrior
@@ -13,7 +13,7 @@ SQRT3 = sqrt(3)
 ard_num_dims = 3
 lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
 lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
-MIN_INFERRED_NOISE_LEVEL = 1e-4  # Minimum noise level to avoid numerical issues
+MIN_INFERRED_NOISE_LEVEL = 1e-5  # Minimum noise level to avoid numerical issues
 
 
 class ExactGPModel(ExactGP):
@@ -40,7 +40,44 @@ def as_task_vec(i: torch.Tensor) -> torch.Tensor:
   """Make sure task indices are (N,) long (for IndexKernel)."""
   return i.view(-1).to(torch.long)
 
-class HadamardModel(ExactGP):
+def as_task_col(i: torch.Tensor) -> torch.Tensor:
+    """Make sure task indices are (N,1) long (for likelihood)."""
+    if i.dim() == 1:
+        i = i.unsqueeze(-1)
+    return i.to(torch.long)
+  
+def get_hadamard_gaussian_likelihood_with_lognormal_prior(
+    num_tasks: int,
+    task_feature_index: int = 1,
+    batch_shape: torch.Size | None = None,
+) -> HadamardGaussianLikelihood:
+    """Hadamard Gaussian Likelihood with independent LogNormal(-4, 1) priors per task.
+
+    Args:
+        num_tasks: Number of tasks in the multi-output GP.
+        batch_shape: Optional batch shape for noise parameterization.
+
+    Returns:
+        HadamardGaussianLikelihood configured with per-task priors and constraints.
+    """
+    batch_shape = torch.Size() if batch_shape is None else batch_shape
+
+    noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
+    noise_constraint = GreaterThan(
+        MIN_INFERRED_NOISE_LEVEL,
+        transform=None,
+        initial_value=noise_prior.mode,
+    )
+
+    return HadamardGaussianLikelihood(
+        num_tasks=num_tasks,
+        noise_prior=noise_prior,
+        noise_constraint=noise_constraint,
+        batch_shape=batch_shape,
+        task_feature_index=task_feature_index,
+    )
+
+class HadamardMultiTaskGP(ExactGP):
     """
     Intrinsic Coregionalization Model (ICM) Multi-task GP with Hadamard structure.
 
@@ -118,22 +155,23 @@ class HadamardModel(ExactGP):
     MultivariateNormal over full stacked observations; predictions for each task
     can be obtained by passing the corresponding (x, i) pairs.
     """
-    def __init__(self, train_x, train_y, likelihood, num_tasks, rank):
-        super(HadamardModel, self).__init__(train_x, train_y, likelihood)
-        d = train_x[0].shape[1]
-        self.mean_module = gpytorch.means.ZeroMean()
-        kernel = MaternKernel(
-            nu=0.5,
-            lengthscale_prior=lengthscale_prior,
-            lengthscale_constraint=lengthscale_constraint,
-            ard_num_dims=d,
-            active_dims=list(range(d)),
-             ) + PeriodicKernel(
-                period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
-                lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint,
-                            ard_num_dims=d,
-            active_dims=list(range(d)))
+    def __init__(self, train_x, train_y, likelihood, mean_f, kernel, num_tasks, rank):
+        super(HadamardMultiTaskGP, self).__init__(train_x, train_y, likelihood)
+        #d = train_x[0].shape[1]
+        self.mean_module = mean_f # gpytorch.means.ZeroMean()
+        # kernel = MaternKernel(
+        #     nu=0.5,
+        #     lengthscale_prior=lengthscale_prior,
+        #     lengthscale_constraint=lengthscale_constraint,
+        #     ard_num_dims=d,
+        #     active_dims=list(range(d)),
+        #      ) + PeriodicKernel(
+        #         period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
+        #         lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint,
+        #                     ard_num_dims=d,
+        #     active_dims=list(range(d)))
         self.covar_module = kernel
+        self._register_lengthscale_constraints(self.covar_module)
         
         self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
 
@@ -149,6 +187,65 @@ class HadamardModel(ExactGP):
         covar = covar_x.mul(covar_i)
 
         return gpytorch.distributions.MultivariateNormal(mean_x, covar)
+    
+    def _register_lengthscale_constraints(self, kernel):
+      """
+      Recursively registers constraints for raw_lengthscale on all sub-kernels.
+
+      Args:
+          kernel: The kernel or combined kernel to register constraints on.
+      """
+      if hasattr(kernel, "base_kernel"):
+          # If the kernel has a base kernel, register constraints on it
+          self._register_lengthscale_constraints(kernel.base_kernel)
+
+      if hasattr(kernel, "kernels"):
+          # If the kernel is a combination (e.g., additive or product), recurse into sub-kernels
+          for sub_kernel in kernel.kernels:
+              self._register_lengthscale_constraints(sub_kernel)
+
+      if hasattr(kernel, "raw_lengthscale"):
+          # Register the constraint for raw_lengthscale
+          kernel.register_constraint("raw_lengthscale", GreaterThan(2.5e-2))
+    
+def train_model_hadamard(train_data, rank, mean_f, kernel, training_iterations=500, patience=50):
+
+    (train_x, train_i), train_y = train_data
+    train_i_col = as_task_col(train_i)        
+
+    num_tasks = len(torch.unique(train_i))
+    likelihood = get_hadamard_gaussian_likelihood_with_lognormal_prior(num_tasks=num_tasks, task_feature_index=1)
+    model = HadamardMultiTaskGP((train_x, train_i_col), train_y, likelihood, mean_f, kernel, num_tasks, rank)
+    model.likelihood.noise_covar.register_constraint("raw_noise", GreaterThan(MIN_INFERRED_NOISE_LEVEL))
+    
+    model.train()
+    likelihood.train()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+    best_loss = float("inf")
+    patience_counter = 0
+    for it in range(training_iterations):
+        optimizer.zero_grad()
+        output = model(train_x, train_i_col)         # model will squeeze internally
+        loss = -mll(output, train_y, [train_i_col])  # ✅ tutorial style: list of (N,1)
+        loss.backward()
+        if (it + 1) % 25 == 0:
+            print(f'Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}')
+        optimizer.step()
+
+        if loss.item() + 1e-4 < best_loss:
+            best_loss = loss.item()
+            patience_counter = 0
+        else:
+            patience_counter += 1
+        if patience_counter >= patience:
+            break
+
+    model.eval()
+    likelihood.eval()
+    return model, likelihood
+
       
     
     

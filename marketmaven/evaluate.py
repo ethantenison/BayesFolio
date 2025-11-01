@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.metrics import r2_score
 from scipy.stats import spearmanr
 
+
 def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
     """
     Evaluate predictive performance using metrics from
@@ -23,24 +24,26 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
         {
             "R2_pooled": float,
             "R2_avg": float,
-            "IC": float
+            "IC": float,
+            "IR": float,
+            "HitRatio": float
         }
     """
-    # Align
+    # Align dataframes
     y_true = y_test.copy().reset_index(drop=True)
     y_hat = y_pred.copy().reset_index(drop=True)
-    y_hat.columns = y_true.columns  # ensure same order
-    
-    # Drop rows with all NaN
+    y_hat.columns = y_true.columns  # ensure consistent ordering
+
+    # Drop rows with all NaNs
     valid_idx = ~(y_true.isna().all(axis=1) | y_hat.isna().all(axis=1))
     y_true, y_hat = y_true.loc[valid_idx], y_hat.loc[valid_idx]
 
-    # --- 1. Pooled R2 (aggregate numerator/denominator across all assets+times) ---
+    # --- 1. Pooled R2 (aggregate) ---
     num = ((y_true - y_hat) ** 2).to_numpy().sum()
     denom = ((y_true - y_true.mean()) ** 2).to_numpy().sum()
     R2_pooled = 1 - num / denom if denom > 0 else np.nan
 
-    # --- 2. Average R2 (per asset, then average) ---
+    # --- 2. Average R2 (per asset) ---
     R2_list = []
     for col in y_true.columns:
         yt, yp = y_true[col], y_hat[col]
@@ -49,17 +52,30 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
             R2_list.append(r2_score(yt[mask], yp[mask]))
     R2_avg = np.nanmean(R2_list) if R2_list else np.nan
 
-    # --- 3. Information Coefficient (cross-sectional Spearman, average over time) ---
+    # --- 3. Cross-sectional IC per time (Spearman) ---
     IC_list = []
+    Hit_list = []
     for i in range(len(y_true)):
         yt, yp = y_true.iloc[i, :], y_hat.iloc[i, :]
         mask = yt.notna() & yp.notna()
         if mask.sum() > 1:
-            IC_list.append(spearmanr(yt[mask], yp[mask]).correlation)
+            ic_val = spearmanr(yt[mask], yp[mask]).correlation
+            IC_list.append(ic_val)
+
+            # Hit ratio for this time step
+            hit = (np.sign(yt[mask]) == np.sign(yp[mask])).mean()
+            Hit_list.append(hit)
+
     IC = np.nanmean(IC_list) if IC_list else np.nan
+    IC_std = np.nanstd(IC_list, ddof=1) if len(IC_list) > 1 else np.nan
+    IR = IC / IC_std if IC_std and not np.isnan(IC_std) and IC_std > 0 else np.nan
+
+    HitRatio = np.nanmean(Hit_list) if Hit_list else np.nan
 
     return {
         "R2_pooled": R2_pooled,
         "R2_avg": R2_avg,
         "IC": IC,
+        "IR": IR,
+        "HitRatio": HitRatio,
     }

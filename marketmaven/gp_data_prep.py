@@ -62,7 +62,8 @@ def prepare_multitask_gp_data(
 
     # Extract target, features, and task index
     y_np = df_proc[target_col].to_numpy()
-    x_np = df_proc.drop(columns=[target_col]).to_numpy()
+    feature_df = df_proc.drop(columns=[target_col, "__task_idx__"], errors="ignore")
+    x_np = feature_df.to_numpy()
     i_np = df["__task_idx__"].to_numpy().reshape(-1, 1)
 
     # Convert to tensors
