@@ -332,6 +332,7 @@ from math import sqrt, log
 from gpytorch.priors import LogNormalPrior
 from gpytorch.constraints import GreaterThan
 import torch
+from gpytorch.means import MultitaskMean
 
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -351,8 +352,14 @@ def adaptive_lengthscale_constraint(num_dims:int):
 
 
 MIN_INFERRED_NOISE_LEVEL = 1e-4  # Minimum noise level to avoid numerical issues
+num_tasks = len(torch.unique(I_tr))
 
-mean_f = ZeroMean()
+#mean_f = ZeroMean()
+mean_f = MultitaskMean(
+            base_means=ConstantMean(batch_shape=X_tr.shape[:-2]),
+            num_tasks=num_tasks,
+        )
+
 kernel_f = MaternKernel(
     nu=2.5,
     ard_num_dims=ard_num_dims,
@@ -381,7 +388,7 @@ kernel_t = MaternKernel(
 
 kernel_total = kernel_f * kernel_t
 
-model, likelihood = train_model_hadamard(((X_trs, I_tr), y_trs), rank=3, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50)
+model, likelihood = train_model_hadamard(((X_trs, I_tr), y_trs), rank=2, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50)
 
 
 

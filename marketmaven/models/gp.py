@@ -3,9 +3,10 @@ from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKerne
 from gpytorch.likelihoods import GaussianLikelihood, HadamardGaussianLikelihood
 from gpytorch.models import ExactGP
 from math import sqrt, log
-from gpytorch.priors import LogNormalPrior
+from gpytorch.priors import LogNormalPrior, GammaPrior, LKJCovariancePrior
 from gpytorch.constraints import GreaterThan
 import torch
+from marketmaven.models.kernels import PositiveIndexKernel
 
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -173,7 +174,19 @@ class HadamardMultiTaskGP(ExactGP):
         self.covar_module = kernel
         self._register_lengthscale_constraints(self.covar_module)
         
-        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
+        sd_prior = GammaPrior(1.0, 0.15)
+        sd_prior._event_shape = torch.Size([num_tasks])
+        eta = 0.8
+        task_covar_prior = LKJCovariancePrior(num_tasks, eta, sd_prior)
+
+        # self.task_covar_module = PositiveIndexKernel(
+        #     num_tasks=num_tasks,
+        #     rank=rank,
+        #     task_prior=task_covar_prior,
+        #     # active_dims=[task_feature],
+        # )
+        
+        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank, task_prior=task_covar_prior)
 
     def forward(self,x,i):
         mean_x = self.mean_module(x)

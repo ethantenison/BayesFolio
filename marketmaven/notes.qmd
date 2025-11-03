@@ -150,3 +150,5 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 - using optuna found that matern 2.5 and periodicmatern 2.5 worked best with task rank 2 
 - BIL and PBC were not helpful additions with virtually zero correlations with others 
 - Task Rank and smoothness of the PERIOD_MATERN most important hyperparameters 
+- Next steps: add Linear Kernel additive to time, Try spectral mixture for time, try spectral mixture linear for features, add prior to coregionalization task covariance to regularize it more, try PositivieIndexKernel, LKJ Prior
+-issues with positiveindexkernel and multitaskmean
