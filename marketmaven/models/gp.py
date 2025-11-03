@@ -208,7 +208,7 @@ class HadamardMultiTaskGP(ExactGP):
           # Register the constraint for raw_lengthscale
           kernel.register_constraint("raw_lengthscale", GreaterThan(2.5e-2))
     
-def train_model_hadamard(train_data, rank, mean_f, kernel, training_iterations=500, patience=50):
+def train_model_hadamard(train_data, rank, mean_f, kernel, training_iterations=500, patience=50, visualize: bool = False):
 
     (train_x, train_i), train_y = train_data
     train_i_col = as_task_col(train_i)        
@@ -230,8 +230,9 @@ def train_model_hadamard(train_data, rank, mean_f, kernel, training_iterations=5
         output = model(train_x, train_i_col)         # model will squeeze internally
         loss = -mll(output, train_y, [train_i_col])  # ✅ tutorial style: list of (N,1)
         loss.backward()
-        if (it + 1) % 25 == 0:
-            print(f'Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}')
+        if visualize:
+          if (it + 1) % 25 == 0:
+              print(f'Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}')
         optimizer.step()
 
         if loss.item() + 1e-4 < best_loss:

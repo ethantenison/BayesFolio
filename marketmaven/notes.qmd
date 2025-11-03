@@ -145,4 +145,8 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 **November 1st**
 - Added IC and IR metrics to evaluate model performance.
 - refactor hadamard kernel 
--
+
+**November 2nd & 3rd**
+- using optuna found that matern 2.5 and periodicmatern 2.5 worked best with task rank 2 
+- BIL and PBC were not helpful additions with virtually zero correlations with others 
+- Task Rank and smoothness of the PERIOD_MATERN most important hyperparameters 

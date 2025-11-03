@@ -20,39 +20,19 @@ from marketmaven.configs import (
 from marketmaven.visualization.eda import correlation_matrix
 from sklearn.preprocessing import StandardScaler
 
-# etf_tickers = [
-#     "SPY",
-#     #"VTV",
-#     "IJR",
-#     "VNQ",
-#     "VNQI",
-#     "VEA",
-#     "VWO",
-#     #"AVEM",
-#     "VSS",
-#     #"ISCF",
-#     "BND",
-#     "IEF",
-#     "BNDX",
-#     "LQD",
-#     "HYG",
-#     "TIP",
-#     #"PDBC", # leaving this out because it is totally separate and uncorrelated
-#     #"BIL",
     
-# ]
 # A shortered list for testing 
 etf_tickers = [
     "SPY",
     "IJR",
-    #"VNQ",
-    #"VNQI",
+    "VNQ",
+    "VNQI",
     "VEA",
     "VWO",
     "VSS",
     "BND",
     "IEF",
-   #"BNDX",
+    "BNDX",
     "LQD",
     "HYG",
     "TIP",
@@ -62,7 +42,7 @@ etf_tickers = [
 ]
 
 config = TickerConfig(
-    start_date="2009-05-01",
+    start_date="2013-06-01",
     end_date="2025-11-01",
     interval=Interval.DAILY,
     tickers=etf_tickers,
@@ -339,37 +319,6 @@ MOM    = [idx[c] for c in ["mom1m","mom6m","mom12m","mom36m","chmom"]]  # [2..6]
 LIQVOL = [idx[c] for c in ["volume","dolvol","turnover","sd_turn","ill","vol_1m","baspread"]]  # [7..13]
 VIX    = [idx[c] for c in ["vix3m","vix_ts_level","vix_ts_chg_1m","vix_ts_z_12m"]]             # [14..17]
 RATES  = [idx[c] for c in ["tnote10y","tbill3m","term_spread","credit_spread","credit_spread_chg_1p"]]  # [18..22]
-ls_prior = LogNormalPrior(loc=0.0, scale=0.5)   # lengthscale ~1 as prior mode
-ls_constraint = GreaterThan(1e-3)
-
-def make_grouped_kernel():
-    # --- Group kernels (additive) ---
-    k_mom = MaternKernel(nu=0.5, ard_num_dims=len(MOM), active_dims=MOM,
-                         lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
-
-    k_liq_smooth = RBFKernel(ard_num_dims=len(LIQVOL), active_dims=LIQVOL,
-                             lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
-    k_liq_lin    = LinearKernel(active_dims=LIQVOL)
-    k_liq = k_liq_smooth + k_liq_lin
-
-    k_vix = RQKernel(ard_num_dims=len(VIX), active_dims=VIX, lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
-
-    k_rates_lin  = LinearKernel(active_dims=RATES)
-    k_rates_smoo = RBFKernel(ard_num_dims=len(RATES), active_dims=RATES,
-                             lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
-    k_rates = k_rates_lin + k_rates_smoo
-
-    k_price = LinearKernel(active_dims=PRICE)  # keep simple to avoid leakage-y curves
-
-    k_features = k_mom + k_liq + k_vix + k_rates + k_price
-
-    # --- Time kernel (1D) ---
-    k_time = MaternKernel(nu=1.5, ard_num_dims=1, active_dims=TIME,
-                          lengthscale_prior=ls_prior, lengthscale_constraint=ls_constraint)
-
-    # Recommend product: covariance high only if close in time AND features
-    k_total = k_features * k_time
-    return k_total
 
 
 ```
@@ -392,7 +341,7 @@ torch.manual_seed(42)
 ard_num_dims = len(feature_cols) -1
 lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
 lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
-lengthscale_prior_time = LogNormalPrior(loc=SQRT2 + log(1) * 0.5, scale=SQRT3)
+lengthscale_prior_time = LogNormalPrior(loc=SQRT2 + log(1) * 0.3, scale=SQRT3)
 lengthscale_constraint_time = GreaterThan(2.5e-2, initial_value=lengthscale_prior_time.mode)
 
 def adaptive_lengthscale_prior(num_dims:int):
@@ -405,7 +354,7 @@ MIN_INFERRED_NOISE_LEVEL = 1e-4  # Minimum noise level to avoid numerical issues
 
 mean_f = ZeroMean()
 kernel_f = MaternKernel(
-    nu=1.5,
+    nu=2.5,
     ard_num_dims=ard_num_dims,
     lengthscale_prior=adaptive_lengthscale_prior(ard_num_dims),
     lengthscale_constraint=adaptive_lengthscale_constraint(ard_num_dims),
@@ -413,15 +362,17 @@ kernel_f = MaternKernel(
 )
 
 
-
-total_months = (int((df['date'].max().to_period('M') - df['date'].min().to_period('M')).n) + 1)-4
-scaled_period = 12.0 / total_months  # annual
-k_per = PeriodicKernel(active_dims=[0], period_length=scaled_period,             period_length_prior=LogNormalPrior(loc=0.0, scale=0.3),
+n_months = len(np.unique(X_tr.numpy()[:,0]))
+period_length = 12.0
+period_length = 12.0 / n_months
+# total_months = (int((df['date'].max().to_period('M') - df['date'].min().to_period('M')).n) + 1)
+# scaled_period = 12.0 / total_months  # annual
+k_per = PeriodicKernel(active_dims=[0], period_length=period_length,             period_length_prior=LogNormalPrior(loc=0.0, scale=0.3),
     lengthscale_prior=adaptive_lengthscale_prior(1),
     lengthscale_constraint=adaptive_lengthscale_constraint(1),)
 
 kernel_t = MaternKernel(
-    nu=1.5,
+    nu=2.5,
     ard_num_dims=1,
     lengthscale_prior=adaptive_lengthscale_prior(1),
     lengthscale_constraint=adaptive_lengthscale_constraint(1),
@@ -430,21 +381,7 @@ kernel_t = MaternKernel(
 
 kernel_total = kernel_f * kernel_t
 
-# MaternKernel(
-#     nu=1.5,
-#     ard_num_dims=1,
-#     lengthscale_prior=lengthscale_prior_time,
-#     lengthscale_constraint=lengthscale_constraint_time,
-#     active_dims=[0],
-# )
-
-# SpectralMixtureKernel(
-#             num_mixtures=5,
-#             ard_num_dims=1,
-#             active_dims=[0],
-#         )
-
-model, likelihood = train_model_hadamard(((X_trs, I_tr), y_trs), rank=2, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50)
+model, likelihood = train_model_hadamard(((X_trs, I_tr), y_trs), rank=3, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50)
 
 
 
@@ -491,6 +428,7 @@ def r2_score(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
 # Use task indices to separate predictions
 task_vals = I_te.view(-1).to(torch.long)
 ic_values = []
+task_values = {}
 for k in torch.unique(task_vals):
     k_mask = (task_vals == k)
     y_true_k = y_te[k_mask]
@@ -500,6 +438,12 @@ for k in torch.unique(task_vals):
     mse_k  = mse(y_true_k, y_mean_k)
     rmse_k = rmse(y_true_k, y_mean_k)
     r2_k   = r2_score(y_true_k, y_mean_k)
+    task_values[int(k.item())] = {
+        'NLPD': nlpd_k,
+        'MSE': mse_k,
+        'RMSE': rmse_k,
+        'R2': r2_k
+    }
     print(f'Task {int(k.item())}: NLPD={nlpd_k:.3f}, MSE={mse_k:.3f}, RMSE={rmse_k:.3f}, R2={r2_k:.3f}')
 
 #### additional metrics 
@@ -522,6 +466,171 @@ results
 
 
 ```{python}
+import optuna
+from abc import ABC, abstractmethod
+from marketmaven.models.kernels import KernelType, ContKernelFactory, initialize_kernel
+from marketmaven.models.means import GPMean, initialize_mean
+
+ard_num_dims = len(feature_cols) -1
+feature_active_dims = list(range(1, ard_num_dims + 1))
+n_months = len(np.unique(X_tr.numpy()[:,0]))
+period_length = 12.0
+period_length = 12.0 / n_months
+
+class ParamStrategy(ABC):
+    @abstractmethod
+    def suggest_params(self, trial):
+        pass
+
+class GPAdvancedStrategy(ParamStrategy):
+    def suggest_params(self, trial):
+
+        task_rank = trial.suggest_int("task_rank", 1, 10)
+
+        kernel_features = trial.suggest_categorical(
+            "kernel",
+            [KernelType.MATERN, KernelType.RBF], #, 
+        )
+
+        kernel_time = trial.suggest_categorical(
+            "kernel_time",
+            [KernelType.PERIODIC_MATERN, KernelType.MATERN], #, KernelType.PERIODIC_MATERN
+        )
+        
+        mean_f = trial.suggest_categorical("mean", [GPMean.ZERO, GPMean.CONSTANT]) # GPMean.CONSTANT, GPMean.LINEAR
+        # Initialize params with default values
+        params = {
+            "kernel_features": kernel_features,
+            "kernel_time": kernel_time,
+            "mean": mean_f,
+            "task_rank": task_rank,
+        }
+
+        # Conditionally override smoothness for feature matern kernels
+        if kernel_features in [
+            KernelType.MATERN,
+            KernelType.MATERN_LINEAR,
+            KernelType.MATERN_LINEAR_PERIODIC,
+        ]:
+            params["smoothness_features"] = trial.suggest_categorical("smoothness_features", [0.5, 1.5, 2.5])
+        else:
+            params["smoothness_features"] = None
+
+        if kernel_time in [
+            KernelType.MATERN,
+            KernelType.MATERN_LINEAR,
+            KernelType.MATERN_LINEAR_PERIODIC,
+            KernelType.PERIODIC_MATERN,
+        ]:
+            params["smoothness_time"] = trial.suggest_categorical("smoothness_time", [0.5, 1.5, 2.5])
+        else:
+            params["smoothness_time"] = None
+
+        return params
+
+strategy = GPAdvancedStrategy()
+batch_size = torch.Size()
+def objective(trial):
+    params = strategy.suggest_params(trial)
+
+    mean_module = initialize_mean(params['mean'], 23, batch_size)
+    feature_kernel = initialize_kernel(params['kernel_features'], batch_size, feature_active_dims, smoothness=params['smoothness_features'])
+    time_kernel = initialize_kernel(params['kernel_time'], batch_size, [0], smoothness=params['smoothness_time'], period_length=period_length)
+
+    kernel_total = feature_kernel * time_kernel
+
+    model, likelihood = train_model_hadamard(((X_trs, I_tr), y_trs), rank=params['task_rank'], mean_f=mean_module, kernel=kernel_total, training_iterations=500, patience=50)
+
+    model.eval(); likelihood.eval()
+    with torch.no_grad(), gpytorch.settings.fast_pred_var():
+        pred = likelihood(model(X_tes, I_te), [I_te])
+
+
+    yhat = scaler.inverse_y(pred.mean, I_te)
+    ystd = scaler.inverse_std(pred.variance.sqrt(), I_te)
+    # Use task indices to separate predictions
+    task_vals = I_te.view(-1).to(torch.long)
+    ic_values = []
+    task_values = {}
+    for k in torch.unique(task_vals):
+        k_mask = (task_vals == k)
+        y_true_k = y_te[k_mask]
+        y_mean_k = yhat[k_mask]
+        y_std_k  = ystd[k_mask]
+        nlpd_k = gaussian_nlpd(y_true_k, y_mean_k, y_std_k)
+        mse_k  = mse(y_true_k, y_mean_k)
+        rmse_k = rmse(y_true_k, y_mean_k)
+        r2_k   = r2_score(y_true_k, y_mean_k)
+        task_values[int(k.item())] = {
+            'NLPD': nlpd_k,
+            'MSE': mse_k,
+            'RMSE': rmse_k,
+            'R2': r2_k
+        }
+    trial.set_user_attr("task scores", task_values)
+
+
+    y_pred = yhat.numpy()
+    y_pred = y_pred.reshape(4, len(task_map))
+    y_pred = pd.DataFrame(y_pred, columns=task_map.values())
+    y_pred
+
+    y_true = y_te.numpy()
+    y_true = y_true.reshape(4, len(task_map))
+    y_true = pd.DataFrame(y_true, columns=task_map.values())
+    y_true
+
+    results = evaluate_asset_pricing(y_true, y_pred)
+    trial.set_user_attr("asset evaluations", results)
+    return (
+        #-results["R2_pooled"],     # minimize negative R² to maximize R²
+        #-metrics["R2_avg"],        # same reasoning
+        -results["IC"],            # maximize IC → minimize negative IC
+        -results["IR"],            # maximize IR
+        -results["HitRatio"],      # maximize HitRatio
+    )
+
+sampler = optuna.samplers.GPSampler()
+study = optuna.create_study(sampler=sampler, directions=["minimize"] * 3)
+study.optimize(objective, n_trials=50, n_jobs=4)
 
 
 ```
+
+```{python}
+import optuna.visualization as viz
+
+optuna.visualization.plot_param_importances(
+    study, target=lambda t: t.values[0], target_name="IC"
+)
+
+fig = viz.plot_pareto_front(
+    study,
+    targets=lambda tr: (-tr.values[0], -tr.values[1]),  # recover original signs
+    target_names=["IC", "IR"],
+)
+fig.show()
+
+fig = viz.plot_pareto_front(
+    study,
+    targets=lambda tr: (-tr.values[0], -tr.values[2]),  # recover original signs
+    target_names=["IC", "HitRatio"],
+)
+fig.show()
+
+
+optuna.visualization.plot_pareto_front(study, target_names=["IC", "IR", "HitRatio"])
+
+
+```
+
+<!-- 
+[FrozenTrial(number=2, state=1, values=[-0.5494505494505495, -7.412493166611015, -0.7692307692307693], datetime_start=datetime.datetime(2025, 11, 2, 14, 28, 21, 219179), datetime_complete=datetime.datetime(2025, 11, 2, 14, 29, 22, 416430), params={'task_rank': 1, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 2.5, 'smoothness_time': 2.5}, user_attrs={'task scores': {0: {'NLPD': -3.05801309650648, 'MSE': 3.2873712221789454e-05, 'RMSE': 0.005733560169893524, 'R2': 0.043858668492544606}, 1: {'NLPD': -3.2527587611985256, 'MSE': 3.634760172830063e-05, 'RMSE': 0.006028897223232507, 'R2': -0.9476470345931112}, 2: {'NLPD': -2.902641890898093, 'MSE': 6.094263419746476e-06, 'RMSE': 0.0024686561971539248, 'R2': 0.74103668062977}, 3: {'NLPD': -2.862701535728098, 'MSE': 5.579683840049957e-05, 'RMSE': 0.007469728134309813, 'R2': 0.1498559863720793}, 4: {'NLPD': -1.8323125252720756, 'MSE': 0.0008332584784527384, 'RMSE': 0.028866216905800775, 'R2': 0.0628812726747795}, 5: {'NLPD': -2.592224717788004, 'MSE': 4.987982709660319e-05, 'RMSE': 0.007062565192378983, 'R2': 0.19818042652302836}, 6: {'NLPD': -2.1790051073686767, 'MSE': 0.00022542628396992316, 'RMSE': 0.015014202741735013, 'R2': -5.538111505982846}, 7: {'NLPD': -3.147133016497995, 'MSE': 2.7354621323096464e-05, 'RMSE': 0.005230164559848616, 'R2': 0.283109003523216}, 8: {'NLPD': -2.103640048739557, 'MSE': 0.0004980065670550486, 'RMSE': 0.022316060742322973, 'R2': -0.1206041087535219}, 9: {'NLPD': -2.0655328337187564, 'MSE': 0.00024560071114579623, 'RMSE': 0.015671653108265134, 'R2': 0.4445452640934725}, 10: {'NLPD': -2.0148459738784528, 'MSE': 0.00040409691151539664, 'RMSE': 0.020102161861735086, 'R2': 0.31481406069301565}, 11: {'NLPD': -2.0264755451518446, 'MSE': 0.0004120936488977901, 'RMSE': 0.020300089874130855, 'R2': 0.13315152043250078}, 12: {'NLPD': -2.0058103453380163, 'MSE': 0.0006270425093360713, 'RMSE': 0.02504081686638979, 'R2': -0.654320863333189}}, 'asset evaluations': {'R2_pooled': np.float64(0.012328237393294361), 'R2_avg': np.float64(-0.37609620224832774), 'IC': np.float64(0.5494505494505495), 'IR': np.float64(7.412493166611015), 'HitRatio': np.float64(0.7692307692307693)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=2, value=None),
+ FrozenTrial(number=5, state=1, values=[-0.5989010989010989, -4.890958649392481, -0.6923076923076924], datetime_start=datetime.datetime(2025, 11, 2, 14, 29, 2, 449080), datetime_complete=datetime.datetime(2025, 11, 2, 14, 30, 0, 774258), params={'task_rank': 2, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 1.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -3.235799409724269, 'MSE': 3.1697509666661995e-05, 'RMSE': 0.00563005414420341, 'R2': 0.07806885654780837}, 1: {'NLPD': -3.444303360442043, 'MSE': 2.7005630984767216e-05, 'RMSE': 0.005196694236220486, 'R2': -0.4470676084206342}, 2: {'NLPD': -3.0066084613431827, 'MSE': 1.2287289006762503e-05, 'RMSE': 0.0035053229532758467, 'R2': 0.4778766639882258}, 3: {'NLPD': -3.0601338783132013, 'MSE': 5.4925074459227365e-05, 'RMSE': 0.007411145286609039, 'R2': 0.16313854712667952}, 4: {'NLPD': -1.83075908719892, 'MSE': 0.000922852173504969, 'RMSE': 0.030378482080330626, 'R2': -0.03787969364579591}, 5: {'NLPD': -2.8300347536508244, 'MSE': 5.017525998476373e-05, 'RMSE': 0.00708344972345846, 'R2': 0.19343133483277097}, 6: {'NLPD': -2.2137204856089765, 'MSE': 0.00018361489590510067, 'RMSE': 0.013550457405752054, 'R2': -4.325442279601937}, 7: {'NLPD': -3.2428452152609095, 'MSE': 2.931741466284005e-05, 'RMSE': 0.005414555813992506, 'R2': 0.23166947319351983}, 8: {'NLPD': -2.0671552180800044, 'MSE': 0.0005078770230550965, 'RMSE': 0.02253612706422948, 'R2': -0.1428144053251772}, 9: {'NLPD': -2.0596112928993184, 'MSE': 0.00031121462655880596, 'RMSE': 0.017641276216838905, 'R2': 0.2961517195980279}, 10: {'NLPD': -2.152169586409213, 'MSE': 0.00047921477127377645, 'RMSE': 0.021890974653353754, 'R2': 0.18744436339872017}, 11: {'NLPD': -2.0930364122436833, 'MSE': 0.00043327108674753086, 'RMSE': 0.020815164826335893, 'R2': 0.08860429227141808}, 12: {'NLPD': -2.0478678347782147, 'MSE': 0.0006256357553035152, 'RMSE': 0.02501271187423537, 'R2': -0.6506094362592894}}, 'asset evaluations': {'R2_pooled': np.float64(-0.04921524121938958), 'R2_avg': np.float64(-0.29903293633043565), 'IC': np.float64(0.5989010989010989), 'IR': np.float64(4.890958649392481), 'HitRatio': np.float64(0.6923076923076924)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=5, value=None),
+ 
+ 
+ 
+ FrozenTrial(number=18, state=1, values=[-0.6153846153846154, -4.781495315103808, -0.7307692307692308], datetime_start=datetime.datetime(2025, 11, 2, 14, 32, 46, 580676), datetime_complete=datetime.datetime(2025, 11, 2, 14, 33, 35, 443322), params={'task_rank': 2, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 2.5, 
+ 'smoothness_time': 2.5},
+ 
+  user_attrs={'task scores': {0: {'NLPD': -3.1547393481471113, 'MSE': 3.145033257875899e-05, 'RMSE': 0.005608059609059001, 'R2': 0.08525807291471021}, 1: {'NLPD': -3.2633275769382006, 'MSE': 2.9003381314815687e-05, 'RMSE': 0.005385478745182798, 'R2': -0.5541149051105505}, 2: {'NLPD': -2.9378418364098198, 'MSE': 1.2063262586012627e-05, 'RMSE': 0.003473220779912015, 'R2': 0.4873962107403471}, 3: {'NLPD': -2.8339652883874926, 'MSE': 5.477978711638672e-05, 'RMSE': 0.0074013368465694574, 'R2': 0.16535220597030986}, 4: {'NLPD': -1.822044064160243, 'MSE': 0.0008556804053758325, 'RMSE': 0.029252015407076355, 'R2': 0.037664598418592155}, 5: {'NLPD': -2.739290009386674, 'MSE': 4.95897617555539e-05, 'RMSE': 0.007041999840638588, 'R2': 0.20284323474788746}, 6: {'NLPD': -2.2089666873629232, 'MSE': 0.00017105455413983557, 'RMSE': 0.013078782593950997, 'R2': -3.9611506204025444}, 7: {'NLPD': -3.120790174081506, 'MSE': 2.8474449131443684e-05, 'RMSE': 0.005336145531321619, 'R2': 0.253761330823736}, 8: {'NLPD': -2.156046752323734, 'MSE': 0.0004924681362504534, 'RMSE': 0.022191623109868584, 'R2': -0.10814164595433096}, 9: {'NLPD': -2.045751738516648, 'MSE': 0.00030187903990599134, 'RMSE': 0.017374666612801275, 'R2': 0.3172652407868708}, 10: {'NLPD': -2.155653014454157, 'MSE': 0.00045881184583386155, 'RMSE': 0.021419893693337078, 'R2': 0.22203952419748274}, 11: {'NLPD': -2.138279392488241, 'MSE': 0.0003962188258883677, 'RMSE': 0.019905246190096915, 'R2': 0.1665445761758424}, 12: {'NLPD': -2.0697786348630975, 'MSE': 0.0005809449388296799, 'RMSE': 0.02410279939819605, 'R2': -0.5327020392466972}}, 'asset evaluations': {'R2_pooled': np.float64(0.009884203598481633), 'R2_avg': np.float64(-0.24753724737987254), 'IC': np.float64(0.6153846153846154), 'IR': np.float64(4.781495315103808), 'HitRatio': np.float64(0.7307692307692308)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=18, value=None)] -->
