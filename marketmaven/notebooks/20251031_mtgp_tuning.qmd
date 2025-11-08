@@ -98,8 +98,7 @@ df = (
 )
 
 # drop some columns like "volume" which is redundant
-df = df.drop(columns=[ 'yc_pc1', 
-       'yc_pc2', 'yc_pc3', 'vix', 'log_ret', 'dxy'])
+df = df.drop(columns=[ 'vix', 'log_ret', 'dxy', ])
 
 all_assets_occur = check_equal_occurrences(df, 'asset_id')
 print('Did all assets occur equally often?', all_assets_occur)
@@ -109,8 +108,9 @@ df["t_index"] = df.groupby("asset_id").cumcount()
 feature_cols = ["t_index", 'price', 'mom1m',
        'mom6m', 'mom12m', 'mom36m', 'chmom', 'volume', 'dolvol', 'turnover',
        'sd_turn', 'ill', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level',
-       'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y', 'tbill3m', 'term_spread',
-       'credit_spread', 'credit_spread_chg_1p']
+       'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y','tbill3m', 'term_spread',
+       'credit_spread', 'credit_spread_chg_1p', 'yc_pc1', 
+       'yc_pc2', 'yc_pc3']
 
 # Move column t_index to the first column position 
 cols = df.columns.tolist()       
@@ -122,6 +122,12 @@ fig = correlation_matrix(df)
 fig.show()
 ```
 
+# with linear kernel added to time 
+{'R2_pooled': np.float64(-0.07937526479775459),
+ 'R2_avg': np.float64(-0.4530566387752799),
+ 'IC': np.float64(0.5782967032967032),
+ 'IR': np.float64(5.421249981297396),
+ 'HitRatio': np.float64(0.6923076923076924)}
 
 ```{python}
 from typing import Optional
@@ -318,7 +324,7 @@ PRICE  = [idx["price"]]                                    # [1]
 MOM    = [idx[c] for c in ["mom1m","mom6m","mom12m","mom36m","chmom"]]  # [2..6]
 LIQVOL = [idx[c] for c in ["volume","dolvol","turnover","sd_turn","ill","vol_1m","baspread"]]  # [7..13]
 VIX    = [idx[c] for c in ["vix3m","vix_ts_level","vix_ts_chg_1m","vix_ts_z_12m"]]             # [14..17]
-RATES  = [idx[c] for c in ["tnote10y","tbill3m","term_spread","credit_spread","credit_spread_chg_1p"]]  # [18..22]
+RATES  = [idx[c] for c in ["tnote10y","tbill3m","term_spread","credit_spread","credit_spread_chg_1p"]]  # [18..22] ,
 
 
 ```
@@ -354,14 +360,14 @@ def adaptive_lengthscale_constraint(num_dims:int):
 MIN_INFERRED_NOISE_LEVEL = 1e-4  # Minimum noise level to avoid numerical issues
 num_tasks = len(torch.unique(I_tr))
 
-#mean_f = ZeroMean()
-mean_f = MultitaskMean(
-            base_means=ConstantMean(batch_shape=X_tr.shape[:-2]),
-            num_tasks=num_tasks,
-        )
+mean_f = ZeroMean()
+# mean_f = MultitaskMean(
+#             base_means=ConstantMean(batch_shape=X_tr.shape[:-2]),
+#             num_tasks=num_tasks,
+#         )
 
 kernel_f = MaternKernel(
-    nu=2.5,
+    nu=0.5,
     ard_num_dims=ard_num_dims,
     lengthscale_prior=adaptive_lengthscale_prior(ard_num_dims),
     lengthscale_constraint=adaptive_lengthscale_constraint(ard_num_dims),
@@ -379,7 +385,7 @@ k_per = PeriodicKernel(active_dims=[0], period_length=period_length,            
     lengthscale_constraint=adaptive_lengthscale_constraint(1),)
 
 kernel_t = MaternKernel(
-    nu=2.5,
+    nu=0.5,
     ard_num_dims=1,
     lengthscale_prior=adaptive_lengthscale_prior(1),
     lengthscale_constraint=adaptive_lengthscale_constraint(1),
@@ -492,19 +498,19 @@ class ParamStrategy(ABC):
 class GPAdvancedStrategy(ParamStrategy):
     def suggest_params(self, trial):
 
-        task_rank = trial.suggest_int("task_rank", 1, 10)
+        task_rank = trial.suggest_int("task_rank", 1, 5)
 
         kernel_features = trial.suggest_categorical(
             "kernel",
-            [KernelType.MATERN, KernelType.RBF], #, 
+            [KernelType.MATERN], #, , KernelType.RBF
         )
 
         kernel_time = trial.suggest_categorical(
             "kernel_time",
-            [KernelType.PERIODIC_MATERN, KernelType.MATERN], #, KernelType.PERIODIC_MATERN
+            [KernelType.PERIODIC_MATERN], #, KernelType.MATERN
         )
         
-        mean_f = trial.suggest_categorical("mean", [GPMean.ZERO, GPMean.CONSTANT]) # GPMean.CONSTANT, GPMean.LINEAR
+        mean_f = trial.suggest_categorical("mean", [GPMean.ZERO]) # GPMean.CONSTANT, GPMean.LINEAR
         # Initialize params with default values
         params = {
             "kernel_features": kernel_features,
@@ -599,7 +605,7 @@ def objective(trial):
 
 sampler = optuna.samplers.GPSampler()
 study = optuna.create_study(sampler=sampler, directions=["minimize"] * 3)
-study.optimize(objective, n_trials=50, n_jobs=4)
+study.optimize(objective, n_trials=20, n_jobs=2)
 
 
 ```

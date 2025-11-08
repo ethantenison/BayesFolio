@@ -152,3 +152,8 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 - Task Rank and smoothness of the PERIOD_MATERN most important hyperparameters 
 - Next steps: add Linear Kernel additive to time, Try spectral mixture for time, try spectral mixture linear for features, add prior to coregionalization task covariance to regularize it more, try PositivieIndexKernel, LKJ Prior
 -issues with positiveindexkernel and multitaskmean
+
+**November 8th**
+- Tried LKJCovariance prior, probably need to redo optuna study with it. removing tnote10yr didn't help. 
+-Addign back in the PC yield curve vars seems to have done something to prevent big negative R2
+-test quantile regression forest 
