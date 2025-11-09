@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import r2_score
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, ttest_1samp
 
 
 def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
@@ -68,6 +68,7 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
 
     IC = np.nanmean(IC_list) if IC_list else np.nan
     IC_std = np.nanstd(IC_list, ddof=1) if len(IC_list) > 1 else np.nan
+    t_stat, p_val = ttest_1samp(IC_list, 0)
     IR = IC / IC_std if IC_std and not np.isnan(IC_std) and IC_std > 0 else np.nan
 
     HitRatio = np.nanmean(Hit_list) if Hit_list else np.nan
@@ -76,6 +77,7 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
         "R2_pooled": R2_pooled,
         "R2_avg": R2_avg,
         "IC": IC,
+        "IC_p_value": p_val,
         "IR": IR,
         "HitRatio": HitRatio,
     }

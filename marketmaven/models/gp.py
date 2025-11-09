@@ -164,10 +164,10 @@ class HadamardMultiTaskGP(ExactGP):
         self.covar_module = kernel
         self._register_lengthscale_constraints(self.covar_module)
         
-        # sd_prior = GammaPrior(1.0, 0.15)
-        # sd_prior._event_shape = torch.Size([num_tasks])
-        # eta = 0.8
-        # task_covar_prior = LKJCovariancePrior(num_tasks, eta, sd_prior)
+        sd_prior = GammaPrior(1.0, 0.15)
+        sd_prior._event_shape = torch.Size([num_tasks])
+        eta = 0.5
+        task_covar_prior = LKJCovariancePrior(num_tasks, eta, sd_prior)
 
         # self.task_covar_module = PositiveIndexKernel(
         #     num_tasks=num_tasks,
@@ -176,7 +176,7 @@ class HadamardMultiTaskGP(ExactGP):
         #     # active_dims=[task_feature],
         # )
         
-        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank)
+        self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank, prior=task_covar_prior)
 
     def forward(self,x,i):
         mean_x = self.mean_module(x)

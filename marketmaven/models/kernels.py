@@ -37,6 +37,7 @@ class KernelType(StrEnum):
     RBF = "rbf"
 
     RBF_LINEAR = "rbflinear"
+    RBF_PERIODIC = "rbfperiodic"
     RQ_LINEAR = "rqlinear"
 
     PERIODIC = "periodic"
@@ -174,6 +175,8 @@ def initialize_kernel(
             return cont_kernel_factory.create_rbf()
         elif kernel_type == KernelType.RBF_LINEAR:
             return cont_kernel_factory.create_rbf() + cont_kernel_factory.create_linear()
+        elif kernel_type == KernelType.RBF_PERIODIC:
+            return cont_kernel_factory.create_rbf() + cont_kernel_factory.create_periodic()
         elif kernel_type == KernelType.RQ:
             return cont_kernel_factory.create_rq()
         elif kernel_type == KernelType.RQ_LINEAR:

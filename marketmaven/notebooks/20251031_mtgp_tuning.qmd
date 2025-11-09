@@ -98,7 +98,8 @@ df = (
 )
 
 # drop some columns like "volume" which is redundant
-df = df.drop(columns=[ 'vix', 'log_ret', 'dxy', ])
+df = df.drop(columns=[ 'vix', 'log_ret', 'dxy', 'yc_pc1', 
+       'yc_pc2', 'yc_pc3'])
 
 all_assets_occur = check_equal_occurrences(df, 'asset_id')
 print('Did all assets occur equally often?', all_assets_occur)
@@ -109,8 +110,7 @@ feature_cols = ["t_index", 'price', 'mom1m',
        'mom6m', 'mom12m', 'mom36m', 'chmom', 'volume', 'dolvol', 'turnover',
        'sd_turn', 'ill', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level',
        'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y','tbill3m', 'term_spread',
-       'credit_spread', 'credit_spread_chg_1p', 'yc_pc1', 
-       'yc_pc2', 'yc_pc3']
+       'credit_spread', 'credit_spread_chg_1p', ]
 
 # Move column t_index to the first column position 
 cols = df.columns.tolist()       
@@ -502,12 +502,12 @@ class GPAdvancedStrategy(ParamStrategy):
 
         kernel_features = trial.suggest_categorical(
             "kernel",
-            [KernelType.MATERN], #, , KernelType.RBF
+            [KernelType.MATERN, KernelType.RBF], #, , KernelType.RBF
         )
 
         kernel_time = trial.suggest_categorical(
             "kernel_time",
-            [KernelType.PERIODIC_MATERN], #, KernelType.MATERN
+            [KernelType.PERIODIC_MATERN, KernelType.RBF_PERIODIC], #, KernelType.MATERN
         )
         
         mean_f = trial.suggest_categorical("mean", [GPMean.ZERO]) # GPMean.CONSTANT, GPMean.LINEAR
@@ -596,16 +596,16 @@ def objective(trial):
     results = evaluate_asset_pricing(y_true, y_pred)
     trial.set_user_attr("asset evaluations", results)
     return (
-        #-results["R2_pooled"],     # minimize negative R² to maximize R²
+        -results["R2_pooled"],     # minimize negative R² to maximize R²
         #-metrics["R2_avg"],        # same reasoning
         -results["IC"],            # maximize IC → minimize negative IC
-        -results["IR"],            # maximize IR
+       # -results["IR"],            # maximize IR
         -results["HitRatio"],      # maximize HitRatio
     )
 
 sampler = optuna.samplers.GPSampler()
 study = optuna.create_study(sampler=sampler, directions=["minimize"] * 3)
-study.optimize(objective, n_trials=20, n_jobs=2)
+study.optimize(objective, n_trials=25, n_jobs=3)
 
 
 ```
@@ -614,29 +614,46 @@ study.optimize(objective, n_trials=20, n_jobs=2)
 import optuna.visualization as viz
 
 optuna.visualization.plot_param_importances(
-    study, target=lambda t: t.values[0], target_name="IC"
+    study, target=lambda t: t.values[1], target_name="IC"
 )
 
 fig = viz.plot_pareto_front(
     study,
-    targets=lambda tr: (-tr.values[0], -tr.values[1]),  # recover original signs
+    targets=lambda tr: (-tr.values[1], -tr.values[2]),  # recover original signs
     target_names=["IC", "IR"],
 )
 fig.show()
 
 fig = viz.plot_pareto_front(
     study,
-    targets=lambda tr: (-tr.values[0], -tr.values[2]),  # recover original signs
-    target_names=["IC", "HitRatio"],
+    targets=lambda tr: (-tr.values[1], -tr.values[0]),  # recover original signs
+    target_names=["IC", "R2 Pooled"],
+)
+fig.show()
+
+fig = viz.plot_pareto_front(
+    study,
+    targets=lambda tr: (-tr.values[2], -tr.values[0]),  # recover original signs
+    target_names=["IR", "R2 Pooled"],
+)
+fig.show()
+
+fig = viz.plot_pareto_front(
+    study,
+    targets=lambda tr: (-tr.values[0], -tr.values[1]),  # recover original signs
+    target_names=["R2 Pooled", "IC"],
 )
 fig.show()
 
 
-optuna.visualization.plot_pareto_front(study, target_names=["IC", "IR", "HitRatio"])
+print(f'Best trials: {study.best_trials}')
+
+optuna.visualization.plot_pareto_front(study, target_names=["R2 Pooled", "IC", "IR"])
 
 
 ```
 
+Best trial Nov 8 task 2, matern1/2 features rbf_periodic time
 <!-- 
 [FrozenTrial(number=2, state=1, values=[-0.5494505494505495, -7.412493166611015, -0.7692307692307693], datetime_start=datetime.datetime(2025, 11, 2, 14, 28, 21, 219179), datetime_complete=datetime.datetime(2025, 11, 2, 14, 29, 22, 416430), params={'task_rank': 1, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 2.5, 'smoothness_time': 2.5}, user_attrs={'task scores': {0: {'NLPD': -3.05801309650648, 'MSE': 3.2873712221789454e-05, 'RMSE': 0.005733560169893524, 'R2': 0.043858668492544606}, 1: {'NLPD': -3.2527587611985256, 'MSE': 3.634760172830063e-05, 'RMSE': 0.006028897223232507, 'R2': -0.9476470345931112}, 2: {'NLPD': -2.902641890898093, 'MSE': 6.094263419746476e-06, 'RMSE': 0.0024686561971539248, 'R2': 0.74103668062977}, 3: {'NLPD': -2.862701535728098, 'MSE': 5.579683840049957e-05, 'RMSE': 0.007469728134309813, 'R2': 0.1498559863720793}, 4: {'NLPD': -1.8323125252720756, 'MSE': 0.0008332584784527384, 'RMSE': 0.028866216905800775, 'R2': 0.0628812726747795}, 5: {'NLPD': -2.592224717788004, 'MSE': 4.987982709660319e-05, 'RMSE': 0.007062565192378983, 'R2': 0.19818042652302836}, 6: {'NLPD': -2.1790051073686767, 'MSE': 0.00022542628396992316, 'RMSE': 0.015014202741735013, 'R2': -5.538111505982846}, 7: {'NLPD': -3.147133016497995, 'MSE': 2.7354621323096464e-05, 'RMSE': 0.005230164559848616, 'R2': 0.283109003523216}, 8: {'NLPD': -2.103640048739557, 'MSE': 0.0004980065670550486, 'RMSE': 0.022316060742322973, 'R2': -0.1206041087535219}, 9: {'NLPD': -2.0655328337187564, 'MSE': 0.00024560071114579623, 'RMSE': 0.015671653108265134, 'R2': 0.4445452640934725}, 10: {'NLPD': -2.0148459738784528, 'MSE': 0.00040409691151539664, 'RMSE': 0.020102161861735086, 'R2': 0.31481406069301565}, 11: {'NLPD': -2.0264755451518446, 'MSE': 0.0004120936488977901, 'RMSE': 0.020300089874130855, 'R2': 0.13315152043250078}, 12: {'NLPD': -2.0058103453380163, 'MSE': 0.0006270425093360713, 'RMSE': 0.02504081686638979, 'R2': -0.654320863333189}}, 'asset evaluations': {'R2_pooled': np.float64(0.012328237393294361), 'R2_avg': np.float64(-0.37609620224832774), 'IC': np.float64(0.5494505494505495), 'IR': np.float64(7.412493166611015), 'HitRatio': np.float64(0.7692307692307693)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=2, value=None),
  FrozenTrial(number=5, state=1, values=[-0.5989010989010989, -4.890958649392481, -0.6923076923076924], datetime_start=datetime.datetime(2025, 11, 2, 14, 29, 2, 449080), datetime_complete=datetime.datetime(2025, 11, 2, 14, 30, 0, 774258), params={'task_rank': 2, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 1.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -3.235799409724269, 'MSE': 3.1697509666661995e-05, 'RMSE': 0.00563005414420341, 'R2': 0.07806885654780837}, 1: {'NLPD': -3.444303360442043, 'MSE': 2.7005630984767216e-05, 'RMSE': 0.005196694236220486, 'R2': -0.4470676084206342}, 2: {'NLPD': -3.0066084613431827, 'MSE': 1.2287289006762503e-05, 'RMSE': 0.0035053229532758467, 'R2': 0.4778766639882258}, 3: {'NLPD': -3.0601338783132013, 'MSE': 5.4925074459227365e-05, 'RMSE': 0.007411145286609039, 'R2': 0.16313854712667952}, 4: {'NLPD': -1.83075908719892, 'MSE': 0.000922852173504969, 'RMSE': 0.030378482080330626, 'R2': -0.03787969364579591}, 5: {'NLPD': -2.8300347536508244, 'MSE': 5.017525998476373e-05, 'RMSE': 0.00708344972345846, 'R2': 0.19343133483277097}, 6: {'NLPD': -2.2137204856089765, 'MSE': 0.00018361489590510067, 'RMSE': 0.013550457405752054, 'R2': -4.325442279601937}, 7: {'NLPD': -3.2428452152609095, 'MSE': 2.931741466284005e-05, 'RMSE': 0.005414555813992506, 'R2': 0.23166947319351983}, 8: {'NLPD': -2.0671552180800044, 'MSE': 0.0005078770230550965, 'RMSE': 0.02253612706422948, 'R2': -0.1428144053251772}, 9: {'NLPD': -2.0596112928993184, 'MSE': 0.00031121462655880596, 'RMSE': 0.017641276216838905, 'R2': 0.2961517195980279}, 10: {'NLPD': -2.152169586409213, 'MSE': 0.00047921477127377645, 'RMSE': 0.021890974653353754, 'R2': 0.18744436339872017}, 11: {'NLPD': -2.0930364122436833, 'MSE': 0.00043327108674753086, 'RMSE': 0.020815164826335893, 'R2': 0.08860429227141808}, 12: {'NLPD': -2.0478678347782147, 'MSE': 0.0006256357553035152, 'RMSE': 0.02501271187423537, 'R2': -0.6506094362592894}}, 'asset evaluations': {'R2_pooled': np.float64(-0.04921524121938958), 'R2_avg': np.float64(-0.29903293633043565), 'IC': np.float64(0.5989010989010989), 'IR': np.float64(4.890958649392481), 'HitRatio': np.float64(0.6923076923076924)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=5, value=None),
