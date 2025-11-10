@@ -157,3 +157,8 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 - Tried LKJCovariance prior, probably need to redo optuna study with it. removing tnote10yr didn't help. 
 -Addign back in the PC yield curve vars seems to have done something to prevent big negative R2
 -test quantile regression forest 
+
+**November 9th**
+- completed multitask mean with positiveindexkernel
+- the two together really helped
+- visualizing the learned task covariance showed that BND, although correlated with others, when you strip out the noise it doesn't really share structure with the others. 
