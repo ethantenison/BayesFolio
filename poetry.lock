@@ -371,19 +371,19 @@ files = [
 
 [[package]]
 name = "botorch"
-version = "0.15.1"
+version = "0.16.0"
 description = "Bayesian Optimization in PyTorch"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "botorch-0.15.1-py3-none-any.whl", hash = "sha256:86f731e2cc04af1783804c226c6b3e83864a754df786a9731ec4f70b0f4d557d"},
-    {file = "botorch-0.15.1.tar.gz", hash = "sha256:da31dd888c2da0ef52f2d76ac45e300e0f7cb2fe5cf509cacdeb4ee62c3c4e9d"},
+    {file = "botorch-0.16.0-py3-none-any.whl", hash = "sha256:0706a2646e8998cf0a7408140746822bf4b5941fab4d7d632f65986fbfc7be0f"},
+    {file = "botorch-0.16.0.tar.gz", hash = "sha256:3b85ece6e1f8201fb7fa4d91f166967f8d6bce068e49d3e626e650a97153a72a"},
 ]
 
 [package.dependencies]
-gpytorch = "1.14"
-linear_operator = "0.6"
+gpytorch = ">=1.14.2"
+linear_operator = ">=0.6"
 multipledispatch = "*"
 pyre_extensions = "*"
 pyro-ppl = ">=1.8.4"
@@ -393,9 +393,9 @@ torch = ">=2.0.1"
 typing_extensions = "*"
 
 [package.extras]
-dev = ["black (==24.4.2)", "flake8", "flake8-docstrings", "pymoo", "pytest", "pytest-cov", "requests", "ruff-api (==0.1.0)", "sphinx", "sphinx-rtd-theme", "stdlibs (==2024.1.28)", "ufmt", "ufmt (==2.8.0)", "usort (==1.0.8.post1)"]
+dev = ["botorch[test]", "flake8", "flake8-docstrings", "sphinx", "sphinx-rtd-theme", "ufmt"]
 pymoo = ["pymoo"]
-test = ["pymoo", "pytest", "pytest-cov", "requests"]
+test = ["pfns", "pymoo", "pytest", "pytest-cov", "requests"]
 tutorials = ["cma", "jupyter", "lxml", "matplotlib", "mdformat", "mdformat-myst", "memory_profiler", "pandas", "papermill", "pykeops", "tabulate", "torchvision"]
 
 [[package]]
@@ -1427,14 +1427,14 @@ urllib3 = ["packaging", "urllib3"]
 
 [[package]]
 name = "gpytorch"
-version = "1.14"
+version = "1.14.2"
 description = "An implementation of Gaussian Processes in Pytorch"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "gpytorch-1.14-py3-none-any.whl", hash = "sha256:9b17ff7bd70dc39c3a3c03eb2bb9a87aa4b840c26e71ac68d120b96487bf5a12"},
-    {file = "gpytorch-1.14.tar.gz", hash = "sha256:032cc11e6a46e1e4bc7763fcef318cc830aceaea85a7289f27b2288c7a339a8d"},
+    {file = "gpytorch-1.14.2-py3-none-any.whl", hash = "sha256:02428b9c419eadf391739e9e82960177da33bfa29df43d7cd50c124e0dd1b18c"},
+    {file = "gpytorch-1.14.2.tar.gz", hash = "sha256:8a42f05146f327002b790dd7cb56f1be29f3245d1b0b5128038f2b39111960b0"},
 ]
 
 [package.dependencies]
@@ -3375,14 +3375,14 @@ files = [
 
 [[package]]
 name = "optuna"
-version = "4.5.0"
+version = "4.6.0"
 description = "A hyperparameter optimization framework"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "optuna-4.5.0-py3-none-any.whl", hash = "sha256:5b8a783e84e448b0742501bc27195344a28d2c77bd2feef5b558544d954851b0"},
-    {file = "optuna-4.5.0.tar.gz", hash = "sha256:264844da16dad744dea295057d8bc218646129c47567d52c35a201d9f99942ba"},
+    {file = "optuna-4.6.0-py3-none-any.whl", hash = "sha256:4c3a9facdef2b2dd7e3e2a8ae3697effa70fae4056fcf3425cfc6f5a40feb069"},
+    {file = "optuna-4.6.0.tar.gz", hash = "sha256:89e38c2447c7f793a726617b8043f01e31f0bad54855040db17eb3b49404a369"},
 ]
 
 [package.dependencies]
@@ -3396,10 +3396,10 @@ tqdm = "*"
 
 [package.extras]
 benchmark = ["asv (>=0.5.0)", "cma", "virtualenv"]
-checking = ["black", "blackdoc", "flake8", "isort", "mypy", "mypy_boto3_s3", "scipy-stubs", "types-PyYAML", "types-redis", "types-setuptools", "types-tqdm", "typing_extensions (>=3.10.0.0)"]
+checking = ["black (<25.9.0)", "blackdoc (<0.4.2)", "flake8", "isort", "mypy", "mypy_boto3_s3", "scipy-stubs", "types-PyYAML", "types-redis", "types-setuptools", "types-tqdm", "typing_extensions (>=3.10.0.0)"]
 document = ["ase", "cmaes (>=0.12.0)", "fvcore", "kaleido (<0.4)", "lightgbm", "matplotlib (!=3.6.0)", "pandas", "pillow", "plotly (>=4.9.0)", "scikit-learn", "sphinx", "sphinx-copybutton", "sphinx-gallery", "sphinx-notfound-page", "sphinx_rtd_theme (>=1.2.0)", "torch", "torchvision"]
-optional = ["boto3", "cmaes (>=0.12.0)", "google-cloud-storage", "grpcio", "matplotlib (!=3.6.0)", "pandas", "plotly (>=4.9.0)", "protobuf (>=5.28.1)", "redis", "scikit-learn (>=0.24.2)", "scipy", "torch"]
-test = ["coverage", "fakeredis[lua]", "grpcio", "kaleido (<0.4)", "moto", "protobuf (>=5.28.1)", "pytest", "pytest-xdist", "scipy (>=1.9.2)", "torch"]
+optional = ["boto3", "cmaes (>=0.12.0)", "google-cloud-storage", "greenlet", "grpcio", "matplotlib (!=3.6.0)", "pandas", "plotly (>=4.9.0)", "protobuf (>=5.28.1)", "redis", "scikit-learn (>=0.24.2)", "scipy", "torch"]
+test = ["coverage", "fakeredis[lua]", "greenlet", "grpcio", "kaleido (<0.4)", "moto", "protobuf (>=5.28.1)", "pytest", "pytest-xdist", "scipy (>=1.9.2)", "torch"]
 
 [[package]]
 name = "osqp"
@@ -6122,4 +6122,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.14"
-content-hash = "4b1723723d87803474fbdaf432f156cad5eba2cec626980246b80b66924f0744"
+content-hash = "2f28dd6033b85fd10d2331722ce747586680ab53214d5d2b16f64b54f6c486d2"

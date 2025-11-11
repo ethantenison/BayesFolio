@@ -10,7 +10,7 @@ def prepare_multitask_gp_data(
     target_col: str = "target",
     asset_col: str = "asset_id",
     drop_cols: list[str] = ["date"],
-    dtype: torch.dtype = torch.float64,
+    dtype: torch.dtype = torch.float32,
 ):
     """
     Convert a multitask DataFrame into tensors for Hadamard multitask GP in GPyTorch,

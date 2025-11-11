@@ -7,6 +7,8 @@ format: html
 ### Setup
 
 ```{python}
+import os
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 from marketmaven.configs import TickerConfig, Interval, Horizon
 from marketmaven.asset_prices import build_long_panel, fetch_etf_features
 from marketmaven.market_fundamentals import fetch_macro_features
@@ -122,12 +124,7 @@ fig = correlation_matrix(df)
 fig.show()
 ```
 
-# with linear kernel added to time 
-{'R2_pooled': np.float64(-0.07937526479775459),
- 'R2_avg': np.float64(-0.4530566387752799),
- 'IC': np.float64(0.5782967032967032),
- 'IR': np.float64(5.421249981297396),
- 'HitRatio': np.float64(0.6923076923076924)}
+
 
 ```{python}
 from typing import Optional
@@ -289,15 +286,17 @@ class MultitaskScaler:
 
 from marketmaven.gp_data_prep import prepare_multitask_gp_data
 from marketmaven.models.cv import rolling_time_splits_multitask
+device = torch.device("cpu")
+
 X, I, y, task_map = prepare_multitask_gp_data(
     df,
     target_col="y_excess_lead",
     asset_col="asset_id",
     drop_cols=["date", "asset_id"]
 )
-index = -1 * len(task_map) *4 
-scale_y="per_task"
-eps=1e-8
+window_size = 1
+index = -1 * len(task_map) * window_size
+eps = 1e-8
 X_tr, I_tr, y_tr = X[:index], I[:index], y[:index]
 X_te, I_te, y_te = X[index:], I[index:], y[index:]
 
@@ -312,6 +311,10 @@ y_trs = scaler.fit_y(y_tr, I_tr)
 # concat the I_tr and I_te to the X_trs and X_tes respectively
 X_trs = torch.cat([X_trs, I_tr.to(X_trs.dtype)], dim=-1)
 X_tes = torch.cat([X_tes, I_te.to(X_tes.dtype)], dim=-1)
+
+X_trs = X_trs.to(device)
+y_trs = y_trs.to(device)
+X_tes = X_tes.to(device)
 
 ```
 
@@ -362,7 +365,7 @@ def adaptive_lengthscale_constraint(num_dims:int):
     return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior(num_dims).mode)
 
 
-MIN_INFERRED_NOISE_LEVEL = 1e-4  # Minimum noise level to avoid numerical issues
+MIN_INFERRED_NOISE_LEVEL = 1e-5  # Minimum noise level to avoid numerical issues
 num_tasks = len(torch.unique(I_tr))
 
 #mean_f = ConstantMean(batch_shape=X_tr.shape[:-2])
@@ -378,8 +381,7 @@ kernel_f = MaternKernel(
     lengthscale_prior=adaptive_lengthscale_prior(ard_num_dims),
     lengthscale_constraint=adaptive_lengthscale_constraint(ard_num_dims),
     active_dims=active_dims_features,
-)
-
+) 
 
 n_months = len(np.unique(X_tr.numpy()[:,0]))
 period_length = 12.0
@@ -394,21 +396,14 @@ kernel_t = MaternKernel(
     ard_num_dims=1,
     lengthscale_prior=adaptive_lengthscale_prior(1),
     lengthscale_constraint=adaptive_lengthscale_constraint(1),
-    active_dims=[1],
-) + k_per
-
-# kernel_t = RBFKernel(
-#         ard_num_dims=1,
-#         lengthscale_prior=adaptive_lengthscale_prior(1),
-#         lengthscale_constraint=adaptive_lengthscale_constraint(1),
-#         active_dims=[0],
-#     ) + k_per
-
+    active_dims=[0],
+) + k_per 
 
 
 kernel_total = kernel_f * kernel_t
 
-model, likelihood = train_model_hadamard(X_trs, y_trs, rank=6, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50, visualize=True, task_feature=-1)
+
+model, likelihood = train_model_hadamard(X_trs, y_trs, rank=2, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50, visualize=True, task_feature=-1, dtype=torch.float32, device=torch.device("cpu"))
 
 
 
@@ -418,14 +413,10 @@ model, likelihood = train_model_hadamard(X_trs, y_trs, rank=6, mean_f=mean_f, ke
 
 ```{python}
 import torch
-from scipy.stats import spearmanr
 import gpytorch
+from marketmaven.models.metrics import gaussian_nlpd, mse, rmse, r2_score
 
 
-
-# model.eval(); likelihood.eval()
-# with torch.no_grad(), gpytorch.settings.fast_pred_var():
-#     pred = likelihood(model(X_tes, I_te), [I_te])
 
 model.eval(); likelihood.eval()
 with torch.no_grad():
@@ -436,24 +427,6 @@ with torch.no_grad():
 yhat = scaler.inverse_y(pred.mean, I_te)
 ystd = scaler.inverse_std(pred.variance.sqrt(), I_te)
 
-
-import math
-
-def gaussian_nlpd(y_true: torch.Tensor, y_mean: torch.Tensor, y_std: torch.Tensor, eps: float = 1e-12) -> float:
-    var = (y_std.clamp_min(eps))**2
-    return float(0.5 * ( ((y_true - y_mean)**2) / var + torch.log(2 * torch.pi * var) ).mean())
-
-def mse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
-    return float(((y_true - y_mean)**2).mean())
-
-def rmse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
-    return float(torch.sqrt(((y_true - y_mean)**2).mean()))
-
-def r2_score(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
-    y_bar = y_true.mean()
-    ss_tot = ((y_true - y_bar)**2).sum()
-    ss_res = ((y_true - y_mean)**2).sum()
-    return float(1 - ss_res / ss_tot)
 
 # Per-task
 
@@ -482,20 +455,92 @@ for k in torch.unique(task_vals):
 from marketmaven.evaluate import evaluate_asset_pricing
 
 y_pred = yhat.numpy()
-y_pred = y_pred.reshape(4, len(task_map))
+y_pred = y_pred.reshape(window_size, len(task_map))
 y_pred = pd.DataFrame(y_pred, columns=task_map.values())
-y_pred
+
 
 y_true = y_te.numpy()
-y_true = y_true.reshape(4, len(task_map))
+y_true = y_true.reshape(window_size, len(task_map))
 y_true = pd.DataFrame(y_true, columns=task_map.values())
-y_true
 
-results = evaluate_asset_pricing(y_true, y_pred)
-results
+# mean historical excess return as benchmark
+y_train_mean = y_tr.numpy().reshape(-1, len(task_map)).mean(0)
+y_train_mean= pd.DataFrame(
+    np.tile(y_train_mean, (window_size, 1)),
+    columns=task_map.values()
+)
+
+# ewma1
+from riskfolio.src.ParamsEstimation import mean_vector
+historical = y_tr.numpy().reshape(-1, len(task_map))
+historical = pd.DataFrame(historical, columns=task_map.values())
+ewm = mean_vector(X=historical, method="ewma2")
+ewm = pd.DataFrame(
+    np.tile(ewm.values, (window_size, 1)),
+    columns=task_map.values()
+)
+
+
+results_pred = evaluate_asset_pricing(y_true, y_pred)
+results_mean = evaluate_asset_pricing(y_true, y_train_mean)
+results_ewm = evaluate_asset_pricing(y_true, ewm)
+
+print(f"Results for MTGP predictions: {results_pred}")
+print(f"Results for historical mean benchmark: {results_mean}")
+print(f"Results for EWMA benchmark: {results_ewm}")
 
 ```
 
+
+For analyzing window of size 1
+
+```{python}
+def add_closest_prediction(df, preds=["MTGP", "Mean", "EWMA2"], true_col="True"):
+    """
+    Adds columns specifying:
+      - which prediction column is closest to the true value
+      - which prediction(s) got the sign correct (same direction as true)
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with prediction columns and a true value column.
+    preds : list of str
+        Columns containing predicted values.
+    true_col : str
+        Column containing true target values.
+        
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with new columns:
+          'Closest' : model name with smallest absolute error
+          'SignCorrect' : comma-separated models with correct sign
+    """
+    # Which prediction is closest to the true value
+    diffs = np.abs(df[preds].sub(df[true_col], axis=0))
+    df["Closest"] = diffs.idxmin(axis=1)
+    
+    # Which predictions have the same sign as the true value
+    sign_match = np.sign(df[preds]).eq(np.sign(df[true_col]), axis=0)
+    df["SignCorrect"] = sign_match.apply(lambda row: ", ".join(row.index[row]), axis=1)
+    
+    return df
+
+all_mu = {
+
+
+    "MTGP": y_pred.values.reshape(-1,),
+    "Mean": y_train_mean.values.reshape(-1,),
+    "EWMA2": ewm.values.reshape(-1,),
+    "True": y_true.values.reshape(-1,),
+}
+all_mu = pd.DataFrame(all_mu)
+all_mu = add_closest_prediction(all_mu)
+all_mu
+
+
+```
 
 Visualizing the learning task covariance 
 
@@ -555,46 +600,28 @@ class ParamStrategy(ABC):
 class GPAdvancedStrategy(ParamStrategy):
     def suggest_params(self, trial):
 
-        task_rank = trial.suggest_int("task_rank", 1, 6)
+        task_rank = trial.suggest_int("task_rank", 2, 10)
 
         kernel_features = trial.suggest_categorical(
             "kernel",
-            [KernelType.MATERN, KernelType.RBF, KernelType.MATERN_LINEAR], #, , KernelType.RBF
+            [KernelType.MATERN], 
         )
 
         kernel_time = trial.suggest_categorical(
             "kernel_time",
-            [KernelType.PERIODIC_MATERN, KernelType.RBF_PERIODIC, KernelType.MATERN, KernelType.MATERN_LINEAR_PERIODIC],
+            [KernelType.PERIODIC_MATERN],
         )
-        
-        #mean_f = trial.suggest_categorical("mean", [GPMean.ZERO]) # GPMean.CONSTANT, GPMean.LINEAR
         # Initialize params with default values
         params = {
             "kernel_features": kernel_features,
             "kernel_time": kernel_time,
-        #    "mean": mean_f,
             "task_rank": task_rank,
         }
 
-        # Conditionally override smoothness for feature matern kernels
-        if kernel_features in [
-            KernelType.MATERN,
-            KernelType.MATERN_LINEAR,
-            KernelType.MATERN_LINEAR_PERIODIC,
-        ]:
-            params["smoothness_features"] = trial.suggest_categorical("smoothness_features", [0.5, 1.5, 2.5])
-        else:
-            params["smoothness_features"] = None
+        params["smoothness_features"] = trial.suggest_categorical("smoothness_features", [0.5, 1.5, 2.5])
 
-        if kernel_time in [
-            KernelType.MATERN,
-            KernelType.MATERN_LINEAR,
-            KernelType.MATERN_LINEAR_PERIODIC,
-            KernelType.PERIODIC_MATERN,
-        ]:
-            params["smoothness_time"] = trial.suggest_categorical("smoothness_time", [0.5, 1.5, 2.5])
-        else:
-            params["smoothness_time"] = None
+        params["smoothness_time"] = trial.suggest_categorical("smoothness_time", [0.5, 1.5, 2.5])
+
 
         return params
 
@@ -613,7 +640,7 @@ def objective(trial):
 
     kernel_total = feature_kernel * time_kernel
 
-    model, likelihood = train_model_hadamard(X_trs, y_trs, rank=params['task_rank'], mean_f=mean_module, kernel=kernel_total, training_iterations=500, patience=50)
+    model, likelihood = train_model_hadamard(X_trs, y_trs, rank=params['task_rank'], mean_f=mean_module, kernel=kernel_total, training_iterations=500, patience=50, dtype=torch.float32, device=torch.device("cpu"))
 
     model.eval(); likelihood.eval()
     with torch.no_grad(), gpytorch.settings.fast_pred_var():
@@ -646,17 +673,18 @@ def objective(trial):
 
 
     y_pred = yhat.numpy()
-    y_pred = y_pred.reshape(4, len(task_map))
+    y_pred = y_pred.reshape(window_size, len(task_map))
     y_pred = pd.DataFrame(y_pred, columns=task_map.values())
     y_pred
 
     y_true = y_te.numpy()
-    y_true = y_true.reshape(4, len(task_map))
+    y_true = y_true.reshape(window_size, len(task_map))
     y_true = pd.DataFrame(y_true, columns=task_map.values())
     y_true
 
     results = evaluate_asset_pricing(y_true, y_pred)
     trial.set_user_attr("asset evaluations", results)
+
     return (
         #-results["R2_pooled"],     # minimize negative R² to maximize R²
         -results["R2_avg"],        # same reasoning
@@ -665,10 +693,10 @@ def objective(trial):
         -results["HitRatio"],      # maximize HitRatio
     )
 
-# sampler = optuna.samplers.GPSampler()
-sampler = optuna.samplers.TPESampler(n_startup_trials=10, n_ei_candidates=20)
+sampler = optuna.samplers.GPSampler()
+# sampler = optuna.samplers.TPESampler(n_startup_trials=10, n_ei_candidates=20) #
 study = optuna.create_study(sampler=sampler, directions=["minimize"] * 3)
-study.optimize(objective, n_trials=50, n_jobs=3)
+study.optimize(objective, n_trials=25, n_jobs=5)
 
 
 ```
@@ -720,21 +748,6 @@ Best trial Nov 8 task 2, matern1/2 features rbf_periodic time. RBF Periodic seem
 
 After that 
 
-[FrozenTrial(number=11, state=1, values=[0.16459749918504216, -0.48489010989010983, -0.673076923076923], datetime_start=datetime.datetime(2025, 11, 9, 12, 14, 42, 15986), datetime_complete=datetime.datetime(2025, 11, 9, 12, 15, 31, 436015), params={'task_rank': 6, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'smoothness_features': 0.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -2.039259603534501, 'MSE': 3.415236683444367e-05, 'RMSE': 0.005844002638127713, 'R2': 0.006673472731802521}, 1: {'NLPD': -3.6543291561048195, 'MSE': 2.292491091089594e-05, 'RMSE': 0.00478799654457853, 'R2': -0.22837787167489676}, 2: {'NLPD': -3.1928938264667392, 'MSE': 1.9471831628082815e-05, 'RMSE': 0.004412689840458177, 'R2': 0.17256773392113522}, 3: {'NLPD': -3.1792529812687724, 'MSE': 5.611569795075328e-05, 'RMSE': 0.007491041179352392, 'R2': 0.14500151470164957}, 4: {'NLPD': -1.9681589707558436, 'MSE': 0.0009460751627573466, 'RMSE': 0.030758334850205182, 'R2': -0.06399727743958583}, 5: {'NLPD': -3.1245388843922055, 'MSE': 5.3907682403155966e-05, 'RMSE': 0.0073421851245495, 'R2': 0.13344899011969824}, 6: {'NLPD': -2.4810754235130545, 'MSE': 0.00011143018373412936, 'RMSE': 0.010556049627305157, 'R2': -2.2318456994265023}, 7: {'NLPD': -3.4959899311627924, 'MSE': 3.102273880398981e-05, 'RMSE': 0.0055698059933888015, 'R2': 0.18697828809344008}, 8: {'NLPD': -2.317870600054319, 'MSE': 0.0004918751168979265, 'RMSE': 0.02217825775163429, 'R2': -0.10680724603478398}, 9: {'NLPD': -2.227106603153751, 'MSE': 0.0003153446388560003, 'RMSE': 0.01775794579493924, 'R2': 0.28681121370483864}, 10: {'NLPD': -2.1933586481112277, 'MSE': 0.0006644659967240181, 'RMSE': 0.025777237957624904, 'R2': -0.12666725512835564}, 11: {'NLPD': -2.3069097594638195, 'MSE': 0.00045877059545732077, 'RMSE': 0.021418930772970923, 'R2': 0.03496548853367343}, 12: {'NLPD': -2.2513208627573063, 'MSE': 0.0005111333943780606, 'RMSE': 0.02260825942831647, 'R2': -0.3485188415076623}}, 'asset evaluations': {'R2_pooled': np.float64(-0.06282698821747146), 'R2_avg': np.float64(-0.16459749918504216), 'IC': np.float64(0.48489010989010983), 'IC_p_value': np.float64(0.06258297687789674), 'IR': np.float64(1.4492062934150292), 'HitRatio': np.float64(0.673076923076923)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=6, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>, <KernelType.MATERN_LINEAR: 'maternlinear'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.RBF_PERIODIC: 'rbfperiodic'>, <KernelType.MATERN: 'matern'>, <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=11, value=None),
- FrozenTrial(number=14, state=1, values=[0.14481831780622076, -0.45467032967032966, -0.673076923076923], datetime_start=datetime.datetime(2025, 11, 9, 12, 16, 12, 197918), datetime_complete=datetime.datetime(2025, 11, 9, 12, 17, 1, 769925), params={'task_rank': 6, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'smoothness_features': 0.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -2.0427145989258215, 'MSE': 3.0877510358840715e-05, 'RMSE': 0.005556753580899617, 'R2': 0.10192314681681203}, 1: {'NLPD': -3.6500071030587202, 'MSE': 2.296671870791019e-05, 'RMSE': 0.0047923604526277225, 'R2': -0.23061804494821447}, 2: {'NLPD': -3.184872975736356, 'MSE': 1.938063941480358e-05, 'RMSE': 0.00440234476328281, 'R2': 0.1764428382833545}, 3: {'NLPD': -3.1845612611891765, 'MSE': 5.218136544345034e-05, 'RMSE': 0.007223667035754787, 'R2': 0.20494638676500976}, 4: {'NLPD': -1.9564981543259294, 'MSE': 0.0009926438744164918, 'RMSE': 0.03150625135455647, 'R2': -0.11637047607085371}, 5: {'NLPD': -3.1270139723533537, 'MSE': 5.133972555296144e-05, 'RMSE': 0.007165174495639408, 'R2': 0.1747281826700875}, 6: {'NLPD': -2.472126805313689, 'MSE': 0.00011267876231496066, 'RMSE': 0.010615025309200193, 'R2': -2.268058628290406}, 7: {'NLPD': -3.4667906077002275, 'MSE': 2.9413270107039197e-05, 'RMSE': 0.005423400234819407, 'R2': 0.22915809057711112}, 8: {'NLPD': -2.335539508971417, 'MSE': 0.0004826118522802702, 'RMSE': 0.021968428534610077, 'R2': -0.08596323899206304}, 9: {'NLPD': -2.2426342319668024, 'MSE': 0.00030497809464945686, 'RMSE': 0.01746362203695032, 'R2': 0.31025636599143236}, 10: {'NLPD': -2.210286586184686, 'MSE': 0.0006482499648168788, 'RMSE': 0.025460753422019523, 'R2': -0.09917138288212102}, 11: {'NLPD': -2.3250465051979887, 'MSE': 0.0004497261423808552, 'RMSE': 0.021206747567245082, 'R2': 0.053990703842920595}, 12: {'NLPD': -2.2489936721923973, 'MSE': 0.0005055931548758421, 'RMSE': 0.022485398703955464, 'R2': -0.333902075243941}}, 'asset evaluations': {'R2_pooled': np.float64(-0.05880945855960862), 'R2_avg': np.float64(-0.14481831780622076), 'IC': np.float64(0.45467032967032966), 'IC_p_value': np.float64(0.06037593488622231), 'IR': np.float64(1.4713775575098023), 'HitRatio': np.float64(0.673076923076923)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=6, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>, <KernelType.MATERN_LINEAR: 'maternlinear'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.RBF_PERIODIC: 'rbfperiodic'>, <KernelType.MATERN: 'matern'>, <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=14, value=None),
- FrozenTrial(number=16, state=1, values=[0.14416650402677636, -0.4848901098901099, -0.6538461538461539], datetime_start=datetime.datetime(2025, 11, 9, 12, 16, 39, 8428), datetime_complete=datetime.datetime(2025, 11, 9, 12, 17, 32, 136486), params={'task_rank': 4, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'smoothness_features': 0.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -2.038381808084128, 'MSE': 3.0149345174982075e-05, 'RMSE': 0.005490841936805509, 'R2': 0.123101936470431}, 1: {'NLPD': -3.6684865013479353, 'MSE': 2.2531217019456708e-05, 'RMSE': 0.0047467059124677935, 'R2': -0.20728270291558526}, 2: {'NLPD': -3.1825396939230997, 'MSE': 1.8896248923599144e-05, 'RMSE': 0.004346981587676574, 'R2': 0.19702643460134528}, 3: {'NLPD': -3.18046615321075, 'MSE': 5.622548300297178e-05, 'RMSE': 0.007498365355393919, 'R2': 0.14332879108271512}, 4: {'NLPD': -1.9625284397414917, 'MSE': 0.0009660410143811168, 'RMSE': 0.031081200336877543, 'R2': -0.08645174258751287}, 5: {'NLPD': -3.173806738173938, 'MSE': 5.3992231941835103e-05, 'RMSE': 0.007347940659928815, 'R2': 0.13208987978771647}, 6: {'NLPD': -2.455986452590679, 'MSE': 0.00010817598424609032, 'RMSE': 0.010400768444979934, 'R2': -2.137463097979946}, 7: {'NLPD': -3.469696403560693, 'MSE': 3.066653517197385e-05, 'RMSE': 0.005537737369357078, 'R2': 0.1963134176743172}, 8: {'NLPD': -2.327932501259767, 'MSE': 0.0004870604621437549, 'RMSE': 0.022069446348827033, 'R2': -0.09597340918066477}, 9: {'NLPD': -2.249252857753306, 'MSE': 0.00030741293377110733, 'RMSE': 0.01753319519571682, 'R2': 0.30474969251731376}, 10: {'NLPD': -2.2042560708355303, 'MSE': 0.0006549963771705668, 'RMSE': 0.025592897006211836, 'R2': -0.11061058658248846}, 11: {'NLPD': -2.3132619357721156, 'MSE': 0.00045403766146109913, 'RMSE': 0.02130815950430959, 'R2': 0.044921324178050615}, 12: {'NLPD': -2.2352923282315356, 'MSE': 0.000522275320491159, 'RMSE': 0.022853343748588717, 'R2': -0.37791448941378625}}, 'asset evaluations': {'R2_pooled': np.float64(-0.06161751716867814), 'R2_avg': np.float64(-0.14416650402677636), 'IC': np.float64(0.4848901098901099), 'IC_p_value': np.float64(0.06267580561708926), 'IR': np.float64(1.4482952725527722), 'HitRatio': np.float64(0.6538461538461539)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=6, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>, <KernelType.MATERN_LINEAR: 'maternlinear'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.RBF_PERIODIC: 'rbfperiodic'>, <KernelType.MATERN: 'matern'>, <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=16, value=None),
- FrozenTrial(number=31, state=1, values=[0.15784772784860104, -0.4835164835164835, -0.6923076923076923], datetime_start=datetime.datetime(2025, 11, 9, 12, 28, 41, 700931), datetime_complete=datetime.datetime(2025, 11, 9, 12, 29, 46, 390082), params={'task_rank': 6, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'smoothness_features': 0.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -2.0382005122518922, 'MSE': 3.4457851987133105e-05, 'RMSE': 0.005870081088633538, 'R2': -0.0022116071024582684}, 1: {'NLPD': -3.655908248070247, 'MSE': 2.205144024848577e-05, 'RMSE': 0.004695896107079646, 'R2': -0.18157498387165982}, 2: {'NLPD': -3.2021640079128635, 'MSE': 1.8833429779106825e-05, 'RMSE': 0.004339749967349136, 'R2': 0.19969585923859667}, 3: {'NLPD': -3.1790301421421265, 'MSE': 5.5295081410653804e-05, 'RMSE': 0.007436066259162421, 'R2': 0.1575047165581348}, 4: {'NLPD': -1.9578107805120104, 'MSE': 0.000984553520934548, 'RMSE': 0.03137759584376324, 'R2': -0.10727171265630275}, 5: {'NLPD': -3.108989359720208, 'MSE': 5.2050671625648845e-05, 'RMSE': 0.007214615140508109, 'R2': 0.16329992217373868}, 6: {'NLPD': -2.4644763626719364, 'MSE': 0.00011048982263322341, 'RMSE': 0.01051141392169595, 'R2': -2.2045721019322895}, 7: {'NLPD': -3.474935334419805, 'MSE': 3.0297639537717802e-05, 'RMSE': 0.005504329163278464, 'R2': 0.20598117015654271}, 8: {'NLPD': -2.3144242476839736, 'MSE': 0.000488585140144515, 'RMSE': 0.02210396209154628, 'R2': -0.0994042081805282}, 9: {'NLPD': -2.2154716403135515, 'MSE': 0.0003201046290034418, 'RMSE': 0.017891468050538553, 'R2': 0.2760459392154856}, 10: {'NLPD': -2.2014975982424305, 'MSE': 0.000648859211246059, 'RMSE': 0.02547271503483794, 'R2': -0.10020441994563578}, 11: {'NLPD': -2.303467915870921, 'MSE': 0.00045544294062696544, 'RMSE': 0.021341109170494522, 'R2': 0.04196528709386527}, 12: {'NLPD': -2.239446240935813, 'MSE': 0.0005311294725821107, 'RMSE': 0.02304624638812383, 'R2': -0.40127432277930386}}, 'asset evaluations': {'R2_pooled': np.float64(-0.07296730387037953), 'R2_avg': np.float64(-0.15784772784860104), 'IC': np.float64(0.4835164835164835), 'IC_p_value': np.float64(0.053936341498168124), 'IR': np.float64(1.5423571089623374), 'HitRatio': np.float64(0.6923076923076923)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=6, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>, <KernelType.MATERN_LINEAR: 'maternlinear'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.RBF_PERIODIC: 'rbfperiodic'>, <KernelType.MATERN: 'matern'>, <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=31, value=None),
- FrozenTrial(number=40, state=1, values=[0.5469272446553453, -0.570054945054945, -0.6730769230769231], datetime_start=datetime.datetime(2025, 11, 9, 12, 33, 53, 686638), datetime_complete=datetime.datetime(2025, 11, 9, 12, 54, 0, 307184), params={'task_rank': 1, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>, 'smoothness_features': 0.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -2.0594010711009636, 'MSE': 3.9527577356663546e-05, 'RMSE': 0.006287096098888862, 'R2': -0.14966530247680954}, 1: {'NLPD': -3.6121807395807233, 'MSE': 3.433320229206206e-05, 'RMSE': 0.005859454095055448, 'R2': -0.8396645519465031}, 2: {'NLPD': -3.0712274990141535, 'MSE': 1.8419676114632242e-05, 'RMSE': 0.004291815014027543, 'R2': 0.21727782783475524}, 3: {'NLPD': -2.9706740173840567, 'MSE': 5.91814077915378e-05, 'RMSE': 0.007692945326176302, 'R2': 0.09829128269962861}, 4: {'NLPD': -1.9436752174672325, 'MSE': 0.000775160340515774, 'RMSE': 0.027841701465890586, 'R2': 0.12822096556881502}, 5: {'NLPD': -2.9553341523412953, 'MSE': 7.56563918248741e-05, 'RMSE': 0.008698068281226245, 'R2': -0.21615546833277155}, 6: {'NLPD': -2.393663929932269, 'MSE': 0.00023956959126115123, 'RMSE': 0.015478035768829041, 'R2': -5.948314426888763}, 7: {'NLPD': -3.445496925022514, 'MSE': 3.3506714135551625e-05, 'RMSE': 0.0057884984353070035, 'R2': 0.12188004228219906}, 8: {'NLPD': -2.278416313190887, 'MSE': 0.0004876752508635158, 'RMSE': 0.022083370459771667, 'R2': -0.09735679408149744}, 9: {'NLPD': -2.2033947502890223, 'MSE': 0.00024410525747216525, 'RMSE': 0.015623868198118071, 'R2': 0.4479274074979924}, 10: {'NLPD': -2.266254787958157, 'MSE': 0.0004689467523700565, 'RMSE': 0.02165517841926167, 'R2': 0.2048547963341849}, 11: {'NLPD': -2.2814053195619435, 'MSE': 0.00041552976250110277, 'RMSE': 0.020384547149767708, 'R2': 0.12592357634595763}, 12: {'NLPD': -2.0803963826083276, 'MSE': 0.0008351137901871211, 'RMSE': 0.028898335422427382, 'R2': -1.2032735353566797}}, 'asset evaluations': {'R2_pooled': np.float64(-0.06569671645159603), 'R2_avg': np.float64(-0.5469272446553453), 'IC': np.float64(0.570054945054945), 'IC_p_value': np.float64(0.01905809277050861), 'IR': np.float64(2.311317251131442), 'HitRatio': np.float64(0.6730769230769231)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=6, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>, <KernelType.MATERN_LINEAR: 'maternlinear'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.RBF_PERIODIC: 'rbfperiodic'>, <KernelType.MATERN: 'matern'>, <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=40, value=None),
- FrozenTrial(number=43, state=1, values=[0.14598052485280738, -0.4793956043956044, -0.6923076923076923], datetime_start=datetime.datetime(2025, 11, 9, 12, 35, 50, 354605), datetime_complete=datetime.datetime(2025, 11, 9, 12, 53, 3, 586570), params={'task_rank': 6, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'smoothness_features': 0.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -2.034980365165148, 'MSE': 3.3972630582296536e-05, 'RMSE': 0.005828604514143719, 'R2': 0.011901127612501727}, 1: {'NLPD': -3.678502654111937, 'MSE': 2.201846273888897e-05, 'RMSE': 0.004692383481652898, 'R2': -0.1798079609502139}, 2: {'NLPD': -3.1652360537416357, 'MSE': 2.059470355237057e-05, 'RMSE': 0.004538138776235316, 'R2': 0.12485263045394113}, 3: {'NLPD': -3.1389172358229427, 'MSE': 5.475688551053823e-05, 'RMSE': 0.007399789558530582, 'R2': 0.16570485834014437}, 4: {'NLPD': -1.9565819272400704, 'MSE': 0.0009806153719759392, 'RMSE': 0.03131477881090555, 'R2': -0.10284269904823051}, 5: {'NLPD': -3.1175284871368936, 'MSE': 5.340644562010136e-05, 'RMSE': 0.007307971375156129, 'R2': 0.14150623207821533}, 6: {'NLPD': -2.4825628215691458, 'MSE': 0.0001021042848108097, 'RMSE': 0.010104666486866833, 'R2': -1.9613636332699023}, 7: {'NLPD': -3.4697995659444656, 'MSE': 3.000228259143362e-05, 'RMSE': 0.005477433942224554, 'R2': 0.21372167339220727}, 8: {'NLPD': -2.326279560418567, 'MSE': 0.0004900588963579608, 'RMSE': 0.022137273914327408, 'R2': -0.10272042402453696}, 9: {'NLPD': -2.203926209191771, 'MSE': 0.00032447055007658296, 'RMSE': 0.0180130660931609, 'R2': 0.26617189803149743}, 10: {'NLPD': -2.189840641587303, 'MSE': 0.0006613368747534298, 'RMSE': 0.02571647088450182, 'R2': -0.12136152198482986}, 11: {'NLPD': -2.3132183996496822, 'MSE': 0.0004628375699328054, 'RMSE': 0.02151366007756015, 'R2': 0.026410514075942637}, 12: {'NLPD': -2.23740894208086, 'MSE': 0.000523035292788072, 'RMSE': 0.022869964861977204, 'R2': -0.3799195177932333}}, 'asset evaluations': {'R2_pooled': np.float64(-0.07498601398669424), 'R2_avg': np.float64(-0.14598052485280738), 'IC': np.float64(0.4793956043956044), 'IC_p_value': np.float64(0.04859950674969447), 'IR': np.float64(1.6097941242131366), 'HitRatio': np.float64(0.6923076923076923)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=6, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>, <KernelType.MATERN_LINEAR: 'maternlinear'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.RBF_PERIODIC: 'rbfperiodic'>, <KernelType.MATERN: 'matern'>, <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=43, value=None),
- FrozenTrial(number=45, state=1, values=[0.43748610946711974, -0.37225274725274726, -0.7115384615384616], datetime_start=datetime.datetime(2025, 11, 9, 12, 53, 3, 587948), datetime_complete=datetime.datetime(2025, 11, 9, 12, 53, 42, 285359), params={'task_rank': 2, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'smoothness_features': 1.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -2.0492436577969277, 'MSE': 3.318099023438255e-05, 'RMSE': 0.00576029428366143, 'R2': 0.0349261015901684}, 1: {'NLPD': -3.555586951142022, 'MSE': 4.146730905881398e-05, 'RMSE': 0.006439511554366059, 'R2': -1.2219290205198172}, 2: {'NLPD': -3.141706687560907, 'MSE': 9.330868367073102e-06, 'RMSE': 0.003054647011861289, 'R2': 0.6034958752254236}, 3: {'NLPD': -3.13129927215246, 'MSE': 4.557597751217573e-05, 'RMSE': 0.006750998260418657, 'R2': 0.3055883975086717}, 4: {'NLPD': -1.9132122297387482, 'MSE': 0.0009397565283120905, 'RMSE': 0.030655448590945305, 'R2': -0.056891066314357586}, 5: {'NLPD': -3.076716772098579, 'MSE': 6.67894141962839e-05, 'RMSE': 0.008172479072856896, 'R2': -0.07362126771221145}, 6: {'NLPD': -2.374773388733779, 'MSE': 0.0002410065458054132, 'RMSE': 0.015524385521025082, 'R2': -5.989990884815324}, 7: {'NLPD': -3.5086965748110006, 'MSE': 2.5576473712294865e-05, 'RMSE': 0.005057318826443006, 'R2': 0.32971010156496017}, 8: {'NLPD': -2.3335672028514898, 'MSE': 0.0004388746201819777, 'RMSE': 0.020949334599981398, 'R2': 0.012453378854334285}, 9: {'NLPD': -2.194513922987956, 'MSE': 0.0002059175112050394, 'RMSE': 0.014349826173338805, 'R2': 0.534293462460594}, 10: {'NLPD': -2.223359204612206, 'MSE': 0.0005647807681131013, 'RMSE': 0.023765116623174844, 'R2': 0.042358825137046474}, 11: {'NLPD': -2.3138532987754834, 'MSE': 0.000376838607253729, 'RMSE': 0.019412331319388947, 'R2': 0.20731131233413014}, 12: {'NLPD': -2.196442174570816, 'MSE': 0.0005363412985303879, 'RMSE': 0.023159043558195314, 'R2': -0.4150246383861762}}, 'asset evaluations': {'R2_pooled': np.float64(-0.0081360500678751), 'R2_avg': np.float64(-0.43748610946711974), 'IC': np.float64(0.37225274725274726), 'IC_p_value': np.float64(0.19108825248925218), 'IR': np.float64(0.8411823277940026), 'HitRatio': np.float64(0.7115384615384616)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=6, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>, <KernelType.MATERN_LINEAR: 'maternlinear'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.RBF_PERIODIC: 'rbfperiodic'>, <KernelType.MATERN: 'matern'>, <KernelType.MATERN_LINEAR_PERIODIC: 'maternlinearperiodic'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=45, value=None)]
+It settled on smoothness 0.5 for matern features and 1.5 for periodic matern time. There was actually multiple with task rank 6.....
 
-<!-- 
-[FrozenTrial(number=2, state=1, values=[-0.5494505494505495, -7.412493166611015, -0.7692307692307693], datetime_start=datetime.datetime(2025, 11, 2, 14, 28, 21, 219179), datetime_complete=datetime.datetime(2025, 11, 2, 14, 29, 22, 416430), params={'task_rank': 1, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 2.5, 'smoothness_time': 2.5}, user_attrs={'task scores': {0: {'NLPD': -3.05801309650648, 'MSE': 3.2873712221789454e-05, 'RMSE': 0.005733560169893524, 'R2': 0.043858668492544606}, 1: {'NLPD': -3.2527587611985256, 'MSE': 3.634760172830063e-05, 'RMSE': 0.006028897223232507, 'R2': -0.9476470345931112}, 2: {'NLPD': -2.902641890898093, 'MSE': 6.094263419746476e-06, 'RMSE': 0.0024686561971539248, 'R2': 0.74103668062977}, 3: {'NLPD': -2.862701535728098, 'MSE': 5.579683840049957e-05, 'RMSE': 0.007469728134309813, 'R2': 0.1498559863720793}, 4: {'NLPD': -1.8323125252720756, 'MSE': 0.0008332584784527384, 'RMSE': 0.028866216905800775, 'R2': 0.0628812726747795}, 5: {'NLPD': -2.592224717788004, 'MSE': 4.987982709660319e-05, 'RMSE': 0.007062565192378983, 'R2': 0.19818042652302836}, 6: {'NLPD': -2.1790051073686767, 'MSE': 0.00022542628396992316, 'RMSE': 0.015014202741735013, 'R2': -5.538111505982846}, 7: {'NLPD': -3.147133016497995, 'MSE': 2.7354621323096464e-05, 'RMSE': 0.005230164559848616, 'R2': 0.283109003523216}, 8: {'NLPD': -2.103640048739557, 'MSE': 0.0004980065670550486, 'RMSE': 0.022316060742322973, 'R2': -0.1206041087535219}, 9: {'NLPD': -2.0655328337187564, 'MSE': 0.00024560071114579623, 'RMSE': 0.015671653108265134, 'R2': 0.4445452640934725}, 10: {'NLPD': -2.0148459738784528, 'MSE': 0.00040409691151539664, 'RMSE': 0.020102161861735086, 'R2': 0.31481406069301565}, 11: {'NLPD': -2.0264755451518446, 'MSE': 0.0004120936488977901, 'RMSE': 0.020300089874130855, 'R2': 0.13315152043250078}, 12: {'NLPD': -2.0058103453380163, 'MSE': 0.0006270425093360713, 'RMSE': 0.02504081686638979, 'R2': -0.654320863333189}}, 'asset evaluations': {'R2_pooled': np.float64(0.012328237393294361), 'R2_avg': np.float64(-0.37609620224832774), 'IC': np.float64(0.5494505494505495), 'IR': np.float64(7.412493166611015), 'HitRatio': np.float64(0.7692307692307693)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=2, value=None),
- FrozenTrial(number=5, state=1, values=[-0.5989010989010989, -4.890958649392481, -0.6923076923076924], datetime_start=datetime.datetime(2025, 11, 2, 14, 29, 2, 449080), datetime_complete=datetime.datetime(2025, 11, 2, 14, 30, 0, 774258), params={'task_rank': 2, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 1.5, 'smoothness_time': 1.5}, user_attrs={'task scores': {0: {'NLPD': -3.235799409724269, 'MSE': 3.1697509666661995e-05, 'RMSE': 0.00563005414420341, 'R2': 0.07806885654780837}, 1: {'NLPD': -3.444303360442043, 'MSE': 2.7005630984767216e-05, 'RMSE': 0.005196694236220486, 'R2': -0.4470676084206342}, 2: {'NLPD': -3.0066084613431827, 'MSE': 1.2287289006762503e-05, 'RMSE': 0.0035053229532758467, 'R2': 0.4778766639882258}, 3: {'NLPD': -3.0601338783132013, 'MSE': 5.4925074459227365e-05, 'RMSE': 0.007411145286609039, 'R2': 0.16313854712667952}, 4: {'NLPD': -1.83075908719892, 'MSE': 0.000922852173504969, 'RMSE': 0.030378482080330626, 'R2': -0.03787969364579591}, 5: {'NLPD': -2.8300347536508244, 'MSE': 5.017525998476373e-05, 'RMSE': 0.00708344972345846, 'R2': 0.19343133483277097}, 6: {'NLPD': -2.2137204856089765, 'MSE': 0.00018361489590510067, 'RMSE': 0.013550457405752054, 'R2': -4.325442279601937}, 7: {'NLPD': -3.2428452152609095, 'MSE': 2.931741466284005e-05, 'RMSE': 0.005414555813992506, 'R2': 0.23166947319351983}, 8: {'NLPD': -2.0671552180800044, 'MSE': 0.0005078770230550965, 'RMSE': 0.02253612706422948, 'R2': -0.1428144053251772}, 9: {'NLPD': -2.0596112928993184, 'MSE': 0.00031121462655880596, 'RMSE': 0.017641276216838905, 'R2': 0.2961517195980279}, 10: {'NLPD': -2.152169586409213, 'MSE': 0.00047921477127377645, 'RMSE': 0.021890974653353754, 'R2': 0.18744436339872017}, 11: {'NLPD': -2.0930364122436833, 'MSE': 0.00043327108674753086, 'RMSE': 0.020815164826335893, 'R2': 0.08860429227141808}, 12: {'NLPD': -2.0478678347782147, 'MSE': 0.0006256357553035152, 'RMSE': 0.02501271187423537, 'R2': -0.6506094362592894}}, 'asset evaluations': {'R2_pooled': np.float64(-0.04921524121938958), 'R2_avg': np.float64(-0.29903293633043565), 'IC': np.float64(0.5989010989010989), 'IR': np.float64(4.890958649392481), 'HitRatio': np.float64(0.6923076923076924)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=5, value=None),
- 
- 
- 
- FrozenTrial(number=18, state=1, values=[-0.6153846153846154, -4.781495315103808, -0.7307692307692308], datetime_start=datetime.datetime(2025, 11, 2, 14, 32, 46, 580676), datetime_complete=datetime.datetime(2025, 11, 2, 14, 33, 35, 443322), params={'task_rank': 2, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'mean': <GPMean.ZERO: 'zero'>, 'smoothness_features': 2.5, 
- 'smoothness_time': 2.5},
- 
-  user_attrs={'task scores': {0: {'NLPD': -3.1547393481471113, 'MSE': 3.145033257875899e-05, 'RMSE': 0.005608059609059001, 'R2': 0.08525807291471021}, 1: {'NLPD': -3.2633275769382006, 'MSE': 2.9003381314815687e-05, 'RMSE': 0.005385478745182798, 'R2': -0.5541149051105505}, 2: {'NLPD': -2.9378418364098198, 'MSE': 1.2063262586012627e-05, 'RMSE': 0.003473220779912015, 'R2': 0.4873962107403471}, 3: {'NLPD': -2.8339652883874926, 'MSE': 5.477978711638672e-05, 'RMSE': 0.0074013368465694574, 'R2': 0.16535220597030986}, 4: {'NLPD': -1.822044064160243, 'MSE': 0.0008556804053758325, 'RMSE': 0.029252015407076355, 'R2': 0.037664598418592155}, 5: {'NLPD': -2.739290009386674, 'MSE': 4.95897617555539e-05, 'RMSE': 0.007041999840638588, 'R2': 0.20284323474788746}, 6: {'NLPD': -2.2089666873629232, 'MSE': 0.00017105455413983557, 'RMSE': 0.013078782593950997, 'R2': -3.9611506204025444}, 7: {'NLPD': -3.120790174081506, 'MSE': 2.8474449131443684e-05, 'RMSE': 0.005336145531321619, 'R2': 0.253761330823736}, 8: {'NLPD': -2.156046752323734, 'MSE': 0.0004924681362504534, 'RMSE': 0.022191623109868584, 'R2': -0.10814164595433096}, 9: {'NLPD': -2.045751738516648, 'MSE': 0.00030187903990599134, 'RMSE': 0.017374666612801275, 'R2': 0.3172652407868708}, 10: {'NLPD': -2.155653014454157, 'MSE': 0.00045881184583386155, 'RMSE': 0.021419893693337078, 'R2': 0.22203952419748274}, 11: {'NLPD': -2.138279392488241, 'MSE': 0.0003962188258883677, 'RMSE': 0.019905246190096915, 'R2': 0.1665445761758424}, 12: {'NLPD': -2.0697786348630975, 'MSE': 0.0005809449388296799, 'RMSE': 0.02410279939819605, 'R2': -0.5327020392466972}}, 'asset evaluations': {'R2_pooled': np.float64(0.009884203598481633), 'R2_avg': np.float64(-0.24753724737987254), 'IC': np.float64(0.6153846153846154), 'IR': np.float64(4.781495315103808), 'HitRatio': np.float64(0.7307692307692308)}}, system_attrs={}, intermediate_values={}, distributions={'task_rank': IntDistribution(high=10, log=False, low=1, step=1), 'kernel': CategoricalDistribution(choices=(<KernelType.MATERN: 'matern'>, <KernelType.RBF: 'rbf'>)), 'kernel_time': CategoricalDistribution(choices=(<KernelType.PERIODIC_MATERN: 'periodicmatern'>, <KernelType.MATERN: 'matern'>)), 'mean': CategoricalDistribution(choices=(<GPMean.ZERO: 'zero'>, <GPMean.CONSTANT: 'constant'>)), 'smoothness_features': CategoricalDistribution(choices=(0.5, 1.5, 2.5)), 'smoothness_time': CategoricalDistribution(choices=(0.5, 1.5, 2.5))}, trial_id=18, value=None)] -->
+0.14598052485280738, -0.4793956043956044, -0.6923076923076923], datetime_start=datetime.datetime(2025, 11, 9, 12, 35, 50, 354605), datetime_complete=datetime.datetime(2025, 11, 9, 12, 53, 3, 586570), params={'task_rank': 6, 'kernel': <KernelType.MATERN: 'matern'>, 'kernel_time': <KernelType.PERIODIC_MATERN: 'periodicmatern'>, 'smoothness_features': 0.5, 'smoothness_time': 1.5}

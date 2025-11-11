@@ -9,6 +9,7 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
     """
     Evaluate predictive performance using metrics from
     'Empirical Asset Pricing via Ensemble Gaussian Process Regression'.
+    I added IC p-value to help determine if good IC was just a fluke. 
 
     Parameters
     ----------
@@ -25,6 +26,7 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
             "R2_pooled": float,
             "R2_avg": float,
             "IC": float,
+            "IC_p_value": float,
             "IR": float,
             "HitRatio": float
         }
@@ -74,10 +76,10 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
     HitRatio = np.nanmean(Hit_list) if Hit_list else np.nan
 
     return {
-        "R2_pooled": R2_pooled,
-        "R2_avg": R2_avg,
-        "IC": IC,
-        "IC_p_value": p_val,
-        "IR": IR,
-        "HitRatio": HitRatio,
+        "R2_pooled": float(R2_pooled),
+        "R2_avg": float(R2_avg),
+        "IC": float(IC),
+        "IC_p_value": float(p_val),
+        "IR": float(IR),
+        "HitRatio": float(HitRatio),
     }

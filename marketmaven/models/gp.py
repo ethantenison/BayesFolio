@@ -107,11 +107,20 @@ class HadamardMultiTaskGP(ExactGP):
         num_tasks: int,
         rank: int = 1,
         task_feature: int = -1,
+        dtype: torch.dtype = torch.float32,
+        device: torch.device | None = None,
     ):
+        # Move inputs and likelihood to the same device/dtype before calling super()
+        train_X = train_X.to(device=device, dtype=dtype)
+        train_Y = train_Y.to(device=device, dtype=dtype)
+        likelihood = likelihood.to(device=device, dtype=dtype)
+        
         super().__init__(train_X, train_Y, likelihood)
 
-        self.mean_module = mean_module
-        self.covar_module = covar_module
+        self.mean_module = mean_module.to(device=device, dtype=dtype)
+        self.covar_module = covar_module.to(device=device, dtype=dtype)
+        self.dtype = dtype
+        self.device = device if device is not None else torch.device("cpu")
         self._register_lengthscale_constraints(self.covar_module)
 
         # --- Task kernel (IndexKernel) with LKJ prior for task covariance
@@ -128,7 +137,7 @@ class HadamardMultiTaskGP(ExactGP):
             rank=rank,
             task_prior=task_covar_prior,
             #active_dims=[task_feature],
-        )
+        ).to(device=device, dtype=dtype)
 
         # Identify which column is the task feature
         self.task_feature = task_feature if task_feature >= 0 else train_X.shape[-1] + task_feature
@@ -199,6 +208,8 @@ def train_model_hadamard(
     patience: int = 50,
     visualize: bool = False,
     task_feature: int = -1,
+    dtype: torch.dtype = torch.float32,
+    device: torch.device | None = None,
 ):
     """
     Train a HadamardMultiTaskGP where the task index is embedded
@@ -237,12 +248,23 @@ def train_model_hadamard(
     # ----------------------------------------------------------------------
     # Identify number of tasks and initialize likelihood
     # ----------------------------------------------------------------------
+    if device is None:
+        device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        
+    # Ensure tensors are on the same device/dtype
+    train_X = train_X.to(device=device, dtype=dtype)
+    train_Y = train_Y.to(device=device, dtype=dtype)
+    
     task_col = train_X[:, task_feature].long()
     num_tasks = len(torch.unique(task_col))
 
     likelihood = get_hadamard_gaussian_likelihood_with_lognormal_prior(
         num_tasks=num_tasks, task_feature_index=task_feature
-    )
+    ).to(device=device, dtype=dtype)
+    
+    # Mean & kernel to device/dtype BEFORE passing into the model
+    mean_f = mean_f.to(device=device, dtype=dtype)
+    kernel = kernel.to(device=device, dtype=dtype)
 
     # ----------------------------------------------------------------------
     # Initialize model
@@ -256,7 +278,7 @@ def train_model_hadamard(
         num_tasks=num_tasks,
         rank=rank,
         task_feature=task_feature,
-    )
+    ).to(device=device, dtype=dtype)
 
     # Ensure positive noise constraint
     model.likelihood.noise_covar.register_constraint(
@@ -305,174 +327,7 @@ def train_model_hadamard(
 
     return model, likelihood
       
-# class HadamardMultiTaskGP(ExactGP):
-#     """
-#     Intrinsic Coregionalization Model (ICM) Multi-task GP with Hadamard structure.
 
-#     Overview
-#     --------
-#     This model implements a multi-task GP where the covariance between two *tasked*
-#     observations ((x, i), (x', j)) factorizes as a Hadamard (elementwise) product:
-
-#         k( (x,i), (x',j) ) = k_X(x, x') * B[i, j]
-
-#     • k_X(x, x') is the **data kernel** over inputs (here: Matern(ν=1/2) + Periodic,
-#       wrapped in ScaleKernel).  
-#     • B is the **task covariance matrix** learned by an IndexKernel with low rank
-#       (rank=1 in this example).
-
-#     This is the classic **Intrinsic Coregionalization Model (ICM)**. It assumes all
-#     tasks share the same input kernel shape (lengthscales etc.), while the IndexKernel
-#     captures how strongly tasks correlate (and their relative marginal variances).
-
-#     Why ICM / Hadamard?
-#     -------------------
-#     • Simple and data-efficient: few extra parameters, good when tasks are
-#       moderately to highly correlated and you expect *shared smoothness/periodicity*.
-#     • Stable & fast: Kronecker-free (no large Kronecker algebra), works well with
-#       mid-sized panels.  
-#     • If you need *task-specific* input kernels or multiple latent processes mixed
-#       per task, consider upgrading to an **LCM** (Linear Coregionalization Model).
-
-#     Inputs & Shapes
-#     ---------------
-#     We pass a tuple of inputs to the model:
-#       - x:  Tensor of shape [N, D]   (features / time index, etc.)
-#       - i:  LongTensor of shape [N, 1] with task IDs in [0, num_tasks-1]
-#       - y:  Tensor of shape [N]
-
-#     For two tasks with aligned inputs, you can stack like:
-#       full_x = concat([x_task0, x_task1])      -> [2N, D]
-#       full_i = concat([zeros(N,1), ones(N,1)]) -> [2N, 1]
-#       full_y = concat([y_task0,   y_task1])    -> [2N]
-
-#     Kernels & Priors
-#     ----------------
-#     Data kernel:  k_X = Scale(Matern(ν=1/2) + Periodic) wrapped again in ScaleKernel.
-#     Task kernel:  IndexKernel(num_tasks=2, rank=1) learns B ≽ 0 (task variances +
-#                   correlations). rank controls the capacity of inter-task structure:
-#                   rank=1 is ICM with one latent coregionalization component.
-
-#     Likelihood
-#     ----------
-#     GaussianLikelihood with LogNormal prior and positivity constraint on noise.
-#     You can:
-#       • Provide fixed noise (known observation noise), or
-#       • Infer homoskedastic noise (as done here), or
-#       • Extend to task-specific noise using MultitaskGaussianLikelihood.
-
-#     Training
-#     --------
-#     We optimize the Exact Marginal Log-Likelihood (mll) with Adam. Early stopping
-#     is optional; it’s helpful if the loss plateaus.
-
-#     Notes & Tips
-#     ------------
-#     • Standardize targets per task (zero mean, unit variance) for stable fits.
-#     • Normalize inputs (e.g., to [0,1]) so lengthscale priors are well-behaved.
-#     • If tasks are weakly related or have different smoothness, consider:
-#         – Increasing IndexKernel rank (>=2), or
-#         – LCM with multiple latent kernels, or
-#         – KroneckerMultiTaskGP when inputs are shared on a grid and you want
-#           exact Kronecker algebra speedups.
-#     • PeriodicKernel period prior (LogNormal(0, 0.5)) implies a median period ≈ exp(0)=1
-#       in input units — adjust to match your calendar (e.g., monthly seasonality).
-
-#     Returns
-#     -------
-#     MultivariateNormal over full stacked observations; predictions for each task
-#     can be obtained by passing the corresponding (x, i) pairs.
-#     """
-#     def __init__(self, train_x, train_y, likelihood, mean_f, kernel, num_tasks, rank):
-#         super(HadamardMultiTaskGP, self).__init__(train_x, train_y, likelihood)
-#         #d = train_x[0].shape[1]
-#         self.mean_module = mean_f # gpytorch.means.ZeroMean()
-
-#         self.covar_module = kernel
-#         self._register_lengthscale_constraints(self.covar_module)
-        
-#         sd_prior = GammaPrior(1.0, 0.15)
-#         sd_prior._event_shape = torch.Size([num_tasks])
-#         eta = 0.5
-#         task_covar_prior = LKJCovariancePrior(num_tasks, eta, sd_prior)
-        
-#         self.task_covar_module = gpytorch.kernels.IndexKernel(num_tasks=num_tasks, rank=rank, prior=task_covar_prior)
-
-#     def forward(self,x,i):
-#         mean_x = self.mean_module(x)
-
-#         # Get input-input covariance
-#         covar_x = self.covar_module(x)
-#         # Get task-task covariance
-#         i_vec   = as_task_vec(i)                   
-#         covar_i = self.task_covar_module(i_vec)
-#         # Multiply the two together to get the covariance we want
-#         covar = covar_x.mul(covar_i)
-
-#         return gpytorch.distributions.MultivariateNormal(mean_x, covar)
-    
-#     def _register_lengthscale_constraints(self, kernel):
-#       """
-#       Recursively registers constraints for raw_lengthscale on all sub-kernels.
-
-#       Args:
-#           kernel: The kernel or combined kernel to register constraints on.
-#       """
-#       if hasattr(kernel, "base_kernel"):
-#           # If the kernel has a base kernel, register constraints on it
-#           self._register_lengthscale_constraints(kernel.base_kernel)
-
-#       if hasattr(kernel, "kernels"):
-#           # If the kernel is a combination (e.g., additive or product), recurse into sub-kernels
-#           for sub_kernel in kernel.kernels:
-#               self._register_lengthscale_constraints(sub_kernel)
-
-#       if hasattr(kernel, "raw_lengthscale"):
-#           # Register the constraint for raw_lengthscale
-#           kernel.register_constraint("raw_lengthscale", GreaterThan(2.5e-2))
-    
-# def train_model_hadamard(train_data, rank, mean_f, kernel, training_iterations=500, patience=50, visualize: bool = False):
-
-#     (train_x, train_i), train_y = train_data
-#     train_i_col = as_task_col(train_i)        
-
-#     num_tasks = len(torch.unique(train_i))
-#     likelihood = get_hadamard_gaussian_likelihood_with_lognormal_prior(num_tasks=num_tasks, task_feature_index=1)
-#     model = HadamardMultiTaskGP((train_x, train_i_col), train_y, likelihood, mean_f, kernel, num_tasks, rank)
-#     model.likelihood.noise_covar.register_constraint("raw_noise", GreaterThan(MIN_INFERRED_NOISE_LEVEL))
-    
-#     model.train()
-#     likelihood.train()
-#     optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
-#     mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
-
-#     best_loss = float("inf")
-#     patience_counter = 0
-#     for it in range(training_iterations):
-#         optimizer.zero_grad()
-#         output = model(train_x, train_i_col)         # model will squeeze internally
-#         loss = -mll(output, train_y, [train_i_col])  # ✅ tutorial style: list of (N,1)
-#         loss.backward()
-#         if visualize:
-#           if (it + 1) % 25 == 0:
-#               print(f'Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}')
-#         optimizer.step()
-
-#         if loss.item() + 1e-4 < best_loss:
-#             best_loss = loss.item()
-#             patience_counter = 0
-#         else:
-#             patience_counter += 1
-#         if patience_counter >= patience:
-#             break
-
-#     model.eval()
-#     likelihood.eval()
-#     return model, likelihood
-
-      
-    
-    
 class KroneckerModel(gpytorch.models.ExactGP):
     """
     Multi-task GP (ICM, Kronecker-structured) with Matern+Periodic data kernel
