@@ -294,7 +294,7 @@ X, I, y, task_map = prepare_multitask_gp_data(
     asset_col="asset_id",
     drop_cols=["date", "asset_id"]
 )
-window_size = 1
+window_size = 2
 index = -1 * len(task_map) * window_size
 eps = 1e-8
 X_tr, I_tr, y_tr = X[:index], I[:index], y[:index]
@@ -370,6 +370,13 @@ num_tasks = len(torch.unique(I_tr))
 
 #mean_f = ConstantMean(batch_shape=X_tr.shape[:-2])
 
+ewma2_means = compute_ewma2_means_torch(
+    returns=y_trs,
+    task_ids=I_tr,
+    num_tasks=len(etf_tickers),
+    d=0.94
+)
+
 mean_f = MultitaskMean(
     ConstantMean(batch_shape=X_tr.shape[:-2]),
     num_tasks=num_tasks,
@@ -382,6 +389,15 @@ kernel_f = MaternKernel(
     lengthscale_constraint=adaptive_lengthscale_constraint(ard_num_dims),
     active_dims=active_dims_features,
 ) 
+# kernel_f = SpectralMixtureKernel(
+#     num_mixtures=4,
+#     ard_num_dims=ard_num_dims,
+#     active_dims=active_dims_features,
+# )
+# kernel_f.initialize_from_data_empspect(
+#     X_trs,
+#     y_trs,
+)
 
 n_months = len(np.unique(X_tr.numpy()[:,0]))
 period_length = 12.0
@@ -392,7 +408,7 @@ k_per = PeriodicKernel(active_dims=[0], period_length=period_length,            
     lengthscale_constraint=adaptive_lengthscale_constraint(1),)
 
 kernel_t = MaternKernel(
-    nu=1.5,
+    nu=2.5,
     ard_num_dims=1,
     lengthscale_prior=adaptive_lengthscale_prior(1),
     lengthscale_constraint=adaptive_lengthscale_constraint(1),
@@ -403,7 +419,7 @@ kernel_t = MaternKernel(
 kernel_total = kernel_f * kernel_t
 
 
-model, likelihood = train_model_hadamard(X_trs, y_trs, rank=2, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50, visualize=True, task_feature=-1, dtype=torch.float32, device=torch.device("cpu"))
+model, likelihood = train_model_hadamard(X_trs, y_trs, rank=6, mean_f=mean_f, kernel=kernel_total, training_iterations=500, patience=50, visualize=True, task_feature=-1, dtype=torch.float32, device=torch.device("cpu"))
 
 
 
@@ -470,7 +486,7 @@ y_train_mean= pd.DataFrame(
     columns=task_map.values()
 )
 
-# ewma1
+# ewma2
 from riskfolio.src.ParamsEstimation import mean_vector
 historical = y_tr.numpy().reshape(-1, len(task_map))
 historical = pd.DataFrame(historical, columns=task_map.values())
@@ -491,6 +507,7 @@ print(f"Results for EWMA benchmark: {results_ewm}")
 
 ```
 
+doing a spectral mixture on the features did seem to help. Predicting with a window size of 1 led to 10 out of 13 correct sign predictions for MTGP with spectral mixture kernel on the feature columns. 
 
 For analyzing window of size 1
 

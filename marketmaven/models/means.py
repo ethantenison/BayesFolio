@@ -19,6 +19,94 @@ class GPMean(StrEnum):
     EXPONENTIAL_SATURATION = "exponential_saturation"
     ZERO = "zero"
 
+def compute_ewma2_means_torch(returns: torch.Tensor, task_ids: torch.Tensor, num_tasks: int, d: float = 0.94) -> torch.Tensor:
+    """
+    Compute per-task EWMA2 means (adjust=False) directly from tensors.
+
+    Parameters
+    ----------
+    returns : torch.Tensor
+        Tensor of returns, shape [N] or [N, 1].
+    task_ids : torch.Tensor
+        Tensor of integer task indices, shape [N] or [N, 1].
+    num_tasks : int
+        Number of unique tasks.
+    d : float
+        EWMA decay factor (Riskfolio default 0.94).
+
+    Returns
+    -------
+    torch.Tensor
+        Tensor of shape [num_tasks] containing the EWMA2 mean for each task.
+    """
+    # ensure correct shapes
+    returns = returns.view(-1)
+    task_ids = task_ids.view(-1).long()
+    alpha = 1.0 - d
+
+    means = torch.zeros(num_tasks, dtype=returns.dtype, device=returns.device)
+
+    for t in range(num_tasks):
+        mask = task_ids == t
+        r_t = returns[mask]
+        if len(r_t) == 0:
+            means[t] = torch.tensor(0.0, device=returns.device)
+            continue
+
+        # compute EWMA (adjust=False)
+        ewma = torch.zeros_like(r_t)
+        ewma[0] = r_t[0]
+        for i in range(1, len(r_t)):
+            ewma[i] = alpha * r_t[i] + (1 - alpha) * ewma[i - 1]
+        means[t] = ewma[-1]
+
+    return means
+
+class EWMATaskConstantMean(Mean):
+    """
+    Per-task constant mean initialized from EWMA2 means.
+    Each task has its own constant expected return.
+    Expects the task index as a column in X.
+    """
+
+    def __init__(
+        self,
+        task_means: torch.Tensor,
+        task_feature: int = -1,
+        learnable: bool = False,
+        dtype: torch.dtype = torch.float32,
+        device: torch.device | None = None,
+    ):
+        super().__init__()
+        device = device or torch.device("cpu")
+        task_means = task_means.to(device=device, dtype=dtype).view(-1)
+
+        if learnable:
+            self.register_parameter("raw_task_means", torch.nn.Parameter(task_means.clone()))
+            self._frozen = False
+        else:
+            self.register_buffer("task_means", task_means.clone())
+            self._frozen = True
+
+        self.task_feature = task_feature
+        self.dtype = dtype
+
+    @property
+    def _means(self) -> torch.Tensor:
+        return self.raw_task_means if not self._frozen else self.task_means
+
+    def forward(self, X: torch.Tensor) -> torch.Tensor:
+        if self.task_feature < 0:
+            tcol = X.shape[-1] + self.task_feature
+        else:
+            tcol = self.task_feature
+
+        task_ids = X[..., tcol].long().view(-1)
+        vals = self._means[task_ids]
+        return vals.view(*X.shape[:-1])
+
+
+
 
 class ExponentialSaturationMean(Mean):
     """

@@ -162,3 +162,9 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 - completed multitask mean with positiveindexkernel
 - the two together really helped
 - visualizing the learned task covariance showed that BND, although correlated with others, when you strip out the noise it doesn't really share structure with the others. 
+
+**November 11th**
+-spectral mixture didn't help and mps device didnt' work for lkj prior
+
+**November 12th**
+- created a EWMA2 mean function but didnt' have time to test it. It probably needs more configuring for multitask. 
