@@ -168,3 +168,6 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 
 **November 12th**
 - created a EWMA2 mean function but didnt' have time to test it. It probably needs more configuring for multitask. 
+
+**November 13th**
+- Tried EWMA2 mean function for multitask, but it didn't help much.I think I'm not calculating it correctly. 
