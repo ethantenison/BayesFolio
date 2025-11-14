@@ -171,3 +171,7 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 
 **November 13th**
 - Tried EWMA2 mean function for multitask, but it didn't help much.I think I'm not calculating it correctly. 
+
+
+**November 14th**
+- Added more etfs with better diversificaiton and it resultsed in better total results 

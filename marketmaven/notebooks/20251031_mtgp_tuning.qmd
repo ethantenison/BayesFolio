@@ -6,6 +6,8 @@ format: html
 
 ### Setup
 
+Including value and growth versions of us market etfs boosts predictions and performance. 
+
 ```{python}
 import os
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
@@ -25,23 +27,61 @@ from sklearn.preprocessing import StandardScaler
     
 # A shortered list for testing 
 etf_tickers = [
-    "SPY",
-    "IJR",
-    "VNQ",
-    "VNQI",
-    "VEA",
-    "VWO",
-    "VSS",
-    "BND",
-    "IEF",
-    "BNDX",
-    "LQD",
-    "HYG",
-    "TIP",
-    #"PDBC", # leaving this out because it is totally separate and uncorrelated
-    #"BIL",
+    "SPY", # total US market big cap
+    "MGK", # US growth
+    "VTV", # US value
+    "IJR", # US small cap
+    "VNQ", # REIT ETF US centric
+    "VNQI", # international REIT ETF
+    "VEA", # developed international equity
+    "VWO", # AVEM actually is better than VWO but not enough history
+    "VSS", # forein small/mid cap
+    "BND", # total bond market ETF US centric
+    "IEF", # 7-10 year treasury bond ETF US centric
+    "BNDX", # total international bond market ETF, USD hedged, but actually developed markets only
+    "LQD", # investment grade bond ETF US centric
+    "HYG", # High yield bond ETF US centric 
+    "TIP", # Treasury inflation protected securities ETF US centric
+    "EMB", # emerging market bond ETF USD hedged
+    "EWX", # emerging market small cap dividend ETF
+    #"PDBC", # Commodities ETF
+    #"BIL", # 1-3 month us treasuries 
     
 ]
+
+# ##### Others to consider
+# 	•	VTV (Value tilt) — improves factor diversification (value vs growth).
+# 	•	MGK (Growth tilt) — if you want symmetrical exposure to growth.
+
+# #commodity alternatives 
+#     •	BCI — cheaper, more systematic exposure
+# 	•	DBC — classic diversified commodities (higher AUM)
+
+#     BWX — International Treasury Bonds (Unhedged)
+#     If the USD weakens, BWX will:
+# 	•	Increase in value due to currency appreciation
+# 	•	Add macro diversification
+#     XLE or IXC — Energy sector (pure play inflation hedge)
+#     If you want stronger inflation beta than commodities ETFs provide.
+
+#     GLDM or IAU — Gold ETF
+#     Gold adds:
+# 	•	Crisis alpha
+# 	•	Negative correlation to real rates
+# 	•	Deep diversification vs equities
+
+#     VIOV or AVUV — U.S. small-cap value
+#     Even small allocations improve:
+# 	•	Risk-adjusted returns
+# 	•	Factor diversification
+# 	•	Downside risk reduction
+
+#     DGS — WisdomTree Emerging Markets SmallCap Dividend Fund, or EWX which is more balanced
+#     	•	True EM small-cap exposure
+# 	•	Emphasizes quality + dividend tilt
+# 	•	More diversifying than VWO or SCHE
+
+#Correlation with SPY ≈ 0.0–0.1
 
 config = TickerConfig(
     start_date="2013-06-01",
@@ -124,7 +164,7 @@ fig = correlation_matrix(df)
 fig.show()
 ```
 
-
+# Pertask scaling isn't needed with the multitaskmean
 
 ```{python}
 from typing import Optional
@@ -294,7 +334,7 @@ X, I, y, task_map = prepare_multitask_gp_data(
     asset_col="asset_id",
     drop_cols=["date", "asset_id"]
 )
-window_size = 1
+window_size = 4
 index = -1 * len(task_map) * window_size
 eps = 1e-8
 X_tr, I_tr, y_tr = X[:index], I[:index], y[:index]
@@ -374,12 +414,12 @@ def adaptive_lengthscale_constraint(num_dims:int):
 MIN_INFERRED_NOISE_LEVEL = 1e-5  # Minimum noise level to avoid numerical issues
 num_tasks = len(torch.unique(I_tr))
 
-ewma2_means = compute_ewma2_means_torch(
-    returns=y_trs,
-    task_ids=I_tr,
-    num_tasks=len(etf_tickers),
-    d=0.94
-)
+# ewma2_means = compute_ewma2_means_torch(
+#     returns=y_trs,
+#     task_ids=I_tr,
+#     num_tasks=len(etf_tickers),
+#     d=0.94
+# )
 # class ConstantScalarMean(Mean):
 #     def __init__(self, value: float):
 #         super().__init__()
@@ -388,78 +428,78 @@ ewma2_means = compute_ewma2_means_torch(
 #     def forward(self, X):
 #         return self.value.expand(*X.shape[:-1])
 
-class PerTaskRiskfolioEWMA2Mean(Mean):
-    """
-    Per-task Riskfolio-style EWMA2 mean.
-    Computes per-task time-dependent EWMA2 means using:
-        m[0] = v[0]
-        m[t] = (2-d)*m[t-1] + (1-d)*v[t]
-    """
+# class PerTaskRiskfolioEWMA2Mean(Mean):
+#     """
+#     Per-task Riskfolio-style EWMA2 mean.
+#     Computes per-task time-dependent EWMA2 means using:
+#         m[0] = v[0]
+#         m[t] = (2-d)*m[t-1] + (1-d)*v[t]
+#     """
 
-    def __init__(self, d=0.94, time_feature=0, task_feature=-1, num_tasks=None):
-        super().__init__()
-        self.d = float(d)
-        self.time_feature = time_feature
-        self.task_feature = task_feature
-        self.num_tasks = num_tasks
+#     def __init__(self, d=0.94, time_feature=0, task_feature=-1, num_tasks=None):
+#         super().__init__()
+#         self.d = float(d)
+#         self.time_feature = time_feature
+#         self.task_feature = task_feature
+#         self.num_tasks = num_tasks
 
-        # Precompute multipliers
-        self.beta = 1 - self.d
-        self.phi = 1 + self.beta  # = 2 - d
+#         # Precompute multipliers
+#         self.beta = 1 - self.d
+#         self.phi = 1 + self.beta  # = 2 - d
 
-    def forward(self, X):
-        # Extract time
-        t = X[..., self.time_feature].view(-1)
+#     def forward(self, X):
+#         # Extract time
+#         t = X[..., self.time_feature].view(-1)
 
-        # Extract task IDs
-        if self.task_feature < 0:
-            col_task = X.shape[-1] + self.task_feature
-        else:
-            col_task = self.task_feature
+#         # Extract task IDs
+#         if self.task_feature < 0:
+#             col_task = X.shape[-1] + self.task_feature
+#         else:
+#             col_task = self.task_feature
 
-        task_ids = X[..., col_task].long().view(-1)
+#         task_ids = X[..., col_task].long().view(-1)
 
-        N = t.shape[0]
-        m = torch.zeros_like(t)
+#         N = t.shape[0]
+#         m = torch.zeros_like(t)
 
-        T = self.num_tasks if self.num_tasks is not None else int(task_ids.max().item() + 1)
+#         T = self.num_tasks if self.num_tasks is not None else int(task_ids.max().item() + 1)
 
-        phi = self.phi
-        beta = self.beta
+#         phi = self.phi
+#         beta = self.beta
 
-        for k in range(T):
-            mask = (task_ids == k)
-            idx = mask.nonzero(as_tuple=True)[0]
-            if idx.numel() == 0:
-                continue
+#         for k in range(T):
+#             mask = (task_ids == k)
+#             idx = mask.nonzero(as_tuple=True)[0]
+#             if idx.numel() == 0:
+#                 continue
 
-            t_k = t[idx]
+#             t_k = t[idx]
 
-            # Sort time within this task
-            sorted_idx_local = torch.argsort(t_k)
-            v = t_k[sorted_idx_local]
+#             # Sort time within this task
+#             sorted_idx_local = torch.argsort(t_k)
+#             v = t_k[sorted_idx_local]
 
-            # EWMA2 recursion
-            m_k = torch.zeros_like(v)
-            m_k[0] = v[0]
-            for i in range(1, len(v)):
-                m_k[i] = phi * m_k[i-1] + beta * v[i]
+#             # EWMA2 recursion
+#             m_k = torch.zeros_like(v)
+#             m_k[0] = v[0]
+#             for i in range(1, len(v)):
+#                 m_k[i] = phi * m_k[i-1] + beta * v[i]
 
-            # Undo the sorting
-            inv_idx = torch.empty_like(sorted_idx_local)
-            inv_idx[sorted_idx_local] = torch.arange(len(sorted_idx_local), device=v.device)
-            m[idx] = m_k[inv_idx]
+#             # Undo the sorting
+#             inv_idx = torch.empty_like(sorted_idx_local)
+#             inv_idx[sorted_idx_local] = torch.arange(len(sorted_idx_local), device=v.device)
+#             m[idx] = m_k[inv_idx]
 
-        return m.view(*X.shape[:-1])
-mean_f = MultitaskMean(
-    PerTaskRiskfolioEWMA2Mean(
-        d=0.94,
-        time_feature=0,
-        task_feature=-1,
-        num_tasks=num_tasks,
-    ),
-    num_tasks=num_tasks,
-)
+#         return m.view(*X.shape[:-1])
+# mean_f = MultitaskMean(
+#     PerTaskRiskfolioEWMA2Mean(
+#         d=0.94,
+#         time_feature=0,
+#         task_feature=-1,
+#         num_tasks=num_tasks,
+#     ),
+#     num_tasks=num_tasks,
+# )
 
 # mean_f = MultitaskMean(
 #     [EWMA2Mean(0.94, 0) for _ in range(num_tasks)],
@@ -473,10 +513,10 @@ mean_f = MultitaskMean(
 #     ],
 #     num_tasks=num_tasks,
 # )
-# mean_f = MultitaskMean(
-#     ConstantMean(),
-#     num_tasks=num_tasks,
-# )
+mean_f = MultitaskMean(
+    ConstantMean(),
+    num_tasks=num_tasks,
+)
 kernel_f = MaternKernel(
     nu=0.5,
     ard_num_dims=ard_num_dims,
@@ -700,27 +740,35 @@ ystd = scaler.inverse_std(pred.variance.sqrt(), I_te)
 
 
 # Per-task
+# Build inverse mapping: index -> ETF ticker
+inv_task_map = {v: k for k, v in task_map.items()}
 
-# Use task indices to separate predictions
 task_vals = I_te.view(-1).to(torch.long)
-ic_values = []
 task_values = {}
+
 for k in torch.unique(task_vals):
     k_mask = (task_vals == k)
+
+    etf_name = inv_task_map[int(k.item())]  # <-- get the ETF name
+
     y_true_k = y_te[k_mask]
     y_mean_k = yhat[k_mask]
     y_std_k  = ystd[k_mask]
+
     nlpd_k = gaussian_nlpd(y_true_k, y_mean_k, y_std_k)
     mse_k  = mse(y_true_k, y_mean_k)
     rmse_k = rmse(y_true_k, y_mean_k)
     r2_k   = r2_score(y_true_k, y_mean_k)
-    task_values[int(k.item())] = {
+
+    task_values[etf_name] = {
         'NLPD': nlpd_k,
         'MSE': mse_k,
         'RMSE': rmse_k,
-        'R2': r2_k
+        'R2': r2_k,
     }
-    print(f'Task {int(k.item())}: NLPD={nlpd_k:.3f}, MSE={mse_k:.3f}, RMSE={rmse_k:.3f}, R2={r2_k:.3f}')
+
+    print(f"{etf_name} (Task {int(k.item())}): "
+          f"NLPD={nlpd_k:.3f}, MSE={mse_k:.3f}, RMSE={rmse_k:.3f}, R2={r2_k:.3f}")
 
 #### additional metrics 
 from marketmaven.evaluate import evaluate_asset_pricing
