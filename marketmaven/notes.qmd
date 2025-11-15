@@ -175,3 +175,7 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 
 **November 14th**
 - Added more etfs with better diversificaiton and it resultsed in better total results 
+
+
+**November 15th**
+-needed to double check noise constraint

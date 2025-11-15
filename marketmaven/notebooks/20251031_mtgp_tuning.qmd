@@ -164,7 +164,7 @@ fig = correlation_matrix(df)
 fig.show()
 ```
 
-# Pertask scaling isn't needed with the multitaskmean
+Pertask scaling isn't needed with the multitaskmean
 
 ```{python}
 from typing import Optional
