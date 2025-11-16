@@ -1,6 +1,9 @@
 """Scaling utilities for MarketMaven models."""
 import torch
 from typing import Optional
+import numpy as np
+import pandas as pd
+from scipy.stats import boxcox
 
 class MultitaskScaler:
     """
@@ -150,3 +153,50 @@ class MultitaskScaler:
                 dtype=s.dtype, device=s.device
             )
             return s * sd
+        
+
+def preprocess_features_boxcox(df, columns=None, eps=1e-6):
+    """
+    Applies Box-Cox transformation to selected columns.
+    Automatically shifts data if needed (Box-Cox requires all values > 0).
+    
+    Returns:
+        df_transformed : transformed DataFrame
+        lambdas : dictionary of lambda parameters for each column
+        shifts : dictionary of shifts applied per column
+    """
+    df = df.copy()
+    lambdas = {}
+    shifts = {}
+    
+    # If no specific columns provided, detect skewed numeric columns by threshold
+    if columns is None:
+        numeric = df.select_dtypes(include=[np.number])
+        skew = numeric.skew().abs()
+        columns = skew[skew > 0.75].index.tolist()
+
+    for col in columns:
+        x = df[col].astype(float)
+
+        # Skip if constant or tiny variance
+        if x.std() < eps:
+            continue
+
+        # Box-Cox requires x > 0. Shift if needed
+        shift = 0
+        if x.min() <= 0:
+            shift = abs(x.min()) + eps
+            x_shifted = x + shift
+        else:
+            x_shifted = x
+
+        # Compute Box-Cox transform safely
+        xt, lam = boxcox(x_shifted)
+        df[col] = xt
+        
+        lambdas[col] = lam
+        shifts[col] = shift
+
+    return df, lambdas, shifts
+
+

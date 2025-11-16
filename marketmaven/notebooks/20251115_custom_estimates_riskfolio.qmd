@@ -123,12 +123,10 @@ fig.show()
 from marketmaven.utils import check_equal_occurrences
 #Market Level Features
 macro_features = fetch_macro_features(start=config.start_date, end=config.end_date)
-macro_features.hist()
 
 #ETF price features
 
 etf_features = fetch_etf_features(config.tickers, config.start_date, config.end_date, config.horizon)
-etf_features
 
 
 #combine all factor columns
@@ -149,7 +147,7 @@ df["t_index"] = df.groupby("asset_id").cumcount()
 
 feature_cols = ["t_index", 'price', 'mom1m',
        'mom6m', 'mom12m', 'mom36m', 'chmom', 'volume', 'dolvol', 'turnover',
-       'sd_turn', 'ill', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level',
+       'sd_turn', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level',
        'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y','tbill3m', 'term_spread',
        'credit_spread', 'credit_spread_chg_1p', ]
 
@@ -161,6 +159,19 @@ df = df[cols]
 
 fig = correlation_matrix(df)
 fig.show()
+
+df[['price','volume', 'dolvol',
+       'sd_turn', 'ill', 'vol_1m', 'baspread', 'vix3m', 'vix_ts_level',
+       'vix_ts_chg_1m', 'vix_ts_z_12m', 'tnote10y','tbill3m', 'term_spread',
+       'credit_spread', 'credit_spread_chg_1p']].hist(bins=30)
+
+from marketmaven.models.scaling import preprocess_features_boxcox
+
+cols = ['price','volume', 'dolvol','credit_spread','tbill3m','sd_turn']
+
+# boxcox actually didnt' help....
+df, lambdas, shifts = preprocess_features_boxcox(df, columns=None, eps=1e-6)
+# Things to log: volume, dolvol, 
 ```
 
 ## Data transformation for MTGP
@@ -178,7 +189,7 @@ X, I, y, task_map = prepare_multitask_gp_data(
     asset_col="asset_id",
     drop_cols=["date", "asset_id"]
 )
-window_size = 1
+window_size = 4
 index = -1 * len(task_map) * window_size
 eps = 1e-8
 X_tr, I_tr, y_tr = X[:index], I[:index], y[:index]

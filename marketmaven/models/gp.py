@@ -65,11 +65,9 @@ def get_hadamard_gaussian_likelihood_with_lognormal_prior(
     """
     batch_shape = torch.Size() if batch_shape is None else batch_shape
 
-    #noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
-    noise_prior = LogNormalPrior(loc=-0.69, scale=0.5)
+    noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
     noise_constraint = GreaterThan(
-        #MIN_INFERRED_NOISE_LEVEL,
-        0.01,
+        MIN_INFERRED_NOISE_LEVEL,
         transform=None,
         initial_value=noise_prior.mode,
     )
