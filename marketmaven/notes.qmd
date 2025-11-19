@@ -179,3 +179,7 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 
 **November 15th**
 -needed to double check noise constraint
+
+**November 19th**
+- Adding more time periods led to worse results in mtgp.
+- Fewer also! god damn 
