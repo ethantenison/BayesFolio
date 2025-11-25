@@ -2,6 +2,7 @@
 from typing import Iterator, Tuple
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def rolling_time_splits(
     dates: pd.DatetimeIndex,
@@ -110,3 +111,56 @@ def rolling_time_splits_multitask(
 
         yield train_idx, test_idx
         start += step
+        
+
+def plot_multitask_time_series_cv(df, date_col, cv_iterator,
+                                  train_color="#4C72B0",
+                                  test_color="#DD8452",
+                                  figsize=(14, 4)):
+
+    splits = list(cv_iterator)
+    if len(splits) == 0:
+        raise ValueError("The CV iterator produced no splits.")
+
+    # Normalize unique dates
+    unique_dates = pd.to_datetime(sorted(df[date_col].unique())).to_numpy()
+
+    train_masks = []
+    test_masks = []
+
+    for train_idx, test_idx in splits:
+        train_dates = pd.to_datetime(df.loc[train_idx, date_col].unique())
+        test_dates = pd.to_datetime(df.loc[test_idx, date_col].unique())
+
+        train_masks.append(np.isin(unique_dates, train_dates))
+        test_masks.append(np.isin(unique_dates, test_dates))
+
+    train_masks = np.array(train_masks)
+    test_masks = np.array(test_masks)
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+    for i in range(len(splits)):
+
+        # TRAIN BAR
+        idx = np.where(train_masks[i])[0]
+        if idx.size > 0:
+            ax.barh(i, idx.size, left=idx[0], height=0.6,
+                    color=train_color, label="Training set" if i == 0 else None)
+
+        # TEST BAR
+        idx = np.where(test_masks[i])[0]
+        if idx.size > 0:
+            ax.barh(i, idx.size, left=idx[0], height=0.6,
+                    color=test_color, label="Testing set" if i == 0 else None)
+
+    ax.set_yticks(np.arange(len(splits)))
+    ax.set_yticklabels([f"Split {i}" for i in range(len(splits))])
+    ax.set_xlabel("Time index")
+    ax.set_title("Rolling Time-Series CV (Sklearn Style)")
+    ax.invert_yaxis()
+    ax.legend()
+
+    plt.tight_layout()
+    plt.show()
+

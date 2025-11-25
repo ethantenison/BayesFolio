@@ -28,6 +28,7 @@ class TickerConfig(BaseModel):
     interval: Interval = Field(Interval.DAILY, description="Data frequency")
     tickers: list[str] = Field(..., description="List of asset tickers")
     horizon: Horizon = Field(Horizon.MONTHLY, description="Prediction horizon")
+    lookback_date: date | None = Field(None, description="Optional lookback start date for features")
     
     model_config = ConfigDict(extra="forbid", frozen=True, use_enum_values=True)
 
@@ -99,6 +100,12 @@ class EvaluationConfig(BaseModel):
     metrics: list[MetricType] = [MetricType.RMSE, MetricType.MAE, MetricType.R2]
     aggregate: AggregateMode = AggregateMode.MACRO
     weights: dict[str, float] | None = None
+    
+class CVConfig(BaseModel):
+    step : int = 1
+    horizon_cv: int = 1
+    embargo: int = 0
+    training_min: int = 60
     
 ###### Experiment Config ######
 class ExperimentConfig(BaseModel):

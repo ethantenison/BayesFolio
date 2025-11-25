@@ -21,11 +21,49 @@ from math import sqrt, log
 from gpytorch.constraints import Interval, Positive
 from gpytorch.kernels import IndexKernel
 from gpytorch.priors import Prior
-from linear_operator.operators import DenseLinearOperator
+from gpytorch.means import ConstantMean, ZeroMean, LinearMean, MultitaskMean
 
 torch.set_default_dtype(torch.float64)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
+
+
+###### Length Scales ######
+def adaptive_lengthscale_prior(num_dims:int):
+    return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.5, scale=SQRT3)
+def adaptive_lengthscale_constraint(num_dims:int):
+    return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior(num_dims).mode)
+
+def adaptive_lengthscale_prior_time(num_dims:int):
+    return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.3, scale=1)
+def adaptive_lengthscale_constraint_time(num_dims:int):
+    return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior_time(num_dims).mode)
+
+
+###### Means ######
+class MeanF(StrEnum):
+    """Supported Gaussian Process kernels."""
+
+    LINEAR = "linear"
+    CONSTANT = "constant"
+    ZERO = "zero"
+    MULTITASK_CONSTANT = "multitask_constant"
+    
+def initialize_mean(mean: MeanF, input_size: int| None = None, num_tasks: int | None = None):
+    if mean == MeanF.CONSTANT:
+        return ConstantMean()
+    elif mean ==  MeanF.LINEAR:
+        return LinearMean(input_size)
+    elif mean ==  MeanF.ZERO:
+        return ZeroMean()
+    elif mean ==  MeanF.MULTITASK_CONSTANT:
+        return MultitaskMean(
+                ConstantMean(),
+                num_tasks=num_tasks,
+            )
+    else:
+        raise ValueError(f"Unknown mean function: {mean}")
+
 
 
 class KernelType(StrEnum):
@@ -34,6 +72,7 @@ class KernelType(StrEnum):
     MATERN = "matern"
 
     MATERN_LINEAR = "maternlinear"
+    MATERN_RQ = "maternrq" 
     LINEAR = "linear"
     RQ = "rq"
     RBF = "rbf"
@@ -103,8 +142,10 @@ class ContKernelFactory:
         self.smoothness = smoothness
         self.period_length = period_length
         self.n_mixtures = n_mixtures
-        self.lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(self.ard_num_dims) * 0.5, scale=SQRT3)
-        self.lengthscale_constraint = GreaterThan(2.5e-2, transform=None, initial_value=self.lengthscale_prior.mode)
+        self.lengthscale_prior = adaptive_lengthscale_prior(self.ard_num_dims)
+        self.lengthscale_constraint = adaptive_lengthscale_constraint(self.ard_num_dims)
+        self.lengthscale_prior_time = adaptive_lengthscale_prior_time(self.ard_num_dims)
+        self.lengthscale_constraint_time = adaptive_lengthscale_constraint_time(self.ard_num_dims)
 
     def create_matern(self) -> MaternKernel:
         return MaternKernel(
@@ -140,7 +181,8 @@ class ContKernelFactory:
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
             period_length=self.period_length,
-            period_length_prior=LogNormalPrior(loc=0.0, scale=0.3),
+            period_length_prior=self.lengthscale_prior_time,
+            period_length_constraint=self.lengthscale_constraint_time,
             lengthscale_prior=self.lengthscale_prior,
             lengthscale_constraint=self.lengthscale_constraint,
         )
@@ -205,6 +247,8 @@ def initialize_kernel(
             return cont_kernel_factory.create_periodic() + cont_kernel_factory.create_matern()
         elif kernel_type == KernelType.SPECTRAL_MIXTURE:
             return cont_kernel_factory.create_spectral_mixture()
+        elif kernel_type == KernelType.MATERN_RQ:
+            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_rq()
         else:
             raise ValueError(f"Unknown kernel function: {kernel_type}")
 
@@ -217,169 +261,6 @@ def initialize_kernel(
     return covar_module
 
 
-
-# class PositiveIndexKernel(Kernel):
-#     r"""
-#     Dense, MPS-safe co-regionalization kernel with strictly positive correlations.
-
-#     Parameterization:
-#         B = W W^T + diag(var), with W >= 0 elementwise and var > 0.
-#     Optional normalization:
-#         If unit_scale_for_target=True, rescale so that B[t,t] == 1 for target task t.
-
-#     k(i, j) = B[i, j]  (or its normalized version)
-#     """
-
-#     def __init__(
-#         self,
-#         num_tasks: int,
-#         rank: int = 1,
-#         task_prior: Prior | None = None,   # e.g., LKJ prior over covariance/correlation
-#         diag_prior: Prior | None = None,
-#         normalize_covar_matrix: bool = False,  # if True, turn B into a correlation matrix
-#         var_constraint: Interval | None = None,
-#         target_task_index: int = 0,
-#         unit_scale_for_target: bool = True,
-#         **kwargs,
-#     ):
-#         if rank > num_tasks:
-#             raise RuntimeError(
-#                 "Cannot create a task covariance matrix larger than the number of tasks"
-#             )
-#         if not (0 <= target_task_index < num_tasks):
-#             raise ValueError(
-#                 f"target_task_index must be between 0 and {num_tasks - 1}, "
-#                 f"got {target_task_index}"
-#             )
-
-#         super().__init__(**kwargs)
-
-#         self.num_tasks = num_tasks
-#         self.rank = rank
-#         self.normalize_covar_matrix = normalize_covar_matrix
-#         self.target_task_index = target_task_index
-#         self.unit_scale_for_target = unit_scale_for_target
-
-#         # --- Parameters ----------------------------------------------------
-#         if var_constraint is None:
-#             var_constraint = Positive()
-
-#         # Diagonal variance (positive)
-#         self.register_parameter(
-#             name="raw_var",
-#             parameter=torch.nn.Parameter(torch.randn(*self.batch_shape, num_tasks)),
-#         )
-#         self.register_constraint("raw_var", var_constraint)
-
-#         # Low-rank factor, constrained positive elementwise (enforces pos corr)
-#         self.register_parameter(
-#             name="raw_covar_factor",
-#             parameter=torch.nn.Parameter(
-#                 torch.rand(*self.batch_shape, num_tasks, rank)
-#             ),
-#         )
-#         self.register_constraint("raw_covar_factor", GreaterThan(0.0))
-
-#         # --- Priors --------------------------------------------------------
-#         # Task prior over the (normalized) covariance/correlation matrix
-#         if task_prior is not None:
-#             if not isinstance(task_prior, Prior):
-#                 raise TypeError(
-#                     f"Expected gpytorch.priors.Prior but got {type(task_prior).__name__}"
-#                 )
-#             # You can put the LKJ prior on the correlation matrix or on the (optionally normalized) covariance.
-#             # Here we expose covar_matrix (after optional normalization), which stays PSD.
-#             self.register_prior(
-#                 "IndexKernelPrior", task_prior, lambda m: m.covar_matrix
-#             )
-
-#         if diag_prior is not None:
-#             self.register_prior("ScalePrior", diag_prior, lambda m: m._diagonal)
-
-#     # ------------------------- Accessors -----------------------------------
-#     @property
-#     def var(self):
-#         return self.raw_var_constraint.transform(self.raw_var)
-
-#     @var.setter
-#     def var(self, value):
-#         self._set_var(value)
-
-#     def _set_var(self, value):
-#         if not torch.is_tensor(value):
-#             value = torch.as_tensor(value, dtype=self.raw_var.dtype, device=self.raw_var.device)
-#         self.initialize(raw_var=self.raw_var_constraint.inverse_transform(value))
-
-#     @property
-#     def covar_factor(self):
-#         return self.raw_covar_factor_constraint.transform(self.raw_covar_factor)
-
-#     @covar_factor.setter
-#     def covar_factor(self, value):
-#         self._set_covar_factor(value)
-
-#     def _set_covar_factor(self, value):
-#         if not torch.is_tensor(value):
-#             value = torch.as_tensor(value, dtype=self.raw_covar_factor.dtype, device=self.raw_covar_factor.device)
-#         self.initialize(
-#             raw_covar_factor=self.raw_covar_factor_constraint.inverse_transform(value)
-#         )
-
-#     # ------------------------- Helpers -------------------------------------
-#     @property
-#     def _diagonal(self):
-#         return torch.diagonal(self.covar_matrix, dim1=-2, dim2=-1)
-
-#     @property
-#     def _corr_matrix(self):
-#         """Return correlation matrix corresponding to covar_matrix (safe if normalize_covar_matrix=False)."""
-#         covar = self.covar_matrix
-#         d = covar.diagonal(dim1=-2, dim2=-1).clamp_min(1e-12).sqrt()
-#         return covar / (d.unsqueeze(-1) * d.unsqueeze(-2))
-
-#     def _eval_covar_matrix(self):
-#         # B = W W^T + diag(var)
-#         cf = self.covar_factor                   # [..., T, r]
-#         covar = cf @ cf.transpose(-1, -2)        # [..., T, T]
-#         covar = covar + torch.diag_embed(self.var)
-
-#         # Optional: turn into correlation matrix globally
-#         if self.normalize_covar_matrix:
-#             d = covar.diagonal(dim1=-2, dim2=-1).clamp_min(1e-12).sqrt()
-#             covar = covar / (d.unsqueeze(-1) * d.unsqueeze(-2))
-
-#         # Optional: fix target task variance to 1 (unit scale for that task)
-#         if self.unit_scale_for_target:
-#             norm = covar[..., self.target_task_index, self.target_task_index].clamp_min(1e-12)
-#             covar = covar / norm.unsqueeze(-1).unsqueeze(-1)
-
-#         return covar
-
-#     @property
-#     def covar_matrix(self):
-#         return self._eval_covar_matrix()
-
-#     # ------------------------- Kernel API ----------------------------------
-#     def forward(
-#         self,
-#         task_idx1: torch.Tensor,
-#         task_idx2: torch.Tensor | None = None,
-#         **params
-#     ):
-#         """
-#         task_idx1, task_idx2: integer tensors of shape [..., N] and [..., M]
-#         Return: LinearOperator over the [..., N, M] task covariance.
-#         """
-#         if task_idx2 is None:
-#             task_idx2 = task_idx1
-
-#         # Ensure long dtype for indexing
-#         task_idx1 = task_idx1.to(torch.long).reshape(-1)
-#         task_idx2 = task_idx2.to(torch.long).reshape(-1)
-
-#         B = self.covar_matrix  # [..., T, T] (no sparse ops, MPS-safe)
-#         K = B.index_select(-2, task_idx1).index_select(-1, task_idx2)  # [..., N, M]
-#         return DenseLinearOperator(K)
 
 class PositiveIndexKernel(IndexKernel):
     r"""

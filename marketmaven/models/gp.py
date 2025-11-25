@@ -16,7 +16,7 @@ SQRT3 = sqrt(3)
 ard_num_dims = 3
 lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
 lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
-MIN_INFERRED_NOISE_LEVEL = 1e-3  # Minimum noise level to avoid numerical issues
+MIN_INFERRED_NOISE_LEVEL = 1e-5  # Minimum noise level to avoid numerical issues
 
 
 class ExactGPModel(ExactGP):
@@ -129,14 +129,10 @@ class HadamardMultiTaskGP(ExactGP):
         eta = 0.5
         task_covar_prior = LKJCovariancePrior(num_tasks, eta, sd_prior)
 
-        # self.task_covar_module = IndexKernel(
-        #     num_tasks=num_tasks, rank=rank, prior=task_covar_prior
-        # )
         self.task_covar_module = PositiveIndexKernel(
             num_tasks=num_tasks,
             rank=rank,
             task_prior=task_covar_prior,
-            #active_dims=[task_feature],
         ).to(device=device, dtype=dtype)
 
         # Identify which column is the task feature
