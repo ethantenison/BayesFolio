@@ -323,7 +323,7 @@ kernel_t = MaternKernel(
 kernel_total = kernel_f * kernel_t
 
 
-model, likelihood = train_model_hadamard(X_trs, y_trs, rank=6, mean_f=mean_f, kernel=kernel_total,training_iterations=500, patience=50, visualize=True, task_feature=-1, dtype=torch.float32, device=torch.device("cpu"))
+model, likelihood = train_model_hadamard(X_trs, y_trs, rank=1, mean_f=mean_f, kernel=kernel_total,training_iterations=500, patience=50, visualize=True, task_feature=-1, dtype=torch.float32, device=torch.device("cpu"))
 
 
 

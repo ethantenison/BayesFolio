@@ -27,6 +27,70 @@ torch.set_default_dtype(torch.float64)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
+import torch
+import gpytorch
+from gpytorch.kernels import Kernel
+
+
+class GammaExponentialKernel(Kernel):
+    """
+    Gamma-exponential kernel with optional ARD:
+        k(x, x') = exp( - ( ||(x - x') / lengthscale||_2 ) ** gamma )
+
+    ARD works via:
+        has_lengthscale = True
+        lengthscale dimension = num_features
+    """
+    has_lengthscale = True
+
+    def __init__(
+        self,
+        ard_num_dims=None,
+        gamma=1.0,
+        gamma_prior=None,
+        **kwargs
+    ):
+        super().__init__(ard_num_dims=ard_num_dims, **kwargs)
+
+        # gamma parameter
+        self.register_parameter(
+            name="raw_gamma",
+            parameter=torch.nn.Parameter(torch.tensor(float(gamma)))
+        )
+        self.register_constraint("raw_gamma", gpytorch.constraints.GreaterThan(0.0))
+
+        if gamma_prior is not None:
+            self.register_prior(
+                "gamma_prior",
+                gamma_prior,
+                lambda m: m.gamma,
+                lambda m, v: m._set_gamma(v),
+            )
+
+    @property
+    def gamma(self):
+        return self.raw_gamma_constraint.transform(self.raw_gamma)
+
+    @gamma.setter
+    def gamma(self, value):
+        self._set_gamma(value)
+
+    def _set_gamma(self, value):
+        self.initialize(
+            raw_gamma=self.raw_gamma_constraint.inverse_transform(torch.as_tensor(value))
+        )
+
+    def forward(self, x1, x2, diag=False, **params):
+        # covar_dist with square_dist=False returns pairwise Euclidean distances
+        # scaled automatically by ARD lengthscales
+        dist = self.covar_dist(
+            x1, x2,
+            diag=diag,
+            square_dist=False,
+            **params
+        )
+
+        return torch.exp(-(dist ** self.gamma))
 
 ###### Length Scales ######
 def adaptive_lengthscale_prior(num_dims:int):

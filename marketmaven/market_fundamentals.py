@@ -391,6 +391,102 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     return merged
 
 
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+def fetch_core_global_macro(start="2010-01-01", end=None, horizon="M"):
+    """
+    Fetch the MOST IMPORTANT macro predictors using only Yahoo sources.
+
+    Includes:
+        oil (CL=F)
+        copper (HG=F)
+        gold (GC=F)
+        10y nominal (^TNX)
+        TIPS ETF (SCHP)
+        EM FX proxy (CEW)
+    """
+
+    def _yf_series(ticker, name):
+        px = yf.download(ticker, start=start, end=end, progress=False, group_by="ticker")
+
+        if px.empty:
+            return None
+
+        # ---- Handle MultiIndex columns ----
+        if isinstance(px.columns, pd.MultiIndex):
+            # try common patterns
+            candidates = [
+                (name, "Adj Close"),
+                (name, "Close"),
+                ("Adj Close", ticker),
+                ("Close", ticker),
+            ]
+            series = None
+            for a, b in candidates:
+                if (a, b) in px.columns:
+                    series = px[(a, b)].rename(name)
+                    break
+            # fallback: pick first column that is numeric
+            if series is None:
+                first = px.columns[0]
+                series = px[first].rename(name)
+        else:
+            # ---- Single index ----
+            if "Adj Close" in px.columns:
+                series = px["Adj Close"].rename(name)
+            else:
+                series = px["Close"].rename(name)
+
+        # Resample monthly (or weekly)
+        series = series.resample(horizon).last().dropna()
+        return series.to_frame().reset_index().rename(columns={"Date": "date"})
+
+    # --- Fetch Yahoo Series ---
+    oil_df    = _yf_series("CL=F", "oil")
+    copper_df = _yf_series("HG=F", "copper")
+    gold_df   = _yf_series("GC=F", "gold")
+
+    tnx_df    = _yf_series("^TNX", "y10_nominal")
+    if tnx_df is not None:
+        tnx_df["y10_nominal"] = tnx_df["y10_nominal"] / 100.0
+
+    schp_df = _yf_series("SCHP", "schp")
+    if schp_df is not None:
+        schp_df["schp_ret"] = np.log(schp_df["schp"] / schp_df["schp"].shift(1))
+
+    cew_df = _yf_series("CEW", "em_fx")
+    if cew_df is not None:
+        cew_df["em_fx_ret"] = np.log(cew_df["em_fx"] / cew_df["em_fx"].shift(1))
+
+    # --- Merge ---
+    dfs = [oil_df, copper_df, gold_df, tnx_df, schp_df, cew_df]
+    dfs = [d for d in dfs if d is not None]
+
+    merged = dfs[0]
+    for df in dfs[1:]:
+        merged = pd.merge(merged, df, on="date", how="outer")
+
+    merged = merged.sort_values("date").ffill().dropna()
+
+    # --- Derived predictors ---
+    merged["oil_ret"] = merged["oil"].pct_change()
+    merged["copper_ret"] = merged["copper"].pct_change()
+    merged["gold_crude_ratio"] = merged["gold"] / merged["oil"]
+
+    merged["y10_real_proxy"] = merged["schp_ret"].rolling(3).mean()
+    merged["breakeven_proxy"] = (
+        merged["y10_nominal"].diff() - merged["y10_real_proxy"].diff()
+    )
+
+    merged["em_fx_ret"] = merged["em_fx_ret"].fillna(0)
+
+    return merged.reset_index(drop=True)
+
+
+
+
 def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
     Enhanced macro-finance feature set, following the SAME merging pattern
@@ -555,3 +651,5 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     merged = merged.sort_values("date").ffill().fillna(0)
 
     return merged
+
+

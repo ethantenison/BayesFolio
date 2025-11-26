@@ -27,7 +27,10 @@ from pydantic import BaseModel, ConfigDict
 from marketmaven.visualization.evaluation import plot_ls_cumulative_compare
 from marketmaven.portfolio.helpers import assessing_long_short_performance, long_short_returns
 from marketmaven.models.kernels import MeanF, KernelType, initialize_mean, initialize_kernel
-from marketmaven.mlflow.helpers import KernelF, KernelT, MultiTaskConfig, long_to_panel, compute_benchmark_panel,r2_os, log_r2_os
+from marketmaven.mlflow.helpers import (
+    KernelF, KernelT, MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
+    extract_full_gp_config,model_error_by_time_index
+)
 warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
@@ -52,6 +55,25 @@ pd.options.display.float_format = '{:.3}'.format
 
 description = "tracking experiments for dec portfolio assets"
 
+"""
+Setting the task matrix eigenvalues to see the effective dimensionality of the asset returns
+data = df[['date','asset_id', 'y_excess_lead']]
+
+# Pivot the dataframe to go from long to wide
+df_wide = data.pivot(index='date', columns='asset_id', values='y_excess_lead')
+
+# Reset index to make it a regular dataframe
+df_wide = df_wide.reset_index()
+df_wide = df_wide.iloc[:, 1:]
+
+cov = np.cov(df_wide.T)
+eigvals = np.linalg.eigvalsh(cov)[::-1]
+print(eigvals)
+print(np.cumsum(eigvals) / np.sum(eigvals))
+
+
+"""
+
 
 etf_tickers = [
     "SPY", # total US market big cap
@@ -66,8 +88,8 @@ etf_tickers = [
     "BND", # total bond market ETF US centric
     "IEF", # 7-10 year treasury bond ETF US centric
     "BNDX", # total international bond market ETF, USD hedged, but actually developed markets only
-    #"IBND", # international corporate bond market ETF unhedged
-    #"ISHG", # international high yield bond ETF unhedged
+    # "IBND", # international corporate bond market ETF unhedged
+    # "ISHG", # international high yield bond ETF unhedged
     "LQD", # investment grade bond ETF US centric
     "HYG", # High yield bond ETF US centric 
     "TIP", # Treasury inflation protected securities ETF US centric
@@ -197,7 +219,7 @@ kernelt = KernelT(
 multiconfig = MultiTaskConfig(
     num_tasks=len(tickers.tickers),
     mean=MeanF.MULTITASK_CONSTANT,
-    rank=6,
+    rank=1,
     scaling="global",
 )
 
@@ -256,6 +278,8 @@ def fit_eval_split_mtgp(
         dtype=torch.float32,
         device=torch.device("cpu"))
     
+    gp_cfg = extract_full_gp_config(model)
+    
     ############### Predict ###############
     model.eval()
     likelihood.eval()
@@ -266,7 +290,7 @@ def fit_eval_split_mtgp(
     y_hat = scaler.inverse_y(pred.mean, I_te)
     y_std = scaler.inverse_std(pred.variance.sqrt(), I_te)
 
-    return y_te, y_hat, y_std
+    return y_te, y_hat, y_std, gp_cfg
 
 
 
@@ -286,6 +310,9 @@ with mlflow.start_run(description="""
                 2.5e-3,  # small but nonzero
                 initial_value=0.02
             ),
+            
+            Hadamard noise prior:
+            noise_prior = LogNormalPrior(loc=-3.2, scale=0.45)
                       
                       """) as run:
     mlflow.log_params(tickers.model_dump())
@@ -294,7 +321,7 @@ with mlflow.start_run(description="""
     mlflow.log_params(kernelf.model_dump())
     mlflow.log_params(kernelt.model_dump())
     mlflow.log_param("seed", seed)
-    
+    mlflow.set_tag("rank", multiconfig.rank)
     
     torch.manual_seed(seed)
 
@@ -312,8 +339,9 @@ with mlflow.start_run(description="""
         for tr_idx, te_idx in splits
     )
 
-    true_list, pred_list, unc_list = zip(*results)
+    true_list, pred_list, unc_list, gp_cfg_list = zip(*results)
 
+    mlflow.log_dict(gp_cfg_list[-1], "gp_config.json")
     true = np.vstack(true_list)
     pred = np.vstack(pred_list)
     unc  = np.vstack(unc_list)
@@ -329,7 +357,6 @@ with mlflow.start_run(description="""
         y_test=true_df,
         y_pred=preds_df
     )
-    mlflow.log_metrics({f"gp_{k}": v for k, v in summary_gp.items()})
 
     # ---- BENCHMARK EVALUATIONS ----
     mean_preds = []
@@ -383,19 +410,27 @@ with mlflow.start_run(description="""
     summary_ewma = evaluate_asset_pricing(y_test=true_b_df, y_pred=ewma_df)
 
     # Log metrics
-    mlflow.log_metrics({f"historic_{k}": v for k, v in summary_mean.items()})
-    mlflow.log_metrics({f"ewma_{k}": v for k, v in summary_ewma.items()})
-
-    true_b_df.to_parquet("marketmaven/mlflow/artifacts/y_test.parquet")
-    mlflow.log_artifact("marketmaven/mlflow/artifacts/y_test.parquet")
-    preds_df.to_parquet("marketmaven/mlflow/artifacts/y_pred_gp.parquet")
-    mlflow.log_artifact("marketmaven/mlflow/artifacts/y_pred_gp.parquet")
+    mlflow.log_metrics({f"gp/{k}": v for k, v in summary_gp.items()})
+    mlflow.log_metrics({f"mean/{k}": v for k, v in summary_mean.items()})
+    mlflow.log_metrics({f"ewma/{k}": v for k, v in summary_ewma.items()})
+    
+    comparison = pd.DataFrame({
+    "GP": summary_gp,
+    "Mean": summary_mean,
+    "EWMA": summary_ewma,
+    })
+    comparison.to_html("marketmaven/mlflow/artifacts/comparison_table.html")
+    mlflow.log_artifact("marketmaven/mlflow/artifacts/comparison_table.html")
     
     # R2_OS calculations
     y_true_norm = true_b_df.rename(columns=lambda c: c.replace("_true", ""))
     y_pred_norm = preds_df.rename(columns=lambda c: c.replace("_pred", ""))
     y_ewma_norm = ewma_df.copy()
     y_mean_norm = mean_df.copy()
+    
+    compare_error = model_error_by_time_index(y_true_norm, y_pred_norm)
+    compare_error.to_html("marketmaven/mlflow/artifacts/compare_error.html")
+    mlflow.log_artifact("marketmaven/mlflow/artifacts/compare_error.html")
     
     r2_gp_vs_mean = r2_os(y_true_norm, y_pred_norm, y_mean_norm)
     r2_gp_vs_ewma = r2_os(y_true_norm, y_pred_norm, y_ewma_norm)
@@ -414,5 +449,5 @@ with mlflow.start_run(description="""
     mlflow.log_metrics(ls_stats_mean)
     mlflow.log_metrics(ls_stats_ewma)
     plot_ls_cumulative_compare(ls_gp, ls_mean, ls_ewma)
-    
+
     

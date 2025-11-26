@@ -1,6 +1,6 @@
 import gpytorch
 from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel, IndexKernel
-from gpytorch.likelihoods import GaussianLikelihood, HadamardGaussianLikelihood
+from gpytorch.likelihoods import HadamardGaussianLikelihood
 from gpytorch.models import ExactGP
 from math import sqrt, log
 from gpytorch.priors import LogNormalPrior, GammaPrior, LKJCovariancePrior
@@ -65,7 +65,7 @@ def get_hadamard_gaussian_likelihood_with_lognormal_prior(
     """
     batch_shape = torch.Size() if batch_shape is None else batch_shape
 
-    noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
+    noise_prior = LogNormalPrior(loc=-4.0, scale=1.0) # loc=-3.2, scale=0.45
     noise_constraint = GreaterThan(
         MIN_INFERRED_NOISE_LEVEL,
         transform=None,
