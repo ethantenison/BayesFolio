@@ -274,7 +274,20 @@ def fit_eval_split_mtgp(
 ############### Run ###############
 seed = 27
 
-with mlflow.start_run(description="""Evaluating Dec Portfolio Assets with MTGP""") as run:
+with mlflow.start_run(description="""
+                      
+            period_length_prior=LogNormalPrior(
+                loc=-2.54,    # ≈ math.log(period_length) - 0.5*sigma**2
+                scale=0.2),
+            lengthscale_prior=LogNormalPrior(
+                loc=-4.02,
+                scale=0.47),
+            lengthscale_constraint=GreaterThan(
+                2.5e-3,  # small but nonzero
+                initial_value=0.02
+            ),
+                      
+                      """) as run:
     mlflow.log_params(tickers.model_dump())
     mlflow.log_params(cv_config.model_dump())
     mlflow.log_params(multiconfig.model_dump())

@@ -35,7 +35,7 @@ def adaptive_lengthscale_constraint(num_dims:int):
     return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior(num_dims).mode)
 
 def adaptive_lengthscale_prior_time(num_dims:int):
-    return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.3, scale=1)
+    return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.3, scale=SQRT3)
 def adaptive_lengthscale_constraint_time(num_dims:int):
     return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior_time(num_dims).mode)
 
@@ -181,11 +181,19 @@ class ContKernelFactory:
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
             period_length=self.period_length,
-            period_length_prior=self.lengthscale_prior_time,
-            period_length_constraint=self.lengthscale_constraint_time,
-            lengthscale_prior=self.lengthscale_prior,
-            lengthscale_constraint=self.lengthscale_constraint,
+            period_length_prior=LogNormalPrior(
+                loc=-2.54,    # ≈ math.log(period_length) - 0.5*sigma**2
+                scale=0.2),
+            lengthscale_prior=LogNormalPrior(
+                loc=-4.02,
+                scale=0.47),
+            lengthscale_constraint=GreaterThan(
+                2.5e-3,  # small but nonzero
+                initial_value=0.02
+            ),
         )
+#         \sigma = \sqrt{\ln(1 + cv^2)},\quad
+# \mu = \ln(m) - \frac{\sigma^2}{2} For lognormal setting
 
     def create_linear(self) -> LinearKernel:
         return LinearKernel(
