@@ -13,31 +13,31 @@ from gpytorch.means import MultitaskMean
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
-ard_num_dims = 3
-lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
-lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
+# ard_num_dims = 3
+# lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
+# lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
 MIN_INFERRED_NOISE_LEVEL = 1e-5  # Minimum noise level to avoid numerical issues
 
 
-class ExactGPModel(ExactGP):
-    def __init__(self, train_x, train_y, likelihood):
-        super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
-        self.mean_module = gpytorch.means.ConstantMean()
-        kernel = MaternKernel(
-            nu=0.5,
-            lengthscale_prior=lengthscale_prior,
-            lengthscale_constraint=lengthscale_constraint
-             ) + PeriodicKernel(
-                period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
-                lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
-        kernel_scale = ScaleKernel(kernel)
-        kernel_scale.base_kernel.kernels[1].initialize(period_length=1.0)
-        self.covar_module = ScaleKernel(kernel_scale)
+# class ExactGPModel(ExactGP):
+#     def __init__(self, train_x, train_y, likelihood):
+#         super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
+#         self.mean_module = gpytorch.means.ConstantMean()
+#         kernel = MaternKernel(
+#             nu=0.5,
+#             lengthscale_prior=lengthscale_prior,
+#             lengthscale_constraint=lengthscale_constraint
+#              ) + PeriodicKernel(
+#                 period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
+#                 lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
+#         kernel_scale = ScaleKernel(kernel)
+#         kernel_scale.base_kernel.kernels[1].initialize(period_length=1.0)
+#         self.covar_module = ScaleKernel(kernel_scale)
 
-    def forward(self, x):
-        mean_x = self.mean_module(x)
-        covar_x = self.covar_module(x)
-        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+#     def forward(self, x):
+#         mean_x = self.mean_module(x)
+#         covar_x = self.covar_module(x)
+#         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
     
 def as_task_vec(i: torch.Tensor) -> torch.Tensor:
   """Make sure task indices are (N,) long (for IndexKernel)."""
@@ -53,6 +53,7 @@ def get_hadamard_gaussian_likelihood_with_lognormal_prior(
     num_tasks: int,
     task_feature_index: int = 1,
     batch_shape: torch.Size | None = None,
+    min_noise: float = MIN_INFERRED_NOISE_LEVEL,
 ) -> HadamardGaussianLikelihood:
     """Hadamard Gaussian Likelihood with independent LogNormal(-4, 1) priors per task.
 
@@ -67,7 +68,7 @@ def get_hadamard_gaussian_likelihood_with_lognormal_prior(
 
     noise_prior = LogNormalPrior(loc=-4.0, scale=1.0) # loc=-3.2, scale=0.45
     noise_constraint = GreaterThan(
-        MIN_INFERRED_NOISE_LEVEL,
+        min_noise,
         transform=None,
         initial_value=noise_prior.mode,
     )
@@ -158,8 +159,6 @@ class HadamardMultiTaskGP(ExactGP):
         if hasattr(kernel, "kernels"):
             for sub_kernel in kernel.kernels:
                 self._register_lengthscale_constraints(sub_kernel)
-        if hasattr(kernel, "raw_lengthscale"):
-            kernel.register_constraint("raw_lengthscale", GreaterThan(2.5e-2))
 
     # ----------------------------------------------------------------------
     # Core forward logic
@@ -206,6 +205,7 @@ def train_model_hadamard(
     task_feature: int = -1,
     dtype: torch.dtype = torch.float32,
     device: torch.device | None = None,
+    min_noise: float = MIN_INFERRED_NOISE_LEVEL,
 ):
     """
     Train a HadamardMultiTaskGP where the task index is embedded
@@ -255,7 +255,7 @@ def train_model_hadamard(
     num_tasks = len(torch.unique(task_col))
 
     likelihood = get_hadamard_gaussian_likelihood_with_lognormal_prior(
-        num_tasks=num_tasks, task_feature_index=task_feature
+        num_tasks=num_tasks, task_feature_index=task_feature, min_noise=min_noise
     ).to(device=device, dtype=dtype)
     
     # Mean & kernel to device/dtype BEFORE passing into the model
@@ -324,126 +324,126 @@ def train_model_hadamard(
     return model, likelihood
       
 
-class KroneckerModel(gpytorch.models.ExactGP):
-    """
-    Multi-task GP (ICM, Kronecker-structured) with Matern+Periodic data kernel
+# class KroneckerModel(gpytorch.models.ExactGP):
+#     """
+#     Multi-task GP (ICM, Kronecker-structured) with Matern+Periodic data kernel
 
-    What this is
-    ------------
-    A 2-task Intrinsic Coregionalization Model (ICM) implemented via
-    `gpytorch.kernels.MultitaskKernel`. The full covariance factorizes as:
+#     What this is
+#     ------------
+#     A 2-task Intrinsic Coregionalization Model (ICM) implemented via
+#     `gpytorch.kernels.MultitaskKernel`. The full covariance factorizes as:
 
-        K( (x, t), (x', t') ) = B[t, t'] ⊗ K_X(x, x')
+#         K( (x, t), (x', t') ) = B[t, t'] ⊗ K_X(x, x')
 
-    where:
-      - K_X is the input (data) kernel: Matern(ν=0.5) + Periodic
-      - B is a learned task covariance (low-rank + diagonal; controlled by `rank`)
-      - ⊗ denotes the Kronecker product
+#     where:
+#       - K_X is the input (data) kernel: Matern(ν=0.5) + Periodic
+#       - B is a learned task covariance (low-rank + diagonal; controlled by `rank`)
+#       - ⊗ denotes the Kronecker product
 
-    This is the standard “ICM with Kronecker structure” used in GPyTorch’s
-    multitask stack (paired with MultitaskMean and MultitaskGaussianLikelihood).
+#     This is the standard “ICM with Kronecker structure” used in GPyTorch’s
+#     multitask stack (paired with MultitaskMean and MultitaskGaussianLikelihood).
 
-    When to use this model
-    ----------------------
-    - Tasks share the *same* input locations (aligned panel): same timestamps or
-      feature vectors for every task. This enables Kronecker structure internally.
-    - You expect tasks to be correlated (learned by the low-rank coregionalization B).
-    - You want per-task noise handled natively (`MultitaskGaussianLikelihood`).
+#     When to use this model
+#     ----------------------
+#     - Tasks share the *same* input locations (aligned panel): same timestamps or
+#       feature vectors for every task. This enables Kronecker structure internally.
+#     - You expect tasks to be correlated (learned by the low-rank coregionalization B).
+#     - You want per-task noise handled natively (`MultitaskGaussianLikelihood`).
 
-    When NOT to use this model
-    --------------------------
-    - Tasks are observed on *different* input grids (missing / misaligned data).
-      In that case, prefer the Hadamard ICM with `IndexKernel` and stacking (x, task_id).
-    - You need different data kernels per task or significantly different smoothness
-      per task. Then consider an LCM (Q > 1) or separate single-task GPs.
+#     When NOT to use this model
+#     --------------------------
+#     - Tasks are observed on *different* input grids (missing / misaligned data).
+#       In that case, prefer the Hadamard ICM with `IndexKernel` and stacking (x, task_id).
+#     - You need different data kernels per task or significantly different smoothness
+#       per task. Then consider an LCM (Q > 1) or separate single-task GPs.
 
-    Data / Target shapes
-    --------------------
-    - train_x : Tensor[N, D]
-    - train_y : Tensor[N, T]  (T = num_tasks, here 2)
-    - likelihood : MultitaskGaussianLikelihood(num_tasks=T)
+#     Data / Target shapes
+#     --------------------
+#     - train_x : Tensor[N, D]
+#     - train_y : Tensor[N, T]  (T = num_tasks, here 2)
+#     - likelihood : MultitaskGaussianLikelihood(num_tasks=T)
 
-    Model parts
-    -----------
-    mean_module:
-        MultitaskMean(ConstantMean(), num_tasks=T)
-        One mean per task.
+#     Model parts
+#     -----------
+#     mean_module:
+#         MultitaskMean(ConstantMean(), num_tasks=T)
+#         One mean per task.
 
-    covar_module:
-        MultitaskKernel(
-            base_kernel = MaternKernel(nu=0.5, ...) + PeriodicKernel(...),
-            num_tasks = T,
-            rank = 1,
-        )
-        - `rank` controls the rank of the task mixing (B ≈ W W^T + diag(τ)).
-          rank=1 is ICM with a single latent function; increase for richer
-          inter-task structure (at computational / statistical cost).
+#     covar_module:
+#         MultitaskKernel(
+#             base_kernel = MaternKernel(nu=0.5, ...) + PeriodicKernel(...),
+#             num_tasks = T,
+#             rank = 1,
+#         )
+#         - `rank` controls the rank of the task mixing (B ≈ W W^T + diag(τ)).
+#           rank=1 is ICM with a single latent function; increase for richer
+#           inter-task structure (at computational / statistical cost).
 
-    likelihood:
-        MultitaskGaussianLikelihood(num_tasks=T)
-        - Learns per-task homoskedastic noise.
+#     likelihood:
+#         MultitaskGaussianLikelihood(num_tasks=T)
+#         - Learns per-task homoskedastic noise.
 
-    Priors / constraints (recommended)
-    ----------------------------------
-    - Lengthscale priors for both Matern and Periodic (e.g., LogNormal)
-    - Period-length prior for Periodic (e.g., LogNormal centered at a plausible cycle)
-    - Outputscale prior / constraints (ScaleKernel) if you find amplitude drifting
-    - Consider standardizing inputs to [0,1]^D and targets to zero-mean, unit-variance
+#     Priors / constraints (recommended)
+#     ----------------------------------
+#     - Lengthscale priors for both Matern and Periodic (e.g., LogNormal)
+#     - Period-length prior for Periodic (e.g., LogNormal centered at a plausible cycle)
+#     - Outputscale prior / constraints (ScaleKernel) if you find amplitude drifting
+#     - Consider standardizing inputs to [0,1]^D and targets to zero-mean, unit-variance
 
-    Training tips
-    -------------
-    - Normalize features and standardize each task column of train_y. Undo at inference.
-    - Start with moderate LR (e.g., 0.05–0.1) and 200–500 iters; add early stopping if needed.
-    - Watch the learned task covariance B: `model.covar_module.task_covar_module.covar_matrix`
-      should become positive-definite with sensible off-diagonals (not all ~0).
-    - If tasks are strongly correlated, rank=1 often suffices; if residual correlation remains
-      unexplained, try rank=2.
-    - If you see underfitting (over-smoothing), check lengthscales (too large) or allow
-      a LinearKernel addend for trend; if overfitting, use stronger priors / increase noise.
+#     Training tips
+#     -------------
+#     - Normalize features and standardize each task column of train_y. Undo at inference.
+#     - Start with moderate LR (e.g., 0.05–0.1) and 200–500 iters; add early stopping if needed.
+#     - Watch the learned task covariance B: `model.covar_module.task_covar_module.covar_matrix`
+#       should become positive-definite with sensible off-diagonals (not all ~0).
+#     - If tasks are strongly correlated, rank=1 often suffices; if residual correlation remains
+#       unexplained, try rank=2.
+#     - If you see underfitting (over-smoothing), check lengthscales (too large) or allow
+#       a LinearKernel addend for trend; if overfitting, use stronger priors / increase noise.
 
-    Forecasting / inference
-    -----------------------
-    - At prediction, pass a test_x of shape [M, D]; the model returns a
-      MultitaskMultivariateNormal with mean of shape [M, T].
-    - You can request only one task’s marginal by indexing the output:
-        preds.mean[:, task_idx]
-    - If you standardized y, re-scale predictions back to original units.
+#     Forecasting / inference
+#     -----------------------
+#     - At prediction, pass a test_x of shape [M, D]; the model returns a
+#       MultitaskMultivariateNormal with mean of shape [M, T].
+#     - You can request only one task’s marginal by indexing the output:
+#         preds.mean[:, task_idx]
+#     - If you standardized y, re-scale predictions back to original units.
 
-    Pros vs the Hadamard (IndexKernel) version
-    ------------------------------------------
-    + Efficient Kronecker algebra on aligned inputs
-    + Clean per-task noise via MultitaskGaussianLikelihood
-    − Requires aligned inputs across tasks
-    − Less flexible for irregular, sparse multi-task panels
+#     Pros vs the Hadamard (IndexKernel) version
+#     ------------------------------------------
+#     + Efficient Kronecker algebra on aligned inputs
+#     + Clean per-task noise via MultitaskGaussianLikelihood
+#     − Requires aligned inputs across tasks
+#     − Less flexible for irregular, sparse multi-task panels
 
-    Extending the model
-    -------------------
-    - Richer inter-task: increase `rank` (ICM→LCM-like as rank grows)
-    - Different smoothness regimes: replace Matern ν, add LinearKernel, or use spectral mixtures
-    - Seasonality: keep PeriodicKernel; consider multiple periodic components if needed
+#     Extending the model
+#     -------------------
+#     - Richer inter-task: increase `rank` (ICM→LCM-like as rank grows)
+#     - Different smoothness regimes: replace Matern ν, add LinearKernel, or use spectral mixtures
+#     - Seasonality: keep PeriodicKernel; consider multiple periodic components if needed
 
-    References
-    ----------
-    - ICM / Coregionalization: Bonilla et al., 2008; Álvarez et al., 2012 (GPs for multi-output)
-    - GPyTorch MultitaskKernel docs
-    """
-    def __init__(self, train_x, train_y, likelihood):
-        super(KroneckerModel, self).__init__(train_x, train_y, likelihood)
-        self.mean_module = gpytorch.means.MultitaskMean(
-            gpytorch.means.ConstantMean(), num_tasks=2
-        )
-        kernel = MaternKernel(
-            nu=0.5,
-            lengthscale_prior=lengthscale_prior,
-            lengthscale_constraint=lengthscale_constraint
-             ) + PeriodicKernel(
-                period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
-                lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
-        self.covar_module = gpytorch.kernels.MultitaskKernel(
-            kernel, num_tasks=2, rank=1
-        )
+#     References
+#     ----------
+#     - ICM / Coregionalization: Bonilla et al., 2008; Álvarez et al., 2012 (GPs for multi-output)
+#     - GPyTorch MultitaskKernel docs
+#     """
+#     def __init__(self, train_x, train_y, likelihood):
+#         super(KroneckerModel, self).__init__(train_x, train_y, likelihood)
+#         self.mean_module = gpytorch.means.MultitaskMean(
+#             gpytorch.means.ConstantMean(), num_tasks=2
+#         )
+#         kernel = MaternKernel(
+#             nu=0.5,
+#             lengthscale_prior=lengthscale_prior,
+#             lengthscale_constraint=lengthscale_constraint
+#              ) + PeriodicKernel(
+#                 period_length_prior=LogNormalPrior(loc=0.0, scale=0.5),
+#                 lengthscale_prior=lengthscale_prior,lengthscale_constraint=lengthscale_constraint) #+ LinearKernel()
+#         self.covar_module = gpytorch.kernels.MultitaskKernel(
+#             kernel, num_tasks=2, rank=1
+#         )
 
-    def forward(self, x):
-        mean_x = self.mean_module(x)
-        covar_x = self.covar_module(x)
-        return gpytorch.distributions.MultitaskMultivariateNormal(mean_x, covar_x)
+#     def forward(self, x):
+#         mean_x = self.mean_module(x)
+#         covar_x = self.covar_module(x)
+#         return gpytorch.distributions.MultitaskMultivariateNormal(mean_x, covar_x)

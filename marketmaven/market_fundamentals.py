@@ -324,7 +324,6 @@ def fetch_earnings_yield(start, end, horizon):
     """
     Earnings Yield = 1 / Shiller CAPE ratio (CAPE from FRED)
     """
-    import pandas as pd
     import pandas_datareader.data as pdr
 
     try:
@@ -391,11 +390,7 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     return merged
 
 
-import yfinance as yf
-import pandas as pd
-import numpy as np
-
-def fetch_core_global_macro(start="2010-01-01", end=None, horizon="M"):
+def fetch_core_global_macro(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
     Fetch the MOST IMPORTANT macro predictors using only Yahoo sources.
 
@@ -480,7 +475,8 @@ def fetch_core_global_macro(start="2010-01-01", end=None, horizon="M"):
         merged["y10_nominal"].diff() - merged["y10_real_proxy"].diff()
     )
 
-    merged["em_fx_ret"] = merged["em_fx_ret"].fillna(0)
+    # merged["em_fx_ret"] = merged["em_fx_ret"].fillna(0)
+    merged = merged.sort_values("date").ffill().fillna(0)
 
     return merged.reset_index(drop=True)
 
@@ -525,7 +521,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     dxy_df  = fetch_dxy(start=start, end=end, horizon=horizon)
     yc_df   = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
     high_y_spread = fetch_high_yield_spread(start=start, end=end, horizon=horizon)
-    #earnings_yield = fetch_earnings_yield(start=start, end=end, horizon=horizon)
+    global_macro = fetch_core_global_macro(start=start, end=end, horizon=horizon)
 
     # ------------------------------------------------------------
     # 2. ERP using your ETF fetcher (no Yahoo weirdness)
@@ -628,7 +624,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         spy_df2, erp_df,                       # ERP block
         skew_df, move_df,    # vol signals
         vix_slope_df, rsp_spy_df, pct50_df,   # breadth
-        acm_df, high_y_spread, #earnings_yield                                   
+        acm_df, high_y_spread,global_macro, #earnings_yield                                   
     ]
 
     # Filter out None

@@ -183,3 +183,50 @@ Out-of-sample Sharpe, turnover, alpha (vs. benchmark)
 **November 19th**
 - Adding more time periods led to worse results in mtgp.
 - Fewer also! god damn 
+
+**November 24th**
+- Added more asset price features helped a little bit 
+- These still lacking: MGK, SPY, BNDX, EMB, VWO
+- May need to explore :
+Macro Factor
+Why it matters
+Affects
+5yr/5yr breakeven inflation expectations
+Real yields + inflation cycle
+SPY, MGK, TIP
+US real yield (10yr TIPS) changes
+Duration-sensitive risk assets
+MGK, SPY, EMB
+MOVE index (you have a proxy—good)
+Bond market volatility
+BND, BNDX, EMB
+Global PMI / China PMI
+EM growth
+VWO, EMB
+Oil / copper returns
+Commodity-linked EM
+VWO, EMB
+Gold/Crude ratio
+risk-off indicator
+SPY, EMB
+Credit impulse (China)
+Strong EM predictor
+VWO
+TED spread
+liquidity stress
+SPY, MGK
+- ADJUSTED TIME PERIOD AND PERIOD PRIORS 
+- ADDING RQ HELPED 
+
+**November 26th**
+- Discovered that my length scales were too restrictive 
+- MaternLinear kernel did well for features kernel 
+- Seed was causing replicateability issues 
+
+**November 27th**
+- changing the lengthscale prior to be more pointed allowing some low values and some high values but the center is gaussianlly around the middle helped a lot. This prevents prediction collapse to the mean. 
+- loc_big = sqrt(2) + 0.01 * log(num_dims), scale_big = 0.2
+
+**November 28th**
+- Taking out only the redundant etf and macro variables helped improve cumulative return but lowered the R2 OS. 
+- PCA probs didn't help although I would have to scale within folds....

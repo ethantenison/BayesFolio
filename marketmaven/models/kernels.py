@@ -14,6 +14,7 @@ from gpytorch.kernels import (
     RQKernel,
     PeriodicKernel,
     SpectralMixtureKernel,
+    piecewise_polynomial_kernel,
 )
 from gpytorch.priors import LogNormalPrior
 from enum import StrEnum
@@ -27,37 +28,42 @@ torch.set_default_dtype(torch.float64)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
-import torch
-import gpytorch
-from gpytorch.kernels import Kernel
-
-
 class GammaExponentialKernel(Kernel):
     """
-    Gamma-exponential kernel with optional ARD:
-        k(x, x') = exp( - ( ||(x - x') / lengthscale||_2 ) ** gamma )
-
-    ARD works via:
-        has_lengthscale = True
-        lengthscale dimension = num_features
+    Gamma–Exponential ARD kernel:
+        k(x, x') = exp( - ||(x - x') / ℓ||_2 ** γ )
     """
+
     has_lengthscale = True
 
     def __init__(
         self,
-        ard_num_dims=None,
         gamma=1.0,
+        ard_num_dims=None,
+        batch_shape=torch.Size(),
+        active_dims=None,
         gamma_prior=None,
-        **kwargs
+        lengthscale_prior=None,
+        lengthscale_constraint=None,
+        **kwargs,
     ):
-        super().__init__(ard_num_dims=ard_num_dims, **kwargs)
-
-        # gamma parameter
-        self.register_parameter(
-            name="raw_gamma",
-            parameter=torch.nn.Parameter(torch.tensor(float(gamma)))
+        super().__init__(
+            ard_num_dims=ard_num_dims,
+            batch_shape=batch_shape,
+            active_dims=active_dims,
+            lengthscale_prior=lengthscale_prior,
+            lengthscale_constraint=lengthscale_constraint,
         )
-        self.register_constraint("raw_gamma", gpytorch.constraints.GreaterThan(0.0))
+
+        # ---- gamma parameter ----
+        self.register_parameter(
+            "raw_gamma",
+            torch.nn.Parameter(torch.tensor(float(gamma)))
+        )
+        self.register_constraint(
+            "raw_gamma",
+            GreaterThan(0.5)
+        )
 
         if gamma_prior is not None:
             self.register_prior(
@@ -67,6 +73,7 @@ class GammaExponentialKernel(Kernel):
                 lambda m, v: m._set_gamma(v),
             )
 
+    # ---- gamma accessors ----
     @property
     def gamma(self):
         return self.raw_gamma_constraint.transform(self.raw_gamma)
@@ -77,31 +84,38 @@ class GammaExponentialKernel(Kernel):
 
     def _set_gamma(self, value):
         self.initialize(
-            raw_gamma=self.raw_gamma_constraint.inverse_transform(torch.as_tensor(value))
+            raw_gamma=self.raw_gamma_constraint.inverse_transform(
+                torch.as_tensor(value)
+            )
         )
 
+    # ---- core forward ----
     def forward(self, x1, x2, diag=False, **params):
-        # covar_dist with square_dist=False returns pairwise Euclidean distances
-        # scaled automatically by ARD lengthscales
+        # center inputs like Matern/RBF
+        mean = x1.mean(dim=-2, keepdim=True)
+
+        # 🔥 THIS IS WHERE ARD HAPPENS
+        x1_ = (x1 - mean).div(self.lengthscale)
+        x2_ = (x2 - mean).div(self.lengthscale)
+
+        # Now computes distance in *ARD-scaled* space
         dist = self.covar_dist(
-            x1, x2,
+            x1_, x2_,
             diag=diag,
             square_dist=False,
             **params
         )
 
+        # Gamma–Exponential kernel
         return torch.exp(-(dist ** self.gamma))
 
 ###### Length Scales ######
 def adaptive_lengthscale_prior(num_dims:int):
     return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.5, scale=SQRT3)
 def adaptive_lengthscale_constraint(num_dims:int):
-    return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior(num_dims).mode)
+    ls_min = 2.5e-2 * sqrt(num_dims)
+    return GreaterThan(ls_min, initial_value=adaptive_lengthscale_prior(num_dims).mode)
 
-def adaptive_lengthscale_prior_time(num_dims:int):
-    return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.3, scale=SQRT3)
-def adaptive_lengthscale_constraint_time(num_dims:int):
-    return GreaterThan(2.5e-2, initial_value=adaptive_lengthscale_prior_time(num_dims).mode)
 
 
 ###### Means ######
@@ -112,6 +126,7 @@ class MeanF(StrEnum):
     CONSTANT = "constant"
     ZERO = "zero"
     MULTITASK_CONSTANT = "multitask_constant"
+    MULTITASK_ZERO = "multitask_zero"
     
 def initialize_mean(mean: MeanF, input_size: int| None = None, num_tasks: int | None = None):
     if mean == MeanF.CONSTANT:
@@ -125,6 +140,11 @@ def initialize_mean(mean: MeanF, input_size: int| None = None, num_tasks: int | 
                 ConstantMean(),
                 num_tasks=num_tasks,
             )
+    elif mean ==  MeanF.MULTITASK_ZERO:
+        return MultitaskMean(
+                ZeroMean(),
+                num_tasks=num_tasks,
+            )
     else:
         raise ValueError(f"Unknown mean function: {mean}")
 
@@ -136,6 +156,7 @@ class KernelType(StrEnum):
     MATERN = "matern"
 
     MATERN_LINEAR = "maternlinear"
+    MATERN_LINEAR_RQ = "maternlinearrq"
     MATERN_RQ = "maternrq" 
     LINEAR = "linear"
     RQ = "rq"
@@ -150,6 +171,12 @@ class KernelType(StrEnum):
     MATERN_LINEAR_PERIODIC = "maternlinearperiodic"
     
     SPECTRAL_MIXTURE = "spectralmixture"
+    
+    EXPO_GAMMA = "expogamma"
+    EXPO_RQ = "exporq"
+    
+    PIECEWISE_POLYNOMIAL = "piecewisepolynomial"
+    MATERN_PIECEWISE = "maternpiecewise"
 
 
 class CategoricalKernel(Kernel):
@@ -192,7 +219,7 @@ class ContKernelFactory:
     methods to initialize different kernel types.
     """
 
-    def __init__(self, batch_shape: torch.Size, active_dims: List[int], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2):
+    def __init__(self, batch_shape: torch.Size, active_dims: List[int], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2, gamma: int=1, q: int =1, prior: Prior | None = None):
         """
         Initializes the ContKernelFactory with common parameters.
 
@@ -206,10 +233,11 @@ class ContKernelFactory:
         self.smoothness = smoothness
         self.period_length = period_length
         self.n_mixtures = n_mixtures
-        self.lengthscale_prior = adaptive_lengthscale_prior(self.ard_num_dims)
+        self.gamma = gamma
+        self.q = q
+        self.lengthscale_prior = prior
         self.lengthscale_constraint = adaptive_lengthscale_constraint(self.ard_num_dims)
-        self.lengthscale_prior_time = adaptive_lengthscale_prior_time(self.ard_num_dims)
-        self.lengthscale_constraint_time = adaptive_lengthscale_constraint_time(self.ard_num_dims)
+
 
     def create_matern(self) -> MaternKernel:
         return MaternKernel(
@@ -248,13 +276,8 @@ class ContKernelFactory:
             period_length_prior=LogNormalPrior(
                 loc=-2.54,    # ≈ math.log(period_length) - 0.5*sigma**2
                 scale=0.2),
-            lengthscale_prior=LogNormalPrior(
-                loc=-4.02,
-                scale=0.47),
-            lengthscale_constraint=GreaterThan(
-                2.5e-3,  # small but nonzero
-                initial_value=0.02
-            ),
+            lengthscale_prior=self.lengthscale_prior,
+            lengthscale_constraint=self.lengthscale_constraint,
         )
 #         \sigma = \sqrt{\ln(1 + cv^2)},\quad
 # \mu = \ln(m) - \frac{\sigma^2}{2} For lognormal setting
@@ -274,10 +297,37 @@ class ContKernelFactory:
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
         )
+        
+    def create_expo_gamma(
+        self,
+    ) -> GammaExponentialKernel:
+        """
+        Gamma-exponential kernel with the same ARD lengthscale prior/constraint
+        as the other continuous kernels.
+        """
+        return GammaExponentialKernel(
+            ard_num_dims=self.ard_num_dims,
+            active_dims=self.active_dims,
+            batch_shape=self.batch_shape,
+            lengthscale_prior=self.lengthscale_prior,
+            lengthscale_constraint=self.lengthscale_constraint,
+            gamma=self.gamma,
+            gamma_prior=LogNormalPrior(loc = log(1.0), scale = 0.5), # prior centered at 1.0
+        )
+        
+    def create_piecewise_polynomial(self):
+        return piecewise_polynomial_kernel.PiecewisePolynomialKernel(
+            q=self.q,
+            ard_num_dims=self.ard_num_dims,
+            active_dims=self.active_dims,
+            batch_shape=self.batch_shape,
+            lengthscale_prior=self.lengthscale_prior,
+            lengthscale_constraint=self.lengthscale_constraint,
+        )
 
 
 def initialize_kernel(
-    kernel: str, batch_shape: torch.Size, active_dims: List[int], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2
+    kernel: str, batch_shape: torch.Size, active_dims: List[int], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2, q: int = 1, prior: Prior | None = None
 ):
     """
     Initializes the kernel for the Gaussian Process model based on the specified type.
@@ -291,7 +341,7 @@ def initialize_kernel(
         ScaleKernel: The initialized kernel.
     """
 
-    cont_kernel_factory = ContKernelFactory(batch_shape=batch_shape, active_dims=active_dims, smoothness=smoothness, period_length=period_length, n_mixtures=n_mixtures)
+    cont_kernel_factory = ContKernelFactory(batch_shape=batch_shape, active_dims=active_dims, smoothness=smoothness, period_length=period_length, n_mixtures=n_mixtures, q=q, prior=prior)
 
     # Define a factory function for each kernel type
     def create_kernel(kernel_type: str):
@@ -321,6 +371,16 @@ def initialize_kernel(
             return cont_kernel_factory.create_spectral_mixture()
         elif kernel_type == KernelType.MATERN_RQ:
             return cont_kernel_factory.create_matern() + cont_kernel_factory.create_rq()
+        elif kernel_type == KernelType.EXPO_GAMMA:
+            return cont_kernel_factory.create_expo_gamma()
+        elif kernel_type == KernelType.EXPO_RQ:
+            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_rq()
+        elif kernel_type == KernelType.MATERN_LINEAR_RQ:
+            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_linear() + cont_kernel_factory.create_rq()
+        elif kernel_type == KernelType.PIECEWISE_POLYNOMIAL:
+            return cont_kernel_factory.create_piecewise_polynomial()
+        elif kernel_type == KernelType.MATERN_PIECEWISE:
+            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_piecewise_polynomial()
         else:
             raise ValueError(f"Unknown kernel function: {kernel_type}")
 

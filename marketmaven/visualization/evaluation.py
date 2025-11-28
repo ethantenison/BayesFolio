@@ -194,3 +194,56 @@ def plot_ls_cumulative_compare(ls_gp: pd.Series,
     ax.legend()
 
     save_plot(fig, "ls_cumulative_comparison")
+    
+
+def plot_actual_vs_pred_matrix(true_df, pred_df, asset_cols, save_path):
+    # ---- Determine global y range across ALL assets ----
+    y_min = true_df.min().min()
+    y_max = true_df.max().max()
+    pad = 0.05 * (y_max - y_min)
+    y_min -= pad
+    y_max += pad
+
+    n_assets = len(asset_cols)
+    ncols = 4
+    nrows = int(np.ceil(n_assets / ncols))
+
+    fig, axes = plt.subplots(
+        nrows, ncols,
+        figsize=(4*ncols, 3*nrows),
+        sharex=True
+    )
+
+    axes = axes.flatten()
+    x = np.arange(len(true_df))
+
+    for i, asset in enumerate(asset_cols):
+        ax = axes[i]
+
+        y_true = true_df[f"{asset}_true"].values
+        y_pred = pred_df[f"{asset}_pred"].values
+
+        ax.plot(x, y_true, label="Actual", linewidth=1.5)
+        ax.plot(x, y_pred, label="Predicted", linewidth=1.5)
+
+        ax.set_ylim(y_min, y_max)      # <---- SAME SCALE FOR ALL
+        ax.set_title(asset)
+        ax.grid(True, alpha=0.3)
+
+        if i % ncols == 0:
+            ax.set_ylabel("Return")
+
+    # Remove unused
+    for j in range(len(asset_cols), len(axes)):
+        fig.delaxes(axes[j])
+
+    # Legend
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper right", ncol=2, fontsize=12)
+
+    fig.suptitle("Actual vs Predicted — Per ETF (Holdout Periods)", fontsize=16)
+    fig.tight_layout(rect=[0, 0, 1, 0.93])
+
+    plt.savefig(save_path, dpi=200)
+    plt.close(fig)
+

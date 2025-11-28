@@ -5,30 +5,46 @@ from pydantic import BaseModel, ConfigDict
 from marketmaven.models.kernels import MeanF, KernelType
 import mlflow
 from gpytorch.kernels import Kernel
-from gpytorch.priors import Prior
+from gpytorch.priors import Prior, LKJCovariancePrior
 from gpytorch.constraints import GreaterThan
+from typing import Any
 
-class KernelF(BaseModel):
-    typef: KernelType
-    featuresf: list[str]
-    active_dims_features: list[int]
-    smoothnessf: float
+class KernelConfig(BaseModel):
+    type: KernelType
+    features: list[str]
+    active_dims: list[int]
+    smoothness: float
+    gamma: float | None = None
+    n_mixtures: int | None = None
+    q: int | None = None
+    mean_sqrt: float | None = None
+    std: float | None = None
+
+    model_config = ConfigDict(
+        use_enum_values=True,
+        extra="forbid",
+        arbitrary_types_allowed=True
+    )
     
-    model_config = ConfigDict(use_enum_values=True)
+def log_kernel_to_mlflow(kernel: KernelConfig, prefix: str):
+    params = kernel.model_dump()
+    prefixed = {f"{prefix}_{k}": v for k, v in params.items()}
+    mlflow.log_params(prefixed)
     
-class KernelT(BaseModel):
-    typet: KernelType
-    featurest: list[str]
-    smoothnesst: float
-    active_dims_time: list[int]
-    
-    model_config = ConfigDict(use_enum_values=True)
-    
+
+
+def log_gpytorch_state_dict(model, artifact_name="gp_state.json"):
+    sd = model.state_dict()
+    sd_clean = {k: v.detach().cpu().numpy().tolist() for k, v in sd.items()}
+    mlflow.log_dict(sd_clean, artifact_name)
+
+
 class MultiTaskConfig(BaseModel):
     num_tasks: int
     mean: MeanF
     rank: int
     scaling: str
+    min_noise: float
     model_config = ConfigDict(use_enum_values=True)
 
 def long_to_panel(y_tensor, I_tensor, asset_names):
@@ -119,18 +135,70 @@ def log_r2_os(prefix, r2_dict):
 
     mlflow.log_metrics(flat_metrics)
 
+def describe_task_kernel(tk):
+    out = {
+        "type": tk.__class__.__name__,
+        "num_tasks": tk.num_tasks,
+        "rank": tk.raw_covar_factor.shape[-1],
+        "target_task_index": tk.target_task_index,
+        "unit_scale_for_target": tk.unit_scale_for_target,
+    }
+
+    # raw parameters (pre-constraints)
+    # out["raw_var"] = tk.raw_var.detach().cpu().numpy().tolist()
+    # out["raw_covar_factor"] = tk.raw_covar_factor.detach().cpu().numpy().tolist()
+
+    # transformed parameters
+    out["var"] = tk.var.detach().cpu().numpy().tolist()
+    out["covar_factor"] = tk.covar_factor.detach().cpu().numpy().tolist()
+
+    # # full covariance & correlation matrix
+    # B = tk.covar_matrix.detach().cpu().numpy()
+    # out["covar_matrix"] = B.tolist()
+
+    # d = np.sqrt(np.clip(B.diagonal(), 1e-12, None))
+    # corr = B / (d[:,None] * d[None,:])
+    # out["corr_matrix"] = corr.tolist()
+
+    # --- Priors (including LKJCovariancePrior) -----------------------------
+    if hasattr(tk, "task_prior") and tk.task_prior is not None:
+        out["task_prior"] = describe_prior(tk.task_prior)
+
+
+    return out
 
 def describe_prior(p: Prior):
-    """Return full prior information."""
-    d = {"type": p.__class__.__name__}
-    for attr in ["loc", "scale", "concentration", "df", "covariance_matrix"]:
-        if hasattr(p, attr):
-            try:
-                d[attr] = float(getattr(p, attr))
-            except:
-                d[attr] = str(getattr(p, attr))
-    return d
+    """Return a JSON-serializable dict describing a GPyTorch Prior."""
+    out = {"type": p.__class__.__name__}
 
+    # --- Special case: LKJCovariancePrior ---------------------------------
+    if isinstance(p, LKJCovariancePrior):
+        # In recent gpytorch, attributes are usually: n (dim), eta, sd_prior
+        # but there can be minor version differences, so be defensive.
+        if hasattr(p, "n"):
+            out["dimension"] = int(p.n)
+        if hasattr(p, "eta"):
+            out["eta"] = float(p.eta)
+
+        # sd_prior is itself a Prior (e.g. GammaPrior over std dev)
+        if hasattr(p, "sd_prior") and p.sd_prior is not None:
+            out["sd_prior"] = describe_prior(p.sd_prior)
+
+        return out
+
+    # --- Generic case: other priors ----------------------------------------
+    for attr in ["loc", "scale", "concentration", "rate", "df", "covariance_matrix"]:
+        if hasattr(p, attr):
+            val = getattr(p, attr)
+            try:
+                out[attr] = float(val)
+            except Exception:
+                # Could be tensor / array / matrix
+                try:
+                    out[attr] = val.detach().cpu().numpy().tolist()
+                except Exception:
+                    out[attr] = str(val)
+    return out
 
 def describe_constraint(c: GreaterThan):
     """Return constraint information."""
@@ -206,7 +274,7 @@ def extract_full_gp_config(model):
     cfg["covar_module"] = describe_kernel(model.covar_module)
 
     # ----- Task kernel -----
-    cfg["task_covar_module"] = describe_kernel(model.task_covar_module)
+    cfg["task_covar_module"] = describe_task_kernel(model.task_covar_module)
 
     # ----- Likelihood noise priors -----
     if hasattr(model.likelihood, "noise"):
@@ -228,38 +296,31 @@ def extract_full_gp_config(model):
 
 def model_error_by_time_index(y_true: pd.DataFrame, y_pred: pd.DataFrame):
     """
-    Compute absolute errors per asset and overall mean absolute error
+    Compute absolute errors per asset and overall mean absolute error.
+    Returns only columns ending in _abs_error plus the mean_abs_error column.
     """
     # Combine true and predicted into one DataFrame
     combined_df = pd.concat(
         [y_true.add_suffix("_true"),
-        y_pred.add_suffix("_pred")],
+         y_pred.add_suffix("_pred")],
         axis=1
     )
 
-    # Add error columns for each asset
+    # Compute abs error for each ETF
+    abs_error_cols = []
     for asset in y_true.columns:
         true_col = f"{asset}_true"
         pred_col = f"{asset}_pred"
+        err_col = f"{asset}_abs_error"
 
-        combined_df[f"{asset}_abs_error"] = (combined_df[pred_col] - combined_df[true_col]).abs()
+        combined_df[err_col] = (combined_df[pred_col] - combined_df[true_col]).abs()
+        abs_error_cols.append(err_col)
 
-    combined_df["mean_abs_error"] = combined_df[[f"{a}_abs_error" for a in y_true.columns]].mean(axis=1)
-    # Build the desired column order
-    ordered_cols = []
+    # Mean absolute error across ETFs
+    combined_df["mean_abs_error"] = combined_df[abs_error_cols].mean(axis=1)
 
-    for asset in y_true.columns:
-        ordered_cols.append(f"{asset}_true")
-        ordered_cols.append(f"{asset}_pred")
-        ordered_cols.append(f"{asset}_abs_error")
-
-    # Append overall metric at the end
-    ordered_cols.append("mean_abs_error")
-
-    # Reorder DataFrame
-    combined_df = combined_df[ordered_cols]
-
-    return combined_df
+    # Return only the error columns + overall MAE
+    return combined_df[abs_error_cols + ["mean_abs_error"]]
 
 
 

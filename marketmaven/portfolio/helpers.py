@@ -170,5 +170,5 @@ def assessing_long_short_performance(
 ):
     ls_ret = long_short_returns(y_true, y_pred)
     stats = portfolio_stats(ls_ret, periods_per_year=12)
-    stats = {f"{label}_{k}": v for k, v in stats.items()}
+    stats = {f"{label}/{k}": v for k, v in stats.items()}
     return stats
