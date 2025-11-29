@@ -23,7 +23,7 @@ from gpytorch.constraints import Interval, Positive
 from gpytorch.kernels import IndexKernel
 from gpytorch.priors import Prior
 from gpytorch.means import ConstantMean, ZeroMean, LinearMean, MultitaskMean
-
+import math
 torch.set_default_dtype(torch.float64)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -116,7 +116,16 @@ def adaptive_lengthscale_constraint(num_dims:int):
     ls_min = 2.5e-2 * sqrt(num_dims)
     return GreaterThan(ls_min, initial_value=adaptive_lengthscale_prior(num_dims).mode)
 
-
+def make_period_length_prior(p0: float, cv: float = 0.5) -> LogNormalPrior:
+    """
+    p0: prior median for period_length in *normalized* time units
+    cv: coefficient of variation (controls how tight the prior is)
+    """
+    # convert CV to lognormal sigma
+    sigma = math.sqrt(math.log(1 + cv**2))
+    # set mu so that median = exp(mu) = p0
+    mu = math.log(p0)
+    return LogNormalPrior(loc=mu, scale=sigma)
 
 ###### Means ######
 class MeanF(StrEnum):
@@ -174,6 +183,8 @@ class KernelType(StrEnum):
     
     EXPO_GAMMA = "expogamma"
     EXPO_RQ = "exporq"
+    EXPO_RQ_LINEAR = "exporqlinear"
+    EXPO_LINEAR = "expolinear"
     
     PIECEWISE_POLYNOMIAL = "piecewisepolynomial"
     MATERN_PIECEWISE = "maternpiecewise"
@@ -273,14 +284,11 @@ class ContKernelFactory:
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
             period_length=self.period_length,
-            period_length_prior=LogNormalPrior(
-                loc=-2.54,    # ≈ math.log(period_length) - 0.5*sigma**2
-                scale=0.2),
+            period_length_prior=make_period_length_prior(self.period_length, cv=0.5),
             lengthscale_prior=self.lengthscale_prior,
             lengthscale_constraint=self.lengthscale_constraint,
         )
-#         \sigma = \sqrt{\ln(1 + cv^2)},\quad
-# \mu = \ln(m) - \frac{\sigma^2}{2} For lognormal setting
+
 
     def create_linear(self) -> LinearKernel:
         return LinearKernel(
@@ -381,6 +389,10 @@ def initialize_kernel(
             return cont_kernel_factory.create_piecewise_polynomial()
         elif kernel_type == KernelType.MATERN_PIECEWISE:
             return cont_kernel_factory.create_matern() + cont_kernel_factory.create_piecewise_polynomial()
+        elif kernel_type == KernelType.EXPO_RQ_LINEAR:
+            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_rq() + cont_kernel_factory.create_linear()
+        elif kernel_type == KernelType.EXPO_LINEAR:
+            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_linear()
         else:
             raise ValueError(f"Unknown kernel function: {kernel_type}")
 
