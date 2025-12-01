@@ -19,7 +19,7 @@ from gpytorch.models import ExactGP
 from math import sqrt, log
 from gpytorch.priors import LogNormalPrior
 from gpytorch.constraints import GreaterThan
-torch.set_default_dtype(torch.float64)
+torch.set_default_dtype(torch.float32)
 from pydantic import BaseModel, Field
 from typing import List, Literal
 import seaborn as sns
@@ -619,9 +619,9 @@ for i in range(training_iter):
         break  # Stop training early if patience is exceeded
 
 X_full = scaler_X.transform(X)
-x_tensor = torch.tensor(X_full, dtype=torch.float64)
+x_tensor = torch.tensor(X_full, dtype=torch.float32)
 y_full = scaler_y.transform(y)
-y_tensor = torch.tensor(y_full, dtype=torch.float64).flatten()
+y_tensor = torch.tensor(y_full, dtype=torch.float32).flatten()
 
 # Get into evaluation (predictive posterior) mode
 model.eval()
@@ -814,13 +814,13 @@ f, (y1_ax, y2_ax) = plt.subplots(1, 2, figsize=(12, 5))
 
 
 X_full = scaler_X.transform(X)
-x_tensor = torch.tensor(X_full, dtype=torch.float64)
+x_tensor = torch.tensor(X_full, dtype=torch.float32)
 test_i_task1 = torch.full((x_tensor.shape[0],1), dtype=torch.long, fill_value=0)
 test_i_task2 = torch.full((x_tensor.shape[0],1), dtype=torch.long, fill_value=1)
 y_full = scaler_y.transform(y)
 y_full2 = scaler_y2.transform(y2)
-y_tensor = torch.tensor(y_full, dtype=torch.float64).flatten()
-y_tensor2 = torch.tensor(y_full2, dtype=torch.float64).flatten()
+y_tensor = torch.tensor(y_full, dtype=torch.float32).flatten()
+y_tensor2 = torch.tensor(y_full2, dtype=torch.float32).flatten()
 
 
 # Make predictions - one task at a time
@@ -1030,11 +1030,11 @@ likelihood.eval()
 f, (y1_ax, y2_ax) = plt.subplots(1, 2, figsize=(12, 5))
 
 X_full = scaler_X.transform(X)
-x_tensor = torch.tensor(X_full, dtype=torch.float64)
+x_tensor = torch.tensor(X_full, dtype=torch.float32)
 y_full = scaler_y.transform(y)
 y_full2 = scaler_y2.transform(y2)
-y_tensor = torch.tensor(y_full, dtype=torch.float64).flatten()
-y_tensor2 = torch.tensor(y_full2, dtype=torch.float64).flatten()
+y_tensor = torch.tensor(y_full, dtype=torch.float32).flatten()
+y_tensor2 = torch.tensor(y_full2, dtype=torch.float32).flatten()
 y_tensor_comb = torch.stack([y_tensor, y_tensor2], -1)
 
 # Make predictions

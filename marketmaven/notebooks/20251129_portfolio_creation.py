@@ -73,3 +73,9 @@ tickers = TickerConfig(
     horizon=Horizon.MONTHLY,
     lookback_date="2010-06-01"
 )
+
+"""
+Prioritize:
+EMB, VSS, VWO, VEA, SPY, MGK, VTV, IJR
+
+"""

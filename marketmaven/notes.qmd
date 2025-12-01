@@ -230,3 +230,7 @@ SPY, MGK
 **November 28th**
 - Taking out only the redundant etf and macro variables helped improve cumulative return but lowered the R2 OS. 
 - PCA probs didn't help although I would have to scale within folds....
+
+**November 30th**
+-rank3 bettter for some and rank7 better for high yield equitities
+- used ewma2 mean estimate for those that were shown to have a worse r2 than either rank3 or rank7

@@ -274,6 +274,7 @@ def train_model_hadamard(
         num_tasks=num_tasks,
         rank=rank,
         task_feature=task_feature,
+        dtype=dtype,
     ).to(device=device, dtype=dtype)
 
     # Ensure positive noise constraint

@@ -24,7 +24,7 @@ from datetime import date
 import mlflow
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-torch.set_default_dtype(torch.float64)
+torch.set_default_dtype(torch.float32)
 
 # MLFlow Configuration
 MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
@@ -178,10 +178,10 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split_data(X_scaled, y_scaled, n_month=2)
 
     # Convert to tensors
-    train_x = torch.tensor(X_train, dtype=torch.float64)
-    train_y = torch.tensor(y_train, dtype=torch.float64).flatten()
-    test_x = torch.tensor(X_test, dtype=torch.float64)
-    test_y = torch.tensor(y_test, dtype=torch.float64).flatten()
+    train_x = torch.tensor(X_train, dtype=torch.float32)
+    train_y = torch.tensor(y_train, dtype=torch.float32).flatten()
+    test_x = torch.tensor(X_test, dtype=torch.float32)
+    test_y = torch.tensor(y_test, dtype=torch.float32).flatten()
 
     # Train GP model (single-task example)
     likelihood = gpytorch.likelihoods.GaussianLikelihood()

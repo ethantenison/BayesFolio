@@ -24,7 +24,7 @@ from gpytorch.kernels import IndexKernel
 from gpytorch.priors import Prior
 from gpytorch.means import ConstantMean, ZeroMean, LinearMean, MultitaskMean
 import math
-torch.set_default_dtype(torch.float64)
+torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
