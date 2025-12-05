@@ -234,3 +234,25 @@ SPY, MGK
 **November 30th**
 -rank3 bettter for some and rank7 better for high yield equitities
 - used ewma2 mean estimate for those that were shown to have a worse r2 than either rank3 or rank7
+
+**December 3rd**
+- USe CVAR at 10% next time to be more aggresive
+- Try to add CPI to get better predictions for asset classes that had worse predictive power than mean mean_etfs = ['BND','BNDX','VNQI','VWOB'], 
+and possibly another feature that would help with international bonds.
+
+**December 5th**
+- Next time add task covariance plot to mlflow artifacts
+- Adding CPI didnt' help so far....maybe try with different task rank
+- Try adding inflation expectation features like 5y5y forward inflation expectation 
+and possibly the following for global yields:
+
+Global yields from FRED or Yahoo:
+	•	Germany 10Y (“DE10Y-BOND”)
+	•	Japan 10Y (“JP10Y-BOND”)
+	•	UK 10Y (“UK10Y-BOND”)
+	•	China 10Y (“CNY10Y-BOND”) (for VWOB)
+
+Or safer FRED equivalents:
+	•	"IRLTLT01DEM156N" (Germany long-term)
+	•	"IRLTLT01JPM156N" (Japan)
+	•	"IRLTLT01GBM156N" (UK)
