@@ -360,7 +360,7 @@ TIME_KERNEL_GRID = {
     KernelType.PERIODIC_MATERN: [0.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
 }
 
-RANK_GRID = [7] #3
+RANK_GRID = [3] #3
 
 # Best before leaving out extra : etf=matern_s=0.5_macro=maternlinearrq_s=0.5_time=periodicmatern_s=0.5
 # periodic smoothness doesn't so much matter, macro smoothness of 0.5 seems better. 

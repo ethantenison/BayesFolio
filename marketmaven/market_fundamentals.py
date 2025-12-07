@@ -8,6 +8,225 @@ import yfinance as yf
 from sklearn.decomposition import PCA
 import pandas_datareader.data as pdr
 from marketmaven.configs import Interval, Horizon
+from typing import Dict, List, Optional, Literal, Tuple
+import io
+import sys
+
+
+# Optional: only needed if you set use_tradingeconomics=True
+try:
+    import tradingeconomics as te  # pip install tradingeconomics
+except Exception:
+    te = None
+
+import requests
+
+def fetch_global_yields(
+    start: str = "2010-01-01",
+    end: Optional[str] = None,
+    horizon: str = "M",  # accepts your Horizon enum (we read .value if present)
+    countries: Optional[List[str]] = None,
+    transform: Literal["level", "diff_1p", "z12"] = "level",
+    fred_codes: Optional[Dict[str, List[str]]] = None,
+    stooq_map: Optional[Dict[str, str]] = None,
+    use_tradingeconomics: bool = False,
+    te_country_map: Optional[Dict[str, Tuple[str, str]]] = None,  # (country, category)
+    verbose: bool = False,
+) -> pd.DataFrame:
+    """
+    Fetch 10Y sovereign yields (decimals) for DE/JP/UK/CN with robust fallbacks.
+
+    Pipeline per country (first success wins):
+      1) FRED OECD long-term yields (monthly)  -> DE/JP/UK
+      2) Stooq CSV (https://stooq.com then https://stooq.pl) -> CN & others
+      3) pandas_datareader('stooq') -> best effort
+      4) TradingEconomics (optional; requires package/API access)
+
+    Returns
+    -------
+    DataFrame with columns: ['date', <keys...>], values in decimals (0.025 = 2.5%).
+    If a country fails across all sources, the column is kept with NaNs (so your
+    downstream merge logic remains stable).
+    """
+    # --- normalize horizon (supports your Horizon enum) ---
+    horizon = getattr(horizon, "value", horizon)
+
+    # --- defaults ---
+    default_fred = {
+        "de10y": ["IRLTLT01DEM156N"],  # Germany
+        "jp10y": ["IRLTLT01JPM156N"],  # Japan
+        "uk10y": ["IRLTLT01GBM156N"],  # UK
+        "cn10y": [],                   # not on FRED OECD 10Y
+    }
+    default_stooq = {
+        "de10y": "10YDEY.B",
+        "jp10y": "10YJPY.B",
+        "uk10y": "10YUKY.B",
+        "cn10y": "10YCNY.B",
+    }
+    # TradingEconomics mapping (country name must match TE’s catalog)
+    default_te = {
+        "de10y": ("Germany", "government bond 10y"),
+        "jp10y": ("Japan",   "government bond 10y"),
+        "uk10y": ("United Kingdom", "government bond 10y"),
+        "cn10y": ("China",   "government bond 10y"),
+    }
+
+    code_map = {**default_fred, **(fred_codes or {})}
+    stq_map  = {**default_stooq, **(stooq_map or {})}
+    te_map   = {**default_te, **(te_country_map or {})}
+    keys     = countries or ["de10y", "jp10y", "uk10y", "cn10y"]
+
+    # --- http session with UA (Stooq sometimes dislikes default UA) ---
+    session = requests.Session()
+    session.headers.update(
+        {"User-Agent": "Mozilla/5.0 (compatible; MarketMavenBot/1.0; +https://example.com)"}
+    )
+
+    def _log(msg):
+        if verbose:
+            print(msg, file=sys.stderr)
+
+    # ---------- Source helpers ----------
+    def _fred_one(symbols: List[str]):
+        for sym in symbols:
+            try:
+                s = pdr.DataReader(sym, "fred", start, end)[sym]
+                s = (s / 100.0)
+                s.index = pd.to_datetime(s.index)
+                _log(f"FRED ok for {sym}")
+                return s
+            except Exception as e:
+                _log(f"FRED fail {sym}: {e}")
+        return None
+
+    def _stooq_csv_one(ticker: str):
+        if not ticker:
+            return None
+        # Try .com first, then .pl
+        for base in ("https://stooq.com", "https://stooq.pl"):
+            url = f"{base}/q/d/l/?s={ticker.lower()}&i=d"
+            try:
+                r = session.get(url, timeout=15)
+                r.raise_for_status()
+                df = pd.read_csv(io.StringIO(r.text))
+                if df.empty or "Date" not in df.columns:
+                    _log(f"Stooq CSV empty or schema mismatch for {ticker} via {base}")
+                    continue
+                # Some variants provide only Date/Close; some have OHLCV
+                close_col = "Close" if "Close" in df.columns else df.columns[-1]
+                df["Date"] = pd.to_datetime(df["Date"])
+                s = df.set_index("Date")[close_col].astype(float)
+                # Percent → decimal (heuristic if someone returns already-decimals)
+                if s.dropna().abs().median() > 5:
+                    s = s / 100.0
+                s.index = pd.to_datetime(s.index)
+                _log(f"Stooq CSV ok for {ticker} via {base}")
+                return s
+            except Exception as e:
+                _log(f"Stooq CSV fail {ticker} via {base}: {e}")
+        return None
+
+    def _stooq_pdr_one(ticker: str):
+        # pandas_datareader 'stooq' sometimes works for bonds; try anyway
+        try:
+            df = pdr.DataReader(ticker, "stooq", start, end)
+            if df is None or df.empty:
+                return None
+            df = df.sort_index()
+            # pick 'Close' if present, otherwise first numeric column
+            close_col = "Close" if "Close" in df.columns else df.select_dtypes("number").columns[0]
+            s = df[close_col].astype(float)
+            if s.dropna().abs().median() > 5:
+                s = s / 100.0
+            _log(f"pandas_datareader('stooq') ok for {ticker}")
+            return s
+        except Exception as e:
+            _log(f"pandas_datareader('stooq') fail {ticker}: {e}")
+            return None
+
+    def _te_one(country: str, category: str):
+        if not use_tradingeconomics or te is None:
+            return None
+        try:
+            # TE returns a list of dicts; we filter category
+            te.login()  # relies on env vars if set; silently uses guest in some setups
+            data = te.getMarketsData(country=country, category=category)
+            if not data:
+                return None
+            df = pd.DataFrame(data)
+            # Expect 'Date' and 'Close' or 'Value'
+            date_col = "Date" if "Date" in df.columns else "date"
+            val_col = "Close" if "Close" in df.columns else ("Value" if "Value" in df.columns else None)
+            if val_col is None or date_col not in df.columns:
+                return None
+            ser = pd.Series(df[val_col].values, index=pd.to_datetime(df[date_col].values), dtype=float)
+            # TE values are typically in percent; convert if needed
+            if ser.dropna().abs().median() > 5:
+                ser = ser / 100.0
+            _log(f"TradingEconomics ok for {country} / {category}")
+            return ser
+        except Exception as e:
+            _log(f"TradingEconomics fail {country} / {category}: {e}")
+            return None
+
+    # ---------- Build all series ----------
+    series = []
+    present_cols = []
+    for k in keys:
+        s = _fred_one(code_map.get(k, []))
+        if s is None:
+            # Stooq CSV (com then pl)
+            s = _stooq_csv_one(stq_map.get(k))
+        if s is None:
+            # pandas_datareader('stooq')
+            s = _stooq_pdr_one(stq_map.get(k))
+        if s is None:
+            # TradingEconomics (optional)
+            country, category = te_map.get(k, (None, None))
+            if country and category:
+                s = _te_one(country, category)
+
+        if s is not None:
+            s = s.sort_index()
+            s = s.resample(horizon).last().rename(k)
+            series.append(s)
+            present_cols.append(k)
+            _log(f"{k}: SUCCESS")
+        else:
+            # keep the column with NaNs so the shape is stable
+            idx = pd.date_range(pd.to_datetime(start), pd.to_datetime(end) if end else pd.Timestamp.today(), freq="M")
+            series.append(pd.Series(index=idx, dtype="float64", name=k))
+            _log(f"{k}: FAILED across all sources")
+
+    # ---------- Align, name 'date', and transform ----------
+    df = pd.concat(series, axis=1)
+    df = df[sorted(df.columns, key=lambda c: keys.index(c))]  # preserve key order
+    df = df.dropna(how="all")
+    df = df.sort_index()
+
+    # Make sure we output an explicit 'date' column (works across pandas versions)
+    df = df.reset_index()
+    df = df.rename(columns={df.columns[0]: "date", "DATE": "date", "index": "date"})
+
+    # Optional transforms
+    if transform == "diff_1p":
+        for k in keys:
+            if k in df.columns:
+                df[k] = df[k].diff(1)
+        df = df.dropna()
+    elif transform == "z12":
+        for k in keys:
+            if k in df.columns:
+                m = df[k].rolling(12, min_periods=12).mean()
+                s = df[k].rolling(12, min_periods=12).std()
+                df[k] = (df[k] - m) / s
+        df = df.dropna()
+
+    cols = ["date"] + [k for k in keys if k in df.columns]
+    return df[cols]
+
+
 
 def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """

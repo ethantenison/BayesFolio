@@ -256,3 +256,7 @@ Or safer FRED equivalents:
 	•	"IRLTLT01DEM156N" (Germany long-term)
 	•	"IRLTLT01JPM156N" (Japan)
 	•	"IRLTLT01GBM156N" (UK)
+
+**December 7th**
+- Rank 3 did actually work better than rank 7, however it seems that the mean is still better 
+- Created 10 y bond yield function for germany, japan, uk, and china to try next time. 
