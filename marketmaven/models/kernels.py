@@ -15,6 +15,7 @@ from gpytorch.kernels import (
     PeriodicKernel,
     SpectralMixtureKernel,
     piecewise_polynomial_kernel,
+    ScaleKernel,
 )
 from gpytorch.priors import LogNormalPrior
 from enum import StrEnum
@@ -62,7 +63,7 @@ class GammaExponentialKernel(Kernel):
         )
         self.register_constraint(
             "raw_gamma",
-            GreaterThan(0.5)
+            GreaterThan(0.8)
         )
 
         if gamma_prior is not None:
@@ -185,6 +186,7 @@ class KernelType(StrEnum):
     EXPO_RQ = "exporq"
     EXPO_RQ_LINEAR = "exporqlinear"
     EXPO_LINEAR = "expolinear"
+    GAMMA_PERIODIC = "gammaperiodic"
     
     PIECEWISE_POLYNOMIAL = "piecewisepolynomial"
     MATERN_PIECEWISE = "maternpiecewise"
@@ -291,12 +293,13 @@ class ContKernelFactory:
 
 
     def create_linear(self) -> LinearKernel:
-        return LinearKernel(
+        return ScaleKernel(LinearKernel(
             ard_num_dims=self.ard_num_dims,
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
-        )
-        
+        ),
+                           outputscale_prior=LogNormalPrior(-4.0, 0.5))
+
     def create_spectral_mixture(self):
 
         return SpectralMixtureKernel(
@@ -313,16 +316,19 @@ class ContKernelFactory:
         Gamma-exponential kernel with the same ARD lengthscale prior/constraint
         as the other continuous kernels.
         """
-        return GammaExponentialKernel(
+        return ScaleKernel(GammaExponentialKernel(
             ard_num_dims=self.ard_num_dims,
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
             lengthscale_prior=self.lengthscale_prior,
             lengthscale_constraint=self.lengthscale_constraint,
             gamma=self.gamma,
-            gamma_prior=LogNormalPrior(loc = log(1.0), scale = 0.5), # prior centered at 1.0
-        )
+            gamma_prior=LogNormalPrior(loc = log(1.3), scale = 0.3), # prior centered at 1.0
+        ),
+                           outputscale_prior=LogNormalPrior(-3.5, 0.5)
         
+        )
+
     def create_piecewise_polynomial(self):
         return piecewise_polynomial_kernel.PiecewisePolynomialKernel(
             q=self.q,
@@ -356,7 +362,7 @@ def initialize_kernel(
         if kernel_type == KernelType.MATERN:
             return cont_kernel_factory.create_matern()
         elif kernel_type == KernelType.MATERN_LINEAR:
-            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_linear()
+            return ScaleKernel(cont_kernel_factory.create_matern()) + cont_kernel_factory.create_linear()
         elif kernel_type == KernelType.RBF:
             return cont_kernel_factory.create_rbf()
         elif kernel_type == KernelType.RBF_LINEAR:
@@ -374,7 +380,8 @@ def initialize_kernel(
         elif kernel_type == KernelType.MATERN_LINEAR_PERIODIC:
             return cont_kernel_factory.create_matern() + cont_kernel_factory.create_linear() + cont_kernel_factory.create_periodic()
         elif kernel_type == KernelType.PERIODIC_MATERN:
-            return cont_kernel_factory.create_periodic() + cont_kernel_factory.create_matern()
+            return ScaleKernel(cont_kernel_factory.create_periodic(),
+                               outputscale_prior=LogNormalPrior(-4.0, 0.5)) + ScaleKernel(cont_kernel_factory.create_matern())
         elif kernel_type == KernelType.SPECTRAL_MIXTURE:
             return cont_kernel_factory.create_spectral_mixture()
         elif kernel_type == KernelType.MATERN_RQ:
@@ -384,7 +391,7 @@ def initialize_kernel(
         elif kernel_type == KernelType.EXPO_RQ:
             return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_rq()
         elif kernel_type == KernelType.MATERN_LINEAR_RQ:
-            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_linear() + cont_kernel_factory.create_rq()
+            return ScaleKernel(cont_kernel_factory.create_matern()) + cont_kernel_factory.create_linear() + ScaleKernel(cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.PIECEWISE_POLYNOMIAL:
             return cont_kernel_factory.create_piecewise_polynomial()
         elif kernel_type == KernelType.MATERN_PIECEWISE:
@@ -393,6 +400,8 @@ def initialize_kernel(
             return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_rq() + cont_kernel_factory.create_linear()
         elif kernel_type == KernelType.EXPO_LINEAR:
             return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_linear()
+        elif kernel_type == KernelType.GAMMA_PERIODIC:
+            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_periodic()
         else:
             raise ValueError(f"Unknown kernel function: {kernel_type}")
 

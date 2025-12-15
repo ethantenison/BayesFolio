@@ -750,6 +750,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     high_y_spread = fetch_high_yield_spread(start=start, end=end, horizon=horizon)
     global_macro = fetch_core_global_macro(start=start, end=end, horizon=horizon)
     cpi_df = fetch_cpi_inflation(start=start, end=end, horizon=horizon)
+    global_yields = fetch_global_yields(start=start, end=end, horizon=horizon, transform="diff_1p")
 
     # ------------------------------------------------------------
     # 2. ERP using your ETF fetcher (no Yahoo weirdness)
@@ -852,7 +853,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         spy_df2, erp_df,                       # ERP block
         skew_df, move_df,    # vol signals
         vix_slope_df, rsp_spy_df, pct50_df,   # breadth
-        acm_df, high_y_spread,global_macro, cpi_df, #earnings_yield                                   
+        acm_df, high_y_spread,global_macro, cpi_df,global_yields  #earnings_yield                                   
     ]
 
     # Filter out None

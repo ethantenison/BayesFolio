@@ -7,7 +7,6 @@ import mlflow
 from gpytorch.kernels import Kernel
 from gpytorch.priors import Prior, LKJCovariancePrior
 from gpytorch.constraints import GreaterThan
-from typing import Any
 
 class KernelConfig(BaseModel):
     type: KernelType
@@ -31,6 +30,104 @@ def log_kernel_to_mlflow(kernel: KernelConfig, prefix: str):
     prefixed = {f"{prefix}_{k}": v for k, v in params.items()}
     mlflow.log_params(prefixed)
     
+def extract_gp_hyperparameters(model):
+    params = {}
+
+    # --------------------------------------------------
+    # Likelihood (noise)
+    # --------------------------------------------------
+    if hasattr(model, "likelihood"):
+        likelihood = model.likelihood
+        noise = getattr(likelihood, "noise", None)
+        if noise is not None:
+            params["likelihood.noise"] = noise.detach().cpu().numpy().tolist()
+
+    # --------------------------------------------------
+    # Mean modules
+    # --------------------------------------------------
+    if hasattr(model, "mean_module"):
+        mean = model.mean_module
+        if hasattr(mean, "base_means"):
+            for i, m in enumerate(mean.base_means):
+                const = getattr(m, "constant", None)
+                if const is not None:
+                    params[f"mean.base_means.{i}.constant"] = (
+                        const.detach().cpu().numpy().tolist()
+                    )
+        else:
+            const = getattr(mean, "constant", None)
+            if const is not None:
+                params["mean.constant"] = const.detach().cpu().numpy().tolist()
+
+    # --------------------------------------------------
+    # Kernel walker
+    # --------------------------------------------------
+    def walk_kernel(kernel, prefix):
+        out = {}
+
+        # Lengthscale
+        lengthscale = getattr(kernel, "lengthscale", None)
+        if lengthscale is not None:
+            out[f"{prefix}.lengthscale"] = (
+                lengthscale.detach().cpu().numpy().tolist()
+            )
+
+        # Outputscale (ScaleKernel)
+        outputscale = getattr(kernel, "outputscale", None)
+        if outputscale is not None:
+            out[f"{prefix}.outputscale"] = (
+                outputscale.detach().cpu().numpy().tolist()
+            )
+
+        # Variance (LinearKernel)
+        variance = getattr(kernel, "variance", None)
+        if variance is not None:
+            out[f"{prefix}.variance"] = (
+                variance.detach().cpu().numpy().tolist()
+            )
+
+        # Composite kernels
+        kernels = getattr(kernel, "kernels", None)
+        if kernels is not None:
+            for i, subkernel in enumerate(kernels):
+                out.update(
+                    walk_kernel(subkernel, f"{prefix}.kernels.{i}")
+                )
+
+        # Wrapped kernels (ScaleKernel, etc.)
+        base_kernel = getattr(kernel, "base_kernel", None)
+        if base_kernel is not None:
+            out.update(
+                walk_kernel(base_kernel, f"{prefix}.base_kernel")
+            )
+
+        return out
+
+    # Main covariance kernel
+    if hasattr(model, "covar_module"):
+        params.update(walk_kernel(model.covar_module, "covar_module"))
+
+    # --------------------------------------------------
+    # Task covariance (PositiveIndexKernel / IndexKernel)
+    # --------------------------------------------------
+    if hasattr(model, "task_covar_module"):
+        task_kernel = model.task_covar_module
+
+        var = getattr(task_kernel, "var", None)
+        if var is not None:
+            params["task_covar.var"] = var.detach().cpu().numpy().tolist()
+
+        covar_factor = getattr(task_kernel, "covar_factor", None)
+        if covar_factor is not None:
+            params["task_covar.covar_factor"] = (
+                covar_factor.detach().cpu().numpy().tolist()
+            )
+
+    return params
+
+def log_gp_hyperparameters(model, artifact_name="gp_hyperparameters.json"):
+    params = extract_gp_hyperparameters(model)
+    mlflow.log_dict(params, artifact_name)
 
 
 def log_gpytorch_state_dict(model, artifact_name="gp_state.json"):

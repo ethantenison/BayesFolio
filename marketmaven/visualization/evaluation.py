@@ -171,7 +171,8 @@ def plot_uncertainty_calibration(y_true, y_pred, y_std):
     
 def plot_ls_cumulative_compare(ls_gp: pd.Series,
                                ls_mean: pd.Series,
-                               ls_ewma: pd.Series):
+                               ls_ewma: pd.Series,
+                               strategy="ls"):
     """
     Plot long–short cumulative returns for GP, Mean, and EWMA
     on the same figure for direct comparison.
@@ -186,14 +187,16 @@ def plot_ls_cumulative_compare(ls_gp: pd.Series,
     ax.plot(cumulative_gp,   label="GP",   lw=2)
     ax.plot(cumulative_mean, label="Mean", lw=2)
     ax.plot(cumulative_ewma, label="EWMA2", lw=2)
+    
+    title = f"{strategy}: Cumulative Returns Comparison"
 
-    ax.set_title("Long–Short Strategy: Cumulative Returns Comparison")
+    ax.set_title(title)
     ax.set_ylabel("Cumulative Return")
     ax.set_xlabel("Time")
     ax.grid(True, alpha=0.3)
     ax.legend()
 
-    save_plot(fig, "ls_cumulative_comparison")
+    save_plot(fig, f"cumulative_compare_{strategy}")
     
 
 def plot_actual_vs_pred_matrix(true_df, pred_df, asset_cols, save_path):

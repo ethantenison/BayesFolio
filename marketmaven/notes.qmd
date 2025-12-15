@@ -260,3 +260,16 @@ Or safer FRED equivalents:
 **December 7th**
 - Rank 3 did actually work better than rank 7, however it seems that the mean is still better 
 - Created 10 y bond yield function for germany, japan, uk, and china to try next time. 
+
+**December 13th**
+- global yields did have a positive impact on VWO,VSS, SPY, HYG, IEF, LQD, EMB, EWX
+- It made others worse: BND, VNQ, VTV, 
+- It's interesting though that the global yields did not lead to better returns...
+-Need to try out adding an equal weight portfolio and a riskfolio portfolio forecasting predictions. That should telll me if not only am i picking up alpha but also if i can monetize it. 
+-trying to incorporate riskfolio testing but needs some work. 
+
+**December 14th**
+-more flexibility in the macro kernel leads to more drastic movements 
+-need to wrap scalekernels around linear perhaps and others (maternlinearrq)
+-putting the scale kernel around matern linear for macro helped!!!!
+-Gamma still not regularized enough...just adjusted the priors but didn't have time to try out. 
