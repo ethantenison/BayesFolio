@@ -32,7 +32,7 @@ from marketmaven.mlflow.helpers import (
 import random
 import itertools
 from marketmaven.market_fundamentals import fetch_enhanced_macro_features
-from marketmaven.asset_prices import fetch_etf_features
+from marketmaven.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank
 warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
@@ -98,17 +98,18 @@ etf_tickers = [
     "VWO", # AVEM actually is better than VWO but not enough history
     "VSS", # forein small/mid cap
     "BND", # total bond market ETF US centric
-    "IBND", # international corporate bond market ETF USD hedged
-    "ISHG", # international high yield bond ETF USD hedged
+    # "IBND", # international corporate bond market ETF USD hedged
+    # "ISHG", # international high yield bond ETF USD hedged
     "IEF", # 7-10 year treasury bond ETF US centric
     "BNDX", # total international bond market ETF, USD hedged, but actually developed markets only
     "LQD", # investment grade bond ETF US centric
     "HYG", # High yield bond ETF US centric 
-    "TIP", # Treasury inflation protected securities ETF US centric
+    #"TIP", # Treasury inflation protected securities ETF US centric
     "EWX", # emerging market small cap ETF
     "VWOB", # Emerging Market Goverment bond 
-    "EMB", # emerging market bond ETF USD hedged
+    #"EMB", # emerging market bond ETF USD hedged
     "HYEM", # emerging market high yield corporate bond ETF USD hedged
+    
 ]
 
     # # "IBND", # international corporate bond market ETF unhedged
@@ -120,11 +121,12 @@ etf_tickers = [
     #"HYEM", # emerging market high yield corporate bond ETF USD hedged
     
 assets_to_drop = [
-    'IBND', 'ISHG', 'PDBC', 'BIL', 'HYG', 'LQD', 'IEF', 'VNQ', 'VNQI',
-    'AVEM', 'EMB', 'HYEM', 'BNDX', 'BND', 'EWX', 'TIP', 'VWOB'
+    'IBND', 'ISHG', 'PDBC', 'BIL', 'EMB', 'TIP',
+"BNDX", "IEF", "LQD", "HYEM", "BND", "HYG", "VWOB", "EWX"
     ]
 
-
+#remove assets_to_drop from etf_tickers
+etf_tickers = [ticker for ticker in etf_tickers if ticker not in assets_to_drop]
 
 tickers = TickerConfig(
     start_date="2016-11-29",
@@ -137,7 +139,8 @@ tickers = TickerConfig(
 
 ############### Returns data ###############
 #return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
-return_data = pd.read_csv("20251219_etf_returns.csv")
+#return_data.to_csv("20251231_etf_returns.csv", index=False)
+return_data = pd.read_csv("20251231_etf_returns.csv")  # Updated to match the new filename
 return_data = return_data[~return_data['asset_id'].isin(assets_to_drop)]
 
 
@@ -157,12 +160,14 @@ fig.show()
 
 # # # ############### Factor data ###############
 #macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
-macro_features = pd.read_csv("20251219_macro_features.csv")
-#macro_features = macro_features[~macro_features['asset_id'].isin(assets_to_drop)]
-macro_features = macro_features.drop(columns=['vix_ts_level','skew_proxy','vix3m','yc_pc1', 'yc_pc2', 'yc_pc3', 'y10_nominal' ])
+#macro_features.to_csv("20251231_macro_features.csv", index=False)
+macro_features = pd.read_csv("20251231_macro_features.csv")
+
+macro_features = macro_features.drop(columns=['vix_ts_level','vix3m','yc_pc1', 'yc_pc2', 'yc_pc3', 'y10_nominal' ])
 macro_cols = macro_features.columns[1:].tolist()
 #etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
-etf_features = pd.read_csv("20251219_etf_features.csv")
+#etf_features.to_csv("20251231_etf_features.csv", index=False)
+etf_features = pd.read_csv("20251231_etf_features.csv")
 etf_features = etf_features[~etf_features['asset_id'].isin(assets_to_drop)]
 etf_features = etf_features.drop(columns=['ma_1m','ma_3m','vol_1w', 'price', 'overnight_gap'])
 
@@ -176,6 +181,7 @@ etf_features["dolvol_log"] = np.log(etf_features["dolvol_adj"] + 1)
 etf_features["ill_log"] = etf_features["ill_log"].clip(upper=etf_features["ill_log"].quantile(0.99))
 etf_features["dolvol_log"] = etf_features["dolvol_log"].clip(upper=etf_features["dolvol_log"].quantile(0.99))
 etf_features = etf_features.drop(columns=['ill', 'ill_adj', 'dolvol', 'dolvol_adj'])
+etf_features = add_cross_sectional_momentum_rank(etf_features, momentum_col='mom12m')
 etf_features = etf_features.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
 
 
@@ -194,29 +200,46 @@ df["lag2_y_excess_lead"] = (
       .shift(2)
 )
 df= df[df['date'] > str("2016-11-28")]
-# df = df.dropna(subset=['y_excess_lead']).reset_index(drop=True)
 df = df.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
 
 
-etf_cols = ['lag_y_excess_lead','lag2_y_excess_lead', 'mom6m', 'mom12m', 'mom36m', 'chmom',
-     'vol_1m', 'vol_3m', 'vol_z','ret_kurt','ret_autocorr',
-       'vol_of_vol', 'vol_autocorr','ma_signal', 
-        'baspread']  #  these are based on the log return which I've left out and lags should work better 
+# etf_cols = ['lag_y_excess_lead','lag2_y_excess_lead', 'mom6m', 'mom12m', 'mom36m', 'chmom',
+#      'vol_1m', 'vol_3m', 'vol_z','ret_kurt','ret_autocorr',
+#        'vol_of_vol', 'vol_autocorr','ma_signal',
+#         'baspread', "ill_log", 'max_dd_6m', 'cs_mom_rank']  #  these are based on the log return which I've left out and lags should work better 
+etf_cols = [
+ 'lag_y_excess_lead',
+ 'baspread',
+ 'ret_kurt',
+ 'chmom',
+ 'mom6m',
+ 'mom12m',
+ 'mom36m',
+ 'cs_mom_rank',
+ 'max_dd_6m',
+ 'ma_signal',
+ 'ret_autocorr',
+ 'vol_z']
 
 macro_cols = ['vix', 
-       'credit_spread_chg_1p', 'spy_ret', 
-       'erp', 
+       'credit_spread_chg_1p', 'spy_ret', 'erp', 
        'pct_above_50dma', 'hy_spread', 'hy_spread_chg_1m', 'hy_spread_z_12m',
-       'oil', 
-       'gold_crude_ratio', 'breakeven_proxy',  'cpi_mom', 'jp10y', 'uk10y', 'cn10y',
-         'tnote10y','vix_ts_chg_1m',  'vix_slope',
-                             'y10_real_proxy', 'cpi_yoy', 
-                             'oil_ret', 'copper_ret','rsp_spy', 'em_fx_ret','term_spread',
+       'breakeven_proxy',  'cpi_mom', 'jp10y', 'uk10y',
+       'cn10y','tnote10y','vix_ts_chg_1m', 'vix_ts_z_12m',  'vix_slope',
+       'y10_real_proxy', 'cpi_yoy',  'rsp_spy', 'term_spread',
+       'tbill3m', 'spy_flow_z_12m',
+       'dealer_gamma_proxy', 
+       'copper_ret','oil_ret', 'gold_crude_ratio','schp_ret', 'em_fx_ret',
                               ]
 
-drop_columns= [ 'volume','turnover','mom1m', 'log_ret', 'ret_skew',  'cpiaucsl', 'move_proxy', 'vol_accel','sd_turn',
-                              'credit_spread', 'trend_slope', 'vix_ts_z_12m', 
-                              "dolvol_log",'gold', 'copper',"schp",'em_fx','de10y', "ill_log",'dxy','tbill3m','schp_ret', 
+drop_columns= [
+    'volume','turnover','mom1m', 'log_ret', 'ret_skew','max_dd_3m',  'cpiaucsl',
+    'move_proxy', 'vol_accel','sd_turn','credit_spread', 'trend_slope', 
+    "dolvol_log",'gold', 'copper','de10y', 'dxy',
+    'skew_proxy','rsp_spy_roc_1m',
+    'oil',"schp",'em_fx',# skew proxy is .99 correlated with vix_slope
+    "ill_log","vol_1m","vol_3m",'vol_of_vol','vol_autocorr','lag2_y_excess_lead',
+    'ma_regime', 
                               ]
 #df_raw = pd.read_csv("marketmaven/datasets/20251129_14tasks.csv")
 df = df.drop(columns=drop_columns)
@@ -252,6 +275,7 @@ global_importance, interaction_fig = xgboost_variable_importance(X, y)
 print("Global Importance:\n", global_importance)
 import plotly.express as px
 
+interaction_fig.show()
 px.bar(pd.DataFrame(global_importance).sort_values(by=0))
 
 
@@ -279,7 +303,7 @@ df = df.dropna(subset=['y_excess_lead']).reset_index(drop=True)
 fig = correlation_matrix(df)
 fig.show()
 
-df.iloc[:, 2:].hist(bins=30)
+df.iloc[:, 2:].hist(bins=30, figsize=(20, 15))
 
 ############### Data Preparation ###############
 
@@ -330,13 +354,13 @@ SQRT3 = sqrt(3)
 
 train_idx_1_ahead = list(range(X.shape[0] - len(tickers.tickers)))
 test_idx_1_ahead = list(range(X.shape[0] - len(tickers.tickers), X.shape[0]))
-multiconfig = MultiTaskConfig(
-    num_tasks=len(tickers.tickers),
-    mean=MeanF.MULTITASK_CONSTANT,
-    rank=3,
-    scaling="global",
-    min_noise=1e-5,
-)
+# multiconfig = MultiTaskConfig(
+#     num_tasks=len(tickers.tickers),
+#     mean=MeanF.MULTITASK_ZERO,
+#     rank=3,
+#     scaling="global",
+#     min_noise=1e-4,
+# )
 
 def create_kernel_initialization(kernel: KernelConfig, n_months: int):
     # prior_mean = sqrt(kernel.mean_sqrt) + 0.01 * log(len(kernel.active_dims))
@@ -357,7 +381,7 @@ def create_kernel_initialization(kernel: KernelConfig, n_months: int):
         period_length=period_length
     )
 
-    return ScaleKernel(kernel_initialized)
+    return kernel_initialized
 
 
 class KernelSpec(BaseModel):
@@ -378,26 +402,38 @@ ETF_KERNEL_GRID = {
     KernelType.MATERN:        [0.5],
     #KernelType.MATERN_RQ:     [0.5],
     #KernelType.EXPO_GAMMA: [None],
+    #KernelType.RQ_LINEAR: [None],
+    #KernelType.RQ_LINEAR: [None],
+    #KernelType.RQ: [None],
 }
 
 
 
 # # Macro kernels
 MACRO_KERNEL_GRID = {
-    #KernelType.MATERN_LINEAR: [0.5],
-    #KernelType.MATERN_LINEAR_RQ: [0.5],
-    #KernelType.MATERN:     [0.5],
+    #KernelType.MATERN_LINEAR: [0.5, 1.5],
+    KernelType.MATERN_LINEAR_RQ: [0.5],
+    #KernelType.MATERN:     [1.5, 2.5],
     #KernelType.EXPO_LINEAR: [None],
-    KernelType.MATERN_RQ: [2.5]
+    #KernelType.MATERN_RQ: [2.5]
+    #KernelType.RQ_LINEAR:     [None],
+    #KernelType.RQ:     [None],
 }
 
 
 # Time kernels
 TIME_KERNEL_GRID = {
-   #KernelType.MATERN: [0.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
+   KernelType.MATERN: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
+   #KernelType.TIME_REGIME_MATERN: [1.5],
    #KernelType.MATERN_LINEAR: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
-   KernelType.PERIODIC_MATERN: [1.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
+   #KernelType.RQ: [None],
+   #KernelType.RQ_LINEAR: [None],
+   #KernelType.MATERN_LINEAR: [2.5],
+    #KernelType.TIME_CHANGE_POINT: [None],
+   #KernelType.PERIODIC_MATERN: [1.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
 }
+
+# MATERN 0.5 is generally better than 1.5 or 2.5
 
 RANK_GRID = [3] #3
 
@@ -429,7 +465,7 @@ experiment_grid = build_experiment_grid()
 seed = 27
 
 # (Optional) group all runs in one MLflow experiment
-mlflow.set_experiment("Product kernels and outputscales")
+mlflow.set_experiment("Jan Portfolio Experiments")
 
 
 for cfg in experiment_grid:
@@ -437,15 +473,15 @@ for cfg in experiment_grid:
         f"e={cfg.etf.type.value}_{cfg.etf.smoothness}_"  
         f"m={cfg.macro.type.value}_{cfg.macro.smoothness}_" 
         f"t={cfg.time.type.value}_{cfg.time.smoothness}_"
-        f"r={cfg.rank}_evenlessScale_but_modulescale"
+        f"r={cfg.rank}"
     )
 
     with mlflow.start_run(run_name=run_name, description="""Finding the best final model for gameday with per task scaling.""") as run:
         multiconfig = MultiTaskConfig(
             num_tasks=len(tickers.tickers),
-            mean=MeanF.MULTITASK_CONSTANT,
+            mean=MeanF.MULTITASK_ZERO,
             rank=cfg.rank,
-            scaling="global",
+            scaling="global",   
             min_noise=1e-5,
                 )
         
@@ -534,6 +570,7 @@ for cfg in experiment_grid:
                 multiconfig.mean,
                 num_tasks=multiconfig.num_tasks,
                 input_size=X.shape[1],
+                macro_dims=active_dims_m,
             )
             
             # Periods
@@ -545,7 +582,7 @@ for cfg in experiment_grid:
             kernelt = create_kernel_initialization(kernel_t, n_months)
 
 
-            kernel_total = (kernele + kernelm) * kernelt
+            kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt  # kernele + (kernele + 
 
             # ---- Train model ----
             model, likelihood = train_model_hadamard(
@@ -726,32 +763,7 @@ for cfg in experiment_grid:
         y_ewma_norm = ewma_df.copy()
         y_mean_norm = mean_df.copy()
         
-        # rf_ret_gp,  w_gp  = riskfolio_returns_rolling(
-        #     y_true=y_true_norm,
-        #     y_pred=y_pred_norm,
-        #     window=6,
-        #     config=risk_config,
-        #     long_only=True,
-        #     leverage=1.0,
-        # )
-        
-        # rf_ret_mean, w_mean = riskfolio_returns_rolling(
-        #     y_true=y_true_norm,
-        #     y_pred=y_mean_norm,
-        #     window=6,
-        #     config=risk_config,
-        #     long_only=True,
-        #     leverage=1.0,
-        # )
-        
-        # from marketmaven.portfolio.helpers import portfolio_stats
-        # print('rf_ret_gp', rf_ret_gp.head())
-        # rf_stats_gp   = portfolio_stats(rf_ret_gp, periods_per_year=12)
-        # rf_stats_mean = portfolio_stats(rf_ret_mean, periods_per_year=12)
-        
-        # mlflow.log_metrics({f"rf_gp/{k}": v for k, v in rf_stats_gp.items()})
-        # mlflow.log_metrics({f"rf_mean/{k}": v for k, v in rf_stats_mean.items()})
-        
+
         # Save global_importance as a CSV file
         importance_path = "marketmaven/mlflow/artifacts/global_importance.csv"
         global_importance.to_csv(importance_path, header=True)

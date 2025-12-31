@@ -25,6 +25,12 @@ from gpytorch.kernels import IndexKernel
 from gpytorch.priors import Prior
 from gpytorch.means import ConstantMean, ZeroMean, LinearMean, MultitaskMean
 import math
+import gpytorch
+from botorch.models.kernels import (
+    ExponentialDecayKernel,
+    InfiniteWidthBNNKernel,
+)
+
 torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -109,6 +115,58 @@ class GammaExponentialKernel(Kernel):
 
         # Gamma–Exponential kernel
         return torch.exp(-(dist ** self.gamma))
+    
+class TimeChangePointKernel(Kernel):
+    """
+    Smooth change-point kernel on a 1D time dimension.
+    """
+
+    has_lengthscale = False
+
+    def __init__(self, kernel_pre, kernel_post, time_dim, **kwargs):
+        super().__init__(**kwargs)
+        self.kernel_pre = kernel_pre
+        self.kernel_post = kernel_post
+        self.time_dim = time_dim
+
+        # Change point location τ
+        self.register_parameter(
+            name="raw_tau",
+            parameter=torch.nn.Parameter(torch.tensor(0.0))
+        )
+
+        # Transition width s > 0
+        self.register_parameter(
+            name="raw_width",
+            parameter=torch.nn.Parameter(torch.tensor(0.2))
+        )
+        self.register_constraint("raw_width", Positive())
+
+    @property
+    def tau(self):
+        return self.raw_tau
+
+    @property
+    def width(self):
+        return self.raw_width_constraint.transform(self.raw_width)
+
+    def _gate(self, t):
+        return torch.sigmoid((t - self.tau) / self.width)
+
+    def forward(self, x1, x2, **params):
+        t1 = x1[..., self.time_dim].unsqueeze(-1)
+        t2 = x2[..., self.time_dim].unsqueeze(-1)
+
+        g1 = self._gate(t1)
+        g2 = self._gate(t2)
+
+        k_pre = self.kernel_pre(x1, x2, **params)
+        k_post = self.kernel_post(x1, x2, **params)
+
+        return (
+            g1 * k_pre * g2.transpose(-1, -2)
+            + (1 - g1) * k_post * (1 - g2).transpose(-1, -2)
+        )
 
 ###### Length Scales ######
 def adaptive_lengthscale_prior(num_dims:int):
@@ -137,8 +195,21 @@ class MeanF(StrEnum):
     ZERO = "zero"
     MULTITASK_CONSTANT = "multitask_constant"
     MULTITASK_ZERO = "multitask_zero"
+    MULTITASK_LINEAR = "multitask_linear"
+    MULTITASK_MACRO_LINEAR = "multitask_macro_linear"
+
+
+class MacroLinearMean(gpytorch.means.Mean):
+    def __init__(self, macro_dims):
+        super().__init__()
+        self.macro_dims = macro_dims
+        self.linear = gpytorch.means.LinearMean(len(macro_dims))
+
+    def forward(self, x):
+        x_macro = x[..., self.macro_dims]
+        return self.linear(x_macro)
     
-def initialize_mean(mean: MeanF, input_size: int| None = None, num_tasks: int | None = None):
+def initialize_mean(mean: MeanF, input_size: int| None = None, num_tasks: int | None = None, macro_dims: List[int] | None = None):  
     if mean == MeanF.CONSTANT:
         return ConstantMean()
     elif mean ==  MeanF.LINEAR:
@@ -153,6 +224,18 @@ def initialize_mean(mean: MeanF, input_size: int| None = None, num_tasks: int | 
     elif mean ==  MeanF.MULTITASK_ZERO:
         return MultitaskMean(
                 ZeroMean(),
+                num_tasks=num_tasks,
+            )
+    elif mean ==  MeanF.MULTITASK_LINEAR:
+        return MultitaskMean(
+                LinearMean(input_size),
+                num_tasks=num_tasks,
+            )
+    elif mean ==  MeanF.MULTITASK_MACRO_LINEAR:
+        if macro_dims is None:
+            raise ValueError("macro_dims must be provided for MULTITASK_MACRO_LINEAR mean function.")
+        return MultitaskMean(
+                MacroLinearMean(macro_dims),
                 num_tasks=num_tasks,
             )
     else:
@@ -179,6 +262,7 @@ class KernelType(StrEnum):
     PERIODIC = "periodic"
     PERIODIC_MATERN = "periodicmatern"
     MATERN_LINEAR_PERIODIC = "maternlinearperiodic"
+    RQ_PERIODIC = "rqperiodic"
     
     SPECTRAL_MIXTURE = "spectralmixture"
     
@@ -190,6 +274,12 @@ class KernelType(StrEnum):
     
     PIECEWISE_POLYNOMIAL = "piecewisepolynomial"
     MATERN_PIECEWISE = "maternpiecewise"
+    
+    TIME_REGIME_MATERN = "timeregimematern"
+    TIME_CHANGE_POINT = "timechangepoint"
+    
+    EXPONENTIAL_DECAY = "exponentialdecay"
+    
 
 
 class CategoricalKernel(Kernel):
@@ -293,12 +383,11 @@ class ContKernelFactory:
 
 
     def create_linear(self) -> LinearKernel:
-        return ScaleKernel(LinearKernel(
-            ard_num_dims=self.ard_num_dims,
+        return LinearKernel(
+            ard_num_dims=None,
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
-        ),
-                           outputscale_prior=LogNormalPrior(-4.0, 0.5))
+        )
 
     def create_spectral_mixture(self):
 
@@ -338,6 +427,19 @@ class ContKernelFactory:
             lengthscale_prior=self.lengthscale_prior,
             lengthscale_constraint=self.lengthscale_constraint,
         )
+        
+    def exponential_decay(self):
+        return ExponentialDecayKernel(
+            ard_num_dims=self.ard_num_dims,
+            active_dims=self.active_dims,
+            batch_shape=self.batch_shape,
+            power=1,
+            power_prior=LogNormalPrior(loc=0.0, scale=1.0),
+            power_constraint=GreaterThan(1e-4),
+            offset_prior=LogNormalPrior(loc=-2.0, scale=1.0),
+            offset_constraint=GreaterThan(1e-6),
+            
+        )
 
 
 def initialize_kernel(
@@ -360,48 +462,93 @@ def initialize_kernel(
     # Define a factory function for each kernel type
     def create_kernel(kernel_type: str):
         if kernel_type == KernelType.MATERN:
-            return cont_kernel_factory.create_matern()
+            return ScaleKernel(cont_kernel_factory.create_matern())
         elif kernel_type == KernelType.MATERN_LINEAR:
-            return ScaleKernel(cont_kernel_factory.create_matern()) + cont_kernel_factory.create_linear()
+            return ScaleKernel(cont_kernel_factory.create_matern() * cont_kernel_factory.create_linear(), outputscale_constraint=Interval(1e-3, 2.0))
         elif kernel_type == KernelType.RBF:
-            return cont_kernel_factory.create_rbf()
+            return ScaleKernel(cont_kernel_factory.create_rbf())
         elif kernel_type == KernelType.RBF_LINEAR:
-            return cont_kernel_factory.create_rbf() + cont_kernel_factory.create_linear()
+            return ScaleKernel(cont_kernel_factory.create_rbf()) + ScaleKernel(cont_kernel_factory.create_linear())
         elif kernel_type == KernelType.RBF_PERIODIC:
-            return cont_kernel_factory.create_rbf() + cont_kernel_factory.create_periodic()
+            return ScaleKernel(cont_kernel_factory.create_rbf()) + ScaleKernel(cont_kernel_factory.create_periodic())
         elif kernel_type == KernelType.RQ:
-            return cont_kernel_factory.create_rq()
+            return ScaleKernel(cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.RQ_LINEAR:
-            return cont_kernel_factory.create_rq() + cont_kernel_factory.create_linear()
+            return ScaleKernel(cont_kernel_factory.create_rq() * cont_kernel_factory.create_linear(), 
+                               outputscale_constraint=Interval(1e-6, 5e-3),
+                               outputscale_prior=LogNormalPrior(log(5e-4), 0.5))
         elif kernel_type == KernelType.PERIODIC:
-            return cont_kernel_factory.create_periodic()
+            return ScaleKernel(cont_kernel_factory.create_periodic())
         elif kernel_type == KernelType.LINEAR:
-            return cont_kernel_factory.create_linear()
+            return ScaleKernel(cont_kernel_factory.create_linear())
         elif kernel_type == KernelType.MATERN_LINEAR_PERIODIC:
-            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_linear() + cont_kernel_factory.create_periodic()
+            return ScaleKernel(cont_kernel_factory.create_matern() + cont_kernel_factory.create_linear() + cont_kernel_factory.create_periodic())
         elif kernel_type == KernelType.PERIODIC_MATERN:
-            return ScaleKernel(cont_kernel_factory.create_periodic(),
-                               outputscale_prior=LogNormalPrior(-4.0, 0.5)) + ScaleKernel(cont_kernel_factory.create_matern())
+            return ScaleKernel(cont_kernel_factory.create_periodic() + cont_kernel_factory.create_matern(), outputscale_constraint=Interval(1e-2, 1.0))
         elif kernel_type == KernelType.SPECTRAL_MIXTURE:
-            return cont_kernel_factory.create_spectral_mixture()
+            return ScaleKernel(cont_kernel_factory.create_spectral_mixture())
         elif kernel_type == KernelType.MATERN_RQ:
-            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_rq()
+            return ScaleKernel(cont_kernel_factory.create_matern() +  cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.EXPO_GAMMA:
             return cont_kernel_factory.create_expo_gamma()
         elif kernel_type == KernelType.EXPO_RQ:
-            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_rq()
+            return cont_kernel_factory.create_expo_gamma() + ScaleKernel(cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.MATERN_LINEAR_RQ:
-            return ScaleKernel(cont_kernel_factory.create_matern()) + cont_kernel_factory.create_linear() + ScaleKernel(cont_kernel_factory.create_rq())
+            return ScaleKernel(cont_kernel_factory.create_matern()) + ScaleKernel(cont_kernel_factory.create_linear()) + ScaleKernel(cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.PIECEWISE_POLYNOMIAL:
-            return cont_kernel_factory.create_piecewise_polynomial()
+            return ScaleKernel(cont_kernel_factory.create_piecewise_polynomial())
         elif kernel_type == KernelType.MATERN_PIECEWISE:
-            return cont_kernel_factory.create_matern() + cont_kernel_factory.create_piecewise_polynomial()
+            return ScaleKernel(cont_kernel_factory.create_matern()) + ScaleKernel(cont_kernel_factory.create_piecewise_polynomial())
         elif kernel_type == KernelType.EXPO_RQ_LINEAR:
-            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_rq() + cont_kernel_factory.create_linear()
+            return cont_kernel_factory.create_expo_gamma() + ScaleKernel(cont_kernel_factory.create_rq()) + ScaleKernel(cont_kernel_factory.create_linear())
         elif kernel_type == KernelType.EXPO_LINEAR:
-            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_linear()
+            return cont_kernel_factory.create_expo_gamma() + ScaleKernel(cont_kernel_factory.create_linear())
         elif kernel_type == KernelType.GAMMA_PERIODIC:
-            return cont_kernel_factory.create_expo_gamma() + cont_kernel_factory.create_periodic()
+            return cont_kernel_factory.create_expo_gamma() + ScaleKernel(cont_kernel_factory.create_periodic())
+        elif kernel_type == KernelType.TIME_REGIME_MATERN:
+            return ScaleKernel(cont_kernel_factory.create_matern()+ 
+                MaternKernel(
+                    nu=2.5,
+                    ard_num_dims=1,
+                    active_dims=active_dims,
+                    batch_shape=batch_shape,
+                    lengthscale_prior=prior,
+                    lengthscale_constraint=adaptive_lengthscale_constraint(1),
+                ), 
+                outputscale_constraint=Interval(1e-3, 1.0))
+        elif kernel_type == KernelType.RQ_PERIODIC:
+            return ScaleKernel(cont_kernel_factory.create_rq()) + ScaleKernel(cont_kernel_factory.create_periodic())
+        elif kernel_type == KernelType.TIME_CHANGE_POINT:
+            kernel_pre = MaternKernel(
+                    nu=2.5,
+                    ard_num_dims=1,
+                    active_dims=active_dims,
+                    batch_shape=batch_shape,
+                    lengthscale_prior=prior,
+                    lengthscale_constraint=adaptive_lengthscale_constraint(1),
+                )
+
+            kernel_post = MaternKernel(
+                    nu=0.5,
+                    ard_num_dims=1,
+                    active_dims=active_dims,
+                    batch_shape=batch_shape,
+                    lengthscale_prior=prior,
+                    lengthscale_constraint=adaptive_lengthscale_constraint(1),
+                )
+            
+            cp_kernel = TimeChangePointKernel(
+                        kernel_pre=kernel_pre,
+                        kernel_post=kernel_post,
+                        time_dim=active_dims
+                    )
+            cp_kernel.register_prior(
+                "width_prior",
+                gpytorch.priors.LogNormalPrior(-1.0, 0.4),
+                "width"
+            )
+            cp_kernel.raw_tau.data.fill_(0.5)
+            return ScaleKernel(cp_kernel)
         else:
             raise ValueError(f"Unknown kernel function: {kernel_type}")
 

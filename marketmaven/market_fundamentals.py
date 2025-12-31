@@ -226,6 +226,184 @@ def fetch_global_yields(
     cols = ["date"] + [k for k in keys if k in df.columns]
     return df[cols]
 
+def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
+    """
+    Dealer gamma proxy = realized volatility - implied volatility (VIX).
+    Negative → dealers long gamma (trend-friendly)
+    Positive → dealers short gamma (choppy / crash-prone)
+    """
+
+    def _safe_adj_close(px, ticker=None):
+        """
+        Robustly extract Adjusted Close or Close from yfinance output,
+        handling both single-index and MultiIndex cases.
+        """
+        if px.empty:
+            return None
+
+        if isinstance(px.columns, pd.MultiIndex):
+            # Try common patterns
+            candidates = []
+            if ticker is not None:
+                candidates.extend([
+                    (ticker, "Adj Close"),
+                    (ticker, "Close"),
+                ])
+            candidates.extend([
+                ("Adj Close", ticker),
+                ("Close", ticker),
+            ])
+
+            for c in candidates:
+                if c in px.columns:
+                    return px[c]
+
+            # Fallback: pick first numeric column
+            return px.select_dtypes("number").iloc[:, 0]
+
+        else:
+            if "Adj Close" in px.columns:
+                return px["Adj Close"]
+            if "Close" in px.columns:
+                return px["Close"]
+
+            # Fallback
+            return px.select_dtypes("number").iloc[:, 0]
+
+    # --- Download data ---
+    vix_px = yf.download("^VIX", start=start, end=end, progress=False, group_by="ticker")
+    spy_px = yf.download("SPY", start=start, end=end, progress=False, group_by="ticker")
+
+    vix = _safe_adj_close(vix_px, "^VIX")
+    spy = _safe_adj_close(spy_px, "SPY")
+
+    if vix is None or spy is None:
+        raise RuntimeError("Could not extract VIX or SPY prices for dealer gamma proxy.")
+
+    vix = vix.astype(float) / 100.0
+    spy = spy.astype(float)
+
+    # --- Realized volatility (21-day) ---
+    rv = np.log(spy / spy.shift(1)).rolling(21).std() * np.sqrt(252)
+
+    df = pd.DataFrame({
+        "rv": rv,
+        "vix": vix,
+    }).dropna()
+
+    df["dealer_gamma_proxy"] = df["rv"] - df["vix"]
+
+    # --- Resample to forecast horizon ---
+    df_m = (
+        df["dealer_gamma_proxy"]
+        .resample(getattr(horizon, "value", horizon))
+        .last()
+        .dropna()
+        .to_frame()
+        .reset_index()
+        .rename(columns={"index": "date"})
+    )
+
+    return df_m
+
+def fetch_put_call_ratio(start, end=None, horizon=Horizon.MONTHLY):
+    px = yf.download("^PPC", start=start, end=end, progress=False)
+
+    if px.empty:
+        return None
+
+    base = "Adj Close" if "Adj Close" in px.columns else "Close"
+    s = px[base].rename("put_call_ratio")
+
+    s = s.resample(horizon).last().dropna()
+    return s.to_frame().reset_index()
+
+def fetch_spy_flow_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
+    """
+    Proxy for SPY passive flows using signed dollar volume,
+    standardized as a 12m z-score.
+    """
+
+    px = yf.download(
+        "SPY",
+        start=start,
+        end=end,
+        interval=Interval.DAILY,
+        progress=False,
+        group_by="ticker",
+    )
+
+    # ------------------------------------------------------------
+    # Robust extraction of price and volume (Series, not DataFrames)
+    # ------------------------------------------------------------
+    price, volume = None, None
+
+    if isinstance(px.columns, pd.MultiIndex):
+        # Try (ticker, field)
+        if ("SPY", "Adj Close") in px.columns:
+            price = px[("SPY", "Adj Close")]
+        elif ("SPY", "Close") in px.columns:
+            price = px[("SPY", "Close")]
+
+        if ("SPY", "Volume") in px.columns:
+            volume = px[("SPY", "Volume")]
+
+        # Fallback: search by field name
+        if price is None:
+            for c in px.columns:
+                if c[1] in ("Adj Close", "Close"):
+                    price = px[c]
+                    break
+        if volume is None:
+            for c in px.columns:
+                if c[1] == "Volume":
+                    volume = px[c]
+                    break
+    else:
+        base = "Adj Close" if "Adj Close" in px.columns else "Close"
+        price = px[base]
+        volume = px["Volume"]
+
+    if price is None or volume is None:
+        raise RuntimeError("Could not extract SPY price/volume for flow proxy.")
+
+    price = price.astype(float)
+    volume = volume.astype(float)
+
+    # ------------------------------------------------------------
+    # Build flow proxy
+    # ------------------------------------------------------------
+    df = pd.DataFrame(
+        {"price": price, "volume": volume},
+        index=price.index,
+    ).dropna()
+
+    # Signed dollar volume
+    df["flow_proxy"] = (
+        np.sign(df["price"].diff()) * df["price"] * df["volume"]
+    )
+
+    # ------------------------------------------------------------
+    # Monthly aggregation + z-score
+    # ------------------------------------------------------------
+    df_m = (
+        df["flow_proxy"]
+        .resample(getattr(horizon, "value", horizon))
+        .sum()
+        .to_frame("flow_proxy")
+    )
+
+    m = df_m["flow_proxy"].rolling(12, min_periods=12).mean()
+    s = df_m["flow_proxy"].rolling(12, min_periods=12).std()
+
+    df_m["spy_flow_z_12m"] = (df_m["flow_proxy"] - m) / s
+
+    return (
+        df_m[["spy_flow_z_12m"]]
+        .dropna()
+        .reset_index()
+        .rename(columns={"index": "date"})
+    )
 
 
 def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
@@ -695,6 +873,9 @@ def fetch_core_global_macro(start="2010-01-01", end=None, horizon: Horizon = Hor
     # --- Derived predictors ---
     merged["oil_ret"] = merged["oil"].pct_change()
     merged["copper_ret"] = merged["copper"].pct_change()
+    # The log shift caused predictions to collapse....
+    # merged["oil_ret"] = np.log(merged["oil"] / merged["oil"].shift(1))
+    # merged["copper_ret"] = np.log(merged["copper"] / merged["copper"].shift(1))
     merged["gold_crude_ratio"] = merged["gold"] / merged["oil"]
 
     merged["y10_real_proxy"] = merged["schp_ret"].rolling(3).mean()
@@ -751,6 +932,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     global_macro = fetch_core_global_macro(start=start, end=end, horizon=horizon)
     cpi_df = fetch_cpi_inflation(start=start, end=end, horizon=horizon)
     global_yields = fetch_global_yields(start=start, end=end, horizon=horizon, transform="diff_1p")
+    dealer_gamma = fetch_dealer_gamma_proxy(start=start, end=end, horizon=horizon)
 
     # ------------------------------------------------------------
     # 2. ERP using your ETF fetcher (no Yahoo weirdness)
@@ -824,8 +1006,18 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         merged_breadth = pd.merge(rsp_px, spy_px, on="date", how="inner")
         merged_breadth["rsp_spy"] = merged_breadth["rsp"] / merged_breadth["spy"]
 
-        rsp_spy_df = merged_breadth[["date", "rsp_spy"]]
-    except Exception as e:
+        breadth_m = (
+            merged_breadth.set_index("date")
+            .resample(horizon)
+            .last()
+            .dropna()
+        )
+
+        breadth_m["rsp_spy_roc_1m"] = breadth_m["rsp_spy"].pct_change(1)
+
+        rsp_spy_df = breadth_m[["rsp_spy", "rsp_spy_roc_1m"]].reset_index()
+
+    except Exception:
         rsp_spy_df = None
 
     spx = fetch_etf_features(["SPY"], start, end, Horizon.DAILY)
@@ -834,6 +1026,8 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     spx["pct_above_50dma"] = (spx["price"] / spx["ma50"]) * 100
     spx = spx[["date", "pct_above_50dma"]].dropna()
     pct50_df = spx
+    
+    spy_flow = fetch_spy_flow_proxy(start, end, horizon)
 
     # ------------------------------------------------------------
     # 5. ACM term premium (FRED)
@@ -852,7 +1046,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         vix_df, term_df, cred_df, dxy_df, yc_df,          # existing macro
         spy_df2, erp_df,                       # ERP block
         skew_df, move_df,    # vol signals
-        vix_slope_df, rsp_spy_df, pct50_df,   # breadth
+        vix_slope_df, rsp_spy_df, spy_flow, dealer_gamma, pct50_df,   # breadth
         acm_df, high_y_spread,global_macro, cpi_df,global_yields  #earnings_yield                                   
     ]
 

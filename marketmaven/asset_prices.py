@@ -6,6 +6,109 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 from marketmaven.configs import Interval, Horizon
+from scipy.stats import spearmanr
+
+def cross_sectional_ic_screening(
+    df: pd.DataFrame,
+    feature_cols: list[str],
+    target_col: str = "y_excess_lead",
+    date_col: str = "date",
+    asset_col: str = "asset_id",
+    min_assets: int = 5,
+    min_periods: int = 24,
+):
+    """
+    Stage 1: Cross-sectional predictive screening using Rank IC.
+
+    For each feature:
+        - Compute monthly Spearman Rank IC vs next-period returns
+        - Aggregate IC statistics across time
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long panel with [date, asset_id, features..., target]
+    feature_cols : list[str]
+        Candidate predictors to screen
+    target_col : str
+        Forward excess return (e.g. y_excess_lead)
+    date_col : str
+        Date column
+    asset_col : str
+        Asset identifier
+    min_assets : int
+        Minimum assets per month to compute IC
+    min_periods : int
+        Minimum months required for a feature to be evaluated
+
+    Returns
+    -------
+    pd.DataFrame
+        Feature screening table with IC statistics
+        
+    Example: 
+    
+    screen_df = cross_sectional_ic_screening(
+        df=df,
+        feature_cols=etf_cols + macro_cols,
+        target_col="y_excess_lead",
+    )
+    screen_df
+    
+    selected = screen_df[
+    (screen_df["abs_mean_ic"] > 0.01) &     # weak but real signal
+    (screen_df["ic_ir"] > 0.01) &            # persistence
+    (screen_df["hit_rate"] > 0.45)          # directional consistency
+    ]["feature"].tolist()
+    selected
+    """
+
+    results = []
+
+    grouped = df[[date_col, asset_col, target_col] + feature_cols] \
+        .dropna(subset=[target_col]) \
+        .groupby(date_col)
+
+    for feat in feature_cols:
+        ic_series = []
+
+        for date, g in grouped:
+            g = g[[feat, target_col]].dropna()
+
+            if len(g) < min_assets:
+                continue
+
+            ic, _ = spearmanr(g[feat], g[target_col])
+            if np.isfinite(ic):
+                ic_series.append(ic)
+
+        if len(ic_series) < min_periods:
+            continue
+
+        ic_series = np.array(ic_series)
+
+        results.append({
+            "feature": feat,
+            "mean_ic": ic_series.mean(),
+            "abs_mean_ic": np.abs(ic_series).mean(),
+            "ic_std": ic_series.std(ddof=1),
+            "ic_ir": ic_series.mean() / (ic_series.std(ddof=1) + 1e-8),
+            "hit_rate": (ic_series > 0).mean(),
+            "n_periods": len(ic_series),
+        })
+
+    res = pd.DataFrame(results)
+
+    if res.empty:
+        return res
+
+    return res.sort_values(
+        by=["abs_mean_ic", "ic_ir"],
+        ascending=False
+    ).reset_index(drop=True)
+
+
+
 
 def fetch_prices(tickers, start, end=None, interval: Interval = Interval.DAILY):
     """
@@ -130,6 +233,44 @@ def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHL
     panel = pd.concat(rows, axis=0).sort_values(["date", "asset_id"]).reset_index(drop=True)
     return panel
 
+def compute_max_drawdown(log_price: pd.Series, window: int = 63):
+    """
+    Rolling max drawdown over a given window.
+    Uses log-price to ensure scale invariance.
+    """
+    roll_max = log_price.rolling(window).max()
+    drawdown = log_price - roll_max
+    return drawdown.rolling(window).min()
+
+def add_cross_sectional_momentum_rank(
+    df: pd.DataFrame,
+    momentum_col: str = "mom12m",
+    out_col: str = "cs_mom_rank",
+):
+    """
+    Compute cross-sectional momentum rank by date. Not only how good is asset
+    to its past but how good is it relative to the others? 
+
+    Parameters
+    ----------
+    df : long-format DataFrame with ['date', 'asset_id', momentum_col]
+    momentum_col : which momentum horizon to rank (default: 12m)
+    out_col : output column name
+
+    Returns
+    -------
+    DataFrame with cross-sectional momentum rank ∈ [0, 1]
+    """
+
+    df = df.copy()
+
+    df[out_col] = (
+        df.groupby("date")[momentum_col]
+          .rank(pct=True, method="average")
+    )
+
+    return df
+
 def fetch_etf_features(
     tickers: list[str] | str,
     start: str,
@@ -191,6 +332,7 @@ def fetch_etf_features(
         "ma_1m": "last",
         "ma_3m": "last",
         "ma_signal": "last",
+        "ma_regime": "last",
         "trend_slope": "last",
         "overnight_gap": "mean",
         "ret_autocorr": "last",
@@ -198,6 +340,9 @@ def fetch_etf_features(
         "ret_skew": "last",
         "ret_kurt": "last",
         "baspread": "mean",
+        "max_dd_3m": "mean",
+        "max_dd_6m": "mean",
+        
     }
 
     if isinstance(tickers, str):
@@ -283,6 +428,8 @@ def fetch_etf_features(
         data["ma_1m"] = data["price"].rolling(21).mean()
         data["ma_3m"] = data["price"].rolling(63).mean()
         data["ma_signal"] = data["ma_1m"] / data["ma_3m"] - 1
+        data["ma_regime"] = (data["ma_signal"] > 0).astype(int)
+        
 
         # Trend slope (simple linear regression over last 21 days)
         def _slope(x):
@@ -293,6 +440,11 @@ def fetch_etf_features(
         data["trend_slope"] = (
             data["price"].rolling(21).apply(_slope, raw=False)
         )
+        
+        # Max drawdown 
+        log_price = np.log(data["price"])
+        data["max_dd_3m"] = compute_max_drawdown(log_price, window=63)
+        data["max_dd_6m"] = compute_max_drawdown(log_price, window=126)
 
         # ---- Overnight / daily gap (log move day-over-day) ----
         data["overnight_gap"] = np.log(data["price"] / data["price"].shift(1))
@@ -372,161 +524,3 @@ def fetch_etf_features(
     )
 
     return df_all
-# def fetch_etf_features(
-#     tickers: list[str],
-#     start: str,
-#     end: str = None,
-#     horizon: Horizon = Horizon.MONTHLY,
-# ):
-#     """
-#     Fetch ETF-level features (liquidity, momentum, volatility, etc.) for one or more tickers.
-
-#     Parameters
-#     ----------
-#     tickers : list[str]
-#         List of ETF tickers (e.g., ["SPY", "QQQ", "ESGD"])
-#     start : str
-#         Start date for fetching data.
-#     end : str, optional
-#         End date (default: today).
-#     horizon : Horizon
-#         Resampling frequency (e.g., Horizon.MONTHLY or Horizon.WEEKLY).
-
-#     Returns
-#     -------
-#     pd.DataFrame
-#         Long-format DataFrame with columns:
-#         ['Date', 'asset_id', 'price', 'volume', 'log_ret', 'mom1m', 'mom6m', 'mom12m',
-#          'mom36m', 'chmom', 'dolvol', 'turnover', 'sd_turn', 'ill', 'vol_1m']
-#         Missing values are filled with 0 (neutral imputation) as in the Ensemble GP paper.
-#     """
-    
-#     # --- Resample (monthly, weekly, etc.) with feature-specific rules ---
-#     agg_map = {
-#         "price": "last",
-#         "log_ret": "sum",
-#         "mom1m": "last",
-#         "mom6m": "last",
-#         "mom12m": "last",
-#         "mom36m": "last",
-#         "chmom": "last",
-#         "volume": "sum",
-#         "dolvol": "sum",
-#         "turnover": "mean",
-#         "sd_turn": "mean",
-#         "ill": "mean",
-#         "vol_1m": "mean",
-#         "baspread": "mean",
-#     }
-
-#     if isinstance(tickers, str):
-#         tickers = [tickers]
-
-#     # Download all tickers together for efficiency
-#     df_raw = yf.download(
-#         tickers,
-#         start=start,
-#         end=end,
-#         interval=Interval.DAILY,
-#         progress=False,
-#         group_by="ticker",
-#     )
-#     print(f"\n>>> Columns: {df_raw.columns.tolist()[:8]} ...")  # Debug check
-
-#     def _extract_single_ticker_features(df, ticker):
-#         """Extract and compute features for one ticker."""
-#         px, vol = None, None
-#         if isinstance(df.columns, pd.MultiIndex):
-#             # Try both (field, ticker) and (ticker, field) orders
-#             if ("Adj Close", ticker) in df.columns:
-#                 px = df[("Adj Close", ticker)]
-#             elif ("Close", ticker) in df.columns:
-#                 px = df[("Close", ticker)]
-#             elif (ticker, "Adj Close") in df.columns:
-#                 px = df[(ticker, "Adj Close")]
-#             elif (ticker, "Close") in df.columns:
-#                 px = df[(ticker, "Close")]
-
-#             if ("Volume", ticker) in df.columns:
-#                 vol = df[("Volume", ticker)]
-#             elif (ticker, "Volume") in df.columns:
-#                 vol = df[(ticker, "Volume")]
-#         else:
-#             # Single ticker fallback
-#             base = "Adj Close" if "Adj Close" in df.columns else "Close"
-#             px = df[base]
-#             vol = df["Volume"]
-
-#         if px is None or vol is None:
-#             raise ValueError(f"Could not extract price/volume for {ticker}")
-
-#         # Compute features
-#         data = pd.concat({"price": px, "volume": vol}, axis=1).dropna()
-#         data.index = pd.to_datetime(data.index)
-#         data["log_ret"] = np.log(data["price"]).diff()
-
-#         # Momentum (price trends)
-#         data["mom1m"] = data["price"].pct_change(21)
-#         data["mom6m"] = data["price"].pct_change(126)
-#         data["mom12m"] = data["price"].pct_change(252)
-#         data["mom36m"] = data["price"].pct_change(756)
-#         data["chmom"] = data["mom12m"] - data["mom6m"]
-
-#         # Liquidity metrics
-#         data["dolvol"] = data["price"] * data["volume"]
-#         data["turnover"] = data["volume"] / data["volume"].rolling(21).mean() - 1
-#         data["sd_turn"] = data["turnover"].rolling(63).std()
-#         data["ill"] = data["log_ret"].abs() / data["dolvol"]
-
-#         # Rolling volatility
-#         data["vol_1m"] = data["log_ret"].rolling(21).std()
-
-#         # --- Approximate Bid-Ask Spread (Corwin-Schultz 2012) ---
-#         if ('High', ticker) in df.columns and ('Low', ticker) in df.columns:
-#             high = df[('High', ticker)]
-#             low = df[('Low', ticker)]
-#         elif (ticker, 'High') in df.columns and (ticker, 'Low') in df.columns:
-#             high = df[(ticker, 'High')]
-#             low = df[(ticker, 'Low')]
-#         else:
-#             high = low = None
-
-#         if high is not None and low is not None:
-#             log_hl = np.log(high / low)
-#             beta = (log_hl.rolling(2).sum() ** 2).rolling(21).mean()
-#             alpha = (np.sqrt(2 * beta) - np.sqrt(beta)) / (3 - 2 * np.sqrt(2))
-#             data["baspread"] = 2 * (np.exp(alpha) - 1) / (1 + np.exp(alpha))
-#             data["baspread"] = data["baspread"].fillna(method="bfill").fillna(0)
-#         else:
-#             data["baspread"] = 0.0  # Default if High/Low not available
-
-#         # Resample (monthly, weekly, etc.)
-#         data = data.resample(horizon).agg(agg_map)
-
-#         # Fill missing with 0 (neutral imputation, paper-style)
-#         data = data.fillna(0)
-
-#         # Metadata
-#         data = data.reset_index().rename(columns={data.index.name or "index": "date"})
-#         data.columns = [c.lower() for c in data.columns]  # normalize column names
-#         data["asset_id"] = ticker
-#         return data
-
-#     # Compute for all tickers
-#     results = []
-#     for tk in tickers:
-#         try:
-#             res = _extract_single_ticker_features(df_raw, tk)
-#             results.append(res)
-#         except Exception as e:
-#             print(f"[WARN] Skipping {tk}: {e}")
-
-#     # Combine into one long DataFrame
-#     df_all = (
-#         pd.concat(results, axis=0)
-#         .sort_values(["date", "asset_id"])
-#         .reset_index(drop=True)
-#     )
-
-#     return df_all
-

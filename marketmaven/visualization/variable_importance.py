@@ -1,3 +1,4 @@
+
 import xgboost as xgb 
 import numpy as np
 import plotly.graph_objects as go
@@ -15,10 +16,21 @@ def xgboost_variable_importance(X, y, xgb_params=None) -> dict:
     Returns:
     dict: A dictionary with feature names as keys and their importance scores as values.
     """
-    if xgb_params is None:
-        xgb_params = {"tree_method": "hist", "max_cat_to_onehot": 19}
+    params = {
+    "objective": "reg:squarederror",
+    "eval_metric": "rmse",
+    "tree_method": "hist",          # or "gpu_hist" if available
+    "max_cat_to_onehot": 20,        # tune per your cardinalities
+    "seed": 42,
+    # Regularization usually helps on small chemical datasets:
+    "lambda": 0.2,                  # L2
+    "alpha": 0.2,                   # L1
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    }
+
     Xy = xgb.DMatrix(X, y, enable_categorical=True)
-    booster = xgb.train(xgb_params, Xy)
+    booster = xgb.train(params, Xy, num_boost_round=500)
     booster.predict(Xy)
     SHAP_int = booster.predict(Xy, pred_interactions=True)
     feature_names = booster.feature_names
@@ -64,7 +76,9 @@ def xgboost_variable_importance(X, y, xgb_params=None) -> dict:
         xaxis_title='Features',
         yaxis_title='Features',
         xaxis=dict(tickangle=45),
-        yaxis=dict(autorange='reversed')
+        yaxis=dict(autorange='reversed'),
+        height=800,
+        width=800
     )
     
     return global_importance, fig

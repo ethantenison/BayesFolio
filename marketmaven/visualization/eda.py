@@ -26,7 +26,7 @@ def correlation_matrix(data: pd.DataFrame, title: str = "Correlation Heatmap"):
         zmax=1,
     )
 
-    fig.update_layout(width=600, height=600)
+    fig.update_layout(width=800, height=800)
     return fig
 
 def visualize_lognormal_distribution():
