@@ -130,11 +130,11 @@ etf_tickers = [ticker for ticker in etf_tickers if ticker not in assets_to_drop]
 
 tickers = TickerConfig(
     start_date="2016-11-29",
-    end_date="2026-01-01",
+    end_date="2025-12-01",
     interval=Interval.DAILY,
     tickers=etf_tickers,
     horizon=Horizon.MONTHLY,
-    lookback_date="2014-07-01"
+    lookback_date="2014-06-01"
 )
 
 ############### Returns data ###############
@@ -365,6 +365,12 @@ splits = rolling_time_splits_multitask(
     embargo=cv_config.embargo
 )
 splits = list(splits)
+
+#take the test splits and grab the actual dates for each test split
+test_dates_splits = []
+for tr_idx, te_idx in splits:
+    test_dates = df.iloc[te_idx]['date'].unique().tolist()
+    test_dates_splits.append(test_dates)
 
 risk_config = RiskfolioConfig(
     model=OptModel.CLASSIC,
@@ -785,6 +791,17 @@ for cfg in experiment_grid:
         ewma_df = pd.DataFrame(ewma_pred, columns=asset_cols)
         
         plot_path = "marketmaven/mlflow/artifacts/actual_vs_pred_matrix.png"
+
+        #fix the index to be the dates from the test splits
+        date_test_splits = np.array(test_dates_splits)
+        date_test_splits = pd.Series(date_test_splits.reshape(-1, ))
+
+
+        true_df.index = date_test_splits
+        preds_df.index = date_test_splits
+        
+        true_df.index = pd.to_datetime(true_df.index)
+        preds_df.index = pd.to_datetime(preds_df.index)
 
         plot_actual_vs_pred_matrix(
             true_df=true_df,          

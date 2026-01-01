@@ -284,3 +284,6 @@ Try out: k = k_inputs ⊗ (Periodic(time) × Matern(time)) and k = k_inputs ⊗ 
 ** Dec 31st**
 - oil returns em_fx returns etc are often better than the raw prices because they capture more of the short term dynamics that are relevant for predicting next month returns.They are also less non-stationary.
 -logging oil and schp returns caused predictions to collapse to the mean.
+-reducing features using the etf and macro ic mean really helped. 
+-with small rank and few etfs, zero mean worked best, but with all the etfs and higher rank, the multitask constant mean worked best.
+- when doing forecasts, need to use the same date for features because it will change since it doesn't automatically stop at the first of the month
