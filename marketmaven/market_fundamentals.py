@@ -1071,4 +1071,61 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
 
     return merged
 
+def macro_predictive_screening(
+    df: pd.DataFrame,
+    macro_cols: list[str],
+    target_col: str = "y_excess_lead",
+    min_periods: int = 60,
+    window: int = 12,
+):
+    """
+    Time-series macro screening using rolling predictive IC.
 
+    Macro variables are evaluated on:
+    - absolute mean IC (strength, not sign)
+    - IC IR (stability)
+    - hit rate (optional diagnostic)
+    """
+
+    results = []
+
+    for col in macro_cols:
+        tmp = df[["date", "asset_id", col, target_col]].dropna()
+        if tmp["date"].nunique() < min_periods:
+            continue
+
+        # Collapse cross-section → market-level return
+        ts = (
+            tmp.groupby("date")
+               .agg({col: "first", target_col: "mean"})
+               .dropna()
+        )
+
+        if len(ts) < min_periods:
+            continue
+
+        rolling_ic = (
+            ts[col]
+            .rolling(window)
+            .corr(ts[target_col])
+            .dropna()
+        )
+
+        if len(rolling_ic) < min_periods // 2:
+            continue
+
+        results.append({
+            "feature": col,
+            "mean_ic": rolling_ic.mean(),
+            "abs_mean_ic": rolling_ic.abs().mean(),
+            "ic_std": rolling_ic.std(ddof=1),
+            "ic_ir": rolling_ic.mean() / (rolling_ic.std(ddof=1) + 1e-12),
+            "hit_rate": (rolling_ic > 0).mean(),
+            "n_periods": len(rolling_ic),
+        })
+
+    return (
+        pd.DataFrame(results)
+        .sort_values("abs_mean_ic", ascending=False)
+        .reset_index(drop=True)
+    )

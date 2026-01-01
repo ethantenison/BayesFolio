@@ -192,7 +192,8 @@ class HadamardMultiTaskGP(ExactGP):
         covar = covar_x.mul(covar_i)
 
         return MultivariateNormal(mean_x, covar)
-      
+
+
 def train_model_hadamard(
     train_X: torch.Tensor,
     train_Y: torch.Tensor,
@@ -207,63 +208,41 @@ def train_model_hadamard(
     device: torch.device | None = None,
     min_noise: float = MIN_INFERRED_NOISE_LEVEL,
 ):
-    """
-    Train a HadamardMultiTaskGP where the task index is embedded
-    as one of the columns in train_X.
-
-    Args
-    ----
-    train_X : torch.Tensor
-        Shape [N, D+1], where one column (specified by task_feature)
-        contains the integer task indices in [0, num_tasks-1].
-    train_Y : torch.Tensor
-        Shape [N], containing the target values.
-    rank : int
-        Rank of the task covariance (IndexKernel).
-    mean_f : gpytorch.means.Mean
-        Mean module (e.g., ZeroMean, ConstantMean, MultitaskMean).
-    kernel : gpytorch.kernels.Kernel
-        Covariance kernel for input features (excluding task index).
-    training_iterations : int, optional
-        Maximum number of training iterations (default: 500).
-    patience : int, optional
-        Early stopping patience (default: 50).
-    visualize : bool, optional
-        Print training progress every 25 iterations if True.
-    task_feature : int, optional
-        Column index of the task feature in train_X. Defaults to -1
-        (i.e., last column).
-
-    Returns
-    -------
-    model : HadamardMultiTaskGP
-        Trained model.
-    likelihood : HadamardGaussianLikelihood
-        Associated likelihood.
-    """
     # ----------------------------------------------------------------------
-    # Identify number of tasks and initialize likelihood
+    # Device / dtype
     # ----------------------------------------------------------------------
     if device is None:
-        device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-        
-    # Ensure tensors are on the same device/dtype
+        device = torch.device("cpu") # "mps" if torch.backends.mps.is_available() else 
+
     train_X = train_X.to(device=device, dtype=dtype)
     train_Y = train_Y.to(device=device, dtype=dtype)
-    
+
+    # ----------------------------------------------------------------------
+    # (Recommended) sort by task index for better cache locality
+    # ----------------------------------------------------------------------
     task_col = train_X[:, task_feature].long()
+    perm = torch.argsort(task_col)
+    train_X = train_X[perm]
+    train_Y = train_Y[perm]
+    task_col = task_col[perm]
+
     num_tasks = len(torch.unique(task_col))
 
+    # ----------------------------------------------------------------------
+    # Likelihood
+    # ----------------------------------------------------------------------
     likelihood = get_hadamard_gaussian_likelihood_with_lognormal_prior(
-        num_tasks=num_tasks, task_feature_index=task_feature, min_noise=min_noise
+        num_tasks=num_tasks,
+        task_feature_index=task_feature,
+        min_noise=min_noise,
     ).to(device=device, dtype=dtype)
-    
-    # Mean & kernel to device/dtype BEFORE passing into the model
+
+    # Mean & kernel to device/dtype BEFORE model construction
     mean_f = mean_f.to(device=device, dtype=dtype)
     kernel = kernel.to(device=device, dtype=dtype)
 
     # ----------------------------------------------------------------------
-    # Initialize model
+    # Model
     # ----------------------------------------------------------------------
     model = HadamardMultiTaskGP(
         train_X=train_X,
@@ -277,9 +256,8 @@ def train_model_hadamard(
         dtype=dtype,
     ).to(device=device, dtype=dtype)
 
-    # Ensure positive noise constraint
     model.likelihood.noise_covar.register_constraint(
-        "raw_noise", GreaterThan(MIN_INFERRED_NOISE_LEVEL)
+        "raw_noise", GreaterThan(min_noise)
     )
 
     model.train()
@@ -289,15 +267,26 @@ def train_model_hadamard(
     mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 
     # ----------------------------------------------------------------------
-    # Training loop with early stopping
+    # Training loop (FAST COMPUTATIONS ENABLED)
     # ----------------------------------------------------------------------
     best_loss = float("inf")
     patience_counter = 0
 
     for it in range(training_iterations):
         optimizer.zero_grad()
-        output = model(train_X)
-        loss = -mll(output, train_Y, train_X)  # pass X so likelihood can read task indices
+
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        # FAST GP COMPUTATION CONTEXT (this is the key addition)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        with gpytorch.settings.fast_computations(
+            log_prob=True,
+            covar_root_decomposition=True,
+            solves=True,
+        ), gpytorch.settings.cholesky_jitter(1e-5):
+
+            output = model(train_X)
+            loss = -mll(output, train_Y, train_X)
+
         loss.backward()
 
         if visualize and (it + 1) % 25 == 0:
@@ -305,25 +294,25 @@ def train_model_hadamard(
 
         optimizer.step()
 
-        # Early stopping check
+        # Early stopping
         if loss.item() + 1e-4 < best_loss:
             best_loss = loss.item()
             patience_counter = 0
         else:
             patience_counter += 1
+
         if patience_counter >= patience:
             if visualize:
                 print(f"Early stopping at iteration {it+1}")
             break
 
     # ----------------------------------------------------------------------
-    # Finalize model
+    # Finalize
     # ----------------------------------------------------------------------
     model.eval()
     likelihood.eval()
 
     return model, likelihood
-      
 
 # class KroneckerModel(gpytorch.models.ExactGP):
 #     """

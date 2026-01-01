@@ -265,6 +265,7 @@ class KernelType(StrEnum):
     RQ_PERIODIC = "rqperiodic"
     
     SPECTRAL_MIXTURE = "spectralmixture"
+    SPECTRAL_MATERN = "spectralmatern"
     
     EXPO_GAMMA = "expogamma"
     EXPO_RQ = "exporq"
@@ -487,6 +488,8 @@ def initialize_kernel(
             return ScaleKernel(cont_kernel_factory.create_periodic() + cont_kernel_factory.create_matern(), outputscale_constraint=Interval(1e-2, 1.0))
         elif kernel_type == KernelType.SPECTRAL_MIXTURE:
             return ScaleKernel(cont_kernel_factory.create_spectral_mixture())
+        elif kernel_type == KernelType.SPECTRAL_MATERN:
+            return ScaleKernel(cont_kernel_factory.create_spectral_mixture()) + ScaleKernel(cont_kernel_factory.create_matern())
         elif kernel_type == KernelType.MATERN_RQ:
             return ScaleKernel(cont_kernel_factory.create_matern() +  cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.EXPO_GAMMA:

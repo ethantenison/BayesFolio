@@ -8,6 +8,28 @@ import numpy as np
 from marketmaven.configs import Interval, Horizon
 from scipy.stats import spearmanr
 
+def cross_sectional_zscore(
+    df: pd.DataFrame,
+    cols: list[str],
+    date_col: str = "date",
+    eps: float = 1e-8,
+):
+    """
+    Cross-sectional z-score per date.
+
+    Applied only to ETF-level predictors.
+    """
+    df = df.copy()
+
+    for c in cols:
+        df[c] = (
+            df.groupby(date_col)[c]
+              .transform(lambda x: (x - x.mean()) / (x.std() + eps))
+              .fillna(0.0)
+        )
+
+    return df
+
 def cross_sectional_ic_screening(
     df: pd.DataFrame,
     feature_cols: list[str],

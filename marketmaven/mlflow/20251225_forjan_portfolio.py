@@ -32,7 +32,7 @@ from marketmaven.mlflow.helpers import (
 import random
 import itertools
 from marketmaven.market_fundamentals import fetch_enhanced_macro_features
-from marketmaven.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank
+from marketmaven.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank, cross_sectional_zscore
 warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
@@ -130,17 +130,17 @@ etf_tickers = [ticker for ticker in etf_tickers if ticker not in assets_to_drop]
 
 tickers = TickerConfig(
     start_date="2016-11-29",
-    end_date="2025-12-19",
+    end_date="2026-01-01",
     interval=Interval.DAILY,
     tickers=etf_tickers,
     horizon=Horizon.MONTHLY,
-    lookback_date="2014-06-01"
+    lookback_date="2014-07-01"
 )
 
 ############### Returns data ###############
-#return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
-#return_data.to_csv("20251231_etf_returns.csv", index=False)
-return_data = pd.read_csv("20251231_etf_returns.csv")  # Updated to match the new filename
+return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
+return_data.to_csv("20260101_etf_returns.csv", index=False)
+return_data = pd.read_csv("20260101_etf_returns.csv")  # Updated to match the new filename
 return_data = return_data[~return_data['asset_id'].isin(assets_to_drop)]
 
 
@@ -159,15 +159,15 @@ fig = correlation_matrix(pivoted_returns)
 fig.show()
 
 # # # ############### Factor data ###############
-#macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
-#macro_features.to_csv("20251231_macro_features.csv", index=False)
-macro_features = pd.read_csv("20251231_macro_features.csv")
+macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
+macro_features.to_csv("20260101_macro_features.csv", index=False)
+macro_features = pd.read_csv("20260101_macro_features.csv")
 
 macro_features = macro_features.drop(columns=['vix_ts_level','vix3m','yc_pc1', 'yc_pc2', 'yc_pc3', 'y10_nominal' ])
 macro_cols = macro_features.columns[1:].tolist()
-#etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
-#etf_features.to_csv("20251231_etf_features.csv", index=False)
-etf_features = pd.read_csv("20251231_etf_features.csv")
+etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
+etf_features.to_csv("20260101_etf_features.csv", index=False)
+etf_features = pd.read_csv("20260101_etf_features.csv")
 etf_features = etf_features[~etf_features['asset_id'].isin(assets_to_drop)]
 etf_features = etf_features.drop(columns=['ma_1m','ma_3m','vol_1w', 'price', 'overnight_gap'])
 
@@ -212,7 +212,6 @@ etf_cols = [
  'baspread',
  'ret_kurt',
  'chmom',
- 'mom6m',
  'mom12m',
  'mom36m',
  'cs_mom_rank',
@@ -221,40 +220,71 @@ etf_cols = [
  'ret_autocorr',
  'vol_z']
 
-macro_cols = ['vix', 
-       'credit_spread_chg_1p', 'spy_ret', 'erp', 
-       'pct_above_50dma', 'hy_spread', 'hy_spread_chg_1m', 'hy_spread_z_12m',
-       'breakeven_proxy',  'cpi_mom', 'jp10y', 'uk10y',
-       'cn10y','tnote10y','vix_ts_chg_1m', 'vix_ts_z_12m',  'vix_slope',
-       'y10_real_proxy', 'cpi_yoy',  'rsp_spy', 'term_spread',
-       'tbill3m', 'spy_flow_z_12m',
-       'dealer_gamma_proxy', 
-       'copper_ret','oil_ret', 'gold_crude_ratio','schp_ret', 'em_fx_ret',
-                              ]
+# cs_norm_cols = [
+#     'baspread', 'ret_kurt', 'chmom',
+#     'mom12m', 'mom36m', 'max_dd_6m'
+# ]
 
-drop_columns= [
-    'volume','turnover','mom1m', 'log_ret', 'ret_skew','max_dd_3m',  'cpiaucsl',
-    'move_proxy', 'vol_accel','sd_turn','credit_spread', 'trend_slope', 
-    "dolvol_log",'gold', 'copper','de10y', 'dxy',
-    'skew_proxy','rsp_spy_roc_1m',
-    'oil',"schp",'em_fx',# skew proxy is .99 correlated with vix_slope
-    "ill_log","vol_1m","vol_3m",'vol_of_vol','vol_autocorr','lag2_y_excess_lead',
-    'ma_regime', 
-                              ]
-#df_raw = pd.read_csv("marketmaven/datasets/20251129_14tasks.csv")
-df = df.drop(columns=drop_columns)
+
+# macro_cols = ['vix', 
+#        'credit_spread_chg_1p', 'spy_ret', 'erp', 
+#        'pct_above_50dma', 'hy_spread', 'hy_spread_chg_1m', 'hy_spread_z_12m',
+#        'breakeven_proxy',  'cpi_mom', 'jp10y', 'uk10y',
+#        'cn10y','tnote10y','vix_ts_chg_1m', 'vix_ts_z_12m',  'vix_slope',
+#        'y10_real_proxy', 'cpi_yoy',  'rsp_spy', 'term_spread',
+#        'tbill3m', 'spy_flow_z_12m',
+#        'dealer_gamma_proxy', 
+#        'copper_ret','oil_ret', 'gold_crude_ratio','schp_ret', 'em_fx_ret',
+#                               ]
+macro_cols = ['hy_spread',
+               'hy_spread_chg_1m',
+                'hy_spread_z_12m',
+ 'vix_slope',
+ 'vix_ts_z_12m',
+ 'vix',
+ 'spy_flow_z_12m',
+ 'spy_ret',
+ 'erp',
+ 'cpi_yoy',
+ 'cpi_mom',
+ 'copper_ret',
+ 'oil_ret',
+ 'gold_crude_ratio',
+ 'pct_above_50dma', 
+ 'em_fx_ret']
+
+# drop_columns= [
+#     'volume','turnover','mom1m', 'log_ret', 'ret_skew','max_dd_3m',  'cpiaucsl',
+#     'move_proxy', 'vol_accel','sd_turn','credit_spread', 'trend_slope', 
+#     "dolvol_log",'gold', 'copper','de10y', 'dxy',
+#     'skew_proxy','rsp_spy_roc_1m',
+#     'oil',"schp",'em_fx',# skew proxy is .99 correlated with vix_slope
+#     "ill_log","vol_1m","vol_3m",'vol_of_vol','vol_autocorr','lag2_y_excess_lead',
+#     'ma_regime',  'mom6m']
+
+PROTECTED_COLS = [
+    "date",
+    "asset_id",
+    "y_excess_lead",
+]
+
+FEATURE_COLS = etf_cols + macro_cols
+
+KEEP_COLS = PROTECTED_COLS + FEATURE_COLS
+df = df.loc[:, KEEP_COLS].copy()
+
 df['date'] = pd.to_datetime(df['date'])
-
 time_col = "date"
 y_col = "y_excess_lead" #"y_excess_lead"
 asset_col = "asset_id"
-etf_macro = etf_cols + macro_cols
+
+#df_raw = pd.read_csv("marketmaven/datasets/20251129_14tasks.csv")
 
 all_assets_occur = check_equal_occurrences(df, 'asset_id')
 print('Did all assets occur equally often?', all_assets_occur)
 droppin_cols = ['date', 'asset_id']
 y_col = ['y_excess_lead']
-col_order  = droppin_cols + etf_macro + y_col
+col_order  = droppin_cols + FEATURE_COLS + y_col
 df = df[col_order]
 df['t_index'] = pd.factorize(df['date'])[0]
 cols = df.columns.tolist()       
@@ -262,7 +292,9 @@ cols.insert(0, cols.pop(cols.index("t_index")))
 
 df = df.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
 
-feature_cols = ['t_index'] + etf_macro
+feature_cols = ['t_index'] + FEATURE_COLS
+
+# df = cross_sectional_zscore(df, cs_norm_cols)
 
 
 ##### Trying out xgboost
@@ -296,7 +328,7 @@ active_dims_m = [feature_cols.index(col) for col in macro_cols]
 ######## Visualize Factors ########
 df = df[cols].copy()
 #df.to_csv("marketmaven/datasets/20251130_18tasks.csv", index=False)
-df_forecast = df[df['date'] > pd.Timestamp("2025-11-01")]
+df_forecast = df[df['date'] > pd.Timestamp("2025-12-01")]
 df_forecast = df_forecast.reset_index(drop=True)
 df = df.dropna(subset=['y_excess_lead']).reset_index(drop=True)
 
@@ -354,13 +386,7 @@ SQRT3 = sqrt(3)
 
 train_idx_1_ahead = list(range(X.shape[0] - len(tickers.tickers)))
 test_idx_1_ahead = list(range(X.shape[0] - len(tickers.tickers), X.shape[0]))
-# multiconfig = MultiTaskConfig(
-#     num_tasks=len(tickers.tickers),
-#     mean=MeanF.MULTITASK_ZERO,
-#     rank=3,
-#     scaling="global",
-#     min_noise=1e-4,
-# )
+
 
 def create_kernel_initialization(kernel: KernelConfig, n_months: int):
     # prior_mean = sqrt(kernel.mean_sqrt) + 0.01 * log(len(kernel.active_dims))
@@ -378,7 +404,8 @@ def create_kernel_initialization(kernel: KernelConfig, n_months: int):
         smoothness=kernel.smoothness,
         q=kernel.q,
         prior=prior,
-        period_length=period_length
+        period_length=period_length,
+        n_mixtures=kernel.n_mixtures,
     )
 
     return kernel_initialized
@@ -416,6 +443,7 @@ MACRO_KERNEL_GRID = {
     #KernelType.MATERN:     [1.5, 2.5],
     #KernelType.EXPO_LINEAR: [None],
     #KernelType.MATERN_RQ: [2.5]
+    #KernelType.MATERN_RQ: [2.5]
     #KernelType.RQ_LINEAR:     [None],
     #KernelType.RQ:     [None],
 }
@@ -424,18 +452,39 @@ MACRO_KERNEL_GRID = {
 # Time kernels
 TIME_KERNEL_GRID = {
    KernelType.MATERN: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
-   #KernelType.TIME_REGIME_MATERN: [1.5],
+   #KernelType.TIME_REGIME_MATERN: [0.5], # couldn't find a situation it was useful....
    #KernelType.MATERN_LINEAR: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
    #KernelType.RQ: [None],
    #KernelType.RQ_LINEAR: [None],
    #KernelType.MATERN_LINEAR: [2.5],
     #KernelType.TIME_CHANGE_POINT: [None],
-   #KernelType.PERIODIC_MATERN: [1.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
+   KernelType.PERIODIC_MATERN: [2.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
+   #KernelType.SPECTRAL_MIXTURE: [None],
+   #KernelType.SPECTRAL_MATERN: [2.5],
 }
 
 # MATERN 0.5 is generally better than 1.5 or 2.5
 
 RANK_GRID = [3] #3
+
+from gpytorch.kernels import SpectralMixtureKernel
+
+def initialize_sm_from_data(kernel, X, y):
+    """
+    Recursively initialize SpectralMixtureKernel components inside
+    composite kernels (Additive / Product / Scale).
+    """
+    if isinstance(kernel, SpectralMixtureKernel):
+        kernel.initialize_from_data(X, y)
+
+    elif hasattr(kernel, "base_kernel"):
+        # ScaleKernel
+        initialize_sm_from_data(kernel.base_kernel, X, y)
+
+    elif hasattr(kernel, "kernels"):
+        # AdditiveKernel or ProductKernel
+        for k in kernel.kernels:
+            initialize_sm_from_data(k, X, y)
 
 # Best before leaving out extra : etf=matern_s=0.5_macro=maternlinearrq_s=0.5_time=periodicmatern_s=0.5
 # periodic smoothness doesn't so much matter, macro smoothness of 0.5 seems better. 
@@ -465,7 +514,7 @@ experiment_grid = build_experiment_grid()
 seed = 27
 
 # (Optional) group all runs in one MLflow experiment
-mlflow.set_experiment("Jan Portfolio Experiments")
+mlflow.set_experiment("Final Jan portfolio with new excess return")
 
 
 for cfg in experiment_grid:
@@ -511,6 +560,7 @@ for cfg in experiment_grid:
             smoothness=cfg.time.smoothness or 1.5,
             gamma=1.2,
             q=1,
+            n_mixtures=1,
         )
         
         mlflow.log_param("seed", seed)
@@ -580,6 +630,8 @@ for cfg in experiment_grid:
             kernele = create_kernel_initialization(kernel_e, n_months)
             kernelm = create_kernel_initialization(kernel_m, n_months)
             kernelt = create_kernel_initialization(kernel_t, n_months)
+            if kernel_t.n_mixtures:
+                initialize_sm_from_data(kernelt, X_trs, y_trs)
 
 
             kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt  # kernele + (kernele + 
@@ -595,6 +647,7 @@ for cfg in experiment_grid:
                 dtype=torch.float32,
                 device=torch.device("cpu"),
                 min_noise=multiconfig.min_noise,
+                patience=50,
             )
 
             model_str = repr(model)

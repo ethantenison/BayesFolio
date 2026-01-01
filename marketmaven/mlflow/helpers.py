@@ -125,6 +125,111 @@ def extract_gp_hyperparameters(model):
 
     return params
 
+#### possible updates to label kernel hyperparameters more completely
+# def walk_kernel(kernel, prefix, feature_map, out):
+#     # Lengthscale (ARD-aware)
+#     lengthscale = getattr(kernel, "lengthscale", None)
+#     if lengthscale is not None:
+#         ls = lengthscale.detach().cpu().numpy().squeeze()
+
+#         feature_names = feature_map.get(prefix)
+#         if feature_names is not None and len(feature_names) == len(ls):
+#             out[f"{prefix}.lengthscale_by_feature"] = dict(
+#                 zip(feature_names, ls.tolist())
+#             )
+#         else:
+#             out[f"{prefix}.lengthscale"] = ls.tolist()
+
+#     # Outputscale
+#     outputscale = getattr(kernel, "outputscale", None)
+#     if outputscale is not None:
+#         out[f"{prefix}.outputscale"] = float(outputscale.detach().cpu())
+
+#     # Linear variance
+#     variance = getattr(kernel, "variance", None)
+#     if variance is not None:
+#         out[f"{prefix}.variance"] = variance.detach().cpu().numpy().tolist()
+
+#     # Composite kernels
+#     kernels = getattr(kernel, "kernels", None)
+#     if kernels is not None:
+#         for i, subkernel in enumerate(kernels):
+#             walk_kernel(
+#                 subkernel,
+#                 f"{prefix}.kernels.{i}",
+#                 feature_map,
+#                 out,
+#             )
+
+#     # Wrapped kernels
+#     base_kernel = getattr(kernel, "base_kernel", None)
+#     if base_kernel is not None:
+#         walk_kernel(
+#             base_kernel,
+#             f"{prefix}.base_kernel",
+#             feature_map,
+#             out,
+#         )
+        
+# def extract_gp_hyperparameters(
+#     model,
+#     kernel_feature_map: dict,
+#     task_name_map: dict,
+# ):
+#     params = {}
+
+#     # ---------------- Likelihood ----------------
+#     if hasattr(model, "likelihood"):
+#         noise = getattr(model.likelihood, "noise", None)
+#         if noise is not None:
+#             noise_vals = noise.detach().cpu().numpy()
+#             params["likelihood.noise_by_task"] = {
+#                 task_name_map[i]: float(n)
+#                 for i, n in enumerate(noise_vals)
+#             }
+
+#     # ---------------- Mean ----------------
+#     if hasattr(model, "mean_module"):
+#         mean = model.mean_module
+#         if hasattr(mean, "base_means"):
+#             for i, m in enumerate(mean.base_means):
+#                 const = getattr(m, "constant", None)
+#                 if const is not None:
+#                     params[f"mean.{task_name_map[i]}"] = float(
+#                         const.detach().cpu()
+#                     )
+#         else:
+#             const = getattr(mean, "constant", None)
+#             if const is not None:
+#                 params["mean.constant"] = float(const.detach().cpu())
+
+#     # ---------------- Kernels ----------------
+#     if hasattr(model, "covar_module"):
+#         walk_kernel(
+#             model.covar_module,
+#             "covar_module",
+#             kernel_feature_map,
+#             params,
+#         )
+
+#     # ---------------- Task covariance ----------------
+#     if hasattr(model, "task_covar_module"):
+#         tc = model.task_covar_module
+
+#         if hasattr(tc, "var"):
+#             params["task_covar.var_by_task"] = {
+#                 task_name_map[i]: float(v)
+#                 for i, v in enumerate(tc.var.detach().cpu())
+#             }
+
+#         if hasattr(tc, "covar_factor"):
+#             params["task_covar.covar_factor"] = (
+#                 tc.covar_factor.detach().cpu().numpy().tolist()
+#             )
+
+#     return params
+
+
 def log_gp_hyperparameters(model, artifact_name="gp_hyperparameters.json"):
     params = extract_gp_hyperparameters(model)
     mlflow.log_dict(params, artifact_name)
