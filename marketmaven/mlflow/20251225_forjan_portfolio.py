@@ -24,15 +24,18 @@ from marketmaven.utils import check_equal_occurrences
 from marketmaven.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
 from marketmaven.visualization.variable_importance import xgboost_variable_importance
 from marketmaven.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
-from marketmaven.models.kernels import MeanF, KernelType, initialize_mean, initialize_kernel, adaptive_lengthscale_prior
+from marketmaven.models.kernels import KernelType, initialize_kernel, adaptive_lengthscale_prior
+from marketmaven.models.means import MeanF, initialize_mean
 from marketmaven.mlflow.helpers import (
     KernelConfig, MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     model_error_by_time_index, log_kernel_to_mlflow, log_gpytorch_state_dict, log_gp_hyperparameters
 )
+import plotly.express as px
 import random
 import itertools
 from marketmaven.market_fundamentals import fetch_enhanced_macro_features
 from marketmaven.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank, cross_sectional_zscore
+from gpytorch.kernels import SpectralMixtureKernel
 warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
@@ -41,10 +44,6 @@ from marketmaven.configs import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from IPython.display import display
 pd.set_option('display.max_rows', 20)
-from gpytorch.kernels import (
-    ScaleKernel,
-)
-from gpytorch.priors import LogNormalPrior
 warnings.filterwarnings("ignore", category=Warning, message=".*not p.d., added jitter.*")
 warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*not p.d., added jitter.*")
 # # MLFlow Configuration
@@ -122,7 +121,7 @@ etf_tickers = [
     
 assets_to_drop = [
     'IBND', 'ISHG', 'PDBC', 'BIL', 'EMB', 'TIP',
-"BNDX", "IEF", "LQD", "HYEM", "BND", "HYG", "VWOB", "EWX"
+#"BNDX", "IEF", "LQD", "HYEM", "BND", "HYG", "VWOB", "EWX"
     ]
 
 #remove assets_to_drop from etf_tickers
@@ -130,7 +129,7 @@ etf_tickers = [ticker for ticker in etf_tickers if ticker not in assets_to_drop]
 
 tickers = TickerConfig(
     start_date="2016-11-29",
-    end_date="2025-12-01",
+    end_date="2026-01-01",
     interval=Interval.DAILY,
     tickers=etf_tickers,
     horizon=Horizon.MONTHLY,
@@ -138,8 +137,8 @@ tickers = TickerConfig(
 )
 
 ############### Returns data ###############
-return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
-return_data.to_csv("20260101_etf_returns.csv", index=False)
+#return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
+#return_data.to_csv("20260101_etf_returns.csv", index=False)
 return_data = pd.read_csv("20260101_etf_returns.csv")  # Updated to match the new filename
 return_data = return_data[~return_data['asset_id'].isin(assets_to_drop)]
 
@@ -159,14 +158,14 @@ fig = correlation_matrix(pivoted_returns)
 fig.show()
 
 # # # ############### Factor data ###############
-macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
-macro_features.to_csv("20260101_macro_features.csv", index=False)
+#macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
+#macro_features.to_csv("20260101_macro_features.csv", index=False)
 macro_features = pd.read_csv("20260101_macro_features.csv")
 
 macro_features = macro_features.drop(columns=['vix_ts_level','vix3m','yc_pc1', 'yc_pc2', 'yc_pc3', 'y10_nominal' ])
 macro_cols = macro_features.columns[1:].tolist()
-etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
-etf_features.to_csv("20260101_etf_features.csv", index=False)
+#etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
+#etf_features.to_csv("20260101_etf_features.csv", index=False)
 etf_features = pd.read_csv("20260101_etf_features.csv")
 etf_features = etf_features[~etf_features['asset_id'].isin(assets_to_drop)]
 etf_features = etf_features.drop(columns=['ma_1m','ma_3m','vol_1w', 'price', 'overnight_gap'])
@@ -305,7 +304,7 @@ X['asset_id'] = X['asset_id'].astype("category")
 
 global_importance, interaction_fig = xgboost_variable_importance(X, y)
 print("Global Importance:\n", global_importance)
-import plotly.express as px
+
 
 interaction_fig.show()
 px.bar(pd.DataFrame(global_importance).sort_values(by=0))
@@ -338,6 +337,30 @@ fig.show()
 df.iloc[:, 2:].hist(bins=30, figsize=(20, 15))
 
 ############### Data Preparation ###############
+
+etf_mean_spec = {
+    "SPY":  MeanF.CONSTANT,   # learnable constant mean
+    "MGK":  MeanF.CONSTANT,   # learnable constant mean
+    "VWOB": MeanF.CONSTANT,   # learnable constant mean
+    "HYEM": MeanF.CONSTANT,   # learnable constant mean
+    "VNQ":  MeanF.CONSTANT,
+    "HYG":  MeanF.CONSTANT,
+    "LQD":  MeanF.CONSTANT,
+    "VTV":  MeanF.CONSTANT,
+
+    # Zero-mean ETFs
+
+    "IJR":  MeanF.ZERO,
+    "IWM":  MeanF.ZERO,
+    "VNQI": MeanF.ZERO,
+    "VEA":  MeanF.ZERO,
+    "VWO":  MeanF.ZERO,
+    "VSS":  MeanF.ZERO,
+    "BND":  MeanF.ZERO,
+    "IEF":  MeanF.ZERO,
+    "BNDX": MeanF.ZERO,
+    "EWX":  MeanF.ZERO,
+}
 
 cv_config = CVConfig(
     step=1,
@@ -427,37 +450,25 @@ class ExperimentConfig(BaseModel):
     macro: KernelSpec
     time: KernelSpec
     rank: int
+    mean_f: MeanF | dict
    
 # Perhaps try  MATERN_LINEAR_RQ
 # ETF kernels and their available smoothness options
 ETF_KERNEL_GRID = { 
-    #KernelType.MATERN_LINEAR: [0.5],
     KernelType.MATERN:        [0.5],
-    #KernelType.MATERN_RQ:     [0.5],
-    #KernelType.EXPO_GAMMA: [None],
-    #KernelType.RQ_LINEAR: [None],
-    #KernelType.RQ_LINEAR: [None],
-    #KernelType.RQ: [None],
 }
 
 
 
 # # Macro kernels
 MACRO_KERNEL_GRID = {
-    #KernelType.MATERN_LINEAR: [0.5, 1.5],
     KernelType.MATERN_LINEAR_RQ: [0.5],
-    #KernelType.MATERN:     [1.5, 2.5],
-    #KernelType.EXPO_LINEAR: [None],
-    #KernelType.MATERN_RQ: [2.5]
-    #KernelType.MATERN_RQ: [2.5]
-    #KernelType.RQ_LINEAR:     [None],
-    #KernelType.RQ:     [None],
 }
 
 
 # Time kernels
 TIME_KERNEL_GRID = {
-   KernelType.MATERN: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
+   KernelType.MATERN: [0.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
    #KernelType.TIME_REGIME_MATERN: [0.5], # couldn't find a situation it was useful....
    #KernelType.MATERN_LINEAR: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
    #KernelType.RQ: [None],
@@ -465,32 +476,14 @@ TIME_KERNEL_GRID = {
    #KernelType.MATERN_LINEAR: [2.5],
     #KernelType.TIME_CHANGE_POINT: [None],
    KernelType.PERIODIC_MATERN: [2.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
-   #KernelType.SPECTRAL_MIXTURE: [None],
-   #KernelType.SPECTRAL_MATERN: [2.5],
+
 }
 
-# MATERN 0.5 is generally better than 1.5 or 2.5
 
-RANK_GRID = [3] #3
+RANK_GRID = [3]
+MEAN_F_GRID = [etf_mean_spec]
 
-from gpytorch.kernels import SpectralMixtureKernel
 
-def initialize_sm_from_data(kernel, X, y):
-    """
-    Recursively initialize SpectralMixtureKernel components inside
-    composite kernels (Additive / Product / Scale).
-    """
-    if isinstance(kernel, SpectralMixtureKernel):
-        kernel.initialize_from_data(X, y)
-
-    elif hasattr(kernel, "base_kernel"):
-        # ScaleKernel
-        initialize_sm_from_data(kernel.base_kernel, X, y)
-
-    elif hasattr(kernel, "kernels"):
-        # AdditiveKernel or ProductKernel
-        for k in kernel.kernels:
-            initialize_sm_from_data(k, X, y)
 
 # Best before leaving out extra : etf=matern_s=0.5_macro=maternlinearrq_s=0.5_time=periodicmatern_s=0.5
 # periodic smoothness doesn't so much matter, macro smoothness of 0.5 seems better. 
@@ -501,17 +494,19 @@ def build_experiment_grid():
     for etf_k, etf_s_list in ETF_KERNEL_GRID.items():
         for macro_k, macro_s_list in MACRO_KERNEL_GRID.items():
             for time_k, time_s_list in TIME_KERNEL_GRID.items():
-                for rank in RANK_GRID:   # 👈 LOOP OVER RANKS
-                    for etf_s, macro_s, time_s in itertools.product(
-                        etf_s_list, macro_s_list, time_s_list
-                    ):
-                        cfg = ExperimentConfig(
-                            etf=KernelSpec(type=etf_k, smoothness=etf_s),
-                            macro=KernelSpec(type=macro_k, smoothness=macro_s),
-                            time=KernelSpec(type=time_k, smoothness=time_s),
-                            rank=rank,                     # 👈 assign here
-                        )
-                        experiment_list.append(cfg)
+                for rank in RANK_GRID:
+                    for mean_f in MEAN_F_GRID:        
+                        for etf_s, macro_s, time_s in itertools.product(
+                            etf_s_list, macro_s_list, time_s_list
+                        ):
+                            cfg = ExperimentConfig(
+                                etf=KernelSpec(type=etf_k, smoothness=etf_s),
+                                macro=KernelSpec(type=macro_k, smoothness=macro_s),
+                                time=KernelSpec(type=time_k, smoothness=time_s),
+                                rank=rank,
+                                mean_f=mean_f,         
+                            )
+                            experiment_list.append(cfg)
 
     return experiment_list
     
@@ -520,7 +515,7 @@ experiment_grid = build_experiment_grid()
 seed = 27
 
 # (Optional) group all runs in one MLflow experiment
-mlflow.set_experiment("Final Jan portfolio with new excess return")
+mlflow.set_experiment("FINAL FINAL Jan full portfolio")
 
 
 for cfg in experiment_grid:
@@ -534,7 +529,7 @@ for cfg in experiment_grid:
     with mlflow.start_run(run_name=run_name, description="""Finding the best final model for gameday with per task scaling.""") as run:
         multiconfig = MultiTaskConfig(
             num_tasks=len(tickers.tickers),
-            mean=MeanF.MULTITASK_ZERO,
+            mean=cfg.mean_f,
             rank=cfg.rank,
             scaling="global",   
             min_noise=1e-5,
@@ -623,10 +618,12 @@ for cfg in experiment_grid:
 
             # ---- Mean and Kernels ----
             mean_f = initialize_mean(
-                multiconfig.mean,
+                mean= None,
                 num_tasks=multiconfig.num_tasks,
                 input_size=X.shape[1],
                 macro_dims=active_dims_m,
+                etf_mean_spec=multiconfig.mean,
+                task_map=task_map,
             )
             
             # Periods
@@ -636,8 +633,8 @@ for cfg in experiment_grid:
             kernele = create_kernel_initialization(kernel_e, n_months)
             kernelm = create_kernel_initialization(kernel_m, n_months)
             kernelt = create_kernel_initialization(kernel_t, n_months)
-            if kernel_t.n_mixtures:
-                initialize_sm_from_data(kernelt, X_trs, y_trs)
+            # if kernel_t.n_mixtures:
+            #     initialize_sm_from_data(kernelt, X_trs, y_trs)
 
 
             kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt  # kernele + (kernele + 
@@ -796,16 +793,17 @@ for cfg in experiment_grid:
         date_test_splits = np.array(test_dates_splits)
         date_test_splits = pd.Series(date_test_splits.reshape(-1, ))
 
-
-        true_df.index = date_test_splits
-        preds_df.index = date_test_splits
+        plot_actual_true = true_df.copy()
+        plot_pred_df = preds_df.copy()
+        plot_actual_true.index = date_test_splits
+        plot_pred_df.index = date_test_splits
         
-        true_df.index = pd.to_datetime(true_df.index)
-        preds_df.index = pd.to_datetime(preds_df.index)
+        plot_actual_true.index = pd.to_datetime(plot_actual_true.index)
+        plot_pred_df.index = pd.to_datetime(plot_pred_df.index)
 
         plot_actual_vs_pred_matrix(
-            true_df=true_df,          
-            pred_df=preds_df,
+            true_df=plot_actual_true,          
+            pred_df=plot_pred_df,
             asset_cols=asset_cols,
             save_path=plot_path
         )
@@ -862,7 +860,7 @@ for cfg in experiment_grid:
         mlflow.log_metrics(ls_stats_gp)
                 
         # Top K botom k 
-                # Long-short performance
+        # Long-short performance
         ls_gpk = long_short_returns_topk(y_true=y_true_norm, y_pred=y_pred_norm, q=0.2)
         ls_meank = long_short_returns_topk(y_true=y_true_norm, y_pred=y_mean_norm, q=0.2)
         ls_ewmak = long_short_returns_topk(y_true=y_true_norm, y_pred=y_ewma_norm, q=0.2 )
@@ -870,6 +868,4 @@ for cfg in experiment_grid:
         ls_stats_meank = assess_performance(ls_meank, label="mean_topk")
         ls_stats_ewmak = assess_performance(ls_ewmak, label="ewma_topk")
         mlflow.log_metrics(ls_stats_gpk)
-        # mlflow.log_metrics(ls_stats_meank)
-        # mlflow.log_metrics(ls_stats_ewmak)
         plot_ls_cumulative_compare(ls_gpk, ls_meank, ls_ewmak, strategy="ls_topk")

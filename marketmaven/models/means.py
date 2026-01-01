@@ -6,9 +6,10 @@ This module provides functions to calculate various types of means used in Gauss
 
 from gpytorch.priors import Prior
 from gpytorch.constraints import Positive
-from gpytorch.means import ConstantMean, ZeroMean, LinearMean, Mean
+from gpytorch.means import ConstantMean, ZeroMean, LinearMean, MultitaskMean, Mean
 from enum import StrEnum
 import torch
+import gpytorch
 
 
 class GPMean(StrEnum):
@@ -200,14 +201,111 @@ class ExponentialSaturationMean(Mean):
         return A * (1 - torch.exp(-B * t))
 
 
-def initialize_mean(mean: GPMean, input_size: int, batch_shape: torch.Size):
-    if mean == GPMean.CONSTANT:
-        return ConstantMean(batch_shape=batch_shape)
-    elif mean == GPMean.LINEAR:
-        return LinearMean(input_size, batch_shape)
-    elif mean == GPMean.ZERO:
-        return ZeroMean(batch_shape=batch_shape)
-    elif mean == GPMean.EXPONENTIAL_SATURATION:
-        return ExponentialSaturationMean(batch_shape=batch_shape)
+###### Means ######
+class MeanF(StrEnum):
+    """Supported Gaussian Process kernels."""
+
+    LINEAR = "linear"
+    CONSTANT = "constant"
+    ZERO = "zero"
+    MULTITASK_CONSTANT = "multitask_constant"
+    MULTITASK_ZERO = "multitask_zero"
+    MULTITASK_LINEAR = "multitask_linear"
+    MULTITASK_MACRO_LINEAR = "multitask_macro_linear"
+
+
+class MacroLinearMean(gpytorch.means.Mean):
+    def __init__(self, macro_dims):
+        super().__init__()
+        self.macro_dims = macro_dims
+        self.linear = gpytorch.means.LinearMean(len(macro_dims))
+
+    def forward(self, x):
+        x_macro = x[..., self.macro_dims]
+        return self.linear(x_macro)
+    
+def initialize_mean(
+    mean: MeanF | None,
+    input_size: int | None = None,
+    num_tasks: int | None = None,
+    macro_dims: list[int] | None = None,
+    *,
+    etf_mean_spec: dict[str, MeanF] | None = None,
+    task_map: dict[str, int] | None = None,
+):
+    """
+    Initialize GP mean function with optional per-task heterogeneity.
+    """
+
+    # --------------------------------------------------
+    # Heterogeneous multitask mean (ETF-specific)
+    # --------------------------------------------------
+    if etf_mean_spec is not None:
+        if task_map is None:
+            raise ValueError("task_map must be provided when using etf_mean_spec.")
+
+        if num_tasks is None:
+            num_tasks = len(task_map)
+
+        if len(task_map) != num_tasks:
+            raise ValueError("task_map size must equal num_tasks.")
+
+        # Enforce correct ordering by task index
+        ordered_tasks = sorted(task_map.items(), key=lambda x: x[1])
+
+        base_means = []
+        for etf, idx in ordered_tasks:
+            spec = etf_mean_spec.get(etf, MeanF.ZERO)
+
+            if spec == MeanF.ZERO:
+                base_means.append(ZeroMean())
+
+            elif spec == MeanF.CONSTANT:
+                base_means.append(ConstantMean())
+
+            elif spec == MeanF.LINEAR:
+                if input_size is None:
+                    raise ValueError("input_size required for LINEAR mean.")
+                base_means.append(LinearMean(input_size))
+
+            else:
+                raise ValueError(
+                    f"Unsupported mean spec {spec} for ETF {etf}"
+                )
+
+        return MultitaskMean(base_means, num_tasks=num_tasks)
+
+    # --------------------------------------------------
+    # Homogeneous multitask means
+    # --------------------------------------------------
+    if mean == MeanF.MULTITASK_CONSTANT:
+        return MultitaskMean(ConstantMean(), num_tasks=num_tasks)
+
+    elif mean == MeanF.MULTITASK_ZERO:
+        return MultitaskMean(ZeroMean(), num_tasks=num_tasks)
+
+    elif mean == MeanF.MULTITASK_LINEAR:
+        return MultitaskMean(LinearMean(input_size), num_tasks=num_tasks)
+
+    elif mean == MeanF.MULTITASK_MACRO_LINEAR:
+        if macro_dims is None:
+            raise ValueError("macro_dims required for MULTITASK_MACRO_LINEAR.")
+        return MultitaskMean(
+            MacroLinearMean(macro_dims),
+            num_tasks=num_tasks,
+        )
+
+    # --------------------------------------------------
+    # Single-task means
+    # --------------------------------------------------
+    if mean == MeanF.CONSTANT:
+        return ConstantMean()
+
+    elif mean == MeanF.LINEAR:
+        return LinearMean(input_size)
+
+    elif mean == MeanF.ZERO:
+        return ZeroMean()
+
     else:
         raise ValueError(f"Unknown mean function: {mean}")

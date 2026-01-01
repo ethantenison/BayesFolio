@@ -287,3 +287,5 @@ Try out: k = k_inputs ⊗ (Periodic(time) × Matern(time)) and k = k_inputs ⊗ 
 -reducing features using the etf and macro ic mean really helped. 
 -with small rank and few etfs, zero mean worked best, but with all the etfs and higher rank, the multitask constant mean worked best.
 - when doing forecasts, need to use the same date for features because it will change since it doesn't automatically stop at the first of the month
+- TODO: use fit_gpytorch_mll...actually maybe not so good for multiple scenarios 
+-mixing means worked splendidly 

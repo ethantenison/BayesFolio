@@ -23,7 +23,6 @@ from math import sqrt, log
 from gpytorch.constraints import Interval, Positive
 from gpytorch.kernels import IndexKernel
 from gpytorch.priors import Prior
-from gpytorch.means import ConstantMean, ZeroMean, LinearMean, MultitaskMean
 import math
 import gpytorch
 from botorch.models.kernels import (
@@ -185,62 +184,6 @@ def make_period_length_prior(p0: float, cv: float = 0.5) -> LogNormalPrior:
     # set mu so that median = exp(mu) = p0
     mu = math.log(p0)
     return LogNormalPrior(loc=mu, scale=sigma)
-
-###### Means ######
-class MeanF(StrEnum):
-    """Supported Gaussian Process kernels."""
-
-    LINEAR = "linear"
-    CONSTANT = "constant"
-    ZERO = "zero"
-    MULTITASK_CONSTANT = "multitask_constant"
-    MULTITASK_ZERO = "multitask_zero"
-    MULTITASK_LINEAR = "multitask_linear"
-    MULTITASK_MACRO_LINEAR = "multitask_macro_linear"
-
-
-class MacroLinearMean(gpytorch.means.Mean):
-    def __init__(self, macro_dims):
-        super().__init__()
-        self.macro_dims = macro_dims
-        self.linear = gpytorch.means.LinearMean(len(macro_dims))
-
-    def forward(self, x):
-        x_macro = x[..., self.macro_dims]
-        return self.linear(x_macro)
-    
-def initialize_mean(mean: MeanF, input_size: int| None = None, num_tasks: int | None = None, macro_dims: List[int] | None = None):  
-    if mean == MeanF.CONSTANT:
-        return ConstantMean()
-    elif mean ==  MeanF.LINEAR:
-        return LinearMean(input_size)
-    elif mean ==  MeanF.ZERO:
-        return ZeroMean()
-    elif mean ==  MeanF.MULTITASK_CONSTANT:
-        return MultitaskMean(
-                ConstantMean(),
-                num_tasks=num_tasks,
-            )
-    elif mean ==  MeanF.MULTITASK_ZERO:
-        return MultitaskMean(
-                ZeroMean(),
-                num_tasks=num_tasks,
-            )
-    elif mean ==  MeanF.MULTITASK_LINEAR:
-        return MultitaskMean(
-                LinearMean(input_size),
-                num_tasks=num_tasks,
-            )
-    elif mean ==  MeanF.MULTITASK_MACRO_LINEAR:
-        if macro_dims is None:
-            raise ValueError("macro_dims must be provided for MULTITASK_MACRO_LINEAR mean function.")
-        return MultitaskMean(
-                MacroLinearMean(macro_dims),
-                num_tasks=num_tasks,
-            )
-    else:
-        raise ValueError(f"Unknown mean function: {mean}")
-
 
 
 class KernelType(StrEnum):
@@ -677,3 +620,21 @@ class PositiveIndexKernel(IndexKernel):
     @property
     def covar_matrix(self):
         return self._eval_covar_matrix()
+    
+    
+def initialize_sm_from_data(kernel, X, y):
+    """
+    Recursively initialize SpectralMixtureKernel components inside
+    composite kernels (Additive / Product / Scale).
+    """
+    if isinstance(kernel, SpectralMixtureKernel):
+        kernel.initialize_from_data(X, y)
+
+    elif hasattr(kernel, "base_kernel"):
+        # ScaleKernel
+        initialize_sm_from_data(kernel.base_kernel, X, y)
+
+    elif hasattr(kernel, "kernels"):
+        # AdditiveKernel or ProductKernel
+        for k in kernel.kernels:
+            initialize_sm_from_data(k, X, y)

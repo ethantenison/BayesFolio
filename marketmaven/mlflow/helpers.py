@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 from riskfolio.src.ParamsEstimation import mean_vector
 from pydantic import BaseModel, ConfigDict
-from marketmaven.models.kernels import MeanF, KernelType
+from marketmaven.models.kernels import KernelType
+from marketmaven.models.means import MeanF
 import mlflow
 from gpytorch.kernels import Kernel
 from gpytorch.priors import Prior, LKJCovariancePrior
@@ -243,7 +244,7 @@ def log_gpytorch_state_dict(model, artifact_name="gp_state.json"):
 
 class MultiTaskConfig(BaseModel):
     num_tasks: int
-    mean: MeanF
+    mean: MeanF | dict[str, MeanF]
     rank: int
     scaling: str
     min_noise: float

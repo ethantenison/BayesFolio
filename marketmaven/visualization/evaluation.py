@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import mlflow
 from typing import Dict, List
+import matplotlib.dates as mdates
 
 
 # =========================================================
@@ -213,30 +214,36 @@ def plot_actual_vs_pred_matrix(true_df, pred_df, asset_cols, save_path):
 
     fig, axes = plt.subplots(
         nrows, ncols,
-        figsize=(4*ncols, 3*nrows),
+        figsize=(4 * ncols, 3 * nrows),
         sharex=True
     )
 
     axes = axes.flatten()
-    x = np.arange(len(true_df))
+
+    # ✅ Use pandas DatetimeIndex directly
+    x = true_df.index
 
     for i, asset in enumerate(asset_cols):
         ax = axes[i]
 
-        y_true = true_df[f"{asset}_true"].values
-        y_pred = pred_df[f"{asset}_pred"].values
+        y_true = true_df[f"{asset}_true"]
+        y_pred = pred_df[f"{asset}_pred"]
 
         ax.plot(x, y_true, label="Actual", linewidth=1.5)
         ax.plot(x, y_pred, label="Predicted", linewidth=1.5)
 
-        ax.set_ylim(y_min, y_max)      # <---- SAME SCALE FOR ALL
+        ax.set_ylim(y_min, y_max)
         ax.set_title(asset)
         ax.grid(True, alpha=0.3)
 
         if i % ncols == 0:
             ax.set_ylabel("Return")
 
-    # Remove unused
+        # ---- Date formatting ----
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+
+    # Remove unused axes
     for j in range(len(asset_cols), len(axes)):
         fig.delaxes(axes[j])
 
@@ -249,4 +256,3 @@ def plot_actual_vs_pred_matrix(true_df, pred_df, asset_cols, save_path):
 
     plt.savefig(save_path, dpi=200)
     plt.close(fig)
-
