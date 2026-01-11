@@ -289,3 +289,28 @@ Try out: k = k_inputs ⊗ (Periodic(time) × Matern(time)) and k = k_inputs ⊗ 
 - when doing forecasts, need to use the same date for features because it will change since it doesn't automatically stop at the first of the month
 - TODO: use fit_gpytorch_mll...actually maybe not so good for multiple scenarios 
 -mixing means worked splendidly 
+
+
+**Jan 1st**
+- big accomplishments with feature selection methods led to more accurate models. It also seems like having a higher task rank isn't as necessary as it was before. 
+
+**Jan 4th**
+- GOAL FOR JANUARY IS TO ASSESS GP UNCERTAINTY
+- Try out predicting the rank 
+- Try out classifying regime 
+ADD: 
+1. carry_12m (rolling mean excess return)
+carry_12m = y_excess_lead.rolling(12).mean()
+
+2. Dividend yield proxy (equities) — generalized
+income_proxy = trailing_12m_total_return − trailing_12m_price_return
+
+3. Bond carry proxy — rate-neutralized return
+rate_adj_return = ETF_return − β_duration × Δ10y
+
+
+the above should all live in the etf kernel 
+
+**Jan 11th**
+- Trying exponential decay, doing a more expressive anova style kernel seems to have a benefit but more parameters. 
+-Actually it wasn't fully anova style! Need to check that. Also discovered that exponential decay couldnt' really be used on it's on as an additive because of its non-stationarity.

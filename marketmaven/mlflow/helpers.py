@@ -2,29 +2,14 @@ import pandas as pd
 import numpy as np
 from riskfolio.src.ParamsEstimation import mean_vector
 from pydantic import BaseModel, ConfigDict
-from marketmaven.models.kernels import KernelType
+from marketmaven.models.kernels import KernelConfig
 from marketmaven.models.means import MeanF
 import mlflow
 from gpytorch.kernels import Kernel
 from gpytorch.priors import Prior, LKJCovariancePrior
 from gpytorch.constraints import GreaterThan
 
-class KernelConfig(BaseModel):
-    type: KernelType
-    features: list[str]
-    active_dims: list[int]
-    smoothness: float
-    gamma: float | None = None
-    n_mixtures: int | None = None
-    q: int | None = None
-    mean_sqrt: float | None = None
-    std: float | None = None
 
-    model_config = ConfigDict(
-        use_enum_values=True,
-        extra="forbid",
-        arbitrary_types_allowed=True
-    )
     
 def log_kernel_to_mlflow(kernel: KernelConfig, prefix: str):
     params = kernel.model_dump()

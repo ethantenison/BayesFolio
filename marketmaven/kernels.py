@@ -332,3 +332,24 @@ def build_kernel(expression: str, input_size: int, batch_shape: torch.Size, gp_o
 
     kernel = parse_expr(expression)
     return ScaleKernel(kernel, batch_shape=batch_shape)
+
+
+
+def create_kernel_initialization(kernel: KernelConfig, n_months: int):
+    prior = adaptive_lengthscale_prior(num_dims=len(kernel.active_dims))
+    
+    
+    # For periodic only basically 
+    period_length = 12.0 / (n_months - 1)  # same as your code
+    kernel_initialized = initialize_kernel(
+        kernel.type,
+        active_dims=kernel.active_dims,
+        batch_shape=torch.Size(),
+        smoothness=kernel.smoothness,
+        q=kernel.q,
+        prior=prior,
+        period_length=period_length,
+        n_mixtures=kernel.n_mixtures,
+    )
+
+    return kernel_initialized

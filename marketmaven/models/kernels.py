@@ -19,7 +19,7 @@ from gpytorch.kernels import (
 )
 from gpytorch.priors import LogNormalPrior
 from enum import StrEnum
-from math import sqrt, log
+from math import sqrt, log, exp
 from gpytorch.constraints import Interval, Positive
 from gpytorch.kernels import IndexKernel
 from gpytorch.priors import Prior
@@ -29,6 +29,7 @@ from botorch.models.kernels import (
     ExponentialDecayKernel,
     InfiniteWidthBNNKernel,
 )
+from pydantic import BaseModel, ConfigDict
 
 torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
@@ -223,6 +224,8 @@ class KernelType(StrEnum):
     TIME_CHANGE_POINT = "timechangepoint"
     
     EXPONENTIAL_DECAY = "exponentialdecay"
+    EXPONENTIAL_DECAY_MATERN = "exponentialdecaymatern"
+    EXPONENTIAL_DECAY_MATERN_c = "exponentialdecaymaternc"
     
 
 
@@ -372,17 +375,30 @@ class ContKernelFactory:
             lengthscale_constraint=self.lengthscale_constraint,
         )
         
-    def exponential_decay(self):
+    def create_exponential_decay(self):
+        # Enforce 1-D use (you already do this check)
+        if len(self.active_dims) != 1:
+            raise ValueError("ExponentialDecayKernel is 1-D; pass exactly one active dim.")
+        ls_prior_1d = LogNormalPrior(loc=log(0.25), scale=0.35)
+        ls_constraint_1d = GreaterThan(0.05, initial_value=exp(log(0.25) - 0.35**2))
+
+        # Prefer power fixed at 1.0; if learnable, constrain it to a safe band
+        power_prior = LogNormalPrior(loc=0.0, scale=0.25)
+        power_constraint = Interval(0.25, 2.0)   # keep within a well-behaved range
+
+        offset_prior = LogNormalPrior(loc=-3.0, scale=0.35)
+        offset_constraint = GreaterThan(1e-6, initial_value=exp(-3.0 - 0.35**2))
+
         return ExponentialDecayKernel(
-            ard_num_dims=self.ard_num_dims,
+            ard_num_dims=self.ard_num_dims,                              # <-- explicit 1D
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
-            power=1,
-            power_prior=LogNormalPrior(loc=0.0, scale=1.0),
-            power_constraint=GreaterThan(1e-4),
-            offset_prior=LogNormalPrior(loc=-2.0, scale=1.0),
-            offset_constraint=GreaterThan(1e-6),
-            
+            lengthscale_prior=ls_prior_1d,
+            lengthscale_constraint=ls_constraint_1d,
+            power_prior=power_prior,
+            power_constraint=power_constraint,           # <-- add this
+            offset_prior=offset_prior,
+            offset_constraint=offset_constraint,
         )
 
 
@@ -495,6 +511,12 @@ def initialize_kernel(
             )
             cp_kernel.raw_tau.data.fill_(0.5)
             return ScaleKernel(cp_kernel)
+        elif kernel_type == KernelType.EXPONENTIAL_DECAY_MATERN:
+            return ScaleKernel(cont_kernel_factory.create_exponential_decay() * cont_kernel_factory.create_matern())
+        elif kernel_type == KernelType.EXPONENTIAL_DECAY_MATERN_c:
+            return ScaleKernel(cont_kernel_factory.create_exponential_decay()) + ScaleKernel(cont_kernel_factory.create_matern()) + cont_kernel_factory.create_exponential_decay() * cont_kernel_factory.create_matern()
+        elif kernel_type == KernelType.EXPONENTIAL_DECAY:
+            return ScaleKernel(cont_kernel_factory.create_exponential_decay()) 
         else:
             raise ValueError(f"Unknown kernel function: {kernel_type}")
 
@@ -638,3 +660,41 @@ def initialize_sm_from_data(kernel, X, y):
         # AdditiveKernel or ProductKernel
         for k in kernel.kernels:
             initialize_sm_from_data(k, X, y)
+            
+
+class KernelConfig(BaseModel):
+    type: KernelType
+    features: list[str]
+    active_dims: list[int]
+    smoothness: float
+    gamma: float | None = None
+    n_mixtures: int | None = None
+    q: int | None = None
+    mean_sqrt: float | None = None
+    std: float | None = None
+
+    model_config = ConfigDict(
+        use_enum_values=True,
+        extra="forbid",
+        arbitrary_types_allowed=True
+    )
+    
+
+def create_kernel_initialization(kernel: KernelConfig, n_months: int):
+    prior = adaptive_lengthscale_prior(num_dims=len(kernel.active_dims))
+    
+    
+    # For periodic only basically 
+    period_length = 12.0 / (n_months - 1)  # same as your code
+    kernel_initialized = initialize_kernel(
+        kernel.type,
+        active_dims=kernel.active_dims,
+        batch_shape=torch.Size(),
+        smoothness=kernel.smoothness,
+        q=kernel.q,
+        prior=prior,
+        period_length=period_length,
+        n_mixtures=kernel.n_mixtures,
+    )
+
+    return kernel_initialized

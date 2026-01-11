@@ -77,8 +77,8 @@ def xgboost_variable_importance(X, y, xgb_params=None) -> dict:
         yaxis_title='Features',
         xaxis=dict(tickangle=45),
         yaxis=dict(autorange='reversed'),
-        height=800,
-        width=800
+        height=900,
+        width=900
     )
     
     return global_importance, fig

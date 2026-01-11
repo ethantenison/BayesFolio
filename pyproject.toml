@@ -19,10 +19,10 @@ seaborn = "^0.13.2"
 xgboost = "3.0.4"
 optuna = "4.6.0"
 torch = "^2.8.0"
-gpytorch = "1.14.2"
+gpytorch = "1.14.3"
 mlflow = "^3.3.2"
 pydantic = "^2.11.7"
-botorch = "0.16.0"
+botorch = "0.16.1"
 vectorbt = "0.28.1"
 
 

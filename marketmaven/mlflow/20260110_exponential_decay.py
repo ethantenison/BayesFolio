@@ -40,6 +40,7 @@ warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
 )
+import gpytorch
 from marketmaven.configs import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from IPython.display import display
@@ -121,7 +122,8 @@ etf_tickers = [
     
 assets_to_drop = [
     'IBND', 'ISHG', 'PDBC', 'BIL', 'EMB', 'TIP',
-#"BNDX", "IEF", "LQD", "HYEM", "BND", "HYG", "VWOB", "EWX"
+"BNDX", "IEF", "LQD", "HYEM", "BND", "HYG", "VWOB", "EWX",
+"VWO", 'VNQI', 'VEA', 'VSS',
     ]
 
 #remove assets_to_drop from etf_tickers
@@ -410,9 +412,12 @@ MACRO_KERNEL_GRID = {
 
 # Time kernels
 TIME_KERNEL_GRID = {
-   KernelType.MATERN: [0.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
+   #KernelType.MATERN: [0.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
    #KernelType.MATERN_LINEAR: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
    #KernelType.PERIODIC_MATERN: [2.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
+   #KernelType.EXPONENTIAL_DECAY_MATERN: [1.5, 2.5],   
+   #KernelType.EXPONENTIAL_DECAY_MATERN_c: [0.5]
+   KernelType.EXPONENTIAL_DECAY: [None]
 
 }
 
@@ -452,7 +457,7 @@ experiment_grid = build_experiment_grid()
 seed = 27
 
 # (Optional) group all runs in one MLflow experiment
-mlflow.set_experiment("FINAL FINAL Jan full portfolio")
+mlflow.set_experiment("Exponential Decay Experiment")
 
 
 for cfg in experiment_grid:
@@ -572,7 +577,7 @@ for cfg in experiment_grid:
             kernelt = create_kernel_initialization(kernel_t, n_months)
 
 
-            kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt 
+            kernel_total = kernele + kernelm + kernelm*kernelt + kernele*kernelt# + kernelm*kernele # + kernelt
 
             # ---- Train model ----
             model, likelihood = train_model_hadamard(
@@ -586,6 +591,7 @@ for cfg in experiment_grid:
                 device=torch.device("cpu"),
                 min_noise=multiconfig.min_noise,
                 patience=50,
+                training_iterations=500
             )
 
             model_str = repr(model)
@@ -594,7 +600,7 @@ for cfg in experiment_grid:
             model.eval()
             likelihood.eval()
             with torch.no_grad():
-                f_dist = model(X_tes)
+                f_dist = model(X_tes)     
                 pred = likelihood(f_dist, X_tes)
 
             y_hat = scaler.inverse_y(pred.mean, I_te)

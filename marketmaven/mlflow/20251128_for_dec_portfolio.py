@@ -1047,7 +1047,7 @@ multiconfig = MultiTaskConfig(
     mean=MeanF.MULTITASK_CONSTANT,
     rank=3,
     scaling="global",
-    min_noise=1e-5,
+    min_noise=5e-3,
         )
 
 

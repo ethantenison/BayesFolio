@@ -12,11 +12,13 @@ from torch import Tensor
 from gpytorch.means import MultitaskMean
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
+import torch
+from linear_operator.operators import DenseLinearOperator
 
 # ard_num_dims = 3
 # lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
 # lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
-MIN_INFERRED_NOISE_LEVEL = 1e-5  # Minimum noise level to avoid numerical issues
+MIN_INFERRED_NOISE_LEVEL = 5e-3 #1e-5  # Minimum noise level to avoid numerical issues
 
 
 # class ExactGPModel(ExactGP):
@@ -81,47 +83,54 @@ def get_hadamard_gaussian_likelihood_with_lognormal_prior(
         task_feature_index=task_feature_index,
     )
 
-class HadamardMultiTaskGP(ExactGP):
+
+# Assuming your PositiveIndexKernel is a wrapper around IndexKernel-like API
+# and accepts batch_shape; if not, add that arg to its __init__ as well.
+class HadamardMultiTaskGP(gpytorch.models.ExactGP):
     """
     Intrinsic Coregionalization (ICM) multitask GP with Hadamard structure.
 
-    Supports either a single mean module (e.g. ConstantMean, ZeroMean)
-    or a gpytorch.means.MultitaskMean with distinct per-task means.
-
-    The task index must be included in X as the last column, similar
-    to BoTorch's MultiTaskGP.
-
     Covariance:
-        k((x,t), (x',t')) = k_X(x,x') * B[t,t']
+        k((x,t), (x',t')) = k_X(x,x') ⊙ B[t,t']
 
     Mean:
         m(x,t) = mean_module(x, task=t)
+
+    Notes
+    -----
+    - Uses dense Hadamard *only during eval* to avoid a fragile lazy-mul path
+      that can trigger 'view size is not compatible...' when certain kernels
+      (e.g., ExponentialDecay) are used.
     """
 
     def __init__(
         self,
         train_X: Tensor,
         train_Y: Tensor,
-        likelihood: HadamardGaussianLikelihood,
+        likelihood: gpytorch.likelihoods._GaussianLikelihoodBase,
         mean_module: gpytorch.means.Mean,
-        covar_module: gpytorch.kernels.Kernel,
+        covar_module: gpytorch.kernels.Kernel,  # your ke/km/kt composition
         num_tasks: int,
         rank: int = 1,
         task_feature: int = -1,
         dtype: torch.dtype = torch.float32,
         device: torch.device | None = None,
+        *,
+        dense_eval: bool = True,   # <— do dense Hadamard only at eval time
     ):
         # Move inputs and likelihood to the same device/dtype before calling super()
         train_X = train_X.to(device=device, dtype=dtype)
         train_Y = train_Y.to(device=device, dtype=dtype)
         likelihood = likelihood.to(device=device, dtype=dtype)
-        
+
         super().__init__(train_X, train_Y, likelihood)
 
         self.mean_module = mean_module.to(device=device, dtype=dtype)
         self.covar_module = covar_module.to(device=device, dtype=dtype)
         self.dtype = dtype
         self.device = device if device is not None else torch.device("cpu")
+        self.dense_eval = dense_eval
+
         self._register_lengthscale_constraints(self.covar_module)
 
         # --- Task kernel (IndexKernel) with LKJ prior for task covariance
@@ -130,10 +139,14 @@ class HadamardMultiTaskGP(ExactGP):
         eta = 0.5
         task_covar_prior = LKJCovariancePrior(num_tasks, eta, sd_prior)
 
+        # IMPORTANT: match batch_shape with the data kernel to avoid broadcasted Hadamard
+        data_batch_shape = getattr(self.covar_module, "batch_shape", torch.Size())
+
         self.task_covar_module = PositiveIndexKernel(
             num_tasks=num_tasks,
             rank=rank,
             task_prior=task_covar_prior,
+            batch_shape=data_batch_shape,  # <-- match batch shape here
         ).to(device=device, dtype=dtype)
 
         # Identify which column is the task feature
@@ -146,9 +159,10 @@ class HadamardMultiTaskGP(ExactGP):
     # Internal utilities
     # ----------------------------------------------------------------------
     def _split_inputs(self, X: Tensor) -> tuple[Tensor, Tensor, Tensor]:
-        """Return (x_before, task_idcs, x_after)."""
+        """Return (x_before, task_idcs, x_after) with contiguous buffers."""
+        # Keep everything contiguous; never .view on column slices
         x_before = X[..., : self.task_feature]
-        task_idcs = X[..., self.task_feature].view(-1, 1).to(torch.long)
+        task_idcs = X.select(-1, self.task_feature).to(torch.long).unsqueeze(-1)  # (N,1)
         x_after = X[..., (self.task_feature + 1):]
         return x_before, task_idcs, x_after
 
@@ -169,30 +183,44 @@ class HadamardMultiTaskGP(ExactGP):
         where task index is embedded as a column.
         """
         x_before, task_idcs, x_after = self._split_inputs(X)
-        t_vec = task_idcs.view(-1)
+        t_vec = task_idcs.reshape(-1)  # reshape, not view
 
         # ---- Mean (BoTorch-style)
         if isinstance(self.mean_module, MultitaskMean):
             # Mean sees only non-task features, returns [..., n, num_tasks]
-            x_mean = torch.cat([x_before, x_after], dim=-1)
+            x_mean = torch.cat([x_before, x_after], dim=-1).contiguous()
             mean_all = self.mean_module(x_mean)
             # Gather the appropriate task mean for each row -> [..., n]
             mean_x = mean_all.gather(-1, task_idcs.long()).squeeze(-1)
         else:
             # Single mean gets task as a feature so it can depend on it
-            # (cast to float so concat works with feature dtype)
-            x_mean = torch.cat([x_before, task_idcs.to(X.dtype), x_after], dim=-1)
+            x_mean = torch.cat([x_before, task_idcs.to(X.dtype), x_after], dim=-1).contiguous()
             mean_x = self.mean_module(x_mean)
 
         # ---- Covariance (Hadamard factorization)
-        # Your factorization is fine: k_X(x,x') ⊙ B[t,t']
-        x_features = torch.cat([x_before, x_after], dim=-1)
-        covar_x = self.covar_module(x_features)
-        covar_i = self.task_covar_module(t_vec)
-        covar = covar_x.mul(covar_i)
+        # K_X(x,x') ⊙ B[t,t']
+        x_features = torch.cat([x_before, x_after], dim=-1).contiguous()
+        Kx = self.covar_module(x_features)     # may be InterpolatedLinearOperator
+        B  = self.task_covar_module(t_vec)     # IndexKernel-like lazy op
 
-        return MultivariateNormal(mean_x, covar)
+        # Ensure batch shapes match (they should, from __init__; this is a guard)
+        if getattr(Kx, "batch_shape", torch.Size()) != getattr(B, "batch_shape", torch.Size()):
+            # If they differ (shouldn't), try expanding B to Kx's batch shape lazily.
+            try:
+                B = B._expand_batch(Kx.batch_shape)  # available on LinearOperator
+            except Exception:
+                # Fallback: handle during eval via dense hadamard
+                pass
 
+        if self.training or not self.dense_eval:
+            # keep it lazy during training
+            K = Kx.mul(B)
+        else:
+            # Dense Hadamard at eval: avoids fragile lazy-mul path that can call .view(...) on
+            # broadcasted, non-contiguous tensors when using ExponentialDecayKernel.
+            K = DenseLinearOperator((Kx.to_dense() * B.to_dense()).contiguous())
+
+        return MultivariateNormal(mean_x, K)
 
 def train_model_hadamard(
     train_X: torch.Tensor,
