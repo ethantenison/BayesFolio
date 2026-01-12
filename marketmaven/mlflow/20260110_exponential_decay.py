@@ -577,7 +577,7 @@ for cfg in experiment_grid:
             kernelt = create_kernel_initialization(kernel_t, n_months)
 
 
-            kernel_total = kernele + kernelm + kernelm*kernelt + kernele*kernelt# + kernelm*kernele # + kernelt
+            kernel_total = kernele + kernelm + kernelm*kernelt + kernele*kernelt + kernelm*kernele # + kernelm*kernele # + kernelt
 
             # ---- Train model ----
             model, likelihood = train_model_hadamard(
