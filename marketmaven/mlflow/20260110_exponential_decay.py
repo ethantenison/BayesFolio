@@ -415,9 +415,9 @@ TIME_KERNEL_GRID = {
    #KernelType.MATERN: [0.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
    #KernelType.MATERN_LINEAR: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
    #KernelType.PERIODIC_MATERN: [2.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
-   #KernelType.EXPONENTIAL_DECAY_MATERN: [1.5, 2.5],   
+   KernelType.EXPONENTIAL_DECAY_MATERN: [2.5],   
    #KernelType.EXPONENTIAL_DECAY_MATERN_c: [0.5]
-   KernelType.EXPONENTIAL_DECAY: [None]
+   #KernelType.EXPONENTIAL_DECAY: [None]
 
 }
 

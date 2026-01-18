@@ -512,8 +512,9 @@ def initialize_kernel(
             cp_kernel.raw_tau.data.fill_(0.5)
             return ScaleKernel(cp_kernel)
         elif kernel_type == KernelType.EXPONENTIAL_DECAY_MATERN:
-            return ScaleKernel(cont_kernel_factory.create_exponential_decay() * cont_kernel_factory.create_matern())
+            return ScaleKernel(cont_kernel_factory.create_exponential_decay() * cont_kernel_factory.create_matern()) + ScaleKernel(cont_kernel_factory.create_matern())
         elif kernel_type == KernelType.EXPONENTIAL_DECAY_MATERN_c:
+            # breaks down
             return ScaleKernel(cont_kernel_factory.create_exponential_decay()) + ScaleKernel(cont_kernel_factory.create_matern()) + cont_kernel_factory.create_exponential_decay() * cont_kernel_factory.create_matern()
         elif kernel_type == KernelType.EXPONENTIAL_DECAY:
             return ScaleKernel(cont_kernel_factory.create_exponential_decay()) 

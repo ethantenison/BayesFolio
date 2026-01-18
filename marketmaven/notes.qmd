@@ -314,3 +314,10 @@ the above should all live in the etf kernel
 **Jan 11th**
 - Trying exponential decay, doing a more expressive anova style kernel seems to have a benefit but more parameters. 
 -Actually it wasn't fully anova style! Need to check that. Also discovered that exponential decay couldnt' really be used on it's on as an additive because of its non-stationarity.
+
+**Jan 18th**
+- Tests to see if I need to model heteroskedastic noise with a separate model.
+1. regressing, modeling, standardized residuals to see if it has structure
+2.  predictive intervals are miscalibrated conditionally on regime volitility 
+3. if adding noise collapses to zero than you probably don't need it 
+- For employing uncertainty, try out blending the historical covariance with Gp task correlation matrix
