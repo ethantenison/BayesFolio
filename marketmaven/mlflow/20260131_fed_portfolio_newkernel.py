@@ -28,7 +28,7 @@ from marketmaven.visualization.variable_importance import xgboost_variable_impor
 from marketmaven.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
 from marketmaven.models.kernels import (
     InteractionPolicy, KernelArchitectureConfig, KernelBlockConfig, KernelType, KernelVariableType, LinearKernelConfig,
-    MaternKernelConfig, BlockStructure,GlobalStructure, ExpoDecayKernelConfig, RQKernelConfig, build_kernel
+    MaternKernelConfig, BlockStructure,GlobalStructure, ExpoDecayKernelConfig, RQKernelConfig, build_kernel, build_block_kernel
     )
     
 from marketmaven.models.means import MeanF, initialize_mean
@@ -401,8 +401,8 @@ MACRO_BASE_KERNEL_GRID = {
 
 # Macro modifier options (can include None for no modifier)
 MACRO_MODIFIER_GRID = {
-    'none': None,
-    #'linear': LinearKernelConfig(kernel_type=KernelType.LINEAR, ard=False),
+    #'none': None,
+    'linear': LinearKernelConfig(kernel_type=KernelType.LINEAR, ard=False),
 }
 
 # Time kernel variations
@@ -414,7 +414,7 @@ TIME_KERNEL_GRID = {
 
 # Global structure and interaction policy options
 GLOBAL_STRUCTURE_GRID = [GlobalStructure.HIERARCHICAL] # GlobalStructure.ADDITIVE
-INTERACTION_POLICY_GRID = [InteractionPolicy.TEMPORAL_ONLY] # , InteractionPolicy.TEMPORAL_ONLY
+INTERACTION_POLICY_GRID = [InteractionPolicy.FULL] # , InteractionPolicy.TEMPORAL_ONLY
 
 
 class ExperimentConfig(BaseModel):
@@ -521,8 +521,11 @@ class ExperimentConfig(BaseModel):
 #     interaction_policy=InteractionPolicy.TEMPORAL_ONLY,
 # )
 
+# etf_kernel = build_block_kernel(etf_block, batch_shape=torch.Size())
+# macro_block = build_block_kernel(macro_block, batch_shape=torch.Size())
+# time_block = build_block_kernel(time_block, batch_shape=torch.Size())
 
-
+# total = etf_kernel + macro_block + etf_kernel*time_block + macro_block*time_block
 def build_experiment_grid():
     """Build grid of all experiment configurations."""
     experiment_list = []

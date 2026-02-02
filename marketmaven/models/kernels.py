@@ -31,7 +31,7 @@ from gpytorch.kernels import (
 from gpytorch.priors import LogNormalPrior
 from pydantic import BaseModel, Field
 
-
+torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
