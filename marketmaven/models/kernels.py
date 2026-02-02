@@ -26,6 +26,7 @@ from gpytorch.kernels import (
     RBFKernel,
     RQKernel,
     ScaleKernel,
+    ProductKernel
 )
 from gpytorch.priors import LogNormalPrior
 from pydantic import BaseModel, Field
@@ -450,16 +451,10 @@ def build_block_kernel(block: KernelBlockConfig, *, batch_shape: torch.Size) -> 
     builder = _get_base_kernel_builder(block.base_kernel.kernel_type)
 
     if block.block_structure is BlockStructure.JOINT:
-        return ScaleKernel(
-            builder(block.dims, block.base_kernel, batch_shape),
-            batch_shape=batch_shape,
-        )
+        return ScaleKernel(builder(block.dims, block.base_kernel, batch_shape), batch_shape=batch_shape)
 
     components = [
-        ScaleKernel(
-            builder([dim], block.base_kernel, batch_shape),
-            batch_shape=batch_shape,
-        )
+        ScaleKernel(builder([dim], block.base_kernel, batch_shape), batch_shape=batch_shape)
         for dim in block.dims
     ]
     return _sum_kernels(components)
@@ -468,8 +463,13 @@ def build_block_kernel(block: KernelBlockConfig, *, batch_shape: torch.Size) -> 
 def _block_interaction_components(block: KernelBlockConfig, *, batch_shape: torch.Size) -> list[Kernel]:
     builder = _get_base_kernel_builder(block.base_kernel.kernel_type)
     if block.block_structure is BlockStructure.JOINT:
-        return [builder(block.dims, block.base_kernel, batch_shape)]
-    return [builder([d], block.base_kernel, batch_shape) for d in block.dims]
+        base = builder(block.dims, block.base_kernel, batch_shape)
+        _assert_unscaled_base(base, ctx="_block_interaction_components(JOINT)")
+        return [base]
+    bases = [builder([d], block.base_kernel, batch_shape) for d in block.dims]
+    for b in bases:
+        _assert_unscaled_base(b, ctx="_block_interaction_components(ADDITIVE)")
+    return bases
 
 
 def _within_block_interactions(block: KernelBlockConfig, *, batch_shape: torch.Size) -> list[Kernel]:
@@ -477,12 +477,14 @@ def _within_block_interactions(block: KernelBlockConfig, *, batch_shape: torch.S
         return []
 
     builder = _get_base_kernel_builder(block.base_kernel.kernel_type)
-    components = [builder([d], block.base_kernel, batch_shape) for d in block.dims]
+    components = [builder([d], block.base_kernel, batch_shape) for d in block.dims]  # unscaled bases
+    for c in components:
+        _assert_unscaled_base(c, ctx="_within_block_interactions")
 
     interactions: list[Kernel] = []
     for i in range(len(components)):
         for j in range(i + 1, len(components)):
-            interactions.append(ScaleKernel(components[i] * components[j], batch_shape=batch_shape))
+            interactions.append(_scaled_product(components[i], components[j], batch_shape=batch_shape))
     return interactions
 
 
@@ -490,6 +492,16 @@ def _within_block_interactions(block: KernelBlockConfig, *, batch_shape: torch.S
 # Architecture-level Kernel Construction
 # ============================================================================
 
+
+def _unwrap_scale(k: Kernel) -> Kernel:
+    """Return the bare base kernel if `k` is a ScaleKernel; else `k`."""
+    return k.base_kernel if isinstance(k, ScaleKernel) else k
+
+def _scaled_product(k1: Kernel, k2: Kernel, *, batch_shape: torch.Size) -> Kernel:
+    """Ensure product terms are formed as Scale( base1 * base2 ) with no inner scales."""
+    b1 = _unwrap_scale(k1)
+    b2 = _unwrap_scale(k2)
+    return ScaleKernel(b1 * b2, batch_shape=batch_shape)
 
 def _default_sparse_pairs(blocks: list[KernelBlockConfig]) -> list[tuple[int, int]]:
     """Domain-informed sparse interaction heuristic.
@@ -561,16 +573,14 @@ def build_block_interactions(
     else:
         raise ValueError(f"Unknown interaction policy: {policy}")
 
-    # Cache kernel components to avoid redundant instantiation
     block_components_cache = [_block_interaction_components(block, batch_shape=batch_shape) for block in blocks]
 
-    # Build interaction kernels for selected pairs
     interactions: list[Kernel] = []
     for i, j in pairs:
         for ki in block_components_cache[i]:
             for kj in block_components_cache[j]:
-                interactions.append(ScaleKernel(ki * kj, batch_shape=batch_shape))
-
+                # OLD: interactions.append(ScaleKernel(ki * kj, batch_shape=batch_shape))
+                interactions.append(_scaled_product(ki, kj, batch_shape=batch_shape))
     return interactions
 
 
@@ -640,3 +650,47 @@ def make_default_kernel_architecture(
         global_structure=GlobalStructure.ADDITIVE,
         interaction_policy=InteractionPolicy.SPARSE,  # Use sparse by default for efficiency
     )
+
+
+# ============================================================================
+# Kernel Composition Utilities
+# ============================================================================
+def _unwrap_scale(k: Kernel) -> Kernel:
+    """Return the bare base kernel if `k` is a ScaleKernel; else the kernel itself."""
+    return k.base_kernel if isinstance(k, ScaleKernel) else k
+
+
+def _scaled_product(k1: Kernel, k2: Kernel, *, batch_shape: torch.Size) -> Kernel:
+    """Form product terms as Scale(base1 * base2), stripping any inner scales."""
+    b1 = _unwrap_scale(k1)
+    b2 = _unwrap_scale(k2)
+    return ScaleKernel(b1 * b2, batch_shape=batch_shape)
+
+
+def _assert_unscaled_base(k: Kernel, *, ctx: str) -> None:
+    """Dev-only guardrail: builders used for interaction terms must return unscaled bases."""
+    if isinstance(k, ScaleKernel):
+        raise RuntimeError(
+            f"[{ctx}] Expected an unscaled base kernel for interaction building, got ScaleKernel(...). "
+            "Use _block_interaction_components/builders that return base kernels only."
+        )
+
+
+def _assert_no_inner_scales_in_products(k: Kernel, *, ctx: str = "sanity") -> None:
+    """Dev-only: recursively assert that ProductKernel children are not ScaleKernel."""
+    def _walk(node: Kernel, path: str) -> None:
+        if isinstance(node, ProductKernel):
+            for child in node.kernels:
+                if isinstance(child, ScaleKernel):
+                    raise RuntimeError(
+                        f"[{ctx}] Found ScaleKernel directly under ProductKernel at: {path} -> ProductKernel"
+                    )
+        # Recurse into common composites
+        # AdditiveKernel / ProductKernel expose `.kernels`; ScaleKernel exposes `.base_kernel`
+        if hasattr(node, "kernels"):  # AdditiveKernel / ProductKernel
+            for idx, child in enumerate(node.kernels):
+                _walk(child, f"{path}/kernels[{idx}]")
+        elif isinstance(node, ScaleKernel):
+            _walk(node.base_kernel, f"{path}/base_kernel")
+
+    _walk(k, "kernel")
