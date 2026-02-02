@@ -8,7 +8,36 @@ import mlflow
 from gpytorch.kernels import Kernel
 from gpytorch.priors import Prior, LKJCovariancePrior
 from gpytorch.constraints import GreaterThan
+from marketmaven.models.kernels import KernelArchitectureConfig
 
+def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, prefix: str = "kernel"):
+    """Log kernel architecture with separated block information."""
+    # Log global structure
+    mlflow.log_param(f"{prefix}.global_structure", kernel_arch.global_structure.value)
+    mlflow.log_param(f"{prefix}.interaction_policy", kernel_arch.interaction_policy.value)
+    mlflow.log_param(f"{prefix}.num_blocks", len(kernel_arch.blocks))
+    
+    # Log each block separately
+    for i, block in enumerate(kernel_arch.blocks):
+        block_prefix = f"{prefix}.block_{i}"
+        mlflow.log_param(f"{block_prefix}.variable_type", block.variable_type.value)
+        mlflow.log_param(f"{block_prefix}.block_structure", block.block_structure.value)
+        mlflow.log_param(f"{block_prefix}.dims", str(block.dims))
+        mlflow.log_param(f"{block_prefix}.num_dims", len(block.dims))
+        
+        # Log base kernel config
+        base_kernel = block.base_kernel
+        mlflow.log_param(f"{block_prefix}.base_kernel.type", base_kernel.kernel_type.value)
+        mlflow.log_param(f"{block_prefix}.base_kernel.ard", base_kernel.ard)
+        
+        # Log kernel-specific parameters
+        if hasattr(base_kernel, 'nu'):
+            mlflow.log_param(f"{block_prefix}.base_kernel.nu", base_kernel.nu)
+        if hasattr(base_kernel, 'depth'):
+            mlflow.log_param(f"{block_prefix}.base_kernel.depth", base_kernel.depth)
+    
+    # Also save full config as JSON for complete record
+    mlflow.log_dict(kernel_arch.model_dump(), f"{prefix}_architecture.json")
 
     
 def log_kernel_to_mlflow(kernel: KernelConfig, prefix: str):
