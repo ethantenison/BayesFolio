@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,15 +8,21 @@ from typing import Dict, List
 import matplotlib.dates as mdates
 
 
+BASE_DIR = Path(__file__).resolve().parents[1]
+ARTIFACT_DIR = BASE_DIR / "mlflow" / "artifacts"
+
+
 # =========================================================
 # Helper: MLflow save + log
 # =========================================================
 def save_plot(fig, name):
     """Save a Matplotlib figure to MLflow."""
-    path = f"marketmaven/mlflow/artifacts/{name}.png"
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+
+    path = ARTIFACT_DIR / f"{name}.png"
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
-    mlflow.log_artifact(path)
+    mlflow.log_artifact(str(path))
 
 
 # =========================================================

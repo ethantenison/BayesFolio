@@ -564,7 +564,7 @@ print(f"Total experiments: {len(experiment_grid)}")
 seed = 27
 
 # (Optional) group all runs in one MLflow experiment
-mlflow.set_experiment("February 2026 portfolio")
+mlflow.set_experiment("March 2026 portfolio")
 
 
 # Then in your MLflow loop:
@@ -731,10 +731,15 @@ for cfg in experiment_grid:
             ci_df[f"{c}_lower_95"]  = preds_df[f"{c}_pred"] - 1.96 * unc_df[f"{c}_unc"]
             ci_df[f"{c}_upper_95"]  = preds_df[f"{c}_pred"] + 1.96 * unc_df[f"{c}_unc"]
 
-        # Save CI DataFrame as artifact
-        ci_path = "marketmaven/mlflow/artifacts/confidence_intervals.csv"
+        from pathlib import Path
+        import mlflow
+
+        out_dir = Path("mlflow/artifacts")
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        ci_path = out_dir / "confidence_intervals.csv"
         ci_df.to_csv(ci_path, index=False)
-        mlflow.log_artifact(ci_path)
+        mlflow.log_artifact(str(ci_path))
                     
         # ---- MTGP EVAL ----
         summary_gp = evaluate_asset_pricing(
@@ -789,7 +794,7 @@ for cfg in experiment_grid:
         mean_df = pd.DataFrame(mean_pred, columns=asset_cols)
         ewma_df = pd.DataFrame(ewma_pred, columns=asset_cols)
         
-        plot_path = "marketmaven/mlflow/artifacts/actual_vs_pred_matrix.png"
+        plot_path = out_dir / "actual_vs_pred_matrix.png"
 
         #fix the index to be the dates from the test splits
         date_test_splits = np.array(test_dates_splits)
@@ -824,8 +829,9 @@ for cfg in experiment_grid:
         "Mean": summary_mean,
         "EWMA": summary_ewma,
         })
-        comparison.to_html("marketmaven/mlflow/artifacts/comparison_table.html")
-        mlflow.log_artifact("marketmaven/mlflow/artifacts/comparison_table.html")
+        comparison_table_path = out_dir / "model_comparison_table.html"
+        comparison.to_html(comparison_table_path)
+        mlflow.log_artifact(str(comparison_table_path))
         
         # R2_OS calculations
         y_true_norm = true_b_df.rename(columns=lambda c: c.replace("_true", ""))
@@ -835,7 +841,7 @@ for cfg in experiment_grid:
         
 
         # Save global_importance as a CSV file
-        # importance_path = "marketmaven/mlflow/artifacts/global_importance.csv"
+        # importance_path = "bayesfolio/mlflow/artifacts/global_importance.csv"
         # global_importance.to_csv(importance_path, header=True)
         # mlflow.log_artifact(importance_path)
 
@@ -843,8 +849,9 @@ for cfg in experiment_grid:
         # mlflow.log_dict(global_importance.to_dict(), "global_importance.json")
         
         compare_error = model_error_by_time_index(y_true_norm, y_pred_norm)
-        compare_error.to_html("marketmaven/mlflow/artifacts/compare_error.html")
-        mlflow.log_artifact("marketmaven/mlflow/artifacts/compare_error.html")
+        compare_error_path = out_dir / "compare_error.html"
+        compare_error.to_html(compare_error_path)
+        mlflow.log_artifact(str(compare_error_path))
         
         r2_gp_vs_mean = r2_os(y_true_norm, y_pred_norm, y_mean_norm)
         r2_gp_vs_ewma = r2_os(y_true_norm, y_pred_norm, y_ewma_norm)
