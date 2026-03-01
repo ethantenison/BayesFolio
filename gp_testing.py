@@ -6,9 +6,9 @@ from astropy import conf
 import pandas as pd
 import yfinance as yf
 import warnings
-from marketmaven.asset_prices import build_long_panel
-from marketmaven.market_fundamentals import fetch_vix_term_structure
-from marketmaven.utils import get_current_date
+from bayesfolio.asset_prices import build_long_panel
+from bayesfolio.market_fundamentals import fetch_vix_term_structure
+from bayesfolio.utils import get_current_date
 import numpy as np
 import matplotlib.pyplot as plt
 import torch

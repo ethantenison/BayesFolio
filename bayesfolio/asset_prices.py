@@ -5,7 +5,7 @@ Module to fetch asset prices and compute future excess returns over risk-free ra
 import yfinance as yf
 import pandas as pd
 import numpy as np
-from marketmaven.configs import Interval, Horizon
+from bayesfolio.configs import Interval, Horizon
 from scipy.stats import spearmanr
 
 def cross_sectional_zscore(

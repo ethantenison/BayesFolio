@@ -7,27 +7,27 @@ from joblib import Parallel, delayed
 from pydantic import BaseModel
 from sympy import use
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-from marketmaven.configs import TickerConfig, Interval, Horizon, CVConfig
-from marketmaven.asset_prices import build_long_panel, fetch_etf_features
-from marketmaven.market_fundamentals import fetch_enhanced_macro_features
+from bayesfolio.configs import TickerConfig, Interval, Horizon, CVConfig
+from bayesfolio.asset_prices import build_long_panel, fetch_etf_features
+from bayesfolio.market_fundamentals import fetch_enhanced_macro_features
 import numpy as np
 import torch
-from marketmaven.configs import (
+from bayesfolio.configs import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
-from marketmaven.visualization.eda import correlation_matrix, apply_pca_and_replace
-from marketmaven.gp_data_prep import prepare_multitask_gp_data
-from marketmaven.models.cv import rolling_time_splits_multitask
-from marketmaven.models.scaling import MultitaskScaler
+from bayesfolio.visualization.eda import correlation_matrix, apply_pca_and_replace
+from bayesfolio.gp_data_prep import prepare_multitask_gp_data
+from bayesfolio.models.cv import rolling_time_splits_multitask
+from bayesfolio.models.scaling import MultitaskScaler
 device = torch.device("cpu")
-from marketmaven.models.gp import train_model_hadamard
+from bayesfolio.models.gp import train_model_hadamard
 from math import log, sqrt
-from marketmaven.evaluate import evaluate_asset_pricing
-from marketmaven.utils import check_equal_occurrences
+from bayesfolio.evaluate import evaluate_asset_pricing
+from bayesfolio.utils import check_equal_occurrences
 from pydantic import BaseModel, ConfigDict
-from marketmaven.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
-from marketmaven.portfolio.helpers import assessing_long_short_performance, long_short_returns
-from marketmaven.models.kernels import MeanF, KernelType, initialize_mean, initialize_kernel
-from marketmaven.mlflow.helpers import (
+from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
+from bayesfolio.portfolio.helpers import assessing_long_short_performance, long_short_returns
+from bayesfolio.models.kernels import MeanF, KernelType, initialize_mean, initialize_kernel
+from bayesfolio.mlflow.helpers import (
     KernelF, KernelT, MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     extract_full_gp_config,model_error_by_time_index
 )

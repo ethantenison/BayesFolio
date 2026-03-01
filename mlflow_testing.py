@@ -6,8 +6,8 @@ from astropy import conf
 import pandas as pd
 import yfinance as yf
 import warnings
-from marketmaven.asset_prices import build_long_panel
-from marketmaven.market_fundamentals import fetch_vix_term_structure
+from bayesfolio.asset_prices import build_long_panel
+from bayesfolio.market_fundamentals import fetch_vix_term_structure
 import numpy as np
 import matplotlib.pyplot as plt
 import torch

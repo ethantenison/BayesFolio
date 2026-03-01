@@ -8,45 +8,45 @@ from joblib import Parallel, delayed
 from pydantic import BaseModel
 from regex import E
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-from marketmaven.configs import TickerConfig, Interval, Horizon, CVConfig
-from marketmaven.asset_prices import build_long_panel
+from bayesfolio.configs import TickerConfig, Interval, Horizon, CVConfig
+from bayesfolio.asset_prices import build_long_panel
 import numpy as np
 import torch
-from marketmaven.configs import (
+from bayesfolio.configs import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
-from marketmaven.visualization.eda import correlation_matrix
-from marketmaven.gp_data_prep import prepare_multitask_gp_data
-from marketmaven.models.cv import rolling_time_splits_multitask
-from marketmaven.models.scaling import MultitaskScaler
+from bayesfolio.visualization.eda import correlation_matrix
+from bayesfolio.gp_data_prep import prepare_multitask_gp_data
+from bayesfolio.models.cv import rolling_time_splits_multitask
+from bayesfolio.models.scaling import MultitaskScaler
 device = torch.device("cpu")
-from marketmaven.models.gp import train_model_hadamard
+from bayesfolio.models.gp import train_model_hadamard
 from math import log, sqrt
-from marketmaven.evaluate import evaluate_asset_pricing
-from marketmaven.utils import check_equal_occurrences
-from marketmaven.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
-from marketmaven.visualization.variable_importance import xgboost_variable_importance
-from marketmaven.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
-from marketmaven.models.kernels import (
+from bayesfolio.evaluate import evaluate_asset_pricing
+from bayesfolio.utils import check_equal_occurrences
+from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
+from bayesfolio.visualization.variable_importance import xgboost_variable_importance
+from bayesfolio.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
+from bayesfolio.models.kernels import (
     InteractionPolicy, KernelArchitectureConfig, KernelBlockConfig, KernelType, KernelVariableType, LinearKernelConfig,
     MaternKernelConfig, BlockStructure,GlobalStructure, ExpoDecayKernelConfig, RQKernelConfig, build_kernel, build_block_kernel
     )
     
-from marketmaven.models.means import MeanF, initialize_mean
-from marketmaven.mlflow.helpers import (
+from bayesfolio.models.means import MeanF, initialize_mean
+from bayesfolio.mlflow.helpers import (
     MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     model_error_by_time_index, log_kernel_architecture_detailed,log_kernel_to_mlflow, log_gpytorch_state_dict, log_gp_hyperparameters
 )
 import plotly.express as px
 import random
 import itertools
-from marketmaven.market_fundamentals import fetch_enhanced_macro_features
-from marketmaven.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank, cross_sectional_zscore
+from bayesfolio.market_fundamentals import fetch_enhanced_macro_features
+from bayesfolio.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank, cross_sectional_zscore
 from gpytorch.kernels import SpectralMixtureKernel
 warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
 )
-from marketmaven.configs import (
+from bayesfolio.configs import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from IPython.display import display
 pd.set_option('display.max_rows', 30)
@@ -143,7 +143,7 @@ etf_tickers = [ticker for ticker in etf_tickers if ticker not in assets_to_drop]
 
 tickers = TickerConfig(
     start_date="2016-11-29",
-    end_date="2026-02-28",
+    end_date="2026-01-31",
     interval=Interval.DAILY,
     tickers=etf_tickers,
     horizon=Horizon.MONTHLY,
@@ -151,9 +151,9 @@ tickers = TickerConfig(
 )
 
 ############### Returns data ###############
-return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
-return_data.to_csv("20260228_etf_returns.csv", index=False)
-return_data = pd.read_csv("20260228_etf_returns.csv")  # Updated to match the new filename
+# return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
+# return_data.to_csv("20260131_etf_returns.csv", index=False)
+return_data = pd.read_csv("20260131_etf_returns.csv")  # Updated to match the new filename
 return_data = return_data[~return_data['asset_id'].isin(assets_to_drop)]
 
 
@@ -172,15 +172,15 @@ fig = correlation_matrix(pivoted_returns)
 fig.show()
 
 # # # ############### Factor data ###############
-macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
-macro_features.to_csv("20260228_macro_features.csv", index=False)
-macro_features = pd.read_csv("20260228_macro_features.csv")
+# macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
+# macro_features.to_csv("20260131_macro_features.csv", index=False)
+macro_features = pd.read_csv("20260131_macro_features.csv")
 macro_features = macro_features.drop(columns=['vix_ts_level','vix3m','yc_pc1', 'yc_pc2', 'yc_pc3', 'y10_nominal' ])
 macro_cols = macro_features.columns[1:].tolist()
 
-etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
-etf_features.to_csv("20260228_etf_features.csv", index=False)
-etf_features = pd.read_csv("20260228_etf_features.csv")
+# etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
+# etf_features.to_csv("20260131_etf_features.csv", index=False)
+etf_features = pd.read_csv("20260131_etf_features.csv")
 etf_features = etf_features[~etf_features['asset_id'].isin(assets_to_drop)]
 etf_features = etf_features.drop(columns=['ma_1m','ma_3m','vol_1w', 'price', 'overnight_gap'])
 
@@ -213,7 +213,7 @@ df["lag2_y_excess_lead"] = (
       .shift(2)
 )
 df= df[df['date'] > str("2016-11-28")]
-df = df[df['date'] < str("2026-02-28")]
+df = df[df['date'] < str("2026-01-30")]
 df = df.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
 
 

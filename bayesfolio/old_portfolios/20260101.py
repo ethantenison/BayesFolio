@@ -5,22 +5,22 @@ Jan 2026 Portoflio Selections
 
 """
 import pandas as pd
-from marketmaven.configs import TickerConfig, Interval, Horizon, CVConfig
-from marketmaven.asset_prices import build_long_panel
+from bayesfolio.configs import TickerConfig, Interval, Horizon, CVConfig
+from bayesfolio.asset_prices import build_long_panel
 import numpy as np
 import torch
-from marketmaven.configs import (
+from bayesfolio.configs import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
-from marketmaven.visualization.eda import correlation_matrix
-from marketmaven.gp_data_prep import prepare_multitask_gp_data
-from marketmaven.models.cv import rolling_time_splits_multitask
-from marketmaven.models.scaling import MultitaskScaler
+from bayesfolio.visualization.eda import correlation_matrix
+from bayesfolio.gp_data_prep import prepare_multitask_gp_data
+from bayesfolio.models.cv import rolling_time_splits_multitask
+from bayesfolio.models.scaling import MultitaskScaler
 device = torch.device("cpu")
-from marketmaven.models.gp import train_model_hadamard
-from marketmaven.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
-from marketmaven.models.kernels import KernelType, initialize_kernel, adaptive_lengthscale_prior,  create_kernel_initialization, KernelConfig
-from marketmaven.models.means import MeanF, initialize_mean
-from marketmaven.mlflow.helpers import (
+from bayesfolio.models.gp import train_model_hadamard
+from bayesfolio.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
+from bayesfolio.models.kernels import KernelType, initialize_kernel, adaptive_lengthscale_prior,  create_kernel_initialization, KernelConfig
+from bayesfolio.models.means import MeanF, initialize_mean
+from bayesfolio.mlflow.helpers import (
     MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     model_error_by_time_index, log_kernel_to_mlflow, log_gpytorch_state_dict, log_gp_hyperparameters
 )

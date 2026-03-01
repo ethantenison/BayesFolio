@@ -6,10 +6,10 @@ from astropy import conf
 import pandas as pd
 import yfinance as yf
 import warnings
-from marketmaven.asset_prices import build_long_panel
-from marketmaven.market_fundamentals import fetch_macro_features
-from marketmaven.evaluate import evaluate_asset_pricing
-from marketmaven.utils import get_current_date
+from bayesfolio.asset_prices import build_long_panel
+from bayesfolio.market_fundamentals import fetch_macro_features
+from bayesfolio.evaluate import evaluate_asset_pricing
+from bayesfolio.utils import get_current_date
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
@@ -34,7 +34,7 @@ import pandas as pd
 from sklearn.metrics import r2_score
 from scipy.stats import spearmanr
 from itertools import cycle
-from marketmaven.configs import TickerConfig, Interval, Horizon
+from bayesfolio.configs import TickerConfig, Interval, Horizon
 from joblib import Parallel, delayed
 from sklearn.preprocessing import MinMaxScaler
 import math
