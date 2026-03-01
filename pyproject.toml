@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "marketmaven"
+name = "BayesFolio"
 version = "0.1.0"
 description = ""
 authors = ["ethantenison <tenison.ethan@gmail.com>"]
