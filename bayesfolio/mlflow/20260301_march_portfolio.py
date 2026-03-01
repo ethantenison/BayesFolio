@@ -203,7 +203,7 @@ df["lag2_y_excess_lead"] = (
       .shift(2)
 )
 df= df[df['date'] > str("2016-11-28")]
-df = df[df['date'] < str("2026-01-30")]
+df = df[df['date'] < str("2026-02-01")]
 df = df.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
 
 
