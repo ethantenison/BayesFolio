@@ -6,7 +6,7 @@ authors = ["ethantenison <tenison.ethan@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.14"
+python = "3.13.12"
 numpy = "^2.0.0"
 pandas = "^2.2.2"
 yfinance = "^0.2.40"
