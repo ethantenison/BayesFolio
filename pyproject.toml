@@ -24,6 +24,7 @@ mlflow = "^3.3.2"
 pydantic = "^2.11.7"
 botorch = "0.16.1"
 vectorbt = "0.28.1"
+pandas-datareader = "^0.10.0"
 
 
 [tool.poetry.group.dev.dependencies]

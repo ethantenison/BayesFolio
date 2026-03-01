@@ -1,5 +1,3 @@
-
-from re import M
 import mlflow
 import pandas as pd
 import warnings
@@ -69,7 +67,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*not p.d., 
 # mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 # mlflow.set_experiment(EXPERIMENT_NAME)
 mlflow.set_tracking_uri("file:./mlruns")
-mlflow.set_experiment("February Portfolio Experiments")
+mlflow.set_experiment("March Portfolio Experiments")
 
 
 warnings.filterwarnings("ignore")
@@ -77,7 +75,7 @@ pd.options.display.float_format = '{:.3}'.format
 
 ############### Experiment Configuration ###############
 
-description = "tracking experiments for february portfolio assets"
+description = "tracking experiments for march portfolio assets"
 
 """
 Setting the task matrix eigenvalues to see the effective dimensionality of the asset returns
