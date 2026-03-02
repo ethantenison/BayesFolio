@@ -19,6 +19,11 @@ BayesFolio is evolving toward an Agentic AI-powered portfolio optimization platf
 - Integrates a future RAG-enhanced conversational interface
 - Emphasizes responsible and transparent AI in financial decision systems
 
+**Optimal envisioned workflow**:
+1. User specifies ETF tickers
+2. The AI asks questions about goals and market views (Bayesian approach)
+3. AI generates an optimized portfolio report with data visualizations
+
 ------------------------------------------------------------
 
 ## Current Capabilities

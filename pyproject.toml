@@ -32,6 +32,9 @@ scipy = "1.17.1"
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 
+[tool.ruff]
+extend-exclude = ["experiments"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
