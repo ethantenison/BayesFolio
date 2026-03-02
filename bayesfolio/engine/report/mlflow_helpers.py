@@ -7,7 +7,6 @@ from bayesfolio.engine.models.gp.means import MeanF
 import mlflow
 from gpytorch.kernels import Kernel
 from gpytorch.priors import Prior, LKJCovariancePrior
-from gpytorch.constraints import GreaterThan
 from bayesfolio.engine.models.gp.kernels import KernelArchitectureConfig
 
 def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, prefix: str = "kernel"):
@@ -31,10 +30,13 @@ def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, pref
         mlflow.log_param(f"{block_prefix}.base_kernel.ard", base_kernel.ard)
         
         # Log kernel-specific parameters
-        if hasattr(base_kernel, 'nu'):
-            mlflow.log_param(f"{block_prefix}.base_kernel.nu", base_kernel.nu)
-        if hasattr(base_kernel, 'depth'):
-            mlflow.log_param(f"{block_prefix}.base_kernel.depth", base_kernel.depth)
+        nu = getattr(base_kernel, "nu", None)
+        if nu is not None:
+            mlflow.log_param(f"{block_prefix}.base_kernel.nu", nu)
+
+        depth = getattr(base_kernel, "depth", None)
+        if depth is not None:
+            mlflow.log_param(f"{block_prefix}.base_kernel.depth", depth)
     
     # Also save full config as JSON for complete record
     mlflow.log_dict(kernel_arch.model_dump(), f"{prefix}_architecture.json")
@@ -280,9 +282,9 @@ def describe_task_kernel(tk):
 
     return out
 
-def describe_prior(p: Prior):
+def describe_prior(p: object):
     """Return a JSON-serializable dict describing a GPyTorch Prior."""
-    out = {"type": p.__class__.__name__}
+    out: dict[str, object] = {"type": p.__class__.__name__}
 
     # --- Special case: LKJCovariancePrior ---------------------------------
     if isinstance(p, LKJCovariancePrior):
@@ -313,66 +315,84 @@ def describe_prior(p: Prior):
                     out[attr] = str(val)
     return out
 
-def describe_constraint(c: GreaterThan):
+def describe_constraint(c: object):
     """Return constraint information."""
-    d = {"type": c.__class__.__name__}
+    d: dict[str, object] = {"type": c.__class__.__name__}
     for attr in ["lower_bound", "upper_bound", "initial_value"]:
         if hasattr(c, attr):
-            d[attr] = getattr(c, attr).item() if hasattr(getattr(c, attr), "item") else getattr(c, attr)
+            value = getattr(c, attr)
+            d[attr] = value.item() if hasattr(value, "item") else value
     return d
 
 
 def describe_kernel(k: Kernel):
     """Recursively describe GPyTorch kernels."""
-    out = {"type": k.__class__.__name__}
+    out: dict[str, object] = {"type": k.__class__.__name__}
 
     # Smoothness for Matern
-    if hasattr(k, "nu"):
-        out["nu"] = float(k.nu)
+    nu = getattr(k, "nu", None)
+    if nu is not None:
+        try:
+            out["nu"] = float(nu)
+        except Exception:
+            out["nu"] = str(nu)
 
     # Periodic kernel
-    if hasattr(k, "period_length") and k.period_length is not None:
+    period_length = getattr(k, "period_length", None)
+    if period_length is not None:
         try:
-            out["period_length"] = k.period_length.item()
-        except:
-            out["period_length"] = str(k.period_length)
+            out["period_length"] = period_length.item()
+        except Exception:
+            out["period_length"] = str(period_length)
 
-        if hasattr(k, "period_length_prior") and k.period_length_prior is not None:
-            out["period_length_prior"] = describe_prior(k.period_length_prior)
+    period_length_prior = getattr(k, "period_length_prior", None)
+    if isinstance(period_length_prior, Prior):
+        out["period_length_prior"] = describe_prior(period_length_prior)
 
     # ARD dims
-    if hasattr(k, "ard_num_dims"):
-        out["ard_num_dims"] = k.ard_num_dims
+    ard_num_dims = getattr(k, "ard_num_dims", None)
+    if ard_num_dims is not None:
+        out["ard_num_dims"] = ard_num_dims
 
     # lengthscale — must check for None
-    if hasattr(k, "lengthscale") and k.lengthscale is not None:
+    lengthscale = getattr(k, "lengthscale", None)
+    if lengthscale is not None:
         try:
-            out["lengthscale"] = k.lengthscale.detach().cpu().numpy().tolist()
-        except:
-            out["lengthscale"] = str(k.lengthscale)
+            out["lengthscale"] = lengthscale.detach().cpu().numpy().tolist()
+        except Exception:
+            out["lengthscale"] = str(lengthscale)
 
     # lengthscale prior
-    if hasattr(k, "lengthscale_prior") and k.lengthscale_prior is not None:
-        out["lengthscale_prior"] = describe_prior(k.lengthscale_prior)
+    lengthscale_prior = getattr(k, "lengthscale_prior", None)
+    if isinstance(lengthscale_prior, Prior):
+        out["lengthscale_prior"] = describe_prior(lengthscale_prior)
 
     # lengthscale constraint
-    if hasattr(k, "raw_lengthscale_constraint") and k.raw_lengthscale_constraint is not None:
-        out["lengthscale_constraint"] = describe_constraint(k.raw_lengthscale_constraint)
+    raw_lengthscale_constraint = getattr(k, "raw_lengthscale_constraint", None)
+    if raw_lengthscale_constraint is not None:
+        out["lengthscale_constraint"] = describe_constraint(raw_lengthscale_constraint)
 
     # Additive / Product kernels
-    if hasattr(k, "kernels"):
-        out["sub_kernels"] = [describe_kernel(sub) for sub in k.kernels]
+    kernels = getattr(k, "kernels", None)
+    if kernels is not None:
+        try:
+            out["sub_kernels"] = [describe_kernel(sub) for sub in kernels]
+        except TypeError:
+            pass
 
     # Index kernels
-    if hasattr(k, "num_tasks"):
-        out["num_tasks"] = k.num_tasks
+    num_tasks = getattr(k, "num_tasks", None)
+    if num_tasks is not None:
+        out["num_tasks"] = num_tasks
 
-    if hasattr(k, "rank"):
-        out["rank"] = k.rank
+    rank = getattr(k, "rank", None)
+    if rank is not None:
+        out["rank"] = rank
 
     # LKJ prior for task covariance
-    if hasattr(k, "task_prior") and k.task_prior is not None:
-        out["task_prior"] = describe_prior(k.task_prior)
+    task_prior = getattr(k, "task_prior", None)
+    if isinstance(task_prior, Prior):
+        out["task_prior"] = describe_prior(task_prior)
 
     return out
 

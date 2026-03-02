@@ -21,13 +21,13 @@ from bayesfolio.engine.models.scaling import MultitaskScaler
 device = torch.device("cpu")
 from bayesfolio.engine.models.gp.multitask import train_model_hadamard
 from math import log, sqrt
-from bayesfolio.optimization.evaluate import evaluate_asset_pricing
+from bayesfolio.engine.backtest.evaluate_asset_pricing import evaluate_asset_pricing
 from bayesfolio.utils import check_equal_occurrences
 from pydantic import BaseModel, ConfigDict
 from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
-from bayesfolio.optimization.portfolio_helpers import assessing_long_short_performance, long_short_returns
+from bayesfolio.engine.backtest.portfolio_helpers import assessing_long_short_performance, long_short_returns
 from bayesfolio.engine.models.gp.kernels import MeanF, KernelType, initialize_mean, initialize_kernel
-from bayesfolio.mlflow.helpers import (
+from bayesfolio.engine.report.mlflow_helpers import (
     KernelF, KernelT, MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     extract_full_gp_config,model_error_by_time_index
 )
