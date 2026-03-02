@@ -58,14 +58,6 @@ All generated code MUST pass linting.
 
 ---
 
-## Dependency & Environment Rules
-
-- BayesFolio is a **Python package**, not a notebook-only project.
-- Prefer lightweight, modular dependencies.
-- Riskfolio-Lib is used for portfolio optimization. Use it via a clean adapter layer.
-
----
-
 ## Architecture Rules (STRICT)
 
 ### Separation of Concerns
@@ -206,21 +198,7 @@ BayesFolio outputs must be explainable and auditable:
 
 ## Defaults (When Unsure)
 
-- Prefer **per_task** scaling for multitask return targets
-- Prefer scenario-based CVaR optimization when using GP uncertainty
 - Keep APIs small and composable
 - Add type hints + docstrings by default
-- Do not modify existing public APIs without adding tests
 
 ---
-
-## What NOT to Add Yet (Important)
-
-BayesFolio will eventually include:
-- an agentic app layer
-- a RAG chatbot interface
-- report generation UI
-
-But currently:
-- do NOT add app infrastructure unless explicitly requested
-- keep model/portfolio/backtesting layers clean and reusable so an app can wrap them later

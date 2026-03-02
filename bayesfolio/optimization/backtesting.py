@@ -5,11 +5,13 @@ import riskfolio as rp
 
 def summarize_backtest(bt_df: pd.DataFrame):
     """Compute summary performance metrics for the backtest."""
-    ret = bt_df["net_return"].dropna()
+    ret = pd.to_numeric(bt_df["net_return"], errors="coerce").dropna()
     if len(ret) == 0:
         return {}
 
-    cagr = (1 + ret).prod() ** (12 / len(ret)) - 1
+    total_growth = float(np.prod(1.0 + ret.to_numpy(dtype=float)))
+    annualization = 12.0 / float(len(ret))
+    cagr = float(np.power(total_growth, annualization) - 1.0)
     vol = ret.std() * np.sqrt(12)
     sharpe = cagr / vol if vol > 0 else np.nan
     sortino = cagr / (ret[ret < 0].std() * np.sqrt(12)) if (ret < 0).any() else np.nan
