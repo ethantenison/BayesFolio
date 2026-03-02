@@ -22,3 +22,5 @@ portfolios/20251201_portfolio.xlsx
 20260101_macro_features.csv
 scratch/
 .vscode/settings.json
+data/
+bayesfolio/mlflow/artifacts/

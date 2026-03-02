@@ -321,3 +321,6 @@ the above should all live in the etf kernel
 2.  predictive intervals are miscalibrated conditionally on regime volitility 
 3. if adding noise collapses to zero than you probably don't need it 
 - For employing uncertainty, try out blending the historical covariance with Gp task correlation matrix
+
+**March 1st**
+- Need to clean up. Streamline mlflow. Paths are off. 
