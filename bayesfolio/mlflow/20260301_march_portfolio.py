@@ -433,7 +433,7 @@ TIME_KERNEL_GRID = {
 }
 
 
-RANK_GRID = [5]
+RANK_GRID = [6]
 MEAN_F_GRID = [MeanF.MULTITASK_ZERO] #etf_mean_spec MeanF.MULTITASK_CONSTANT, 
 
 
