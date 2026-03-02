@@ -433,8 +433,8 @@ TIME_KERNEL_GRID = {
 }
 
 
-RANK_GRID = [3]
-MEAN_F_GRID = [MeanF.MULTITASK_ZERO] #etf_mean_spec
+RANK_GRID = [2,3]
+MEAN_F_GRID = [MeanF.MULTITASK_CONSTANT] #etf_mean_spec
 
 
 
@@ -1371,3 +1371,21 @@ display(w_compare.T)
 
 # Optional: save
 w_compare.to_csv("20260228_weights_hist_vs_gp.csv")
+
+
+################### Determining if the rank is good enough. 
+K = model.task_covar_module(I, I).to_dense().detach().cpu()
+d = torch.sqrt(torch.diag(K)).clamp_min(1e-12)
+Corr = K / (d[:, None] * d[None, :])
+
+eigvals = torch.linalg.eigvalsh(Corr).flip(0)
+cum = torch.cumsum(eigvals, dim=0) / eigvals.sum()  # sum is N=18
+
+print(eigvals[:10])
+print(cum[:10])
+
+#### determining if per task scaling woudl help
+y_panel = full_train_data.pivot(index="date", columns="asset_id", values="y_excess_lead").dropna()
+stds = y_panel.std()
+ratio = stds.max() / stds.min()
+print(ratio, stds.sort_values())
