@@ -92,7 +92,7 @@ Use interfaces/adapters if two domains must interact.
 
 ---
 
-## Config & Schemas
+## Schemas
 
 - All configs and “results that cross boundaries” must be **Pydantic** models
 - `*Config` defines behavior; include defaults that are safe and reproducible

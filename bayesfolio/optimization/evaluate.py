@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import r2_score
 from scipy.stats import spearmanr, ttest_1samp
-
+from typing import Any, cast
 
 def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
     """
@@ -61,7 +61,7 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
         yt, yp = y_true.iloc[i, :], y_hat.iloc[i, :]
         mask = yt.notna() & yp.notna()
         if mask.sum() > 1:
-            ic_val = spearmanr(yt[mask], yp[mask]).correlation
+            ic_val, _ = spearmanr(yt[mask], yp[mask], nan_policy="omit")
             IC_list.append(ic_val)
 
             # Hit ratio for this time step
@@ -70,7 +70,25 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
 
     IC = np.nanmean(IC_list) if IC_list else np.nan
     IC_std = np.nanstd(IC_list, ddof=1) if len(IC_list) > 1 else np.nan
-    t_stat, p_val = ttest_1samp(IC_list, 0)
+
+
+    if len(IC_list) > 1:
+        ic_arr = np.asarray(IC_list, dtype=float)
+        ic_arr = ic_arr[np.isfinite(ic_arr)]
+
+        if ic_arr.size > 1:
+            res = cast(Any, ttest_1samp(ic_arr, 0.0, nan_policy="omit"))
+
+            # Works for both SciPy return styles: object with .pvalue or tuple-like
+            p_raw = res.pvalue if hasattr(res, "pvalue") else res[1]
+
+            # If p_raw is a numpy scalar/array, convert safely to Python float
+            p_val = float(np.asarray(p_raw).item())
+        else:
+            p_val = float(np.nan)
+    else:
+        p_val = float(np.nan)
+
     IR = IC / IC_std if IC_std and not np.isnan(IC_std) and IC_std > 0 else np.nan
 
     HitRatio = np.nanmean(Hit_list) if Hit_list else np.nan

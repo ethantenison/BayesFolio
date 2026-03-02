@@ -324,3 +324,6 @@ the above should all live in the etf kernel
 
 **March 1st**
 - Need to clean up. Streamline mlflow. Paths are off. 
+
+**March 2nd**
+- Found out per task made higher rank more valuable. 

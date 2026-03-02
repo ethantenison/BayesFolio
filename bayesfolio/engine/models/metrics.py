@@ -57,7 +57,7 @@ def compute_periodogram_from_panel(
 
     ts = compute_market_return_series(df, date_col, target_col)
 
-    x = ts.values
+    x = np.asarray(ts.values, dtype=np.float64)
 
     # Optional but recommended: remove mean / trend
     if detrend:
@@ -74,19 +74,3 @@ def compute_periodogram_from_panel(
         "frequency": freqs,
         "power": power,
     }), ts
-
-
-
-# import matplotlib.pyplot as plt
-
-# spec_df, market_ts = compute_periodogram_from_panel(df)
-
-# plt.figure(figsize=(10, 4))
-# plt.plot(spec_df["frequency"], spec_df["power"])
-# plt.xlabel("Frequency (cycles per year)")
-# plt.ylabel("Spectral density")
-# plt.title("Periodogram of Cross-Sectional Mean Excess Return")
-# plt.grid(True)
-# plt.show()
-
-

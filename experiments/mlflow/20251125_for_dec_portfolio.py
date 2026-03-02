@@ -16,17 +16,17 @@ from bayesfolio.schemas.configs.core import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from bayesfolio.visualization.eda import correlation_matrix, apply_pca_and_replace
 from bayesfolio.features.gp_data_prep import prepare_multitask_gp_data
-from bayesfolio.models.cv import rolling_time_splits_multitask
-from bayesfolio.models.scaling import MultitaskScaler
+from bayesfolio.engine.models.cv import rolling_time_splits_multitask
+from bayesfolio.engine.models.scaling import MultitaskScaler
 device = torch.device("cpu")
-from bayesfolio.models.gp import train_model_hadamard
+from bayesfolio.engine.models.gp.multitask import train_model_hadamard
 from math import log, sqrt
 from bayesfolio.optimization.evaluate import evaluate_asset_pricing
 from bayesfolio.utils import check_equal_occurrences
 from pydantic import BaseModel, ConfigDict
 from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
 from bayesfolio.optimization.portfolio_helpers import assessing_long_short_performance, long_short_returns
-from bayesfolio.models.kernels import MeanF, KernelType, initialize_mean, initialize_kernel
+from bayesfolio.engine.models.gp.kernels import MeanF, KernelType, initialize_mean, initialize_kernel
 from bayesfolio.mlflow.helpers import (
     KernelF, KernelT, MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     extract_full_gp_config,model_error_by_time_index

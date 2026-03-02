@@ -2,8 +2,10 @@ import itertools
 import os
 import random
 import warnings
+from datetime import date
 from math import sqrt
 from pathlib import Path
+from typing import Any, cast
 
 import mlflow
 import matplotlib.pyplot as plt
@@ -18,7 +20,8 @@ from pydantic import BaseModel
 
 from bayesfolio.features.asset_prices import add_cross_sectional_momentum_rank
 from bayesfolio.features.gp_data_prep import prepare_multitask_gp_data
-from bayesfolio.ml.legacy.old_kernels import KernelConfig, KernelType, adaptive_lengthscale_prior, initialize_kernel
+from bayesfolio.engine.pipeline import run_schema_first_pipeline
+from bayesfolio.models.legacy.old_kernels import KernelConfig, KernelType, adaptive_lengthscale_prior, initialize_kernel
 from bayesfolio.mlflow.helpers import (
     MultiTaskConfig,
     compute_benchmark_panel,
@@ -30,10 +33,10 @@ from bayesfolio.mlflow.helpers import (
     model_error_by_time_index,
     r2_os,
 )
-from bayesfolio.models.cv import rolling_time_splits_multitask
-from bayesfolio.models.gp import train_model_hadamard
-from bayesfolio.models.means import MeanF, initialize_mean
-from bayesfolio.models.scaling import MultitaskScaler
+from bayesfolio.engine.models.cv import rolling_time_splits_multitask
+from bayesfolio.engine.models.gp.multitask import train_model_hadamard
+from bayesfolio.engine.models.gp.means import MeanF, initialize_mean
+from bayesfolio.engine.models.scaling import MultitaskScaler
 from bayesfolio.optimization.evaluate import evaluate_asset_pricing
 from bayesfolio.optimization.portfolio_helpers import (
     assess_performance,
@@ -88,6 +91,48 @@ mlflow.set_experiment(EXPERIMENT_NAME)
 
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.3}'.format
+
+
+def build_default_risk_config() -> RiskfolioConfig:
+    """Create the default Riskfolio configuration used in this experiment."""
+
+    return RiskfolioConfig(
+        model=OptModel.CLASSIC,
+        rm=RiskMeasure.CVaR,
+        rf=0.0,
+        ra=0.5,
+        hist=True,
+        obj=Objective.SHARPE,
+        method_mu=MuEstimator.EWMA2,
+        method_cov=CovEstimator.GERBER2,
+        method_kurt=None,
+        upperlng=0.35,
+        nea=10,
+    )
+
+
+def prepare_full_train_test_data(
+    return_data_path: str,
+    cutoff: pd.Timestamp,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Load and prepare full panel data, then split into train/test by cutoff."""
+
+    full_data = pd.read_csv(return_data_path)
+    full_data = full_data.loc[:, KEEP_COLS].copy()
+    full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
+    full_data["date"] = pd.to_datetime(full_data["date"])
+
+    full_data = full_data[col_order]
+    full_data["t_index"] = pd.factorize(full_data["date"])[0]
+    cols = full_data.columns.tolist()
+    cols.insert(0, cols.pop(cols.index("t_index")))
+    full_data = full_data[cols]
+    full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
+    full_data = full_data[full_data["date"] > pd.Timestamp("2016-11-28")].copy()
+
+    full_train_data = full_data[full_data["date"] < cutoff].copy()
+    full_test_data = full_data[full_data["date"] >= cutoff].copy()
+    return full_data, full_train_data, full_test_data
 
 ############### Experiment Configuration ###############
 
@@ -146,12 +191,12 @@ assets_to_drop = [
 etf_tickers = [ticker for ticker in etf_tickers if ticker not in assets_to_drop]
 
 tickers = TickerConfig(
-    start_date="2016-11-29",
-    end_date="2026-02-28",
+    start_date=date.fromisoformat("2016-11-29"),
+    end_date=date.fromisoformat("2026-02-28"),
     interval=Interval.DAILY,
     tickers=etf_tickers,
     horizon=Horizon.MONTHLY,
-    lookback_date="2014-07-01",
+    lookback_date=date.fromisoformat("2014-07-01"),
 )
 
 ############### Returns data ###############
@@ -364,20 +409,9 @@ for tr_idx, te_idx in splits:
     test_dates = df.iloc[te_idx]['date'].unique().tolist()
     test_dates_splits.append(test_dates)
 
-risk_config = RiskfolioConfig(
-    model=OptModel.CLASSIC,
-    rm=RiskMeasure.CVaR,
-    obj=Objective.SHARPE,
-    method_mu=MuEstimator.EWMA2,
-    method_cov=CovEstimator.GERBER2,
-    nea=10
-
-)
-
 ############### Model Setup ###############
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
-
 
 # ard_num_dims = len(feature_cols)
 # active_dims_features = list(range(1, ard_num_dims + 1))
@@ -397,10 +431,10 @@ def create_kernel_initialization(kernel: KernelConfig, n_months: int):
         active_dims=kernel.active_dims,
         batch_shape=torch.Size(),
         smoothness=kernel.smoothness,
-        q=kernel.q,
+        q=kernel.q or 1,
         prior=prior,
         period_length=period_length,
-        n_mixtures=kernel.n_mixtures,
+        n_mixtures=kernel.n_mixtures or 1,
     )
 
     return kernel_initialized
@@ -416,7 +450,93 @@ class ExperimentConfig(BaseModel):
     macro: KernelSpec
     time: KernelSpec
     rank: int
-    mean_f: MeanF | dict
+    mean_f: MeanF
+
+
+def train_full_hadamard_from_cfg(
+    X: torch.Tensor,
+    task_ids: torch.Tensor,
+    y: torch.Tensor,
+    cfg: ExperimentConfig,
+    num_tasks: int,
+) -> tuple[MultiTaskConfig, MultitaskScaler, Any, Any]:
+    """Build kernels/scaler and train full-data Hadamard GP for a config."""
+
+    multiconfig = MultiTaskConfig(
+        num_tasks=num_tasks,
+        mean=cfg.mean_f,
+        rank=cfg.rank,
+        scaling="per_task",
+        min_noise=5e-3,
+    )
+
+    kernel_e = KernelConfig(
+        type=cfg.etf.type,
+        features=etf_cols,
+        active_dims=active_dims_e,
+        smoothness=cfg.etf.smoothness or 1.5,
+        gamma=1.2,
+        q=1,
+    )
+
+    kernel_m = KernelConfig(
+        type=cfg.macro.type,
+        features=macro_cols,
+        active_dims=active_dims_m,
+        smoothness=cfg.macro.smoothness or 1.5,
+        gamma=1.2,
+        q=1,
+    )
+
+    kernel_t = KernelConfig(
+        type=cfg.time.type,
+        features=[time_col],
+        active_dims=active_dims_t,
+        smoothness=cfg.time.smoothness or 1.5,
+        gamma=1.2,
+        q=1,
+        n_mixtures=1,
+    )
+
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.use_deterministic_algorithms(True)
+
+    scaler = MultitaskScaler(scale_y="per_task", exclude_time_col=False)
+    scaler.fit_x(X)
+    X_trs = scaler.transform_x(X)
+    y_trs = scaler.fit_y(y, task_ids)
+
+    X_trs = torch.cat([X_trs, task_ids.to(X_trs.dtype)], dim=-1).to(device)
+    y_trs = y_trs.to(device)
+
+    mean_f = initialize_mean(
+        cast(MeanF, multiconfig.mean),
+        num_tasks=multiconfig.num_tasks,
+        input_size=X.shape[1],
+    )
+
+    n_months = len(np.unique(X.numpy()[:, 0]))
+    kernele = create_kernel_initialization(kernel_e, n_months)
+    kernelm = create_kernel_initialization(kernel_m, n_months)
+    kernelt = create_kernel_initialization(kernel_t, n_months)
+    kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt
+
+    model, likelihood = train_model_hadamard(
+        X_trs,
+        y_trs,
+        rank=multiconfig.rank,
+        mean_f=mean_f,
+        kernel=kernel_total,
+        visualize=True,
+        dtype=torch.float32,
+        device=torch.device("cpu"),
+        min_noise=multiconfig.min_noise,
+        patience=50,
+    )
+
+    return multiconfig, scaler, model, likelihood
    
 
 #KERNEL GRID SEARCH
@@ -578,7 +698,7 @@ for cfg in experiment_grid:
 
             # ---- Mean and Kernels ----
             mean_f = initialize_mean(
-                mean= multiconfig.mean,
+                mean=cast(MeanF, multiconfig.mean),
                 num_tasks=multiconfig.num_tasks,
                 input_size=X.shape[1],
                 macro_dims=active_dims_m,
@@ -630,9 +750,9 @@ for cfg in experiment_grid:
         mlflow.log_params(tickers.model_dump())
         mlflow.log_params(cv_config.model_dump())
         mlflow.log_params(multiconfig.model_dump())
-        log_kernel_to_mlflow(kernel_e, "etf")
-        log_kernel_to_mlflow(kernel_m, "macro")
-        log_kernel_to_mlflow(kernel_t, "time")
+        log_kernel_to_mlflow(cast(Any, kernel_e), "etf")
+        log_kernel_to_mlflow(cast(Any, kernel_m), "macro")
+        log_kernel_to_mlflow(cast(Any, kernel_t), "time")
 
 
         # ---- MULTITASK GP PARALLEL EVALUATION ----
@@ -833,20 +953,11 @@ for cfg in experiment_grid:
 
 ################################################### Get the predictions. 
 
-full_data = pd.read_csv("20260228_return_data.csv")
-full_data = full_data.loc[:, KEEP_COLS].copy()
-full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
-full_data['date'] = pd.to_datetime(full_data['date'])
-full_data = full_data[col_order]
-full_data['t_index'] = pd.factorize(full_data['date'])[0]
-cols = full_data.columns.tolist()       
-cols.insert(0, cols.pop(cols.index("t_index")))
-full_data = full_data[cols]
-full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
-full_data = full_data[full_data['date'] > pd.Timestamp("2016-11-28")]
-
-full_train_data = full_data[full_data['date'] < pd.Timestamp("2026-02-27")].copy()
-full_test_data = full_data[full_data['date'] >= pd.Timestamp("2026-02-27")].copy()
+cutoff = pd.Timestamp("2026-02-27")
+full_data, full_train_data, full_test_data = prepare_full_train_test_data(
+    return_data_path="20260228_return_data.csv",
+    cutoff=cutoff,
+)
 
    
 X, task_ids, y, task_map = prepare_multitask_gp_data(
@@ -859,89 +970,12 @@ X, task_ids, y, task_map = prepare_multitask_gp_data(
 
 
 cfg = experiment_grid[0]
-
-# Kernel 
-multiconfig = MultiTaskConfig(
+multiconfig, scaler, model, likelihood = train_full_hadamard_from_cfg(
+    X=X,
+    task_ids=task_ids,
+    y=y,
+    cfg=cfg,
     num_tasks=len(tickers.tickers),
-    mean=cfg.mean_f,
-    rank=cfg.rank,
-    scaling="per_task",   
-    min_noise=5e-3,
-        )
-
-# Convert ExperimentConfig → your KernelConfig
-kernel_e = KernelConfig(
-    type=cfg.etf.type,
-    features=etf_cols,
-    active_dims=active_dims_e,
-    smoothness=cfg.etf.smoothness or 1.5,
-    gamma=1.2,
-    q=1,
-)
-
-kernel_m = KernelConfig(
-    type=cfg.macro.type,
-    features=macro_cols,
-    active_dims=active_dims_m,
-    smoothness=cfg.macro.smoothness or 1.5,
-    gamma=1.2,
-    q=1,
-)
-
-kernel_t = KernelConfig(
-    type=cfg.time.type,
-    features=[time_col],
-    active_dims=active_dims_t,
-    smoothness=cfg.time.smoothness or 1.5,
-    gamma=1.2,
-    q=1,
-    n_mixtures=1,
-)
-
-torch.manual_seed(seed)
-np.random.seed(seed)
-random.seed(seed)
-torch.use_deterministic_algorithms(True)
-
-
-# # ---- Scaling ----
-scaler = MultitaskScaler(scale_y="per_task", exclude_time_col=False)
-scaler.fit_x(X)
-X_trs = scaler.transform_x(X)
-y_trs = scaler.fit_y(y, task_ids)
-
-# Append task index as last column
-X_trs = torch.cat([X_trs, task_ids.to(X_trs.dtype)], dim=-1)
-X_trs = X_trs.to(device)
-y_trs = y_trs.to(device)
-# ---- Mean and Kernels ----
-mean_f = initialize_mean(
-    multiconfig.mean,
-    num_tasks=multiconfig.num_tasks,
-    input_size=X.shape[1],
-)
-
-# Periods
-n_months = len(np.unique(X.numpy()[:, 0]))
-
-# Kernels
-kernele = create_kernel_initialization(kernel_e, n_months)
-kernelm = create_kernel_initialization(kernel_m, n_months)
-kernelt = create_kernel_initialization(kernel_t, n_months)
-kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt
-
-# ---- Train model ----
-model, likelihood = train_model_hadamard(
-    X_trs,
-    y_trs,
-    rank=multiconfig.rank,
-    mean_f=mean_f,
-    kernel=kernel_total,
-    visualize=True,
-    dtype=torch.float32,
-    device=torch.device("cpu"),
-    min_noise=multiconfig.min_noise,
-    patience=50,
 )
 
 model_str = repr(model)
@@ -983,8 +1017,8 @@ asset_cols = list(task_map.keys())  # task_map assumed defined elsewhere
 y_hat = y_hat.reshape(-1, len(asset_cols))
 y_std = y_std.reshape(-1, len(asset_cols))
 
-preds_df = pd.DataFrame(y_hat, columns=[f"{c}_pred" for c in asset_cols])
-unc_df = pd.DataFrame(y_std, columns=[f"{c}_unc" for c in asset_cols])
+preds_df = pd.DataFrame(y_hat.detach().cpu().numpy(), columns=[f"{c}_pred" for c in asset_cols])
+unc_df = pd.DataFrame(y_std.detach().cpu().numpy(), columns=[f"{c}_unc" for c in asset_cols])
 
 # Step 1 — rename columns to remove the "_pred" / "_unc" suffix
 preds = preds_df.rename(columns=lambda c: c.replace("_pred", ""))
@@ -1036,15 +1070,6 @@ plt.show()
 
 
 ########## Build Riskfolio ############
-risk_config = RiskfolioConfig(
-    model=OptModel.CLASSIC,
-    rm=RiskMeasure.CVaR,
-    obj=Objective.SHARPE,
-    method_mu=MuEstimator.EWMA2,
-    method_cov=CovEstimator.GERBER2,
-    nea=10
-
-)
 
 ###################################################
 # BASIC HISTORICAL PORTFOLIO  vs  GP-POSTERIOR (1M) CVaR PORTFOLIO
@@ -1075,14 +1100,7 @@ final_pivoted_returns = pivoted_returns.drop(columns=[c for c in EXCLUDE if c in
 # -----------------------------
 # 1) BASIC HISTORICAL PORTFOLIO (unchanged idea, but no percent-strings)
 # -----------------------------
-risk_config = RiskfolioConfig(
-    model=OptModel.CLASSIC,
-    rm=RiskMeasure.CVaR,
-    obj=Objective.SHARPE,
-    method_mu=MuEstimator.EWMA2,
-    method_cov=CovEstimator.GERBER2,
-    nea=10
-)
+risk_config = build_default_risk_config()
 
 port_hist = rp.Portfolio(returns=final_pivoted_returns)
 
@@ -1143,22 +1161,10 @@ ax = rp.plot_frontier(
 # -----------------------------
 # 2) TRAIN MTGP ON full_train_data (includes MGK/BND/BNDX)
 # -----------------------------
-full_data = pd.read_csv("20260228_return_data.csv")
-full_data = full_data.loc[:, KEEP_COLS].copy()
-full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
-full_data["date"] = pd.to_datetime(full_data["date"])
-
-full_data = full_data[col_order]
-full_data["t_index"] = pd.factorize(full_data["date"])[0]
-cols = full_data.columns.tolist()
-cols.insert(0, cols.pop(cols.index("t_index")))
-full_data = full_data[cols]
-full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
-full_data = full_data[full_data["date"] > pd.Timestamp("2016-11-28")].copy()
-
-cutoff = pd.Timestamp("2026-02-27")
-full_train_data = full_data[full_data["date"] < cutoff].copy()
-full_test_data  = full_data[full_data["date"] >= cutoff].copy()
+full_data, full_train_data, full_test_data = prepare_full_train_test_data(
+    return_data_path="20260228_return_data.csv",
+    cutoff=cutoff,
+)
 
 X, task_ids, y, task_map = prepare_multitask_gp_data(
     full_train_data,
@@ -1175,80 +1181,16 @@ random.seed(seed)
 torch.use_deterministic_algorithms(True)
 
 cfg = experiment_grid[0]
-
-multiconfig = MultiTaskConfig(
+multiconfig, scaler, model, likelihood = train_full_hadamard_from_cfg(
+    X=X,
+    task_ids=task_ids,
+    y=y,
+    cfg=cfg,
     num_tasks=len(task_map),
-    mean=cfg.mean_f,
-    rank=cfg.rank,
-    scaling="per_task",
-    min_noise=5e-3
-)
-
-kernel_e = KernelConfig(
-    type=cfg.etf.type,
-    features=etf_cols,
-    active_dims=active_dims_e,
-    smoothness=cfg.etf.smoothness or 1.5,
-    gamma=1.2,
-    q=1
-)
-
-kernel_m = KernelConfig(
-    type=cfg.macro.type,
-    features=macro_cols,
-    active_dims=active_dims_m,
-    smoothness=cfg.macro.smoothness or 1.5,
-    gamma=1.2,
-    q=1
-)
-
-kernel_t = KernelConfig(
-    type=cfg.time.type,
-    features=[time_col],
-    active_dims=active_dims_t,
-    smoothness=cfg.time.smoothness or 1.5,
-    gamma=1.2,
-    q=1,
-    n_mixtures=1
-)
-
-# scaling
-scaler = MultitaskScaler(scale_y="per_task", exclude_time_col=False)
-scaler.fit_x(X)
-X_trs = scaler.transform_x(X)
-y_trs = scaler.fit_y(y, task_ids)
-
-# append task index
-X_trs = torch.cat([X_trs, task_ids.to(X_trs.dtype)], dim=-1).to(device)
-y_trs = y_trs.to(device)
-
-mean_f = initialize_mean(
-    multiconfig.mean,
-    num_tasks=multiconfig.num_tasks,
-    input_size=X.shape[1]
-)
-
-n_months = len(np.unique(X.numpy()[:, 0]))
-kernele = create_kernel_initialization(kernel_e, n_months)
-kernelm = create_kernel_initialization(kernel_m, n_months)
-kernelt = create_kernel_initialization(kernel_t, n_months)
-kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt
-
-model, likelihood = train_model_hadamard(
-    X_trs,
-    y_trs,
-    rank=multiconfig.rank,
-    mean_f=mean_f,
-    kernel=kernel_total,
-    visualize=True,
-    dtype=torch.float32,
-    device=torch.device("cpu"),
-    min_noise=multiconfig.min_noise,
-    patience=50
 )
 
 # -----------------------------
-# 3) FORECAST ONE REBALANCE DATE -> FULL posterior mean/cov -> sample scenarios
+# 3) FORECAST ONE REBALANCE DATE -> FULL posterior mean/cov
 # -----------------------------
 full_test_data = full_test_data.reset_index(drop=True)
 
@@ -1287,7 +1229,7 @@ with torch.no_grad():
     pred = likelihood(f_dist, X_scaled)
 
 m_scaled = pred.mean.detach().cpu()
-S_scaled = pred.covariance_matrix.detach().cpu()
+S_scaled = cast(Any, pred).covariance_matrix.detach().cpu()
 
 # per-asset scaling vectors (supports none/global/per_task)
 task_ids_long = [int(t) for t in task_ids_all]
@@ -1295,8 +1237,10 @@ if scaler.scale_y == "none":
     mu_vec = torch.zeros(len(task_ids_long), dtype=m_scaled.dtype)
     sd_vec = torch.ones(len(task_ids_long), dtype=m_scaled.dtype)
 elif scaler.scale_y == "global":
-    mu_vec = torch.full((len(task_ids_long),), float(scaler.y_mean), dtype=m_scaled.dtype)
-    sd_vec = torch.full((len(task_ids_long),), float(scaler.y_std), dtype=m_scaled.dtype)
+    mu_default = float(scaler.y_mean) if scaler.y_mean is not None else 0.0
+    sd_default = float(scaler.y_std) if scaler.y_std is not None else 1.0
+    mu_vec = torch.full((len(task_ids_long),), mu_default, dtype=m_scaled.dtype)
+    sd_vec = torch.full((len(task_ids_long),), sd_default, dtype=m_scaled.dtype)
 elif scaler.scale_y == "per_task":
     mu_vec = torch.tensor([float(scaler.y_mean_k.get(t, scaler.global_mu)) for t in task_ids_long], dtype=m_scaled.dtype)
     sd_vec = torch.tensor([float(scaler.y_std_k.get(t, scaler.global_sd)) for t in task_ids_long], dtype=m_scaled.dtype)
@@ -1315,60 +1259,34 @@ asset_order = [asset_order_all[i] for i in keep_idx]
 m_sub = m[keep_idx]
 S_sub = S[np.ix_(keep_idx, keep_idx)]
 
-# sample posterior scenarios
+# -----------------------------
+# 4) SCHEMA-FIRST PIPELINE (production path)
+# -----------------------------
 n_scen = 5000
-mv = torch.distributions.MultivariateNormal(m_sub, covariance_matrix=S_sub)
-scen = mv.sample((n_scen,)).numpy()
+realized_oos = (
+    full_test_data.pivot(index="date", columns="asset_id", values="y_excess_lead")
+    .sort_index()
+)
+realized_oos = realized_oos[[a for a in asset_order if a in realized_oos.columns]]
 
-scenario_returns = pd.DataFrame(scen, columns=asset_order)
-scenario_returns.to_csv("20260228_gp_posterior_scenarios.csv", index=False)
+if realized_oos.empty:
+    realized_oos = final_pivoted_returns[asset_order].tail(12).copy()
 
-# -----------------------------
-# 4) RISKFOLIO ON GP POSTERIOR SCENARIOS (CVaR uses uncertainty via scenarios)
-# -----------------------------
-port_gp = rp.Portfolio(returns=scenario_returns)
-port_gp.assets_stats(method_mu="hist", method_cov="hist")
-
-port_gp.alpha = 0.20
-port_gp.nea = risk_config.nea
-port_gp.card = None
-
-w_gp = port_gp.optimization(
-    model="Classic",
-    rm="CVaR",
-    obj="Sharpe",
-    rf=0,
-    l=0,
-    hist=True
+report_bundle = run_schema_first_pipeline(
+    asset_order=asset_order,
+    mean=m_sub.detach().cpu().numpy(),
+    covariance=S_sub.detach().cpu().numpy(),
+    realized_returns=realized_oos,
+    objective=getattr(obj, "value", str(obj)),
+    risk_measure=getattr(rm, "value", str(rm)),
+    n_scenarios=n_scen,
+    seed=seed,
 )
 
-display(w_gp.T)
-ax = rp.plot_pie(
-    w=w_gp,
-    title=f"{rm} {obj} — GP Posterior Scenarios (1M) (excl. MGK/BND/BNDX)",
-    others=0.05,
-    nrow=25,
-    cmap="tab20",
-    height=6,
-    width=10,
-    ax=None
-)
-
-# -----------------------------
-# 5) Side-by-side comparison table
-# -----------------------------
-w_compare = pd.concat(
-    [
-        w_hist.rename(columns={"weights": "hist_weights"}),
-        w_gp.rename(columns={"weights": "gp_weights"})
-    ],
-    axis=1
-).fillna(0.0)
-
-display(w_compare.T)
-
-# Optional: save
-w_compare.to_csv("20260228_weights_hist_vs_gp.csv")
+report_df = pd.DataFrame([report_bundle.headline_metrics])
+display(report_df)
+report_df.to_csv("20260228_schema_pipeline_report.csv", index=False)
+w_hist.to_csv("20260228_weights_hist_only.csv")
 
 
 ################### Determining if the rank is good enough. 

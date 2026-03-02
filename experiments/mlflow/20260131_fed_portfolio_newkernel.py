@@ -16,22 +16,22 @@ from bayesfolio.schemas.configs.core import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from bayesfolio.visualization.eda import correlation_matrix
 from bayesfolio.features.gp_data_prep import prepare_multitask_gp_data
-from bayesfolio.models.cv import rolling_time_splits_multitask
-from bayesfolio.models.scaling import MultitaskScaler
+from bayesfolio.engine.models.cv import rolling_time_splits_multitask
+from bayesfolio.engine.models.scaling import MultitaskScaler
 device = torch.device("cpu")
-from bayesfolio.models.gp import train_model_hadamard
+from bayesfolio.engine.models.gp.multitask import train_model_hadamard
 from math import log, sqrt
 from bayesfolio.optimization.evaluate import evaluate_asset_pricing
 from bayesfolio.utils import check_equal_occurrences
 from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
 from bayesfolio.visualization.variable_importance import xgboost_variable_importance
 from bayesfolio.optimization.portfolio_helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
-from bayesfolio.models.kernels import (
+from bayesfolio.engine.models.gp.kernels import (
     InteractionPolicy, KernelArchitectureConfig, KernelBlockConfig, KernelType, KernelVariableType, LinearKernelConfig,
     MaternKernelConfig, BlockStructure,GlobalStructure, ExpoDecayKernelConfig, RQKernelConfig, build_kernel, build_block_kernel
     )
     
-from bayesfolio.models.means import MeanF, initialize_mean
+from bayesfolio.engine.models.gp.means import MeanF, initialize_mean
 from bayesfolio.mlflow.helpers import (
     MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     model_error_by_time_index, log_kernel_architecture_detailed,log_kernel_to_mlflow, log_gpytorch_state_dict, log_gp_hyperparameters

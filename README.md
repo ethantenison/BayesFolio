@@ -137,7 +137,7 @@ This is not a black-box allocation engine. It is designed to make risk structure
 ## Project Structure
 
     bayesfolio/
-        data/
+        features/
             asset_prices.py
             market_fundamentals.py
             gp_data_prep.py
@@ -149,13 +149,34 @@ This is not a black-box allocation engine. It is designed to make risk structure
         optimization/
             evaluate.py
             backtesting.py
+            portfolio_helpers.py
         schemas/
+            common.py
+            contracts/
+                universe.py
+                intent.py
+                beliefs.py
+                forecast.py
+                scenarios.py
+                optimize.py
+                backtest.py
+                report.py
             configs/
                 core.py
-        portfolio/
-            helpers.py
+        io/
+            artifacts.py
+            parquet_store.py
+            mlflow_logger.py
+        engine/
+            pipeline.py
+            data/
+            models/
+            scenarios/
+            optimize/
+            backtest/
+            report/
+            agent/
         visualization/
-        workflows/
         mlflow/
 
     experiments/
@@ -196,6 +217,7 @@ Future versions:
 ## Migration Notes
 
 Recent package reorganization mappings are documented in [docs/migration-map-phase1-3.md](docs/migration-map-phase1-3.md).
+Schema-first engine/io migration starts in this version; existing experiment imports remain compatible.
 - User-facing portfolio reporting
 
 ------------------------------------------------------------
