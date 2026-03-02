@@ -1,23 +1,32 @@
 """
 Gaussian Process Kernels
 """
-import torch
-from gpytorch.kernels.kernel import Kernel
-from torch import Tensor
+from __future__ import annotations
+
+from math import log, sqrt
 from typing import Any, Dict, List
+
+import torch
 from gpytorch.constraints import GreaterThan
 from gpytorch.kernels import (
-    MaternKernel,
     LinearKernel,
+    MaternKernel,
+    PeriodicKernel,
+    ProductKernel,
     RBFKernel,
     RQKernel,
-    PeriodicKernel,
     ScaleKernel,
-    ProductKernel,
     SpectralMixtureKernel,
 )
+from gpytorch.kernels.kernel import Kernel
 from gpytorch.priors import LogNormalPrior
-from math import sqrt, log
+from torch import Tensor
+
+from bayesfolio.ml.legacy.old_kernels import (
+    KernelConfig,
+    KernelType,
+    adaptive_lengthscale_prior,
+)
 
 torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
@@ -57,7 +66,7 @@ class CategoricalKernel(Kernel):
         return res
 
 
-class ContKernelFactory:
+class EnhancedContKernelFactory:
     """
     A base class for creating Gaussian Process kernels.
 
@@ -281,7 +290,11 @@ def build_kernel(expression: str, input_size: int, batch_shape: torch.Size, gp_o
     - parentheses respected
     """
 
-    factory = ContKernelFactory(batch_shape=batch_shape, gp_options=gp_options, active_dims_map=active_dims_map)
+    factory = EnhancedContKernelFactory(
+        batch_shape=batch_shape,
+        gp_options=gp_options,
+        active_dims_map=active_dims_map,
+    )
 
     def parse_token(token: str):
         token = token.strip().lower()

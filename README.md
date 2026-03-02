@@ -23,7 +23,7 @@ BayesFolio is evolving toward an Agentic AI-powered portfolio optimization platf
 
 ## Current Capabilities
 
-### Multitask Gaussian Process Modeling
+### Gaussian Process Modeling
 
 - Hadamard multitask GP implementation
 - Heteroskedastic task noise modeling
@@ -137,17 +137,31 @@ This is not a black-box allocation engine. It is designed to make risk structure
 ## Project Structure
 
     bayesfolio/
+        data/
+            asset_prices.py
+            market_fundamentals.py
+            gp_data_prep.py
         models/
             gp.py
             scaling.py
             means.py
             kernels.py
+        optimization/
+            evaluate.py
+            backtesting.py
+        schemas/
+            configs/
+                core.py
         portfolio/
             helpers.py
-        evaluation/
         visualization/
-        configs/
+        workflows/
         mlflow/
+
+    experiments/
+        mlflow/
+            *.py
+            data_snapshots/
 
 ------------------------------------------------------------
 
@@ -176,6 +190,12 @@ Future versions:
 - Application layer
 - Agentic AI system
 - RAG conversational interface
+
+------------------------------------------------------------
+
+## Migration Notes
+
+Recent package reorganization mappings are documented in [docs/migration-map-phase1-3.md](docs/migration-map-phase1-3.md).
 - User-facing portfolio reporting
 
 ------------------------------------------------------------

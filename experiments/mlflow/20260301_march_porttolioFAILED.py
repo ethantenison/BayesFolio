@@ -1,5 +1,3 @@
-
-from re import M
 import mlflow
 import pandas as pd
 import warnings
@@ -8,24 +6,24 @@ from joblib import Parallel, delayed
 from pydantic import BaseModel
 from regex import E
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-from bayesfolio.configs import TickerConfig, Interval, Horizon, CVConfig
-from bayesfolio.asset_prices import build_long_panel
+from bayesfolio.schemas.configs.core import TickerConfig, Interval, Horizon, CVConfig
+from bayesfolio.features.asset_prices import build_long_panel
 import numpy as np
 import torch
-from bayesfolio.configs import (
+from bayesfolio.schemas.configs.core import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from bayesfolio.visualization.eda import correlation_matrix
-from bayesfolio.gp_data_prep import prepare_multitask_gp_data
+from bayesfolio.features.gp_data_prep import prepare_multitask_gp_data
 from bayesfolio.models.cv import rolling_time_splits_multitask
 from bayesfolio.models.scaling import MultitaskScaler
 device = torch.device("cpu")
 from bayesfolio.models.gp import train_model_hadamard
 from math import log, sqrt
-from bayesfolio.evaluate import evaluate_asset_pricing
+from bayesfolio.optimization.evaluate import evaluate_asset_pricing
 from bayesfolio.utils import check_equal_occurrences
 from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
 from bayesfolio.visualization.variable_importance import xgboost_variable_importance
-from bayesfolio.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
+from bayesfolio.optimization.portfolio_helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
 from bayesfolio.models.kernels import (
     InteractionPolicy, KernelArchitectureConfig, KernelBlockConfig, KernelType, KernelVariableType, LinearKernelConfig,
     MaternKernelConfig, BlockStructure,GlobalStructure, ExpoDecayKernelConfig, RQKernelConfig, build_kernel, build_block_kernel
@@ -39,14 +37,14 @@ from bayesfolio.mlflow.helpers import (
 import plotly.express as px
 import random
 import itertools
-from bayesfolio.market_fundamentals import fetch_enhanced_macro_features
-from bayesfolio.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank, cross_sectional_zscore
+from bayesfolio.features.market_fundamentals import fetch_enhanced_macro_features
+from bayesfolio.features.asset_prices import fetch_etf_features, add_cross_sectional_momentum_rank, cross_sectional_zscore
 from gpytorch.kernels import SpectralMixtureKernel
 warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
 )
-from bayesfolio.configs import (
+from bayesfolio.schemas.configs.core import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from IPython.display import display
 pd.set_option('display.max_rows', 30)
@@ -69,7 +67,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*not p.d., 
 # mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 # mlflow.set_experiment(EXPERIMENT_NAME)
 mlflow.set_tracking_uri("file:./mlruns")
-mlflow.set_experiment("February Portfolio Experiments")
+mlflow.set_experiment("March Portfolio Experiments")
 
 
 warnings.filterwarnings("ignore")
@@ -77,7 +75,7 @@ pd.options.display.float_format = '{:.3}'.format
 
 ############### Experiment Configuration ###############
 
-description = "tracking experiments for february portfolio assets"
+description = "tracking experiments for march portfolio assets"
 
 """
 Setting the task matrix eigenvalues to see the effective dimensionality of the asset returns
@@ -143,7 +141,7 @@ etf_tickers = [ticker for ticker in etf_tickers if ticker not in assets_to_drop]
 
 tickers = TickerConfig(
     start_date="2016-11-29",
-    end_date="2026-01-31",
+    end_date="2026-02-28",
     interval=Interval.DAILY,
     tickers=etf_tickers,
     horizon=Horizon.MONTHLY,
@@ -151,9 +149,9 @@ tickers = TickerConfig(
 )
 
 ############### Returns data ###############
-# return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
-# return_data.to_csv("20260131_etf_returns.csv", index=False)
-return_data = pd.read_csv("20260131_etf_returns.csv")  # Updated to match the new filename
+return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
+return_data.to_csv("20260228_etf_returns.csv", index=False)
+return_data = pd.read_csv("20260228_etf_returns.csv")  # Updated to match the new filename
 return_data = return_data[~return_data['asset_id'].isin(assets_to_drop)]
 
 
@@ -172,15 +170,15 @@ fig = correlation_matrix(pivoted_returns)
 fig.show()
 
 # # # ############### Factor data ###############
-# macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
-# macro_features.to_csv("20260131_macro_features.csv", index=False)
-macro_features = pd.read_csv("20260131_macro_features.csv")
+macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
+macro_features.to_csv("20260228_macro_features.csv", index=False)
+macro_features = pd.read_csv("20260228_macro_features.csv")
 macro_features = macro_features.drop(columns=['vix_ts_level','vix3m','yc_pc1', 'yc_pc2', 'yc_pc3', 'y10_nominal' ])
 macro_cols = macro_features.columns[1:].tolist()
 
-# etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
-# etf_features.to_csv("20260131_etf_features.csv", index=False)
-etf_features = pd.read_csv("20260131_etf_features.csv")
+etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
+etf_features.to_csv("20260228_etf_features.csv", index=False)
+etf_features = pd.read_csv("20260228_etf_features.csv")
 etf_features = etf_features[~etf_features['asset_id'].isin(assets_to_drop)]
 etf_features = etf_features.drop(columns=['ma_1m','ma_3m','vol_1w', 'price', 'overnight_gap'])
 
@@ -213,7 +211,7 @@ df["lag2_y_excess_lead"] = (
       .shift(2)
 )
 df= df[df['date'] > str("2016-11-28")]
-df = df[df['date'] < str("2026-01-30")]
+df = df[df['date'] < str("2026-02-28")]
 df = df.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
 
 
@@ -566,7 +564,7 @@ print(f"Total experiments: {len(experiment_grid)}")
 seed = 27
 
 # (Optional) group all runs in one MLflow experiment
-mlflow.set_experiment("February 2026 portfolio")
+mlflow.set_experiment("March 2026 portfolio")
 
 
 # Then in your MLflow loop:
@@ -733,10 +731,15 @@ for cfg in experiment_grid:
             ci_df[f"{c}_lower_95"]  = preds_df[f"{c}_pred"] - 1.96 * unc_df[f"{c}_unc"]
             ci_df[f"{c}_upper_95"]  = preds_df[f"{c}_pred"] + 1.96 * unc_df[f"{c}_unc"]
 
-        # Save CI DataFrame as artifact
-        ci_path = "marketmaven/mlflow/artifacts/confidence_intervals.csv"
+        from pathlib import Path
+        import mlflow
+
+        out_dir = Path("mlflow/artifacts")
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        ci_path = out_dir / "confidence_intervals.csv"
         ci_df.to_csv(ci_path, index=False)
-        mlflow.log_artifact(ci_path)
+        mlflow.log_artifact(str(ci_path))
                     
         # ---- MTGP EVAL ----
         summary_gp = evaluate_asset_pricing(
@@ -791,7 +794,7 @@ for cfg in experiment_grid:
         mean_df = pd.DataFrame(mean_pred, columns=asset_cols)
         ewma_df = pd.DataFrame(ewma_pred, columns=asset_cols)
         
-        plot_path = "marketmaven/mlflow/artifacts/actual_vs_pred_matrix.png"
+        plot_path = out_dir / "actual_vs_pred_matrix.png"
 
         #fix the index to be the dates from the test splits
         date_test_splits = np.array(test_dates_splits)
@@ -826,8 +829,9 @@ for cfg in experiment_grid:
         "Mean": summary_mean,
         "EWMA": summary_ewma,
         })
-        comparison.to_html("marketmaven/mlflow/artifacts/comparison_table.html")
-        mlflow.log_artifact("marketmaven/mlflow/artifacts/comparison_table.html")
+        comparison_table_path = out_dir / "model_comparison_table.html"
+        comparison.to_html(comparison_table_path)
+        mlflow.log_artifact(str(comparison_table_path))
         
         # R2_OS calculations
         y_true_norm = true_b_df.rename(columns=lambda c: c.replace("_true", ""))
@@ -837,7 +841,7 @@ for cfg in experiment_grid:
         
 
         # Save global_importance as a CSV file
-        # importance_path = "marketmaven/mlflow/artifacts/global_importance.csv"
+        # importance_path = "bayesfolio/mlflow/artifacts/global_importance.csv"
         # global_importance.to_csv(importance_path, header=True)
         # mlflow.log_artifact(importance_path)
 
@@ -845,8 +849,9 @@ for cfg in experiment_grid:
         # mlflow.log_dict(global_importance.to_dict(), "global_importance.json")
         
         compare_error = model_error_by_time_index(y_true_norm, y_pred_norm)
-        compare_error.to_html("marketmaven/mlflow/artifacts/compare_error.html")
-        mlflow.log_artifact("marketmaven/mlflow/artifacts/compare_error.html")
+        compare_error_path = out_dir / "compare_error.html"
+        compare_error.to_html(compare_error_path)
+        mlflow.log_artifact(str(compare_error_path))
         
         r2_gp_vs_mean = r2_os(y_true_norm, y_pred_norm, y_mean_norm)
         r2_gp_vs_ewma = r2_os(y_true_norm, y_pred_norm, y_ewma_norm)

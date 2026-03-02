@@ -1,183 +1,226 @@
 # GitHub Copilot Instructions for BayesFolio
 
+BayesFolio is a research-grade Bayesian portfolio optimization framework built around:
+- Multitask (Hadamard) Gaussian Processes with uncertainty quantification
+- Scenario-based portfolio optimization (Riskfolio-Lib integration)
+- Rolling time-series CV, backtesting, and diagnostics
+- Transparent, reproducible, and responsible AI practices
+
+These instructions are **STRICT**. Generated code must follow them.
+
+---
+
 ## Language & Style
-- Python 3.13+
-- Poetry 2.3.2
-- Use native Python typing (list[str], X | None)
-- Do NOT use typing.List, Optional, Union
-- All public APIs require Google-style docstrings
+
+- Python **3.13+**
+- Use **native typing**: `list[str]`, `dict[str, float]`, `X | None`
+- Do NOT use `typing.List`, `Optional`, `Union`
+- Use `from __future__ import annotations` in new modules
 - Prefer clarity over cleverness
+- Avoid hidden state; prefer explicit inputs/outputs
+
+### Docstrings
+- All **public** functions/classes require **Google-style docstrings**
+- Include shape/units expectations for arrays/DataFrames (especially returns)
+
+### Numeric / Finance Conventions (IMPORTANT)
+- Returns must be clearly documented as either:
+  - **decimal** (0.02 = 2%), or
+  - **percent points** (2.0 = 2%)
+- Never silently mix units. If converting, do it explicitly and document it.
+- Time indexing must avoid look-ahead bias. Every feature/label must be aligned.
+
 ---
 
 ## Code Quality & Linting (STRICT)
 
-This repository uses **ruff** for linting with strict pre-commit hooks. All generated code MUST pass linting before commit.
+This repository uses **ruff** with strict pre-commit hooks.
+All generated code MUST pass linting.
 
-### Pre-Generation Checks
+### Must Avoid
+- Unused variables (F841)
+- Unused imports (F401)
+- Line length > 120 (E501)
+- Imports not at top of file (E402)
+- Bare `except:` (E722)
+- Shadowing builtins (A001/A002/A003)
 
-Before writing any Python code, verify:
+### Formatting Rules
+- Max line length: **120**
+- Organize imports: stdlib → third-party → local
+- No commented-out dead code
+- No debug prints in library code; use `logging` when needed
 
-1. **No Unused Variables or Imports**
-   - ❌ `result = function()` if `result` is never used → `function()`
-   - ❌ `import pytest` if pytest is never referenced → Remove import
-   - ✅ Every variable assigned must be used
-   - ✅ Every import must be referenced
-
-2. **Line Length: 120 Characters Maximum**
-   - ❌ Long log messages or f-strings on single line
-   - ✅ Split long lines using parentheses or multi-line f-strings:
-     ```python
-     # Good:
-     logger.info(
-         f"Connected to {host}:{port}/"
-         f"{database}"
-     )
-     ```
-
-3. **Import Organization**
-   - ❌ Imports scattered throughout file
-   - ❌ Module-level imports after code
-   - ✅ All imports at top of file
-   - ✅ Order: stdlib → third-party → local
-
-4. **No Dead Code**
-   - ❌ Commented-out code blocks
-   - ❌ Variables assigned for "future use"
-   - ✅ Only include code that is actively used
-
-5. **Type Hints**
-   - ✅ All function parameters and return values typed
-   - ✅ Use `from __future__ import annotations` for forward references
-
-### Common Ruff Violations to Avoid
-
-- **F841**: Local variable assigned but never used
-- **F401**: Module imported but unused
-- **E501**: Line too long (>120 characters)
-- **E402**: Module-level import not at top of file
-- **E722**: Bare `except:` (use specific exceptions)
-
-### Pre-Commit Verification
-
-Before completing code generation:
-1. Mentally check for unused variables and imports
-2. Verify line lengths are ≤120 characters
-3. Confirm all imports are at file top
-4. Remove any debug/test code that isn't needed
-
-**If code doesn't pass ruff linting, it's incorrect.**
+### Determinism
+- Fix RNG seeds when randomness affects results (torch / numpy / random)
+- Provide `seed` in configs where relevant
+- Avoid nondeterministic ops unless explicitly justified
 
 ---
-## Development Environment
 
-### Poetry Environment
-BayesFolio uses Poetry for dependency management. **All Python commands must be run within the Poetry environment.**
+## Dependency & Environment Rules
 
-#### Running Python Code
-- **Correct:** `poetry run python script.py`
-- **Correct:** `poetry run pytest tests/`
-- **Wrong:** `python script.py` (will not find dependencies)
-- **Wrong:** `python3 -m pytest` (will not find dependencies)
+- BayesFolio is a **Python package**, not a notebook-only project.
+- Prefer lightweight, modular dependencies.
+- Riskfolio-Lib is used for portfolio optimization. Use it via a clean adapter layer.
 
-#### Common Commands
-```bash
-# Install dependencies
-poetry install
-
-# Run Python script
-poetry run python path/to/script.py
-
-# Run tests
-poetry run pytest tests/
-
-# Run specific test file
-poetry run pytest tests/unit/test_file.py
-```
+---
 
 ## Architecture Rules (STRICT)
-- Workflows/orchestrators coordinate only — no computation
-- All computation for workflows lives in helper modules
-- Do NOT introduce cross-imports between:
-  data / ml / optimization / interpret
-- New functionality must use helpers + registries
-- Do NOT modify core workflows to add features
+
+### Separation of Concerns
+- Workflows/orchestrators coordinate only — **no heavy computation**
+- Heavy logic lives in dedicated helpers/modules
+
+### No Cross-Imports Between Domains
+Avoid circular coupling. Do NOT introduce cross-imports between:
+- `data/` (ingestion, cleaning, panels)
+- `features/` (feature engineering)
+- `models/` (GPs, baselines)
+- `portfolio/` (optimization, constraints, scenario engines)
+- `backtesting/` (walk-forward, CV, performance attribution)
+- `reporting/` (plots, artifacts, report generation)
+- `apps/` (future agent/RAG UI layer)
+
+Use interfaces/adapters if two domains must interact.
+
+### Where Code Goes
+- Data ingestion & panels → `bayesfolio/features/`
+- Feature engineering → `bayesfolio/features/`
+- GP models, kernels, likelihoods, means → `bayesfolio/models/`
+- Scaling/normalization utilities → `bayesfolio/models/scaling.py` or `bayesfolio/preprocessing/`
+- CV and walk-forward splitting → `bayesfolio/backtesting/cv.py`
+- Backtesting engine → `bayesfolio/backtesting/`
+- Portfolio optimization + Riskfolio adapters → `bayesfolio/portfolio/`
+- Evaluation metrics → `bayesfolio/evaluation/`
+- Visualization → `bayesfolio/visualization/`
+- Config schemas → `bayesfolio/configs/`
+- Experiment tracking → `bayesfolio/mlflow/` (optional)
+- Tests → `tests/unit/`, `tests/integration/`, `tests/regression/`
+
+---
 
 ## Config & Schemas
-- All configs and results are Pydantic models
-- `*Config` classes define workflow behavior
-- `*WorkflowResult` classes are transport schemas crossing ML ↔ backend boundaries
-- Transport schemas must be JSON-serializable
-- NEVER use pickle or dill
-- All transport schemas require schema_version
-- Changing transport schemas requires regression test updates
 
-## Where Code Goes
-- Data ingestion & validation → BayesFolio/data/
-- Surrogate models & tuning → BayesFolio/ml/
-- Bayesian Optimization → BayesFolio/bo/
-- DOE & Space Filling Design -> sureact/doe
-- Interpreting Variables -> BayesFolio/interpret
-- Workflow orchestration (coordination only) → BayesFolio/workflows/
-- Workflow helper logic → helpers modules within workflows
-- Config schemas (`*Config`) → BayesFolio/schemas/configs/
-- Transport schemas (`*WorkflowResult`) → BayesFolio/schemas/results/
-- Tests → tests/unit/, tests/integration/, tests/regression/, tests/workflow
-- New Feature Documentation → docs/new_feature_info/ *use descriptive filenames*
+- All configs and “results that cross boundaries” must be **Pydantic** models
+- `*Config` defines behavior; include defaults that are safe and reproducible
+- Any transport/result schema must be **JSON-serializable**
+- NEVER use `pickle`/`dill` for saved artifacts that need interoperability
+- Add `schema_version: str` to transport schemas if intended to persist across releases
+
+---
+
+## Gaussian Process + Uncertainty Rules (CRITICAL)
+
+### Scaling / Transforms
+- Scaling must be explicit and invertible:
+  - `transform_x`, `fit_y`, `inverse_y`, `inverse_std`
+- If scaling is **per_task**, inverse transforms must respect task alignment.
+- When using predictive covariance:
+  - If `y_orig = D * y_scaled + mu`, then `Cov_orig = D Cov_scaled D`
+- Never “use uncertainty” as a scalar per asset when joint covariance is available.
+  Prefer the **full posterior covariance** for scenario generation.
+
+### Posterior Scenario Generation
+- If you use GP posterior scenarios for portfolio risk:
+  - sample from the **joint predictive distribution**
+  - preserve cross-asset covariance
+- Make scenario sampling functions take:
+  - `mean: torch.Tensor (n_assets,)`
+  - `cov: torch.Tensor (n_assets, n_assets)`
+  - `asset_order: list[str]`
+  - and output `pd.DataFrame` scenarios with stable column order
+
+### Look-Ahead Safety
+- Features must not leak future info.
+- Labels such as `y_excess_lead` must be aligned so that:
+  - training uses only information available at time t
+  - predicting t+1 uses only features known at t
+
+---
+
+## Riskfolio Integration Rules (CRITICAL)
+
+BayesFolio uses Riskfolio-Lib as an optimizer backend.
+
+### Historical Optimization
+- `port = rp.Portfolio(returns=historical_returns)`
+- `assets_stats(method_mu=..., method_cov=...)`
+- Use `hist=True` for scenario-based risk measures (CVaR/EVaR/etc.) when appropriate.
+
+### GP Posterior Scenario Optimization
+- GP scenario matrix is treated as a **scenario return panel**
+- Use:
+  - `port = rp.Portfolio(returns=scenario_returns)`
+  - `assets_stats(method_mu="hist", method_cov="hist")` (or set `port.mu` explicitly)
+  - `optimization(hist=True, rm="CVaR", ...)`
+
+### Unit Consistency
+- Ensure GP scenarios are in the same return units (decimal vs percent) as historical.
+- Provide helper checks:
+  - compare scenario mean/std vs historical mean/std for sanity.
+
+### Constraints & Universe
+- If an asset is modeled in the GP but excluded from the portfolio:
+  - exclude **after** posterior extraction (subselect mean/cov / scenario columns)
+  - do NOT break asset alignment
+
+---
 
 ## Testing Expectations
-- Helper logic requires unit tests
-- Workflows require workflow tests
-- End to End test require integration tests
-- Config & Transport schema require regression tests
-- Fix random seeds for determinism
 
-## Defaults
-- Prefer small, testable helpers
-- Avoid modifying existing APIs
-- Maintain backward compatibility for transport schemas
-- Follow coding_guidelines.md strictly
+- Helpers require unit tests
+- CV/backtesting requires integration tests
+- Any schema changes require regression tests
+- Tests must be deterministic (fixed seeds)
+- Use small synthetic data for fast tests
 
-## Variable Definitions
-- See [docs/variable_definitions.md](../docs/variable_definitions.md) for comprehensive guide on:
-  - Differences between variable type, role, and usage
-  - Supported input/output/meta variable types
-  - Parameter settings and caveats
-  - Current limitations (temporal inputs, output types, Non-Modeled Variables)
- 
-## Sustainability & Efficiency Guidelines
+Suggested test focus areas:
+- Scaling round-trip correctness (`fit_y` + `inverse_y`, `inverse_std`)
+- Posterior covariance unscaling correctness
+- Scenario sampling PSD robustness (jitter / Cholesky fallback)
+- Asset ordering stability (task_idx sort)
+- Riskfolio adapter correctness (hist portfolio vs GP scenario portfolio)
 
-BayesFolio is a long-lived, agent-facing system. Code must be safe to evolve,
-cheap to reason about, and efficient at scale.
+---
 
-### Performance & Resource Use
-- Prefer linear-time algorithms; avoid accidental quadratic behavior
-- Avoid materializing large intermediate objects when streaming or iterating is sufficient
-- Cache expensive computations when results are reused (explicit caches only)
-- Do not recompute schema-derived metadata repeatedly — compute once and reuse
+## Performance & Research Integrity
 
-### Memory & Serialization
-- Be mindful of object lifetimes in workflows and helpers
-- Avoid copying large arrays or DataFrames unless strictly necessary
-- Transport schemas must remain compact and JSON-friendly
-
-### API & Schema Stability
-- New fields must be additive and backward-compatible
-- Prefer optional fields over breaking changes
-- Avoid overloading a single field with multiple meanings
-
-### Abstraction Discipline
-- Helpers may grow; workflows must not
-- If logic is reused in more than one place, extract it
-- Do not encode business rules implicitly — make them explicit and testable
-
-### Agent Awareness
-- Assume code and schemas may be queried by LLMs
-- Prefer explicit names and structured metadata over clever inference
-- Avoid hidden coupling that an agent cannot observe
-
-### Cost Awareness
-- Assume workflows may be executed repeatedly in CI, batch, or agent loops
-- Avoid unnecessary randomness or non-determinism
+- Avoid accidental quadratic operations over long panels
+- Avoid copying large DataFrames unless necessary
+- Cache reusable computations explicitly (no hidden global caches)
 - Make expensive operations obvious and documented
 
-**NOTE**: When in doubt, prefer the simplest solution that preserves extensibility.
+---
+
+## Responsible AI & Transparency
+
+BayesFolio outputs must be explainable and auditable:
+- record model assumptions (kernel, rank, likelihood)
+- record scaling choice (global vs per_task)
+- record dataset cutoffs and dates used
+- include uncertainty diagnostics (posterior std, correlations, stress scenarios)
+- do not claim guaranteed performance
+
+---
+
+## Defaults (When Unsure)
+
+- Prefer **per_task** scaling for multitask return targets
+- Prefer scenario-based CVaR optimization when using GP uncertainty
+- Keep APIs small and composable
+- Add type hints + docstrings by default
+- Do not modify existing public APIs without adding tests
+
+---
+
+## What NOT to Add Yet (Important)
+
+BayesFolio will eventually include:
+- an agentic app layer
+- a RAG chatbot interface
+- report generation UI
+
+But currently:
+- do NOT add app infrastructure unless explicitly requested
+- keep model/portfolio/backtesting layers clean and reusable so an app can wrap them later

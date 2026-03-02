@@ -6,23 +6,23 @@ import os
 from joblib import Parallel, delayed
 from pydantic import BaseModel
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-from bayesfolio.configs import TickerConfig, Interval, Horizon, CVConfig
-from bayesfolio.asset_prices import build_long_panel
+from bayesfolio.schemas.configs.core import TickerConfig, Interval, Horizon, CVConfig
+from bayesfolio.features.asset_prices import build_long_panel
 import numpy as np
 import torch
-from bayesfolio.configs import (
+from bayesfolio.schemas.configs.core import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from bayesfolio.visualization.eda import correlation_matrix
-from bayesfolio.gp_data_prep import prepare_multitask_gp_data
+from bayesfolio.features.gp_data_prep import prepare_multitask_gp_data
 from bayesfolio.models.cv import rolling_time_splits_multitask
 from bayesfolio.models.scaling import MultitaskScaler
 device = torch.device("cpu")
 from bayesfolio.models.gp import train_model_hadamard
 from math import log, sqrt
-from bayesfolio.evaluate import evaluate_asset_pricing
+from bayesfolio.optimization.evaluate import evaluate_asset_pricing
 from bayesfolio.utils import check_equal_occurrences
 from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot_actual_vs_pred_matrix
-from bayesfolio.portfolio.helpers import assessing_long_short_performance, long_short_returns
+from bayesfolio.optimization.portfolio_helpers import assessing_long_short_performance, long_short_returns
 from bayesfolio.models.kernels import MeanF, KernelType, initialize_mean, initialize_kernel, adaptive_lengthscale_prior
 from bayesfolio.mlflow.helpers import (
     KernelConfig, MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
@@ -30,8 +30,8 @@ from bayesfolio.mlflow.helpers import (
 )
 import random
 import itertools
-from bayesfolio.market_fundamentals import fetch_enhanced_macro_features
-from bayesfolio.asset_prices import fetch_etf_features
+from bayesfolio.features.market_fundamentals import fetch_enhanced_macro_features
+from bayesfolio.features.asset_prices import fetch_etf_features
 warnings.filterwarnings(
     "ignore",
     message=".*torch.sparse.SparseTensor.*is deprecated.*"
@@ -1232,7 +1232,7 @@ plt.show()
 
 ############## Build riskfolio  
 import riskfolio as rp
-from bayesfolio.configs import (
+from bayesfolio.schemas.configs.core import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from IPython.display import display
 risk_config = RiskfolioConfig(

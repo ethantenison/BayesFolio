@@ -2,7 +2,6 @@
 import pandas as pd 
 import numpy as np
 import riskfolio as rp
-import vectorbt as vbt
 
 def summarize_backtest(bt_df: pd.DataFrame):
     """Compute summary performance metrics for the backtest."""
@@ -38,7 +37,7 @@ def opt_weights(excess_returns, risk_config):
     port.nea = risk_config.nea  # Update to use risk_config.nea
 
     # Optimize portfolio
-    weights = port.optimization(
+    weights_df = port.optimization(
         model=risk_config.model,
         rm=risk_config.rm,
         obj=risk_config.obj,
@@ -46,9 +45,9 @@ def opt_weights(excess_returns, risk_config):
         l=risk_config.ra,
         hist=risk_config.hist
     )
-    weights = np.ravel(w.to_numpy())
+    weights = np.ravel(weights_df.to_numpy())
     print(weights)
-    shp = rp.Sharpe(w=w, mu=port.mu,
+    shp = rp.Sharpe(w=weights_df, mu=port.mu,
                     cov=port.cov,
                     returns=excess_returns,
                     rm=risk_config.rm,

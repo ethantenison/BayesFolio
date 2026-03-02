@@ -7,7 +7,7 @@ import pandas as pd
 import yfinance as yf
 from sklearn.decomposition import PCA
 import pandas_datareader.data as pdr
-from bayesfolio.configs import Interval, Horizon
+from bayesfolio.schemas.configs.core import Interval, Horizon
 from typing import Dict, List, Optional, Literal, Tuple
 import io
 import sys
@@ -908,7 +908,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     import numpy as np
     import yfinance as yf
     import pandas_datareader.data as pdr
-    from bayesfolio.asset_prices import fetch_etf_features
+    from bayesfolio.features.asset_prices import fetch_etf_features
 
     # ------------------------------------------------------------
     # Helper to convert ANY Series into a 2-col DataFrame with date

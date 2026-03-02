@@ -6,7 +6,7 @@ from math import sqrt, log
 from gpytorch.priors import LogNormalPrior, GammaPrior, LKJCovariancePrior
 from gpytorch.constraints import GreaterThan
 import torch
-from bayesfolio.models.old_kernels import PositiveIndexKernel
+from bayesfolio.ml.legacy.old_kernels import PositiveIndexKernel
 from gpytorch.distributions import MultivariateNormal
 from torch import Tensor
 from gpytorch.means import MultitaskMean
