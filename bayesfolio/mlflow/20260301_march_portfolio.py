@@ -433,8 +433,8 @@ TIME_KERNEL_GRID = {
 }
 
 
-RANK_GRID = [2,3]
-MEAN_F_GRID = [MeanF.MULTITASK_CONSTANT] #etf_mean_spec
+RANK_GRID = [5]
+MEAN_F_GRID = [MeanF.MULTITASK_ZERO] #etf_mean_spec MeanF.MULTITASK_CONSTANT, 
 
 
 
@@ -483,7 +483,7 @@ for cfg in experiment_grid:
             num_tasks=len(tickers.tickers),
             mean=cfg.mean_f,
             rank=cfg.rank,
-            scaling="global",   
+            scaling="per_task",   
             min_noise=5e-3,
                 )
         
@@ -533,7 +533,7 @@ for cfg in experiment_grid:
             kernel_e: KernelConfig,
             kernel_m: KernelConfig,
             kernel_t: KernelConfig,
-            scale_y: str = "global",
+            scale_y: str = "per_task",
             eps: float = 1e-8,
         ):
             """
@@ -857,7 +857,7 @@ multiconfig = MultiTaskConfig(
     num_tasks=len(tickers.tickers),
     mean=cfg.mean_f,
     rank=cfg.rank,
-    scaling="global",   
+    scaling="per_task",   
     min_noise=5e-3,
         )
 
@@ -897,7 +897,7 @@ torch.use_deterministic_algorithms(True)
 
 
 # # ---- Scaling ----
-scaler = MultitaskScaler(scale_y="global", exclude_time_col=False)
+scaler = MultitaskScaler(scale_y="per_task", exclude_time_col=False)
 scaler.fit_x(X)
 X_trs = scaler.transform_x(X)
 y_trs = scaler.fit_y(y, I)
@@ -1182,7 +1182,7 @@ multiconfig = MultiTaskConfig(
     num_tasks=len(task_map),
     mean=cfg.mean_f,
     rank=cfg.rank,
-    scaling="global",
+    scaling="per_task",
     min_noise=5e-3
 )
 
@@ -1215,7 +1215,7 @@ kernel_t = KernelConfig(
 )
 
 # scaling
-scaler = MultitaskScaler(scale_y="global", exclude_time_col=False)
+scaler = MultitaskScaler(scale_y="per_task", exclude_time_col=False)
 scaler.fit_x(X)
 X_trs = scaler.transform_x(X)
 y_trs = scaler.fit_y(y, I)
@@ -1388,4 +1388,4 @@ print(cum[:10])
 y_panel = full_train_data.pivot(index="date", columns="asset_id", values="y_excess_lead").dropna()
 stds = y_panel.std()
 ratio = stds.max() / stds.min()
-print(ratio, stds.sort_values())
+print(ratio, stds.sort_values()) 
