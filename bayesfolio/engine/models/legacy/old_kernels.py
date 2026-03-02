@@ -5,7 +5,6 @@ Gaussian Process Kernels
 import torch
 from gpytorch.kernels.kernel import Kernel
 from torch import Tensor
-from typing import Any, Dict, List
 from gpytorch.constraints import GreaterThan
 from gpytorch.kernels import (
     MaternKernel,
@@ -27,7 +26,6 @@ import math
 import gpytorch
 from botorch.models.kernels import (
     ExponentialDecayKernel,
-    InfiniteWidthBNNKernel,
 )
 from pydantic import BaseModel, ConfigDict
 
@@ -269,7 +267,7 @@ class ContKernelFactory:
     methods to initialize different kernel types.
     """
 
-    def __init__(self, batch_shape: torch.Size, active_dims: List[int], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2, gamma: int=1, q: int =1, prior: Prior | None = None):
+    def __init__(self, batch_shape: torch.Size, active_dims: list[int] | tuple[int, ...], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2, gamma: int=1, q: int =1, prior: Prior | None = None):
         """
         Initializes the ContKernelFactory with common parameters.
 
@@ -278,7 +276,7 @@ class ContKernelFactory:
             gp_options (Dict[str, Any]): Options for configuring the kernel.
         """
         self.batch_shape = batch_shape
-        self.active_dims = active_dims
+        self.active_dims = tuple(active_dims)
         self.ard_num_dims = len(active_dims)
         self.smoothness = smoothness
         self.period_length = period_length
@@ -403,7 +401,7 @@ class ContKernelFactory:
 
 
 def initialize_kernel(
-    kernel: str, batch_shape: torch.Size, active_dims: List[int], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2, q: int = 1, prior: Prior | None = None
+    kernel: str, batch_shape: torch.Size, active_dims: list[int] | tuple[int, ...], smoothness: float = 2.5, period_length: float = 1.0, n_mixtures=2, q: int = 1, prior: Prior | None = None
 ):
     """
     Initializes the kernel for the Gaussian Process model based on the specified type.

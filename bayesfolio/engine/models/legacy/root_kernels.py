@@ -4,7 +4,7 @@ Gaussian Process Kernels
 from __future__ import annotations
 
 from math import log, sqrt
-from typing import Any, Dict, List
+from typing import Any
 
 import torch
 from gpytorch.constraints import GreaterThan
@@ -74,7 +74,7 @@ class EnhancedContKernelFactory:
     methods to initialize different kernel types.
     """
 
-    def __init__(self, batch_shape: torch.Size, active_dims: List[int], gp_options: Dict[str, Any]):
+    def __init__(self, batch_shape: torch.Size, active_dims: list[int], gp_options: dict[str, Any]):
         """
         Initializes the ContKernelFactory with common parameters.
 
@@ -141,7 +141,7 @@ class EnhancedContKernelFactory:
 
 
 def initialize_kernel(
-    kernel: str, input_size: int, batch_shape: torch.Size, active_dims: List[int], gp_options: Dict[str, Any]
+    kernel: str, input_size: int, batch_shape: torch.Size, active_dims: list[int], gp_options: dict[str, Any]
 ):
     """
     Initializes the kernel for the Gaussian Process model based on the specified type.
@@ -201,12 +201,12 @@ class ContKernelFactory:
     A factory for continuous kernels that supports flexible active dimensions.
     """
 
-    def __init__(self, batch_shape: torch.Size, gp_options: Dict[str, Any], active_dims_map: Dict[str, List[int]]):
+    def __init__(self, batch_shape: torch.Size, gp_options: dict[str, Any], active_dims_map: dict[str, list[int]]):
         self.batch_shape = batch_shape
         self.gp_options = gp_options
         self.active_dims_map = active_dims_map
 
-    def _get_active_dims(self, kernel_type: str, input_size: int) -> List[int]:
+    def _get_active_dims(self, kernel_type: str, input_size: int) -> list[int]:
         """Lookup active dims for a kernel type, default = all dims."""
         return self.active_dims_map.get(kernel_type, list(range(input_size)))
 
@@ -281,8 +281,8 @@ class ContKernelFactory:
         )
 
 # ---- Kernel Expression Parser ----
-def build_kernel(expression: str, input_size: int, batch_shape: torch.Size, gp_options: Dict[str, Any],
-                 active_dims_map: Dict[str, List[int]]):
+def build_kernel(expression: str, input_size: int, batch_shape: torch.Size, gp_options: dict[str, Any],
+                 active_dims_map: dict[str, list[int]]):
     """
     Build a kernel from an expression string like "(rq*matern)+periodic".
     - * means ProductKernel

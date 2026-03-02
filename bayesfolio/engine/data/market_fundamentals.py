@@ -8,7 +8,7 @@ import yfinance as yf
 from sklearn.decomposition import PCA
 import pandas_datareader.data as pdr
 from bayesfolio.schemas.configs.core import Interval, Horizon
-from typing import Dict, List, Optional, Literal, Tuple
+from typing import Literal
 import io
 import sys
 
@@ -20,17 +20,17 @@ except Exception:
     te = None
 
 import requests
-
++
 def fetch_global_yields(
     start: str = "2010-01-01",
-    end: Optional[str] = None,
+    end: str | None = None,
     horizon: str = "M",  # accepts your Horizon enum (we read .value if present)
-    countries: Optional[List[str]] = None,
+    countries: list[str] | None = None,
     transform: Literal["level", "diff_1p", "z12"] = "level",
-    fred_codes: Optional[Dict[str, List[str]]] = None,
-    stooq_map: Optional[Dict[str, str]] = None,
+    fred_codes: dict[str, list[str]] | None = None,
+    stooq_map: dict[str, str] | None = None,
     use_tradingeconomics: bool = False,
-    te_country_map: Optional[Dict[str, Tuple[str, str]]] = None,  # (country, category)
+    te_country_map: dict[str, tuple[str, str]] | None = None,  # (country, category)
     verbose: bool = False,
 ) -> pd.DataFrame:
     """
@@ -88,7 +88,7 @@ def fetch_global_yields(
             print(msg, file=sys.stderr)
 
     # ---------- Source helpers ----------
-    def _fred_one(symbols: List[str]):
+    def _fred_one(symbols: list[str]):
         for sym in symbols:
             try:
                 s = pdr.DataReader(sym, "fred", start, end)[sym]
@@ -568,7 +568,6 @@ def fetch_tbill_rate(start="2010-01-01", end=None, horizon: Horizon = Horizon.MO
       - tbill3m (decimal yield)
     """
     import yfinance as yf
-    import pandas as pd
 
     px = yf.download("^IRX", start=start, end=end, interval=Interval.DAILY, progress=False)
 

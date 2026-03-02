@@ -1,5 +1,5 @@
 """Cross Validation"""
-from typing import Iterator, Tuple
+from collections.abc import Iterator
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ def rolling_time_splits(
     horizon: int = 1,         # forecast horizon (steps ahead)
     embargo: int = 0,         # gap between train end and test start
     train_max: int | None = None,  # optional cap for sliding window
-) -> Iterator[Tuple[np.ndarray, np.ndarray]]:
+) -> Iterator[tuple[np.ndarray, np.ndarray]]:
     """
     Yields (train_idx, test_idx) index arrays for walk-forward splits.
     Test is a single timestamp at t+h (or a block if you prefer multi-step).
@@ -46,7 +46,7 @@ def rolling_time_splits_multitask(
     horizon: int = 1,
     embargo: int = 0,
     train_max: int | None = None,
-) -> Iterator[Tuple[np.ndarray, np.ndarray]]:
+) -> Iterator[tuple[np.ndarray, np.ndarray]]:
     """
     Rolling time-series splits for multitask (panel) data.
 

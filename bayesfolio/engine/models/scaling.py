@@ -1,8 +1,6 @@
 """Scaling utilities for MarketMaven models."""
 import torch
-from typing import Optional
 import numpy as np
-import pandas as pd
 from scipy.stats import boxcox
 
 class MultitaskScaler:
@@ -45,8 +43,8 @@ class MultitaskScaler:
         self.exclude_time_col = exclude_time_col
 
         # containers
-        self.x_mean: Optional[torch.Tensor] = None
-        self.x_std: Optional[torch.Tensor] = None
+        self.x_mean: torch.Tensor | None = None
+        self.x_std: torch.Tensor | None = None
         self.y_mean = None
         self.y_std = None
         self.y_mean_k = {}
@@ -83,7 +81,7 @@ class MultitaskScaler:
     # -----------------------------------------------
     # Target scaling
     # -----------------------------------------------
-    def fit_y(self, y: torch.Tensor, I: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def fit_y(self, y: torch.Tensor, task_idx: torch.Tensor | None = None) -> torch.Tensor:
         """Compute target scaling (global or per task)."""
         if self.scale_y == "none":
             return y
@@ -94,11 +92,11 @@ class MultitaskScaler:
             return (y - self.y_mean) / self.y_std
 
         elif self.scale_y == "per_task":
-            if I is None:
-                raise ValueError("Must pass task indices I for per-task scaling.")
+            if task_idx is None:
+                raise ValueError("Must pass task indices for per-task scaling.")
 
             y_scaled = torch.empty_like(y)
-            task_vals = I.view(-1).to(torch.long)
+            task_vals = task_idx.view(-1).to(torch.long)
             for k in torch.unique(task_vals):
                 mask = task_vals == k
                 mu = y[mask].mean()
@@ -118,7 +116,7 @@ class MultitaskScaler:
     # -----------------------------------------------
     # Inverse transforms
     # -----------------------------------------------
-    def inverse_y(self, yhat: torch.Tensor, I: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def inverse_y(self, yhat: torch.Tensor, task_idx: torch.Tensor | None = None) -> torch.Tensor:
         """Inverse transform predictions back to original target space."""
         if self.scale_y == "none":
             return yhat
@@ -127,29 +125,29 @@ class MultitaskScaler:
             return yhat * self.y_std + self.y_mean
 
         elif self.scale_y == "per_task":
-            if I is None:
-                raise ValueError("Must pass task indices I for per-task inverse transform.")
+            if task_idx is None:
+                raise ValueError("Must pass task indices for per-task inverse transform.")
             mu = torch.tensor(
-                [self.y_mean_k.get(int(t), self.global_mu) for t in I.view(-1).tolist()],
+                [self.y_mean_k.get(int(t), self.global_mu) for t in task_idx.view(-1).tolist()],
                 dtype=yhat.dtype, device=yhat.device
             )
             sd = torch.tensor(
-                [self.y_std_k.get(int(t), self.global_sd) for t in I.view(-1).tolist()],
+                [self.y_std_k.get(int(t), self.global_sd) for t in task_idx.view(-1).tolist()],
                 dtype=yhat.dtype, device=yhat.device
             )
             return yhat * sd + mu
 
-    def inverse_std(self, s: torch.Tensor, I: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def inverse_std(self, s: torch.Tensor, task_idx: torch.Tensor | None = None) -> torch.Tensor:
         """Inverse transform predicted standard deviations."""
         if self.scale_y == "none":
             return s
         if self.scale_y == "global":
             return s * self.y_std
         elif self.scale_y == "per_task":
-            if I is None:
-                raise ValueError("Must pass task indices I for per-task inverse transform.")
+            if task_idx is None:
+                raise ValueError("Must pass task indices for per-task inverse transform.")
             sd = torch.tensor(
-                [self.y_std_k.get(int(t), self.global_sd) for t in I.view(-1).tolist()],
+                [self.y_std_k.get(int(t), self.global_sd) for t in task_idx.view(-1).tolist()],
                 dtype=s.dtype, device=s.device
             )
             return s * sd

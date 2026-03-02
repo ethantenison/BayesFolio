@@ -1,8 +1,4 @@
 """Functions meant to extract relevant kernel information"""
-import numpy as np
-import torch
-from gpytorch.kernels import Kernel
-from gpytorch.priors import Prior
 
 
 def serialize_prior(p):
@@ -14,10 +10,10 @@ def serialize_prior(p):
             val = getattr(p, attr)
             try:
                 d[attr] = float(val)
-            except:
+            except Exception:
                 try:
                     d[attr] = val.detach().cpu().numpy().tolist()
-                except:
+                except Exception:
                     d[attr] = str(val)
     return d
 
@@ -30,7 +26,7 @@ def serialize_constraint(c):
         if hasattr(c, attr):
             try:
                 d[attr] = getattr(c, attr).item()
-            except:
+            except Exception:
                 d[attr] = getattr(c, attr)
     return d
 
@@ -49,7 +45,7 @@ def describe_kernel_recursive(k):
     if hasattr(k, "lengthscale"):
         try:
             out["lengthscale"] = k.lengthscale.detach().cpu().numpy().tolist()
-        except:
+        except Exception:
             out["lengthscale"] = str(k.lengthscale)
 
     # priors

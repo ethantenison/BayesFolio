@@ -1,10 +1,7 @@
 import torch
-from scipy.stats import spearmanr
-import gpytorch
 import numpy as np
 import pandas as pd
 from scipy.signal import periodogram
-import math
 
 def gaussian_nlpd(y_true: torch.Tensor, y_mean: torch.Tensor, y_std: torch.Tensor, eps: float = 1e-12) -> float:
     var = (y_std.clamp_min(eps))**2

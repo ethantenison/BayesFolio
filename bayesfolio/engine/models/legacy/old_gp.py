@@ -1,8 +1,7 @@
 import gpytorch
-from gpytorch.kernels import RBFKernel, ScaleKernel, PeriodicKernel, LinearKernel, MaternKernel, IndexKernel
 from gpytorch.likelihoods import HadamardGaussianLikelihood
 from gpytorch.models import ExactGP
-from math import sqrt, log
+from math import sqrt
 from gpytorch.priors import LogNormalPrior, GammaPrior, LKJCovariancePrior
 from gpytorch.constraints import GreaterThan
 import torch

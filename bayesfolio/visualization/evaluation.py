@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import mlflow
-from typing import Dict, List
 import matplotlib.dates as mdates
 
 
