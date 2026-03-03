@@ -17,18 +17,21 @@ SQRT3 = sqrt(3)
 # ard_num_dims = 3
 # lengthscale_prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
 # lengthscale_constraint = GreaterThan(2.5e-2, initial_value=lengthscale_prior.mode)
-MIN_INFERRED_NOISE_LEVEL = 5e-3 #1e-5  # Minimum noise level to avoid numerical issues
+MIN_INFERRED_NOISE_LEVEL = 5e-3  # 1e-5  # Minimum noise level to avoid numerical issues
+
 
 def as_task_vec(i: torch.Tensor) -> torch.Tensor:
-  """Make sure task indices are (N,) long (for IndexKernel)."""
-  return i.view(-1).to(torch.long)
+    """Make sure task indices are (N,) long (for IndexKernel)."""
+    return i.view(-1).to(torch.long)
+
 
 def as_task_col(i: torch.Tensor) -> torch.Tensor:
     """Make sure task indices are (N,1) long (for likelihood)."""
     if i.dim() == 1:
         i = i.unsqueeze(-1)
     return i.to(torch.long)
-  
+
+
 def get_hadamard_gaussian_likelihood_with_lognormal_prior(
     num_tasks: int,
     task_feature_index: int = 1,
@@ -46,7 +49,7 @@ def get_hadamard_gaussian_likelihood_with_lognormal_prior(
     """
     batch_shape = torch.Size() if batch_shape is None else batch_shape
 
-    noise_prior = LogNormalPrior(loc=-4.0, scale=1.0) # loc=-3.2, scale=0.45
+    noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)  # loc=-3.2, scale=0.45
     noise_constraint = GreaterThan(
         min_noise,
         transform=None,
@@ -60,6 +63,7 @@ def get_hadamard_gaussian_likelihood_with_lognormal_prior(
         batch_shape=batch_shape,
         task_feature_index=task_feature_index,
     )
+
 
 class HadamardMultiTaskGP(ExactGP):
     """
@@ -95,7 +99,7 @@ class HadamardMultiTaskGP(ExactGP):
         train_X = train_X.to(device=device, dtype=dtype)
         train_Y = train_Y.to(device=device, dtype=dtype)
         likelihood = likelihood.to(device=device, dtype=dtype)
-        
+
         super().__init__(train_X, train_Y, likelihood)
 
         self.mean_module = mean_module.to(device=device, dtype=dtype)
@@ -129,7 +133,7 @@ class HadamardMultiTaskGP(ExactGP):
         """Return (x_before, task_idcs, x_after)."""
         x_before = X[..., : self.task_feature]
         task_idcs = X[..., self.task_feature].view(-1, 1).to(torch.long)
-        x_after = X[..., (self.task_feature + 1):]
+        x_after = X[..., (self.task_feature + 1) :]
         return x_before, task_idcs, x_after
 
     def _register_lengthscale_constraints(self, kernel):
@@ -151,7 +155,6 @@ class HadamardMultiTaskGP(ExactGP):
         if hasattr(kernel, "raw_lengthscale"):
             # Register the constraint for raw_lengthscale
             kernel.register_constraint("raw_lengthscale", GreaterThan(2.5e-3))
-
 
     # ----------------------------------------------------------------------
     # Core forward logic
@@ -205,7 +208,7 @@ def train_model_hadamard(
     # Device / dtype
     # ----------------------------------------------------------------------
     if device is None:
-        device = torch.device("cpu") # "mps" if torch.backends.mps.is_available() else 
+        device = torch.device("cpu")  # "mps" if torch.backends.mps.is_available() else
 
     train_X = train_X.to(device=device, dtype=dtype)
     train_Y = train_Y.to(device=device, dtype=dtype)
@@ -249,9 +252,7 @@ def train_model_hadamard(
         dtype=dtype,
     ).to(device=device, dtype=dtype)
 
-    model.likelihood.noise_covar.register_constraint(
-        "raw_noise", GreaterThan(min_noise)
-    )
+    model.likelihood.noise_covar.register_constraint("raw_noise", GreaterThan(min_noise))
 
     model.train()
     likelihood.train()
@@ -271,19 +272,21 @@ def train_model_hadamard(
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         # FAST GP COMPUTATION CONTEXT (this is the key addition)
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        with gpytorch.settings.fast_computations(
-            log_prob=True,
-            covar_root_decomposition=True,
-            solves=True,
-        ), gpytorch.settings.cholesky_jitter(1e-5):
-
+        with (
+            gpytorch.settings.fast_computations(
+                log_prob=True,
+                covar_root_decomposition=True,
+                solves=True,
+            ),
+            gpytorch.settings.cholesky_jitter(1e-5),
+        ):
             output = model(train_X)
             loss = -mll(output, train_Y, train_X)
 
         loss.backward()
 
         if visualize and (it + 1) % 25 == 0:
-            print(f"Iter {it+1}/{training_iterations} - Loss: {loss.item():.3f}")
+            print(f"Iter {it + 1}/{training_iterations} - Loss: {loss.item():.3f}")
 
         optimizer.step()
 
@@ -296,7 +299,7 @@ def train_model_hadamard(
 
         if patience_counter >= patience:
             if visualize:
-                print(f"Early stopping at iteration {it+1}")
+                print(f"Early stopping at iteration {it + 1}")
             break
 
     # ----------------------------------------------------------------------

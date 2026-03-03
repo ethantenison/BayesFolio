@@ -1,4 +1,5 @@
 """Pydantic Configs used for MLFlow tracking."""
+
 from __future__ import annotations
 
 from datetime import date

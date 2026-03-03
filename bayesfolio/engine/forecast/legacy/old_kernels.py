@@ -32,6 +32,7 @@ torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
+
 class GammaExponentialKernel(Kernel):
     """
     Gamma–Exponential ARD kernel:
@@ -60,14 +61,8 @@ class GammaExponentialKernel(Kernel):
         )
 
         # ---- gamma parameter ----
-        self.register_parameter(
-            "raw_gamma",
-            torch.nn.Parameter(torch.tensor(float(gamma)))
-        )
-        self.register_constraint(
-            "raw_gamma",
-            GreaterThan(0.8)
-        )
+        self.register_parameter("raw_gamma", torch.nn.Parameter(torch.tensor(float(gamma))))
+        self.register_constraint("raw_gamma", GreaterThan(0.8))
 
         if gamma_prior is not None:
             self.register_prior(
@@ -87,11 +82,7 @@ class GammaExponentialKernel(Kernel):
         self._set_gamma(value)
 
     def _set_gamma(self, value):
-        self.initialize(
-            raw_gamma=self.raw_gamma_constraint.inverse_transform(
-                torch.as_tensor(value)
-            )
-        )
+        self.initialize(raw_gamma=self.raw_gamma_constraint.inverse_transform(torch.as_tensor(value)))
 
     # ---- core forward ----
     def forward(self, x1, x2, diag=False, **params):
@@ -103,16 +94,12 @@ class GammaExponentialKernel(Kernel):
         x2_ = (x2 - mean).div(self.lengthscale)
 
         # Now computes distance in *ARD-scaled* space
-        dist = self.covar_dist(
-            x1_, x2_,
-            diag=diag,
-            square_dist=False,
-            **params
-        )
+        dist = self.covar_dist(x1_, x2_, diag=diag, square_dist=False, **params)
 
         # Gamma–Exponential kernel
-        return torch.exp(-(dist ** self.gamma))
-    
+        return torch.exp(-(dist**self.gamma))
+
+
 class TimeChangePointKernel(Kernel):
     """
     Smooth change-point kernel on a 1D time dimension.
@@ -127,16 +114,10 @@ class TimeChangePointKernel(Kernel):
         self.time_dim = time_dim
 
         # Change point location τ
-        self.register_parameter(
-            name="raw_tau",
-            parameter=torch.nn.Parameter(torch.tensor(0.0))
-        )
+        self.register_parameter(name="raw_tau", parameter=torch.nn.Parameter(torch.tensor(0.0)))
 
         # Transition width s > 0
-        self.register_parameter(
-            name="raw_width",
-            parameter=torch.nn.Parameter(torch.tensor(0.2))
-        )
+        self.register_parameter(name="raw_width", parameter=torch.nn.Parameter(torch.tensor(0.2)))
         self.register_constraint("raw_width", Positive())
 
     @property
@@ -160,17 +141,18 @@ class TimeChangePointKernel(Kernel):
         k_pre = self.kernel_pre(x1, x2, **params)
         k_post = self.kernel_post(x1, x2, **params)
 
-        return (
-            g1 * k_pre * g2.transpose(-1, -2)
-            + (1 - g1) * k_post * (1 - g2).transpose(-1, -2)
-        )
+        return g1 * k_pre * g2.transpose(-1, -2) + (1 - g1) * k_post * (1 - g2).transpose(-1, -2)
+
 
 ###### Length Scales ######
-def adaptive_lengthscale_prior(num_dims:int):
+def adaptive_lengthscale_prior(num_dims: int):
     return LogNormalPrior(loc=SQRT2 + log(num_dims) * 0.5, scale=SQRT3)
-def adaptive_lengthscale_constraint(num_dims:int):
+
+
+def adaptive_lengthscale_constraint(num_dims: int):
     ls_min = 2.5e-2 * sqrt(num_dims)
     return GreaterThan(ls_min, initial_value=adaptive_lengthscale_prior(num_dims).mode)
+
 
 def make_period_length_prior(p0: float, cv: float = 0.5) -> LogNormalPrior:
     """
@@ -191,7 +173,7 @@ class KernelType(StrEnum):
 
     MATERN_LINEAR = "maternlinear"
     MATERN_LINEAR_RQ = "maternlinearrq"
-    MATERN_RQ = "maternrq" 
+    MATERN_RQ = "maternrq"
     LINEAR = "linear"
     RQ = "rq"
     RBF = "rbf"
@@ -204,26 +186,25 @@ class KernelType(StrEnum):
     PERIODIC_MATERN = "periodicmatern"
     MATERN_LINEAR_PERIODIC = "maternlinearperiodic"
     RQ_PERIODIC = "rqperiodic"
-    
+
     SPECTRAL_MIXTURE = "spectralmixture"
     SPECTRAL_MATERN = "spectralmatern"
-    
+
     EXPO_GAMMA = "expogamma"
     EXPO_RQ = "exporq"
     EXPO_RQ_LINEAR = "exporqlinear"
     EXPO_LINEAR = "expolinear"
     GAMMA_PERIODIC = "gammaperiodic"
-    
+
     PIECEWISE_POLYNOMIAL = "piecewisepolynomial"
     MATERN_PIECEWISE = "maternpiecewise"
-    
+
     TIME_REGIME_MATERN = "timeregimematern"
     TIME_CHANGE_POINT = "timechangepoint"
-    
+
     EXPONENTIAL_DECAY = "exponentialdecay"
     EXPONENTIAL_DECAY_MATERN = "exponentialdecaymatern"
     EXPONENTIAL_DECAY_MATERN_c = "exponentialdecaymaternc"
-    
 
 
 class CategoricalKernel(Kernel):
@@ -295,7 +276,6 @@ class ContKernelFactory:
         self.lengthscale_prior = prior
         self.lengthscale_constraint = adaptive_lengthscale_constraint(self.ard_num_dims)
 
-
     def create_matern(self) -> MaternKernel:
         return MaternKernel(
             nu=self.smoothness,
@@ -335,7 +315,6 @@ class ContKernelFactory:
             lengthscale_constraint=self.lengthscale_constraint,
         )
 
-
     def create_linear(self) -> LinearKernel:
         return LinearKernel(
             ard_num_dims=None,
@@ -351,7 +330,7 @@ class ContKernelFactory:
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
         )
-        
+
     def create_expo_gamma(
         self,
     ) -> GammaExponentialKernel:
@@ -359,17 +338,17 @@ class ContKernelFactory:
         Gamma-exponential kernel with the same ARD lengthscale prior/constraint
         as the other continuous kernels.
         """
-        return ScaleKernel(GammaExponentialKernel(
-            ard_num_dims=self.ard_num_dims,
-            active_dims=self.active_dims,
-            batch_shape=self.batch_shape,
-            lengthscale_prior=self.lengthscale_prior,
-            lengthscale_constraint=self.lengthscale_constraint,
-            gamma=self.gamma,
-            gamma_prior=LogNormalPrior(loc = log(1.3), scale = 0.3), # prior centered at 1.0
-        ),
-                           outputscale_prior=LogNormalPrior(-3.5, 0.5)
-        
+        return ScaleKernel(
+            GammaExponentialKernel(
+                ard_num_dims=self.ard_num_dims,
+                active_dims=self.active_dims,
+                batch_shape=self.batch_shape,
+                lengthscale_prior=self.lengthscale_prior,
+                lengthscale_constraint=self.lengthscale_constraint,
+                gamma=self.gamma,
+                gamma_prior=LogNormalPrior(loc=log(1.3), scale=0.3),  # prior centered at 1.0
+            ),
+            outputscale_prior=LogNormalPrior(-3.5, 0.5),
         )
 
     def create_piecewise_polynomial(self):
@@ -381,7 +360,7 @@ class ContKernelFactory:
             lengthscale_prior=self.lengthscale_prior,
             lengthscale_constraint=self.lengthscale_constraint,
         )
-        
+
     def create_exponential_decay(self):
         # Enforce 1-D use (you already do this check)
         if len(self.active_dims) != 1:
@@ -391,19 +370,19 @@ class ContKernelFactory:
 
         # Prefer power fixed at 1.0; if learnable, constrain it to a safe band
         power_prior = LogNormalPrior(loc=0.0, scale=0.25)
-        power_constraint = Interval(0.25, 2.0)   # keep within a well-behaved range
+        power_constraint = Interval(0.25, 2.0)  # keep within a well-behaved range
 
         offset_prior = LogNormalPrior(loc=-3.0, scale=0.35)
         offset_constraint = GreaterThan(1e-6, initial_value=exp(-3.0 - 0.35**2))
 
         return ExponentialDecayKernel(
-            ard_num_dims=self.ard_num_dims,                              # <-- explicit 1D
+            ard_num_dims=self.ard_num_dims,  # <-- explicit 1D
             active_dims=self.active_dims,
             batch_shape=self.batch_shape,
             lengthscale_prior=ls_prior_1d,
             lengthscale_constraint=ls_constraint_1d,
             power_prior=power_prior,
-            power_constraint=power_constraint,           # <-- add this
+            power_constraint=power_constraint,  # <-- add this
             offset_prior=offset_prior,
             offset_constraint=offset_constraint,
         )
@@ -459,9 +438,11 @@ def initialize_kernel(
         elif kernel_type == KernelType.RQ:
             return ScaleKernel(cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.RQ_LINEAR:
-            return ScaleKernel(cont_kernel_factory.create_rq() * cont_kernel_factory.create_linear(), 
-                               outputscale_constraint=Interval(1e-6, 5e-3),
-                               outputscale_prior=LogNormalPrior(log(5e-4), 0.5))
+            return ScaleKernel(
+                cont_kernel_factory.create_rq() * cont_kernel_factory.create_linear(),
+                outputscale_constraint=Interval(1e-6, 5e-3),
+                outputscale_prior=LogNormalPrior(log(5e-4), 0.5),
+            )
         elif kernel_type == KernelType.PERIODIC:
             return ScaleKernel(cont_kernel_factory.create_periodic())
         elif kernel_type == KernelType.LINEAR:
@@ -484,7 +465,7 @@ def initialize_kernel(
                 cont_kernel_factory.create_matern()
             )
         elif kernel_type == KernelType.MATERN_RQ:
-            return ScaleKernel(cont_kernel_factory.create_matern() +  cont_kernel_factory.create_rq())
+            return ScaleKernel(cont_kernel_factory.create_matern() + cont_kernel_factory.create_rq())
         elif kernel_type == KernelType.EXPO_GAMMA:
             return cont_kernel_factory.create_expo_gamma()
         elif kernel_type == KernelType.EXPO_RQ:
@@ -514,8 +495,7 @@ def initialize_kernel(
         elif kernel_type == KernelType.TIME_REGIME_MATERN:
             return ScaleKernel(
                 cont_kernel_factory.create_matern()
-                +
-                MaternKernel(
+                + MaternKernel(
                     nu=2.5,
                     ard_num_dims=1,
                     active_dims=active_dims,
@@ -529,33 +509,25 @@ def initialize_kernel(
             return ScaleKernel(cont_kernel_factory.create_rq()) + ScaleKernel(cont_kernel_factory.create_periodic())
         elif kernel_type == KernelType.TIME_CHANGE_POINT:
             kernel_pre = MaternKernel(
-                    nu=2.5,
-                    ard_num_dims=1,
-                    active_dims=active_dims,
-                    batch_shape=batch_shape,
-                    lengthscale_prior=prior,
-                    lengthscale_constraint=adaptive_lengthscale_constraint(1),
-                )
+                nu=2.5,
+                ard_num_dims=1,
+                active_dims=active_dims,
+                batch_shape=batch_shape,
+                lengthscale_prior=prior,
+                lengthscale_constraint=adaptive_lengthscale_constraint(1),
+            )
 
             kernel_post = MaternKernel(
-                    nu=0.5,
-                    ard_num_dims=1,
-                    active_dims=active_dims,
-                    batch_shape=batch_shape,
-                    lengthscale_prior=prior,
-                    lengthscale_constraint=adaptive_lengthscale_constraint(1),
-                )
-            
-            cp_kernel = TimeChangePointKernel(
-                        kernel_pre=kernel_pre,
-                        kernel_post=kernel_post,
-                        time_dim=active_dims
-                    )
-            cp_kernel.register_prior(
-                "width_prior",
-                gpytorch.priors.LogNormalPrior(-1.0, 0.4),
-                "width"
+                nu=0.5,
+                ard_num_dims=1,
+                active_dims=active_dims,
+                batch_shape=batch_shape,
+                lengthscale_prior=prior,
+                lengthscale_constraint=adaptive_lengthscale_constraint(1),
             )
+
+            cp_kernel = TimeChangePointKernel(kernel_pre=kernel_pre, kernel_post=kernel_post, time_dim=active_dims)
+            cp_kernel.register_prior("width_prior", gpytorch.priors.LogNormalPrior(-1.0, 0.4), "width")
             cp_kernel.raw_tau.data.fill_(0.5)
             return ScaleKernel(cp_kernel)
         elif kernel_type == KernelType.EXPONENTIAL_DECAY_MATERN:
@@ -570,7 +542,7 @@ def initialize_kernel(
                 + cont_kernel_factory.create_exponential_decay() * cont_kernel_factory.create_matern()
             )
         elif kernel_type == KernelType.EXPONENTIAL_DECAY:
-            return ScaleKernel(cont_kernel_factory.create_exponential_decay()) 
+            return ScaleKernel(cont_kernel_factory.create_exponential_decay())
         else:
             raise ValueError(f"Unknown kernel function: {kernel_type}")
 
@@ -581,7 +553,6 @@ def initialize_kernel(
         raise ValueError(f"Unknown kernel function: {kernel}")
 
     return covar_module
-
 
 
 class PositiveIndexKernel(IndexKernel):
@@ -606,14 +577,9 @@ class PositiveIndexKernel(IndexKernel):
         **kwargs,
     ):
         if rank > num_tasks:
-            raise RuntimeError(
-                "Cannot create a task covariance matrix larger than the number of tasks"
-            )
+            raise RuntimeError("Cannot create a task covariance matrix larger than the number of tasks")
         if not (0 <= target_task_index < num_tasks):
-            raise ValueError(
-                f"target_task_index must be between 0 and {num_tasks - 1}, "
-                f"got {target_task_index}"
-            )
+            raise ValueError(f"target_task_index must be between 0 and {num_tasks - 1}, got {target_task_index}")
         Kernel.__init__(self, **kwargs)
 
         if var_constraint is None:
@@ -628,9 +594,7 @@ class PositiveIndexKernel(IndexKernel):
 
         self.register_parameter(
             name="raw_covar_factor",
-            parameter=torch.nn.Parameter(
-                torch.rand(*self.batch_shape, num_tasks, rank)
-            ),
+            parameter=torch.nn.Parameter(torch.rand(*self.batch_shape, num_tasks, rank)),
         )
         self.register_constraint("raw_covar_factor", GreaterThan(0.0))
 
@@ -642,13 +606,9 @@ class PositiveIndexKernel(IndexKernel):
         # ---- Priors -------------------------------------------------------
         if task_prior is not None:
             if not isinstance(task_prior, Prior):
-                raise TypeError(
-                    f"Expected gpytorch.priors.Prior but got {type(task_prior).__name__}"
-                )
+                raise TypeError(f"Expected gpytorch.priors.Prior but got {type(task_prior).__name__}")
             # ✅ Register LKJ prior on the full covariance matrix
-            self.register_prior(
-                "IndexKernelPrior", task_prior, lambda m: m.covar_matrix
-            )
+            self.register_prior("IndexKernelPrior", task_prior, lambda m: m.covar_matrix)
 
         if diag_prior is not None:
             self.register_prior("ScalePrior", diag_prior, lambda m: m._diagonal)
@@ -665,9 +625,7 @@ class PositiveIndexKernel(IndexKernel):
         self._set_covar_factor(value)
 
     def _set_covar_factor(self, value):
-        self.initialize(
-            raw_covar_factor=self.raw_covar_factor_constraint.inverse_transform(value)
-        )
+        self.initialize(raw_covar_factor=self.raw_covar_factor_constraint.inverse_transform(value))
 
     @property
     def _diagonal(self):
@@ -685,9 +643,7 @@ class PositiveIndexKernel(IndexKernel):
     # ----------------------------------------------------------------------
     def _eval_covar_matrix(self):
         cf = self.covar_factor
-        covar = cf @ cf.transpose(-1, -2) + self.var * torch.eye(
-            self.num_tasks, dtype=cf.dtype, device=cf.device
-        )
+        covar = cf @ cf.transpose(-1, -2) + self.var * torch.eye(self.num_tasks, dtype=cf.dtype, device=cf.device)
         if self.unit_scale_for_target:
             norm = covar[..., self.target_task_index, self.target_task_index]
             covar = covar / norm.unsqueeze(-1).unsqueeze(-1)
@@ -696,8 +652,8 @@ class PositiveIndexKernel(IndexKernel):
     @property
     def covar_matrix(self):
         return self._eval_covar_matrix()
-    
-    
+
+
 def initialize_sm_from_data(kernel, X, y):
     """
     Recursively initialize SpectralMixtureKernel components inside
@@ -714,7 +670,7 @@ def initialize_sm_from_data(kernel, X, y):
         # AdditiveKernel or ProductKernel
         for k in kernel.kernels:
             initialize_sm_from_data(k, X, y)
-            
+
 
 class KernelConfig(BaseModel):
     type: KernelType
@@ -727,18 +683,13 @@ class KernelConfig(BaseModel):
     mean_sqrt: float | None = None
     std: float | None = None
 
-    model_config = ConfigDict(
-        use_enum_values=True,
-        extra="forbid",
-        arbitrary_types_allowed=True
-    )
-    
+    model_config = ConfigDict(use_enum_values=True, extra="forbid", arbitrary_types_allowed=True)
+
 
 def create_kernel_initialization(kernel: KernelConfig, n_months: int):
     prior = adaptive_lengthscale_prior(num_dims=len(kernel.active_dims))
-    
-    
-    # For periodic only basically 
+
+    # For periodic only basically
     period_length = 12.0 / (n_months - 1)  # same as your code
     kernel_initialized = initialize_kernel(
         kernel.type,

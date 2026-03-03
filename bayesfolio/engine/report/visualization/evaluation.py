@@ -42,17 +42,14 @@ def plot_true_vs_pred(y_true: pd.DataFrame, y_pred: pd.DataFrame):
 # =========================================================
 def plot_scatter_pooled(y_true: pd.DataFrame, y_pred: pd.DataFrame):
     fig, ax = plt.subplots(figsize=(5, 5))
-    
+
     x = y_pred.values.flatten()
     y = y_true.values.flatten()
 
     ax.scatter(x, y, alpha=0.3)
-    lims = [
-        min(x.min(), y.min()),
-        max(x.max(), y.max())
-    ]
-    ax.plot(lims, lims, 'r--', lw=2)
-    
+    lims = [min(x.min(), y.min()), max(x.max(), y.max())]
+    ax.plot(lims, lims, "r--", lw=2)
+
     ax.set_title("Pooled: Predicted vs True returns")
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Realized")
@@ -66,7 +63,7 @@ def plot_scatter_pooled(y_true: pd.DataFrame, y_pred: pd.DataFrame):
 # =========================================================
 def plot_residuals(y_true: pd.DataFrame, y_pred: pd.DataFrame):
     residuals = y_true - y_pred
-    
+
     for asset in y_true.columns:
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(residuals[asset], lw=1.5)
@@ -122,7 +119,7 @@ def plot_ls_drawdown(ret: pd.Series, label: str):
     cumulative = (1 + ret).cumprod()
     peak = cumulative.cummax()
     drawdown = (cumulative - peak) / peak
-    
+
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(drawdown, lw=2)
     ax.set_title(f"{label}: Long–Short Drawdown")
@@ -153,8 +150,7 @@ def plot_gp_uncertainty(y_true, y_pred, y_std):
 
         upper = y_pred[asset] + y_std[asset]
         lower = y_pred[asset] - y_std[asset]
-        ax.fill_between(np.arange(len(y_pred)), lower, upper,
-                        color="blue", alpha=0.2, label="±1 std")
+        ax.fill_between(np.arange(len(y_pred)), lower, upper, color="blue", alpha=0.2, label="±1 std")
 
         ax.set_title(f"{asset}: GP Predictive Uncertainty")
         ax.legend()
@@ -175,26 +171,24 @@ def plot_uncertainty_calibration(y_true, y_pred, y_std):
     ax.grid(True, alpha=0.3)
 
     save_plot(fig, "gp_uncertainty_calibration")
-    
-def plot_ls_cumulative_compare(ls_gp: pd.Series,
-                               ls_mean: pd.Series,
-                               ls_ewma: pd.Series,
-                               strategy="ls"):
+
+
+def plot_ls_cumulative_compare(ls_gp: pd.Series, ls_mean: pd.Series, ls_ewma: pd.Series, strategy="ls"):
     """
     Plot long–short cumulative returns for GP, Mean, and EWMA
     on the same figure for direct comparison.
     """
 
-    cumulative_gp   = (1 + ls_gp).cumprod()
+    cumulative_gp = (1 + ls_gp).cumprod()
     cumulative_mean = (1 + ls_mean).cumprod()
     cumulative_ewma = (1 + ls_ewma).cumprod()
 
     fig, ax = plt.subplots(figsize=(10, 5))
 
-    ax.plot(cumulative_gp,   label="GP",   lw=2)
+    ax.plot(cumulative_gp, label="GP", lw=2)
     ax.plot(cumulative_mean, label="Mean", lw=2)
     ax.plot(cumulative_ewma, label="EWMA2", lw=2)
-    
+
     title = f"{strategy}: Cumulative Returns Comparison"
 
     ax.set_title(title)
@@ -204,7 +198,7 @@ def plot_ls_cumulative_compare(ls_gp: pd.Series,
     ax.legend()
 
     save_plot(fig, f"cumulative_compare_{strategy}")
-    
+
 
 def plot_actual_vs_pred_matrix(true_df, pred_df, asset_cols, save_path):
     # ---- Determine global y range across ALL assets ----
@@ -218,11 +212,7 @@ def plot_actual_vs_pred_matrix(true_df, pred_df, asset_cols, save_path):
     ncols = 4
     nrows = int(np.ceil(n_assets / ncols))
 
-    fig, axes = plt.subplots(
-        nrows, ncols,
-        figsize=(4 * ncols, 3 * nrows),
-        sharex=True
-    )
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4 * ncols, 3 * nrows), sharex=True)
 
     axes = axes.flatten()
 

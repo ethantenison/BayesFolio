@@ -10,11 +10,10 @@ from sklearn.preprocessing import StandardScaler
 
 
 def correlation_matrix(data: pd.DataFrame, title: str = "Correlation Heatmap"):
-    
+
     # Select only continuous variables
     continuous_data = data.select_dtypes(include=[np.number])
-    
-    
+
     corr_matrix = continuous_data.corr()
     # Create a heatmap using Plotly
     fig = px.imshow(
@@ -31,12 +30,12 @@ def correlation_matrix(data: pd.DataFrame, title: str = "Correlation Heatmap"):
     fig.update_layout(width=800, height=800)
     return fig
 
+
 def visualize_lognormal_distribution():
-  
 
     samples = np.random.lognormal(mean=log(1.1), sigma=0.2, size=10000)
 
-    plt.figure(figsize=(7,4))
+    plt.figure(figsize=(7, 4))
     plt.hist(samples, bins=50, density=True, alpha=0.6, color="orange")
     plt.axvline(np.median(samples), color="red", linestyle="--", label="median")
     plt.title("Histogram of LogNormal(μ=log(1), σ=0.5)")
@@ -45,7 +44,8 @@ def visualize_lognormal_distribution():
     plt.legend()
     plt.grid(alpha=0.3)
     plt.show()
-    
+
+
 def plot_lognormal_prior(loc, scale, label=None, color=None, x_max=20.0):
     """
     Visualize a LogNormalPrior(loc, scale) using matplotlib.
@@ -133,13 +133,13 @@ def plot_pca_explained_variance(df: pd.DataFrame, cols: list):
 
     # 5. Plot explained variance and cumulative variance
     plt.figure(figsize=(12, 6))
-    plt.bar(range(1, len(explained_variance)+1), explained_variance, alpha=0.7, label='Individual Component Variance')
-    plt.step(range(1, len(cum_variance)+1), cum_variance, where='mid', label='Cumulative Variance')
-    plt.axhline(0.90, color='red', linestyle='--', label='90%')
-    plt.axhline(0.95, color='green', linestyle='--', label='95%')
-    plt.xlabel('Principal Component')
-    plt.ylabel('Explained Variance Ratio')
-    plt.title('PCA Explained Variance - Macro Features')
+    plt.bar(range(1, len(explained_variance) + 1), explained_variance, alpha=0.7, label="Individual Component Variance")
+    plt.step(range(1, len(cum_variance) + 1), cum_variance, where="mid", label="Cumulative Variance")
+    plt.axhline(0.90, color="red", linestyle="--", label="90%")
+    plt.axhline(0.95, color="green", linestyle="--", label="95%")
+    plt.xlabel("Principal Component")
+    plt.ylabel("Explained Variance Ratio")
+    plt.title("PCA Explained Variance - Macro Features")
     plt.legend()
     plt.show()
 
@@ -149,11 +149,11 @@ def plot_pca_explained_variance(df: pd.DataFrame, cols: list):
 
     print(f"Components needed for 90% variance: {n_comp_90}")
     print(f"Components needed for 95% variance: {n_comp_95}")
-    
-    
+
+
 def apply_pca_and_replace(df, cols_to_pca, n_components, prefix="pca"):
     """
-    Standardizes the selected columns, applies PCA, and replaces them 
+    Standardizes the selected columns, applies PCA, and replaces them
     with the PCA component columns.
 
     Parameters
@@ -192,7 +192,7 @@ def apply_pca_and_replace(df, cols_to_pca, n_components, prefix="pca"):
     X_pca = pca.fit_transform(X_scaled)
 
     # Build PCA column names
-    pca_cols = [f"{prefix}_pc{i+1}" for i in range(n_components)]
+    pca_cols = [f"{prefix}_pc{i + 1}" for i in range(n_components)]
 
     # Insert PCA columns
     for i, col in enumerate(pca_cols):

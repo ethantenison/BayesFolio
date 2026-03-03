@@ -1,6 +1,7 @@
 """
 Gaussian Process Kernels
 """
+
 from __future__ import annotations
 
 from math import log, sqrt
@@ -31,7 +32,6 @@ from bayesfolio.ml.legacy.old_kernels import (
 torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
-
 
 
 class CategoricalKernel(Kernel):
@@ -196,6 +196,7 @@ def initialize_kernel(
 
 ######## IMproved kernel factory
 
+
 class ContKernelFactory:
     """
     A factory for continuous kernels that supports flexible active dimensions.
@@ -270,6 +271,7 @@ class ContKernelFactory:
             active_dims=active_dims,
             batch_shape=self.batch_shape,
         )
+
     def create_spectral_mixture(self, input_size: int) -> SpectralMixtureKernel:
         active_dims = self._get_active_dims("spectralmixture", input_size)
         num_mixtures = self.gp_options.get("num_mixtures", 4)
@@ -280,9 +282,15 @@ class ContKernelFactory:
             batch_shape=self.batch_shape,
         )
 
+
 # ---- Kernel Expression Parser ----
-def build_kernel(expression: str, input_size: int, batch_shape: torch.Size, gp_options: dict[str, Any],
-                 active_dims_map: dict[str, list[int]]):
+def build_kernel(
+    expression: str,
+    input_size: int,
+    batch_shape: torch.Size,
+    gp_options: dict[str, Any],
+    active_dims_map: dict[str, list[int]],
+):
     """
     Build a kernel from an expression string like "(rq*matern)+periodic".
     - * means ProductKernel
@@ -347,12 +355,10 @@ def build_kernel(expression: str, input_size: int, batch_shape: torch.Size, gp_o
     return ScaleKernel(kernel, batch_shape=batch_shape)
 
 
-
 def create_kernel_initialization(kernel: KernelConfig, n_months: int):
     prior = adaptive_lengthscale_prior(num_dims=len(kernel.active_dims))
-    
-    
-    # For periodic only basically 
+
+    # For periodic only basically
     period_length = 12.0 / (n_months - 1)  # same as your code
     kernel_initialized = initialize_kernel(
         kernel.type,

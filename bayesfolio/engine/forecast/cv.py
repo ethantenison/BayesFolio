@@ -1,4 +1,5 @@
 """Cross Validation"""
+
 from collections.abc import Iterator
 
 import matplotlib.pyplot as plt
@@ -8,10 +9,10 @@ import pandas as pd
 
 def rolling_time_splits(
     dates: pd.DatetimeIndex,
-    train_min: int,           # min train length in periods
-    step: int,                # how far to advance origin each split
-    horizon: int = 1,         # forecast horizon (steps ahead)
-    embargo: int = 0,         # gap between train end and test start
+    train_min: int,  # min train length in periods
+    step: int,  # how far to advance origin each split
+    horizon: int = 1,  # forecast horizon (steps ahead)
+    embargo: int = 0,  # gap between train end and test start
     train_max: int | None = None,  # optional cap for sliding window
 ) -> Iterator[tuple[np.ndarray, np.ndarray]]:
     """
@@ -24,20 +25,20 @@ def rolling_time_splits(
         train_end = start
         # windowing
         if train_max is None:
-            train_start = 0                         # expanding
+            train_start = 0  # expanding
         else:
             train_start = max(0, train_end - train_max)  # sliding
-        
+
         test_time = train_end + embargo + horizon - 1
-        if test_time >= n: 
+        if test_time >= n:
             break
-        
+
         train_idx = np.arange(train_start, train_end)  # [0 ... train_end-1]
-        test_idx  = np.array([test_time])              # predict y at t+h
-        
+        test_idx = np.array([test_time])  # predict y at t+h
+
         yield train_idx, test_idx
         start += step
-        
+
 
 def rolling_time_splits_multitask(
     df: pd.DataFrame,
@@ -73,7 +74,7 @@ def rolling_time_splits_multitask(
         Gap (in time steps) between training end and testing start.
     train_max : int | None
         Optional maximum training window per task (for sliding windows).
-    
+
     Yields
     ------
     (train_idx, test_idx) : Tuple[np.ndarray, np.ndarray]
@@ -113,12 +114,11 @@ def rolling_time_splits_multitask(
 
         yield train_idx, test_idx
         start += step
-        
 
-def plot_multitask_time_series_cv(df, date_col, cv_iterator,
-                                  train_color="#4C72B0",
-                                  test_color="#DD8452",
-                                  figsize=(14, 4)):
+
+def plot_multitask_time_series_cv(
+    df, date_col, cv_iterator, train_color="#4C72B0", test_color="#DD8452", figsize=(14, 4)
+):
 
     splits = list(cv_iterator)
     if len(splits) == 0:
@@ -143,18 +143,15 @@ def plot_multitask_time_series_cv(df, date_col, cv_iterator,
     fig, ax = plt.subplots(figsize=figsize)
 
     for i in range(len(splits)):
-
         # TRAIN BAR
         idx = np.where(train_masks[i])[0]
         if idx.size > 0:
-            ax.barh(i, idx.size, left=idx[0], height=0.6,
-                    color=train_color, label="Training set" if i == 0 else None)
+            ax.barh(i, idx.size, left=idx[0], height=0.6, color=train_color, label="Training set" if i == 0 else None)
 
         # TEST BAR
         idx = np.where(test_masks[i])[0]
         if idx.size > 0:
-            ax.barh(i, idx.size, left=idx[0], height=0.6,
-                    color=test_color, label="Testing set" if i == 0 else None)
+            ax.barh(i, idx.size, left=idx[0], height=0.6, color=test_color, label="Testing set" if i == 0 else None)
 
     ax.set_yticks(np.arange(len(splits)))
     ax.set_yticklabels([f"Split {i}" for i in range(len(splits))])
@@ -165,4 +162,3 @@ def plot_multitask_time_series_cv(df, date_col, cv_iterator,
 
     plt.tight_layout()
     plt.show()
-

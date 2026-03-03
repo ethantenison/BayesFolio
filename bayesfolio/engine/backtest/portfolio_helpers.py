@@ -6,17 +6,17 @@ from bayesfolio.core.settings import RiskfolioConfig
 
 
 def riskfolio_returns_rolling(
-    y_true: pd.DataFrame,               # realized excess returns (T × N)
-    y_pred: pd.DataFrame,               # predicted excess returns (T × N)
+    y_true: pd.DataFrame,  # realized excess returns (T × N)
+    y_pred: pd.DataFrame,  # predicted excess returns (T × N)
     y_unc: pd.DataFrame | None = None,  # optional uncertainty (T × N)
-    window: int = 36,                   # rolling window for risk estimation
-    config=None,                        # RiskfolioConfig
+    window: int = 36,  # rolling window for risk estimation
+    config=None,  # RiskfolioConfig
     rf: float = 0.0,
     long_only: bool = True,
     leverage: float = 1.0,
-    unc_penalty: float = 0.0,           # if >0, shrinks mu by uncertainty
+    unc_penalty: float = 0.0,  # if >0, shrinks mu by uncertainty
     min_assets: int = 3,
-    min_hist_frac: float = 0.80,        # allow up to 20% missing in window
+    min_hist_frac: float = 0.80,  # allow up to 20% missing in window
     eps: float = 1e-12,
 ):
     """
@@ -49,7 +49,7 @@ def riskfolio_returns_rolling(
     y_pred = y_pred.loc[common_idx].copy()
     if y_unc is not None:
         y_unc = y_unc.loc[common_idx].copy()
-        
+
     print(f"Riskfolio rolling backtest: T={len(y_true)}, N={len(common_assets)}")
 
     T, N = y_true.shape
@@ -65,7 +65,7 @@ def riskfolio_returns_rolling(
 
     for t in range(window, T):
         # 1) Historical returns window (no lookahead)
-        R_hist = y_true.iloc[t - window:t].copy()
+        R_hist = y_true.iloc[t - window : t].copy()
         mu_t = y_pred.iloc[t].copy()
 
         # Optional uncertainty-aware shrinkage
@@ -78,7 +78,7 @@ def riskfolio_returns_rolling(
         # - must have enough non-NaNs in history window
         valid = mu_t.dropna().index
 
-        hist_ok = (R_hist.notna().mean(axis=0) >= float(min_hist_frac))
+        hist_ok = R_hist.notna().mean(axis=0) >= float(min_hist_frac)
         valid = valid.intersection(R_hist.columns[hist_ok])
 
         # also require realized return exists at t (so dot-product is valid)
@@ -94,15 +94,15 @@ def riskfolio_returns_rolling(
         R_hist_v = R_hist_v.ffill().bfill().fillna(0.0)
 
         mu_v = mu_t.loc[valid].astype(float)
-        print('mu_v:', mu_v)
+        print("mu_v:", mu_v)
 
         # 3) Build portfolio
         port = rp.Portfolio(returns=R_hist_v, nea=getattr(config, "nea", 10))
 
         # Provide expected returns with labels (Riskfolio expects indexed structure)
         port.mu = pd.DataFrame(mu_v, columns=["mu"])
-        
-        port.card = None 
+
+        port.card = None
 
         # Estimate stats (this sets covariance etc.)
         port.assets_stats(
@@ -154,8 +154,8 @@ def riskfolio_returns_rolling(
 
         w_t = w_ser.values
         r_t = y_true.iloc[t].loc[valid].values.astype(float)
-        
-        print('w_t:', w_t)
+
+        print("w_t:", w_t)
 
         # Defensive normalization
         if long_only:
@@ -179,18 +179,15 @@ def riskfolio_returns_rolling(
         idx.append(y_true.index[t])
 
     port_ret = pd.Series(rets, index=idx, name="riskfolio_return")
-    w_df = (
-        pd.DataFrame(w_rows, index=idx)
-        .reindex(columns=common_assets)
-        .fillna(0.0)
-    )
+    w_df = pd.DataFrame(w_rows, index=idx).reindex(columns=common_assets).fillna(0.0)
     return port_ret, w_df
+
 
 def long_short_returns(y_true: pd.DataFrame, y_pred: pd.DataFrame):
     """
     Compute long–short returns based on predicted cross-sectional rankings.
     For each period, the asset with the highest predicted return is taken
-    as a long position, and the asset with the lowest predicted return is 
+    as a long position, and the asset with the lowest predicted return is
     taken as a short position. The resulting long–short return is:
 
         r_ls,t = r_true,long_asset,t − r_true,short_asset,t
@@ -209,53 +206,53 @@ def long_short_returns(y_true: pd.DataFrame, y_pred: pd.DataFrame):
 
     Why This Matters
     ----------------
-    Long–short portfolio performance is one of the most important ways to 
+    Long–short portfolio performance is one of the most important ways to
     evaluate an asset-return forecasting model in empirical finance.
     It answers the key question:
 
         “Do the model’s predictions successfully rank assets by expected return?”
 
-    This measure is directly connected to the core idea of factor investing 
-    and anomaly discovery: profitable long–short spreads indicate that 
+    This measure is directly connected to the core idea of factor investing
+    and anomaly discovery: profitable long–short spreads indicate that
     the model extracts economically meaningful signals beyond noise.
 
     Pros
     ----
-    • **Direct test of predictive skill**  
+    • **Direct test of predictive skill**
       Long–short spreads reveal whether the model finds alpha, independent
       of portfolio optimization or risk-budgeting frameworks.
 
-    • **Benchmarked to academic standards**  
+    • **Benchmarked to academic standards**
       Used universally in asset-pricing research (Fama–French portfolios,
       factor testing, Gu–Kelly–Xiu deep learning, anomaly studies).
 
-    • **Robust to scale**  
+    • **Robust to scale**
       Only requires correct *ranking*, not accurate magnitude of predictions.
 
-    • **Model evaluation, not portfolio engineering**  
+    • **Model evaluation, not portfolio engineering**
       Avoids conflating predictive performance with optimization artifacts.
 
     Cons
     ----
-    • **Concentrated and unrealistic to trade**  
+    • **Concentrated and unrealistic to trade**
       A 1×1 long–short portfolio has high tracking error and is not meant to
       represent a real investable strategy.
 
-    • **Ignores risk and diversification**  
+    • **Ignores risk and diversification**
       Does not account for correlations, risk constraints, or turnover costs.
 
-    • **Sensitive to small cross-sections**  
+    • **Sensitive to small cross-sections**
       With few assets, a single ranking mistake has large impact.
 
-    • **Not a substitute for portfolio optimization**  
-      After evaluating signal strength, real portfolios should still use 
+    • **Not a substitute for portfolio optimization**
+      After evaluating signal strength, real portfolios should still use
       optimization (e.g., Riskfolio, mean–variance, HRP, Black–Litterman).
 
     Notes
     -----
-    This method is best interpreted as a **diagnostic of information content** 
-    rather than a practical trading rule. A strong long–short return series 
-    confirms that the forecasting model carries meaningful cross-sectional 
+    This method is best interpreted as a **diagnostic of information content**
+    rather than a practical trading rule. A strong long–short return series
+    confirms that the forecasting model carries meaningful cross-sectional
     predictive power.
     """
     ls_returns = []
@@ -268,12 +265,13 @@ def long_short_returns(y_true: pd.DataFrame, y_pred: pd.DataFrame):
         ranked = preds.sort_values()
 
         short_asset = ranked.index[0]
-        long_asset  = ranked.index[-1]
+        long_asset = ranked.index[-1]
 
-        r_ls = true[long_asset] - true[short_asset]   # equal-weighted LS
+        r_ls = true[long_asset] - true[short_asset]  # equal-weighted LS
         ls_returns.append(r_ls)
 
     return pd.Series(ls_returns, name="long_short")
+
 
 def long_short_returns_topk(
     y_true: pd.DataFrame,
@@ -313,12 +311,12 @@ def long_short_returns_topk(
 
     for t in range(len(y_pred)):
         preds = y_pred.iloc[t]
-        true  = y_true.iloc[t]
+        true = y_true.iloc[t]
 
         # Align & clean
         valid = preds.notna() & true.notna()
         preds = preds[valid]
-        true  = true[valid]
+        true = true[valid]
 
         n = len(preds)
         if n < min_assets:
@@ -336,15 +334,16 @@ def long_short_returns_topk(
         ranked = preds.sort_values()
 
         short_assets = ranked.index[:k_t]
-        long_assets  = ranked.index[-k_t:]
+        long_assets = ranked.index[-k_t:]
 
         # Equal-weighted portfolios
-        r_long  = true.loc[long_assets].mean()
+        r_long = true.loc[long_assets].mean()
         r_short = true.loc[short_assets].mean()
 
         ls_returns.append(r_long - r_short)
 
     return pd.Series(ls_returns, name="long_short")
+
 
 def portfolio_stats(ret: pd.Series, periods_per_year=12):
     """
@@ -362,24 +361,24 @@ def portfolio_stats(ret: pd.Series, periods_per_year=12):
     dict
         A dictionary containing:
 
-        📈 **cum_return** : float  
-            Total cumulative return over the sample  
+        📈 **cum_return** : float
+            Total cumulative return over the sample
             `(1 + r_1)(1 + r_2)...(1 + r_T) - 1`
 
-        🚀 **ann_return** : float  
-            Annualized geometric return  
+        🚀 **ann_return** : float
+            Annualized geometric return
             `(1 + mean(r))**periods_per_year - 1`
 
-        ⚠️ **ann_vol** : float  
-            Annualized volatility  
+        ⚠️ **ann_vol** : float
+            Annualized volatility
             `std(r) * sqrt(periods_per_year)`
 
-        ⚡ **sharpe** : float  
-            Annualized Sharpe ratio (risk-free assumed 0)  
+        ⚡ **sharpe** : float
+            Annualized Sharpe ratio (risk-free assumed 0)
             `ann_return / ann_vol`
 
-        📉 **max_drawdown** : float  
-            Maximum drawdown over the cumulative return path  
+        📉 **max_drawdown** : float
+            Maximum drawdown over the cumulative return path
             `min((cum_ret - peak) / peak)`
 
     Notes
@@ -398,9 +397,9 @@ def portfolio_stats(ret: pd.Series, periods_per_year=12):
         }
 
     cum_return = (1 + ret).prod() - 1
-    ann_return = (1 + ret.mean())**periods_per_year - 1
+    ann_return = (1 + ret.mean()) ** periods_per_year - 1
     ann_vol = ret.std() * np.sqrt(periods_per_year)
-    
+
     sharpe = np.nan if ann_vol == 0 else ann_return / ann_vol
 
     # Max drawdown
@@ -416,16 +415,14 @@ def portfolio_stats(ret: pd.Series, periods_per_year=12):
         "sharpe": float(sharpe),
         "max_drawdown": float(max_dd),
     }
-    
-def assessing_long_short_performance(
-    y_true: pd.DataFrame,
-    y_pred: pd.DataFrame,
-    label: str = "model"
-):
+
+
+def assessing_long_short_performance(y_true: pd.DataFrame, y_pred: pd.DataFrame, label: str = "model"):
     ls_ret = long_short_returns(y_true, y_pred)
     stats = portfolio_stats(ls_ret, periods_per_year=12)
     stats = {f"{label}/{k}": v for k, v in stats.items()}
     return stats
+
 
 def assess_performance(
     ret: pd.Series,

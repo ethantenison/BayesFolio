@@ -5,21 +5,23 @@ from scipy.signal import periodogram
 
 
 def gaussian_nlpd(y_true: torch.Tensor, y_mean: torch.Tensor, y_std: torch.Tensor, eps: float = 1e-12) -> float:
-    var = (y_std.clamp_min(eps))**2
-    return float(0.5 * ( ((y_true - y_mean)**2) / var + torch.log(2 * torch.pi * var) ).mean())
+    var = (y_std.clamp_min(eps)) ** 2
+    return float(0.5 * (((y_true - y_mean) ** 2) / var + torch.log(2 * torch.pi * var)).mean())
+
 
 def mse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
-    return float(((y_true - y_mean)**2).mean())
+    return float(((y_true - y_mean) ** 2).mean())
+
 
 def rmse(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
-    return float(torch.sqrt(((y_true - y_mean)**2).mean()))
+    return float(torch.sqrt(((y_true - y_mean) ** 2).mean()))
+
 
 def r2_score(y_true: torch.Tensor, y_mean: torch.Tensor) -> float:
     y_bar = y_true.mean()
-    ss_tot = ((y_true - y_bar)**2).sum()
-    ss_res = ((y_true - y_mean)**2).sum()
+    ss_tot = ((y_true - y_bar) ** 2).sum()
+    ss_res = ((y_true - y_mean) ** 2).sum()
     return float(1 - ss_res / ss_tot)
-
 
 
 def compute_market_return_series(
@@ -30,19 +32,11 @@ def compute_market_return_series(
     """
     Cross-sectional mean excess return per time period.
     """
-    ts = (
-        df
-        .groupby(date_col)[target_col]
-        .mean()
-        .sort_index()
-        .dropna()
-    )
+    ts = df.groupby(date_col)[target_col].mean().sort_index().dropna()
     return ts
 
 
 def compute_periodogram_from_panel(
-
-
     df: pd.DataFrame,
     date_col: str = "date",
     target_col: str = "y_excess_lead",
@@ -63,12 +57,14 @@ def compute_periodogram_from_panel(
 
     freqs, power = periodogram(
         x,
-        fs=freq_per_year,      # samples per year
+        fs=freq_per_year,  # samples per year
         scaling="density",
-        window="hann"
+        window="hann",
     )
 
-    return pd.DataFrame({
-        "frequency": freqs,
-        "power": power,
-    }), ts
+    return pd.DataFrame(
+        {
+            "frequency": freqs,
+            "power": power,
+        }
+    ), ts

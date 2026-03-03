@@ -16,7 +16,7 @@ def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, pref
     mlflow.log_param(f"{prefix}.global_structure", kernel_arch.global_structure.value)
     mlflow.log_param(f"{prefix}.interaction_policy", kernel_arch.interaction_policy.value)
     mlflow.log_param(f"{prefix}.num_blocks", len(kernel_arch.blocks))
-    
+
     # Log each block separately
     for i, block in enumerate(kernel_arch.blocks):
         block_prefix = f"{prefix}.block_{i}"
@@ -24,12 +24,12 @@ def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, pref
         mlflow.log_param(f"{block_prefix}.block_structure", block.block_structure.value)
         mlflow.log_param(f"{block_prefix}.dims", str(block.dims))
         mlflow.log_param(f"{block_prefix}.num_dims", len(block.dims))
-        
+
         # Log base kernel config
         base_kernel = block.base_kernel
         mlflow.log_param(f"{block_prefix}.base_kernel.type", base_kernel.kernel_type.value)
         mlflow.log_param(f"{block_prefix}.base_kernel.ard", base_kernel.ard)
-        
+
         # Log kernel-specific parameters
         nu = getattr(base_kernel, "nu", None)
         if nu is not None:
@@ -38,16 +38,17 @@ def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, pref
         depth = getattr(base_kernel, "depth", None)
         if depth is not None:
             mlflow.log_param(f"{block_prefix}.base_kernel.depth", depth)
-    
+
     # Also save full config as JSON for complete record
     mlflow.log_dict(kernel_arch.model_dump(), f"{prefix}_architecture.json")
 
-    
+
 def log_kernel_to_mlflow(kernel: KernelConfig, prefix: str):
     params = kernel.model_dump()
     prefixed = {f"{prefix}_{k}": v for k, v in params.items()}
     mlflow.log_params(prefixed)
-    
+
+
 def extract_gp_hyperparameters(model):
     params = {}
 
@@ -69,9 +70,7 @@ def extract_gp_hyperparameters(model):
             for i, m in enumerate(mean.base_means):
                 const = getattr(m, "constant", None)
                 if const is not None:
-                    params[f"mean.base_means.{i}.constant"] = (
-                        const.detach().cpu().numpy().tolist()
-                    )
+                    params[f"mean.base_means.{i}.constant"] = const.detach().cpu().numpy().tolist()
         else:
             const = getattr(mean, "constant", None)
             if const is not None:
@@ -86,38 +85,28 @@ def extract_gp_hyperparameters(model):
         # Lengthscale
         lengthscale = getattr(kernel, "lengthscale", None)
         if lengthscale is not None:
-            out[f"{prefix}.lengthscale"] = (
-                lengthscale.detach().cpu().numpy().tolist()
-            )
+            out[f"{prefix}.lengthscale"] = lengthscale.detach().cpu().numpy().tolist()
 
         # Outputscale (ScaleKernel)
         outputscale = getattr(kernel, "outputscale", None)
         if outputscale is not None:
-            out[f"{prefix}.outputscale"] = (
-                outputscale.detach().cpu().numpy().tolist()
-            )
+            out[f"{prefix}.outputscale"] = outputscale.detach().cpu().numpy().tolist()
 
         # Variance (LinearKernel)
         variance = getattr(kernel, "variance", None)
         if variance is not None:
-            out[f"{prefix}.variance"] = (
-                variance.detach().cpu().numpy().tolist()
-            )
+            out[f"{prefix}.variance"] = variance.detach().cpu().numpy().tolist()
 
         # Composite kernels
         kernels = getattr(kernel, "kernels", None)
         if kernels is not None:
             for i, subkernel in enumerate(kernels):
-                out.update(
-                    walk_kernel(subkernel, f"{prefix}.kernels.{i}")
-                )
+                out.update(walk_kernel(subkernel, f"{prefix}.kernels.{i}"))
 
         # Wrapped kernels (ScaleKernel, etc.)
         base_kernel = getattr(kernel, "base_kernel", None)
         if base_kernel is not None:
-            out.update(
-                walk_kernel(base_kernel, f"{prefix}.base_kernel")
-            )
+            out.update(walk_kernel(base_kernel, f"{prefix}.base_kernel"))
 
         return out
 
@@ -137,9 +126,7 @@ def extract_gp_hyperparameters(model):
 
         covar_factor = getattr(task_kernel, "covar_factor", None)
         if covar_factor is not None:
-            params["task_covar.covar_factor"] = (
-                covar_factor.detach().cpu().numpy().tolist()
-            )
+            params["task_covar.covar_factor"] = covar_factor.detach().cpu().numpy().tolist()
 
     return params
 
@@ -163,6 +150,7 @@ class MultiTaskConfig(BaseModel):
     min_noise: float
     model_config = ConfigDict(use_enum_values=True)
 
+
 def long_to_panel(y_tensor, I_tensor, asset_names):
     """
     Convert long-format torch vectors into a wide (panel) DataFrame:
@@ -171,16 +159,19 @@ def long_to_panel(y_tensor, I_tensor, asset_names):
     y_np = y_tensor.cpu().numpy().reshape(-1)
     asset_np = I_tensor.cpu().numpy().reshape(-1).astype(int)
 
-    df = pd.DataFrame({
-        "asset": [asset_names[i] for i in asset_np],
-        "value": y_np,
-    })
+    df = pd.DataFrame(
+        {
+            "asset": [asset_names[i] for i in asset_np],
+            "value": y_np,
+        }
+    )
 
     # time index is implicit by occurrence order
     # we assign row numbers for each group of assets
     df["time"] = np.repeat(np.arange(len(df) // len(asset_names)), len(asset_names))
 
     return df.pivot(index="time", columns="asset", values="value")
+
 
 def compute_benchmark_panel(y_train, y_test, method="mean"):
     if method == "mean":
@@ -189,14 +180,14 @@ def compute_benchmark_panel(y_train, y_test, method="mean"):
         vec = mean_vector(X=y_train, method=method).values.reshape(-1)
     else:
         raise ValueError
-    
+
     pred = np.tile(vec, (len(y_test), 1))
     return pd.DataFrame(pred, index=y_test.index, columns=y_test.columns)
 
 
 def r2_os(y_true: pd.DataFrame, y_pred: pd.DataFrame, y_bench: pd.DataFrame):
     """
-    Campbell–Thompson out-of-sample R² (R²_OS).Interpretation is that positive means GP is better. 
+    Campbell–Thompson out-of-sample R² (R²_OS).Interpretation is that positive means GP is better.
 
     Parameters
     ----------
@@ -216,8 +207,8 @@ def r2_os(y_true: pd.DataFrame, y_pred: pd.DataFrame, y_bench: pd.DataFrame):
     """
 
     # --- 1. Residual sum of squares for model and benchmark ---
-    ss_model  = ((y_true - y_pred)**2).sum(axis=0)   # per asset
-    ss_bench  = ((y_true - y_bench)**2).sum(axis=0)  # per asset
+    ss_model = ((y_true - y_pred) ** 2).sum(axis=0)  # per asset
+    ss_bench = ((y_true - y_bench) ** 2).sum(axis=0)  # per asset
 
     # --- 2. R²_OS per asset ---
     r2_asset = 1 - ss_model / ss_bench
@@ -227,16 +218,13 @@ def r2_os(y_true: pd.DataFrame, y_pred: pd.DataFrame, y_bench: pd.DataFrame):
     r2_avg = r2_asset.mean()
 
     # --- 4. Pooled (sum errors first, then compute R²) ---
-    total_ss_model = ((y_true - y_pred)**2).to_numpy().sum()
-    total_ss_bench = ((y_true - y_bench)**2).to_numpy().sum()
+    total_ss_model = ((y_true - y_pred) ** 2).to_numpy().sum()
+    total_ss_bench = ((y_true - y_bench) ** 2).to_numpy().sum()
     r2_pooled = 1 - total_ss_model / total_ss_bench
 
-    return {
-        "R2_OS_pooled": float(r2_pooled),
-        "R2_OS_avg": float(r2_avg),
-        "R2_OS_per_asset": r2_asset.to_dict()
-    }
-    
+    return {"R2_OS_pooled": float(r2_pooled), "R2_OS_avg": float(r2_avg), "R2_OS_per_asset": r2_asset.to_dict()}
+
+
 # Flatten before logging
 def log_r2_os(prefix, r2_dict):
     flat_metrics = {}
@@ -250,6 +238,7 @@ def log_r2_os(prefix, r2_dict):
             flat_metrics[f"{prefix}_{k}"] = float(v)
 
     mlflow.log_metrics(flat_metrics)
+
 
 def describe_task_kernel(tk):
     out = {
@@ -280,8 +269,8 @@ def describe_task_kernel(tk):
     if hasattr(tk, "task_prior") and tk.task_prior is not None:
         out["task_prior"] = describe_prior(tk.task_prior)
 
-
     return out
+
 
 def describe_prior(p: object):
     """Return a JSON-serializable dict describing a GPyTorch Prior."""
@@ -315,6 +304,7 @@ def describe_prior(p: object):
                 except Exception:
                     out[attr] = str(val)
     return out
+
 
 def describe_constraint(c: object):
     """Return constraint information."""
@@ -397,6 +387,7 @@ def describe_kernel(k: Kernel):
 
     return out
 
+
 def extract_full_gp_config(model):
     """Extract full architecture, priors, hyperparameters, and constraints."""
     cfg = {}
@@ -428,17 +419,14 @@ def extract_full_gp_config(model):
 
     return cfg
 
+
 def model_error_by_time_index(y_true: pd.DataFrame, y_pred: pd.DataFrame):
     """
     Compute absolute errors per asset and overall mean absolute error.
     Returns only columns ending in _abs_error plus the mean_abs_error column.
     """
     # Combine true and predicted into one DataFrame
-    combined_df = pd.concat(
-        [y_true.add_suffix("_true"),
-         y_pred.add_suffix("_pred")],
-        axis=1
-    )
+    combined_df = pd.concat([y_true.add_suffix("_true"), y_pred.add_suffix("_pred")], axis=1)
 
     # Compute abs error for each ETF
     abs_error_cols = []
@@ -455,8 +443,3 @@ def model_error_by_time_index(y_true: pd.DataFrame, y_pred: pd.DataFrame):
 
     # Return only the error columns + overall MAE
     return combined_df[abs_error_cols + ["mean_abs_error"]]
-
-
-
-
-

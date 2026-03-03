@@ -417,8 +417,6 @@ class KernelArchitectureConfig(BaseModel):
     blocks: list[KernelBlockConfig]
     global_structure: GlobalStructure
     interaction_policy: InteractionPolicy = InteractionPolicy.SPARSE
-    
-
 
 
 # ============================================================================
@@ -454,8 +452,7 @@ def build_block_kernel(block: KernelBlockConfig, *, batch_shape: torch.Size) -> 
         return ScaleKernel(builder(block.dims, block.base_kernel, batch_shape), batch_shape=batch_shape)
 
     components = [
-        ScaleKernel(builder([dim], block.base_kernel, batch_shape), batch_shape=batch_shape)
-        for dim in block.dims
+        ScaleKernel(builder([dim], block.base_kernel, batch_shape), batch_shape=batch_shape) for dim in block.dims
     ]
     return _sum_kernels(components)
 
@@ -497,11 +494,13 @@ def _unwrap_scale(k: Kernel) -> Kernel:
     """Return the bare base kernel if `k` is a ScaleKernel; else `k`."""
     return k.base_kernel if isinstance(k, ScaleKernel) else k
 
+
 def _scaled_product(k1: Kernel, k2: Kernel, *, batch_shape: torch.Size) -> Kernel:
     """Ensure product terms are formed as Scale( base1 * base2 ) with no inner scales."""
     b1 = _unwrap_scale(k1)
     b2 = _unwrap_scale(k2)
     return ScaleKernel(b1 * b2, batch_shape=batch_shape)
+
 
 def _default_sparse_pairs(blocks: list[KernelBlockConfig]) -> list[tuple[int, int]]:
     """Domain-informed sparse interaction heuristic.
@@ -678,6 +677,7 @@ def _assert_unscaled_base(k: Kernel, *, ctx: str) -> None:
 
 def _assert_no_inner_scales_in_products(k: Kernel, *, ctx: str = "sanity") -> None:
     """Dev-only: recursively assert that ProductKernel children are not ScaleKernel."""
+
     def _walk(node: Kernel, path: str) -> None:
         if isinstance(node, ProductKernel):
             for child in node.kernels:

@@ -21,6 +21,7 @@ class GPMean(StrEnum):
     EXPONENTIAL_SATURATION = "exponential_saturation"
     ZERO = "zero"
 
+
 def compute_ewma2_means_torch(
     returns: torch.Tensor,
     task_ids: torch.Tensor,
@@ -69,6 +70,7 @@ def compute_ewma2_means_torch(
 
     return means
 
+
 class EWMATaskConstantMean(Mean):
     """
     Per-task constant mean initialized from EWMA2 means.
@@ -111,8 +113,6 @@ class EWMATaskConstantMean(Mean):
         task_ids = X[..., tcol].long().view(-1)
         vals = self._means[task_ids]
         return vals.view(*X.shape[:-1])
-
-
 
 
 class ExponentialSaturationMean(Mean):
@@ -229,7 +229,8 @@ class MacroLinearMean(gpytorch.means.Mean):
     def forward(self, x):
         x_macro = x[..., self.macro_dims]
         return self.linear(x_macro)
-    
+
+
 def initialize_mean(
     mean: MeanF | None,
     input_size: int | None = None,
@@ -275,9 +276,7 @@ def initialize_mean(
                 base_means.append(LinearMean(input_size))
 
             else:
-                raise ValueError(
-                    f"Unsupported mean spec {spec} for ETF {etf}"
-                )
+                raise ValueError(f"Unsupported mean spec {spec} for ETF {etf}")
 
         return MultitaskMean(base_means, num_tasks=num_tasks)
 

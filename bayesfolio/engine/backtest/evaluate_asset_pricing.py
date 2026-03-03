@@ -1,4 +1,3 @@
-
 from typing import Any, cast
 
 import numpy as np
@@ -11,7 +10,7 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
     """
     Evaluate predictive performance using metrics from
     'Empirical Asset Pricing via Ensemble Gaussian Process Regression'.
-    I added IC p-value to help determine if good IC was just a fluke. 
+    I added IC p-value to help determine if good IC was just a fluke.
 
     Parameters
     ----------
@@ -72,7 +71,6 @@ def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
 
     IC = np.nanmean(IC_list) if IC_list else np.nan
     IC_std = np.nanstd(IC_list, ddof=1) if len(IC_list) > 1 else np.nan
-
 
     if len(IC_list) > 1:
         ic_arr = np.asarray(IC_list, dtype=float)

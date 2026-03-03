@@ -1,4 +1,5 @@
 """Riskfolio Backtesting"""
+
 import numpy as np
 import pandas as pd
 import riskfolio as rp
@@ -29,13 +30,11 @@ def summarize_backtest(bt_df: pd.DataFrame):
         "MeanTurnover": bt_df["turnover"].mean(),
     }
 
+
 def opt_weights(excess_returns, risk_config):
     # Initialize Riskfolio portfolio
     port = rp.Portfolio(returns=excess_returns)
-    port.assets_stats(
-        method_mu=risk_config.method_mu,
-        method_cov=risk_config.method_cov
-    )
+    port.assets_stats(method_mu=risk_config.method_mu, method_cov=risk_config.method_cov)
     port.upperlng = risk_config.upperlng
     port.nea = risk_config.nea  # Update to use risk_config.nea
 
@@ -46,24 +45,19 @@ def opt_weights(excess_returns, risk_config):
         obj=risk_config.obj,
         rf=risk_config.rf,
         l=risk_config.ra,
-        hist=risk_config.hist
+        hist=risk_config.hist,
     )
     weights = np.ravel(weights_df.to_numpy())
     print(weights)
-    shp = rp.Sharpe(w=weights_df, mu=port.mu,
-                    cov=port.cov,
-                    returns=excess_returns,
-                    rm=risk_config.rm,
-                    rf=risk_config.rf)
+    shp = rp.Sharpe(
+        w=weights_df, mu=port.mu, cov=port.cov, returns=excess_returns, rm=risk_config.rm, rf=risk_config.rf
+    )
 
     return shp, weights
 
+
 def backtest_portfolio(
-    y: pd.DataFrame,
-    ticker_config,
-    risk_config,
-    window: int = 24,
-    cost_rate: float = 0.0
+    y: pd.DataFrame, ticker_config, risk_config, window: int = 24, cost_rate: float = 0.0
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series]:
     """
     Config-driven backtest for Riskfolio portfolios.
@@ -115,10 +109,7 @@ def backtest_portfolio(
 
             # Initialize Riskfolio portfolio
             port = rp.Portfolio(returns=train)
-            port.assets_stats(
-                method_mu=risk_config.method_mu,
-                method_cov=risk_config.method_cov
-            )
+            port.assets_stats(method_mu=risk_config.method_mu, method_cov=risk_config.method_cov)
             port.upperlng = risk_config.upperlng
             port.nea = risk_config.nea  # Update to use risk_config.nea
 
@@ -129,7 +120,7 @@ def backtest_portfolio(
                 obj=risk_config.obj,
                 rf=risk_config.rf,
                 l=risk_config.ra,
-                hist=risk_config.hist
+                hist=risk_config.hist,
             )
 
             # Handle failed optimizations
@@ -159,13 +150,15 @@ def backtest_portfolio(
                 turnover, cost = np.nan, 0.0
 
             net_ret = port_ret - cost
-            results.append({
-                "date": date,
-                "portfolio_return": port_ret,
-                "net_return": net_ret,
-                "turnover": turnover,
-                "n_assets": len(train.columns)
-            })
+            results.append(
+                {
+                    "date": date,
+                    "portfolio_return": port_ret,
+                    "net_return": net_ret,
+                    "turnover": turnover,
+                    "n_assets": len(train.columns),
+                }
+            )
 
             w_prev = w.copy()
 
@@ -185,13 +178,23 @@ def backtest_portfolio(
     eq_returns = (y @ eq_w).loc[bt_results.index]
     bt_results["benchmark"] = (1 + eq_returns).cumprod()
 
-
     # === Schwab-aligned benchmark ===
-    schwab_weights = pd.Series({
-        "AVEM": 0.04, "BCD": 0.02, "BYLD": 0.03, "ESGD": 0.2, "HYEM": 0.00,
-        "IEF": 0.08, "ISCF": 0.04, "SNPE": 0.37, "VBK": 0.08, "VNQ": 0.028,
-        "VNQI": 0.02, "VWOB": 0.03
-    })
+    schwab_weights = pd.Series(
+        {
+            "AVEM": 0.04,
+            "BCD": 0.02,
+            "BYLD": 0.03,
+            "ESGD": 0.2,
+            "HYEM": 0.00,
+            "IEF": 0.08,
+            "ISCF": 0.04,
+            "SNPE": 0.37,
+            "VBK": 0.08,
+            "VNQ": 0.028,
+            "VNQI": 0.02,
+            "VWOB": 0.03,
+        }
+    )
     schwab_weights = schwab_weights.reindex(y.columns).fillna(0)
     schwab_weights /= schwab_weights.sum()  # normalize
 
@@ -204,4 +207,3 @@ def backtest_portfolio(
     final_weights = weights_df.iloc[-1].sort_values(ascending=False)
 
     return bt_results, weights_df, final_weights
-

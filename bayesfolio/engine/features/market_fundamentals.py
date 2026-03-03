@@ -2,6 +2,7 @@
 Module for fetching fundamental financial data for assets.
 
 """
+
 import io
 import sys
 from typing import Literal
@@ -58,7 +59,7 @@ def fetch_global_yields(
         "de10y": ["IRLTLT01DEM156N"],  # Germany
         "jp10y": ["IRLTLT01JPM156N"],  # Japan
         "uk10y": ["IRLTLT01GBM156N"],  # UK
-        "cn10y": [],                   # not on FRED OECD 10Y
+        "cn10y": [],  # not on FRED OECD 10Y
     }
     default_stooq = {
         "de10y": "10YDEY.B",
@@ -69,21 +70,19 @@ def fetch_global_yields(
     # TradingEconomics mapping (country name must match TE’s catalog)
     default_te = {
         "de10y": ("Germany", "government bond 10y"),
-        "jp10y": ("Japan",   "government bond 10y"),
+        "jp10y": ("Japan", "government bond 10y"),
         "uk10y": ("United Kingdom", "government bond 10y"),
-        "cn10y": ("China",   "government bond 10y"),
+        "cn10y": ("China", "government bond 10y"),
     }
 
     code_map = {**default_fred, **(fred_codes or {})}
-    stq_map  = {**default_stooq, **(stooq_map or {})}
-    te_map   = {**default_te, **(te_country_map or {})}
-    keys     = countries or ["de10y", "jp10y", "uk10y", "cn10y"]
+    stq_map = {**default_stooq, **(stooq_map or {})}
+    te_map = {**default_te, **(te_country_map or {})}
+    keys = countries or ["de10y", "jp10y", "uk10y", "cn10y"]
 
     # --- http session with UA (Stooq sometimes dislikes default UA) ---
     session = requests.Session()
-    session.headers.update(
-        {"User-Agent": "Mozilla/5.0 (compatible; MarketMavenBot/1.0; +https://example.com)"}
-    )
+    session.headers.update({"User-Agent": "Mozilla/5.0 (compatible; MarketMavenBot/1.0; +https://example.com)"})
 
     def _log(msg):
         if verbose:
@@ -94,7 +93,7 @@ def fetch_global_yields(
         for sym in symbols:
             try:
                 s = pdr.DataReader(sym, "fred", start, end)[sym]
-                s = (s / 100.0)
+                s = s / 100.0
                 s.index = pd.to_datetime(s.index)
                 _log(f"FRED ok for {sym}")
                 return s
@@ -228,6 +227,7 @@ def fetch_global_yields(
     cols = ["date"] + [k for k in keys if k in df.columns]
     return df[cols]
 
+
 def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
     """
     Dealer gamma proxy = realized volatility - implied volatility (VIX).
@@ -247,14 +247,18 @@ def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTH
             # Try common patterns
             candidates = []
             if ticker is not None:
-                candidates.extend([
-                    (ticker, "Adj Close"),
-                    (ticker, "Close"),
-                ])
-            candidates.extend([
-                ("Adj Close", ticker),
-                ("Close", ticker),
-            ])
+                candidates.extend(
+                    [
+                        (ticker, "Adj Close"),
+                        (ticker, "Close"),
+                    ]
+                )
+            candidates.extend(
+                [
+                    ("Adj Close", ticker),
+                    ("Close", ticker),
+                ]
+            )
 
             for c in candidates:
                 if c in px.columns:
@@ -288,10 +292,12 @@ def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTH
     # --- Realized volatility (21-day) ---
     rv = np.log(spy / spy.shift(1)).rolling(21).std() * np.sqrt(252)
 
-    df = pd.DataFrame({
-        "rv": rv,
-        "vix": vix,
-    }).dropna()
+    df = pd.DataFrame(
+        {
+            "rv": rv,
+            "vix": vix,
+        }
+    ).dropna()
 
     df["dealer_gamma_proxy"] = df["rv"] - df["vix"]
 
@@ -308,6 +314,7 @@ def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTH
 
     return df_m
 
+
 def fetch_put_call_ratio(start, end=None, horizon=Horizon.MONTHLY):
     px = yf.download("^PPC", start=start, end=end, progress=False)
 
@@ -319,6 +326,7 @@ def fetch_put_call_ratio(start, end=None, horizon=Horizon.MONTHLY):
 
     s = s.resample(horizon).last().dropna()
     return s.to_frame().reset_index()
+
 
 def fetch_spy_flow_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
     """
@@ -381,31 +389,19 @@ def fetch_spy_flow_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
     ).dropna()
 
     # Signed dollar volume
-    df["flow_proxy"] = (
-        np.sign(df["price"].diff()) * df["price"] * df["volume"]
-    )
+    df["flow_proxy"] = np.sign(df["price"].diff()) * df["price"] * df["volume"]
 
     # ------------------------------------------------------------
     # Monthly aggregation + z-score
     # ------------------------------------------------------------
-    df_m = (
-        df["flow_proxy"]
-        .resample(getattr(horizon, "value", horizon))
-        .sum()
-        .to_frame("flow_proxy")
-    )
+    df_m = df["flow_proxy"].resample(getattr(horizon, "value", horizon)).sum().to_frame("flow_proxy")
 
     m = df_m["flow_proxy"].rolling(12, min_periods=12).mean()
     s = df_m["flow_proxy"].rolling(12, min_periods=12).std()
 
     df_m["spy_flow_z_12m"] = (df_m["flow_proxy"] - m) / s
 
-    return (
-        df_m[["spy_flow_z_12m"]]
-        .dropna()
-        .reset_index()
-        .rename(columns={"index": "date"})
-    )
+    return df_m[["spy_flow_z_12m"]].dropna().reset_index().rename(columns={"index": "date"})
 
 
 def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
@@ -473,7 +469,7 @@ def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Ho
     s = df_m["vix_ts_level"].rolling(12, min_periods=12).std()
     df_m["vix_ts_z_12m"] = (df_m["vix_ts_level"] - m) / s.replace(0, np.nan)
 
-    return df_m.reset_index().rename(columns={"index":"date", "Date":"date"})
+    return df_m.reset_index().rename(columns={"index": "date", "Date": "date"})
 
 
 def fetch_term_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
@@ -483,8 +479,9 @@ def fetch_term_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.M
     Falls back to FRED DTB3 for 3M if ^IRX not available.
     """
     tickers = ["^TNX", "^IRX"]
-    px = yf.download(tickers, start=start, end=end, interval=Interval.DAILY,
-                     auto_adjust=False, progress=False, group_by="ticker")
+    px = yf.download(
+        tickers, start=start, end=end, interval=Interval.DAILY, auto_adjust=False, progress=False, group_by="ticker"
+    )
 
     # Normalize MultiIndex or single-index
     def _safe_col(df, ticker):
@@ -497,7 +494,7 @@ def fetch_term_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.M
             return df.get("Adj Close", None)
 
     tnote10y = _safe_col(px, "^TNX")
-    tbill3m  = _safe_col(px, "^IRX")
+    tbill3m = _safe_col(px, "^IRX")
 
     # Fallback for missing ^IRX (3M T-bill)
     if tbill3m is None or tbill3m.isna().all():
@@ -509,13 +506,13 @@ def fetch_term_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.M
 
     # Convert Yahoo % yields to decimals
     df["tnote10y"] = df["tnote10y"] / 100.0
-    df["tbill3m"]  = df["tbill3m"]  / 100.0
+    df["tbill3m"] = df["tbill3m"] / 100.0
 
     # Resample
     df_m = df.resample(horizon).last().dropna()
     df_m["term_spread"] = df_m["tnote10y"] - df_m["tbill3m"]
 
-    return df_m.reset_index().rename(columns={"index":"date"})
+    return df_m.reset_index().rename(columns={"index": "date"})
 
 
 def fetch_credit_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
@@ -533,8 +530,15 @@ def fetch_credit_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon
     import pandas as pd
     import yfinance as yf
 
-    px = yf.download(["HYG", "LQD"], start=start, end=end, interval=Interval.DAILY,
-                     auto_adjust=False, progress=False, group_by="ticker")
+    px = yf.download(
+        ["HYG", "LQD"],
+        start=start,
+        end=end,
+        interval=Interval.DAILY,
+        auto_adjust=False,
+        progress=False,
+        group_by="ticker",
+    )
 
     # Normalize across yfinance versions
     def _get_col(df, ticker):
@@ -596,7 +600,8 @@ def fetch_tbill_rate(start="2010-01-01", end=None, horizon: Horizon = Horizon.MO
 
     # Ensure DataFrame with correct column name
     df = tbill3m.resample(horizon).last().dropna()
-    return df.reset_index().rename(columns={"index": "date", "^IRX" : "tbill3m"})
+    return df.reset_index().rename(columns={"index": "date", "^IRX": "tbill3m"})
+
 
 def fetch_dxy(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
@@ -629,7 +634,7 @@ def fetch_yield_curve_pcs(start="2010-01-01", end=None, horizon: Horizon = Horiz
     Uses FRED if Yahoo fails.
     """
     tickers_yahoo = {"^IRX": "3m", "^FVX": "5y", "^TNX": "10y", "^TYX": "30y"}
-    tickers_fred  = {"DTB3": "3m", "DGS5": "5y", "DGS10": "10y", "DGS30": "30y"}
+    tickers_fred = {"DTB3": "3m", "DGS5": "5y", "DGS10": "10y", "DGS30": "30y"}
 
     # Try Yahoo first
     px = yf.download(list(tickers_yahoo.keys()), start=start, end=end, interval=Interval.DAILY, progress=False)
@@ -658,9 +663,10 @@ def fetch_yield_curve_pcs(start="2010-01-01", end=None, horizon: Horizon = Horiz
     # PCA
     pca = PCA(n_components=min(n_components, df.shape[1]))
     pcs = pca.fit_transform(df.values)
-    pcs_df = pd.DataFrame(pcs, index=df.index, columns=[f"yc_pc{i+1}" for i in range(pcs.shape[1])])
+    pcs_df = pd.DataFrame(pcs, index=df.index, columns=[f"yc_pc{i + 1}" for i in range(pcs.shape[1])])
 
     return pcs_df.reset_index().rename(columns={"DATE": "date"})
+
 
 def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
@@ -721,11 +727,12 @@ def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Hor
 
     # Clean final output
     df = df.dropna()
-    df = df.reset_index().rename(columns={"index": "date", "DATE":"date"})
+    df = df.reset_index().rename(columns={"index": "date", "DATE": "date"})
     print(df.columns)
     df["date"] = pd.to_datetime(df["date"])
 
     return df
+
 
 def fetch_earnings_yield(start, end, horizon):
     """
@@ -736,7 +743,7 @@ def fetch_earnings_yield(start, end, horizon):
         cape = pdr.DataReader("CAPE", "fred", start, end)  # Shiller PE
         cape = cape.resample(horizon).last().dropna()
         cape["earnings_yield"] = 1.0 / cape["CAPE"]
-        df = cape[["earnings_yield"]].reset_index().rename(columns={"index": "date", "DATE":"date", "Date":"date"})
+        df = cape[["earnings_yield"]].reset_index().rename(columns={"index": "date", "DATE": "date", "Date": "date"})
         return df
     except Exception:
         return None
@@ -744,9 +751,8 @@ def fetch_earnings_yield(start, end, horizon):
 
 def fetch_cpi_inflation(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
 
-
     cpi = pdr.DataReader("CPIAUCSL", "fred", start, end)  # headline CPI level
-    cpi = cpi.resample(horizon).last().dropna()   # monthly
+    cpi = cpi.resample(horizon).last().dropna()  # monthly
 
     cpi["cpi_yoy"] = cpi["CPIAUCSL"].pct_change(12)
     cpi["cpi_mom"] = cpi["CPIAUCSL"].pct_change(1)
@@ -757,7 +763,7 @@ def fetch_cpi_inflation(start="2010-01-01", end=None, horizon: Horizon = Horizon
 def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
     Fetch and merge a standard set of macro-finance features for ETF return prediction.
-    
+
     Features included:
         - VIX term structure (level, 1m change, 12m z-score)
         - Term spread (10Y – 3M Treasury yield)
@@ -775,16 +781,15 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
         pd.DataFrame with all features aligned by date.
     """
     # Individual feature fetchers
-    vix_df   = fetch_vix_term_structure(start=start, end=end, horizon=horizon)
-    term_df  = fetch_term_spread(start=start, end=end, horizon=horizon)
-    cred_df  = fetch_credit_spread(start=start, end=end, horizon=horizon)
-    #tbill_df = fetch_tbill_rate(start=start, end=end, horizon=horizon)
-    dxy_df   = fetch_dxy(start=start, end=end, horizon=horizon)
-    yc_df    = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
-
+    vix_df = fetch_vix_term_structure(start=start, end=end, horizon=horizon)
+    term_df = fetch_term_spread(start=start, end=end, horizon=horizon)
+    cred_df = fetch_credit_spread(start=start, end=end, horizon=horizon)
+    # tbill_df = fetch_tbill_rate(start=start, end=end, horizon=horizon)
+    dxy_df = fetch_dxy(start=start, end=end, horizon=horizon)
+    yc_df = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
 
     # Merge on date
-    dfs = [vix_df, term_df, cred_df, dxy_df, yc_df] #tbill_df,
+    dfs = [vix_df, term_df, cred_df, dxy_df, yc_df]  # tbill_df,
 
     # Ensure all have lowercase column names and 'date'
     for i, df in enumerate(dfs):
@@ -799,7 +804,6 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
         dfs[i] = df
     merged = dfs[0]
     for df in dfs[1:]:
-
         merged = pd.merge(merged, df, on="date", how="left")
 
     # Sort and forward-fill small gaps (e.g., missing DXY data)
@@ -857,11 +861,11 @@ def fetch_core_global_macro(start="2010-01-01", end=None, horizon: Horizon = Hor
         return series.to_frame().reset_index().rename(columns={"Date": "date"})
 
     # --- Fetch Yahoo Series ---
-    oil_df    = _yf_series("CL=F", "oil")
+    oil_df = _yf_series("CL=F", "oil")
     copper_df = _yf_series("HG=F", "copper")
-    gold_df   = _yf_series("GC=F", "gold")
+    gold_df = _yf_series("GC=F", "gold")
 
-    tnx_df    = _yf_series("^TNX", "y10_nominal")
+    tnx_df = _yf_series("^TNX", "y10_nominal")
     if tnx_df is not None:
         tnx_df["y10_nominal"] = tnx_df["y10_nominal"] / 100.0
 
@@ -892,16 +896,12 @@ def fetch_core_global_macro(start="2010-01-01", end=None, horizon: Horizon = Hor
     merged["gold_crude_ratio"] = merged["gold"] / merged["oil"]
 
     merged["y10_real_proxy"] = merged["schp_ret"].rolling(3).mean()
-    merged["breakeven_proxy"] = (
-        merged["y10_nominal"].diff() - merged["y10_real_proxy"].diff()
-    )
+    merged["breakeven_proxy"] = merged["y10_nominal"].diff() - merged["y10_real_proxy"].diff()
 
     # merged["em_fx_ret"] = merged["em_fx_ret"].fillna(0)
     merged = merged.sort_values("date").ffill().fillna(0)
 
     return merged.reset_index(drop=True)
-
-
 
 
 def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
@@ -937,11 +937,11 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     # ------------------------------------------------------------
     # 1. Existing stable macro components (your original fetchers)
     # ------------------------------------------------------------
-    vix_df  = fetch_vix_term_structure(start=start, end=end, horizon=horizon)
+    vix_df = fetch_vix_term_structure(start=start, end=end, horizon=horizon)
     term_df = fetch_term_spread(start=start, end=end, horizon=horizon)
     cred_df = fetch_credit_spread(start=start, end=end, horizon=horizon)
-    dxy_df  = fetch_dxy(start=start, end=end, horizon=horizon)
-    yc_df   = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
+    dxy_df = fetch_dxy(start=start, end=end, horizon=horizon)
+    yc_df = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
     high_y_spread = fetch_high_yield_spread(start=start, end=end, horizon=horizon)
     global_macro = fetch_core_global_macro(start=start, end=end, horizon=horizon)
     cpi_df = fetch_cpi_inflation(start=start, end=end, horizon=horizon)
@@ -984,13 +984,12 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         except Exception:
             return None
 
-
     # MOVE proxy using TLT
     tlt = fetch_etf_features(["TLT"], start, end, Horizon.DAILY)
-    df = tlt[["date","price"]].copy()
+    df = tlt[["date", "price"]].copy()
     df["tlt_ret"] = np.log(df["price"] / df["price"].shift(1))
     df["move_proxy"] = df["tlt_ret"].rolling(21).std() * np.sqrt(12)
-    move_df = df[["date","move_proxy"]].dropna()
+    move_df = df[["date", "move_proxy"]].dropna()
 
     # 3c. SKEW proxy (VIX3M / VIX)
     if all(col in vix_df.columns for col in ["vix", "vix3m"]):
@@ -1020,12 +1019,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         merged_breadth = pd.merge(rsp_px, spy_px, on="date", how="inner")
         merged_breadth["rsp_spy"] = merged_breadth["rsp"] / merged_breadth["spy"]
 
-        breadth_m = (
-            merged_breadth.set_index("date")
-            .resample(horizon)
-            .last()
-            .dropna()
-        )
+        breadth_m = merged_breadth.set_index("date").resample(horizon).last().dropna()
 
         breadth_m["rsp_spy_roc_1m"] = breadth_m["rsp_spy"].pct_change(1)
 
@@ -1035,12 +1029,12 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         rsp_spy_df = None
 
     spx = fetch_etf_features(["SPY"], start, end, Horizon.DAILY)
-    spx = spx[["date","price"]].copy()
+    spx = spx[["date", "price"]].copy()
     spx["ma50"] = spx["price"].rolling(50).mean()
     spx["pct_above_50dma"] = (spx["price"] / spx["ma50"]) * 100
     spx = spx[["date", "pct_above_50dma"]].dropna()
     pct50_df = spx
-    
+
     spy_flow = fetch_spy_flow_proxy(start, end, horizon)
 
     # ------------------------------------------------------------
@@ -1057,11 +1051,25 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     # 6. Merge EVERYTHING (same pattern as your original function)
     # ------------------------------------------------------------
     dfs = [
-        vix_df, term_df, cred_df, dxy_df, yc_df,          # existing macro
-        spy_df2, erp_df,                       # ERP block
-        skew_df, move_df,    # vol signals
-        vix_slope_df, rsp_spy_df, spy_flow, dealer_gamma, pct50_df,   # breadth
-        acm_df, high_y_spread,global_macro, cpi_df,global_yields  #earnings_yield                                   
+        vix_df,
+        term_df,
+        cred_df,
+        dxy_df,
+        yc_df,  # existing macro
+        spy_df2,
+        erp_df,  # ERP block
+        skew_df,
+        move_df,  # vol signals
+        vix_slope_df,
+        rsp_spy_df,
+        spy_flow,
+        dealer_gamma,
+        pct50_df,  # breadth
+        acm_df,
+        high_y_spread,
+        global_macro,
+        cpi_df,
+        global_yields,  # earnings_yield
     ]
 
     # Filter out None
@@ -1084,6 +1092,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     merged = merged.sort_values("date").ffill().fillna(0)
 
     return merged
+
 
 def macro_predictive_screening(
     df: pd.DataFrame,
@@ -1109,37 +1118,26 @@ def macro_predictive_screening(
             continue
 
         # Collapse cross-section → market-level return
-        ts = (
-            tmp.groupby("date")
-               .agg({col: "first", target_col: "mean"})
-               .dropna()
-        )
+        ts = tmp.groupby("date").agg({col: "first", target_col: "mean"}).dropna()
 
         if len(ts) < min_periods:
             continue
 
-        rolling_ic = (
-            ts[col]
-            .rolling(window)
-            .corr(ts[target_col])
-            .dropna()
-        )
+        rolling_ic = ts[col].rolling(window).corr(ts[target_col]).dropna()
 
         if len(rolling_ic) < min_periods // 2:
             continue
 
-        results.append({
-            "feature": col,
-            "mean_ic": rolling_ic.mean(),
-            "abs_mean_ic": rolling_ic.abs().mean(),
-            "ic_std": rolling_ic.std(ddof=1),
-            "ic_ir": rolling_ic.mean() / (rolling_ic.std(ddof=1) + 1e-12),
-            "hit_rate": (rolling_ic > 0).mean(),
-            "n_periods": len(rolling_ic),
-        })
+        results.append(
+            {
+                "feature": col,
+                "mean_ic": rolling_ic.mean(),
+                "abs_mean_ic": rolling_ic.abs().mean(),
+                "ic_std": rolling_ic.std(ddof=1),
+                "ic_ir": rolling_ic.mean() / (rolling_ic.std(ddof=1) + 1e-12),
+                "hit_rate": (rolling_ic > 0).mean(),
+                "n_periods": len(rolling_ic),
+            }
+        )
 
-    return (
-        pd.DataFrame(results)
-        .sort_values("abs_mean_ic", ascending=False)
-        .reset_index(drop=True)
-    )
+    return pd.DataFrame(results).sort_values("abs_mean_ic", ascending=False).reset_index(drop=True)

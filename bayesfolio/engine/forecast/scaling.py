@@ -1,4 +1,5 @@
 """Scaling utilities for MarketMaven models."""
+
 import numpy as np
 import torch
 from scipy.stats import boxcox
@@ -61,10 +62,10 @@ class MultitaskScaler:
         if self.exclude_time_col and X.shape[1] > 1:
             feat_mask = torch.arange(X.shape[1]) != 0
             self.x_mean = X[:, feat_mask].mean(0, keepdim=True)
-            self.x_std  = X[:, feat_mask].std(0, unbiased=False, keepdim=True).clamp_min(self.eps)
+            self.x_std = X[:, feat_mask].std(0, unbiased=False, keepdim=True).clamp_min(self.eps)
         else:
             self.x_mean = X.mean(0, keepdim=True)
-            self.x_std  = X.std(0, unbiased=False, keepdim=True).clamp_min(self.eps)
+            self.x_std = X.std(0, unbiased=False, keepdim=True).clamp_min(self.eps)
 
     def transform_x(self, X: torch.Tensor) -> torch.Tensor:
         """Scale features using previously fitted statistics."""
@@ -130,11 +131,13 @@ class MultitaskScaler:
                 raise ValueError("Must pass task indices for per-task inverse transform.")
             mu = torch.tensor(
                 [self.y_mean_k.get(int(t), self.global_mu) for t in task_idx.view(-1).tolist()],
-                dtype=yhat.dtype, device=yhat.device
+                dtype=yhat.dtype,
+                device=yhat.device,
             )
             sd = torch.tensor(
                 [self.y_std_k.get(int(t), self.global_sd) for t in task_idx.view(-1).tolist()],
-                dtype=yhat.dtype, device=yhat.device
+                dtype=yhat.dtype,
+                device=yhat.device,
             )
             return yhat * sd + mu
 
@@ -149,16 +152,17 @@ class MultitaskScaler:
                 raise ValueError("Must pass task indices for per-task inverse transform.")
             sd = torch.tensor(
                 [self.y_std_k.get(int(t), self.global_sd) for t in task_idx.view(-1).tolist()],
-                dtype=s.dtype, device=s.device
+                dtype=s.dtype,
+                device=s.device,
             )
             return s * sd
-        
+
 
 def preprocess_features_boxcox(df, columns=None, eps=1e-6):
     """
     Applies Box-Cox transformation to selected columns.
     Automatically shifts data if needed (Box-Cox requires all values > 0).
-    
+
     Returns:
         df_transformed : transformed DataFrame
         lambdas : dictionary of lambda parameters for each column
@@ -167,7 +171,7 @@ def preprocess_features_boxcox(df, columns=None, eps=1e-6):
     df = df.copy()
     lambdas = {}
     shifts = {}
-    
+
     # If no specific columns provided, detect skewed numeric columns by threshold
     if columns is None:
         numeric = df.select_dtypes(include=[np.number])
@@ -192,10 +196,8 @@ def preprocess_features_boxcox(df, columns=None, eps=1e-6):
         # Compute Box-Cox transform safely
         xt, lam = boxcox(x_shifted)
         df[col] = xt
-        
+
         lambdas[col] = lam
         shifts[col] = shift
 
     return df, lambdas, shifts
-
-

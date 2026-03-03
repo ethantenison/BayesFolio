@@ -2,6 +2,7 @@
 Module to fetch asset prices and compute future excess returns over risk-free rate.
 
 """
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
@@ -24,13 +25,10 @@ def cross_sectional_zscore(
     df = df.copy()
 
     for c in cols:
-        df[c] = (
-            df.groupby(date_col)[c]
-              .transform(lambda x: (x - x.mean()) / (x.std() + eps))
-              .fillna(0.0)
-        )
+        df[c] = df.groupby(date_col)[c].transform(lambda x: (x - x.mean()) / (x.std() + eps)).fillna(0.0)
 
     return df
+
 
 def cross_sectional_ic_screening(
     df: pd.DataFrame,
@@ -69,16 +67,16 @@ def cross_sectional_ic_screening(
     -------
     pd.DataFrame
         Feature screening table with IC statistics
-        
-    Example: 
-    
+
+    Example:
+
     screen_df = cross_sectional_ic_screening(
         df=df,
         feature_cols=etf_cols + macro_cols,
         target_col="y_excess_lead",
     )
     screen_df
-    
+
     selected = screen_df[
     (screen_df["abs_mean_ic"] > 0.01) &     # weak but real signal
     (screen_df["ic_ir"] > 0.01) &            # persistence
@@ -89,9 +87,7 @@ def cross_sectional_ic_screening(
 
     results = []
 
-    grouped = df[[date_col, asset_col, target_col] + feature_cols] \
-        .dropna(subset=[target_col]) \
-        .groupby(date_col)
+    grouped = df[[date_col, asset_col, target_col] + feature_cols].dropna(subset=[target_col]).groupby(date_col)
 
     for feat in feature_cols:
         ic_series = []
@@ -111,27 +107,24 @@ def cross_sectional_ic_screening(
 
         ic_series = np.array(ic_series)
 
-        results.append({
-            "feature": feat,
-            "mean_ic": ic_series.mean(),
-            "abs_mean_ic": np.abs(ic_series).mean(),
-            "ic_std": ic_series.std(ddof=1),
-            "ic_ir": ic_series.mean() / (ic_series.std(ddof=1) + 1e-8),
-            "hit_rate": (ic_series > 0).mean(),
-            "n_periods": len(ic_series),
-        })
+        results.append(
+            {
+                "feature": feat,
+                "mean_ic": ic_series.mean(),
+                "abs_mean_ic": np.abs(ic_series).mean(),
+                "ic_std": ic_series.std(ddof=1),
+                "ic_ir": ic_series.mean() / (ic_series.std(ddof=1) + 1e-8),
+                "hit_rate": (ic_series > 0).mean(),
+                "n_periods": len(ic_series),
+            }
+        )
 
     res = pd.DataFrame(results)
 
     if res.empty:
         return res
 
-    return res.sort_values(
-        by=["abs_mean_ic", "ic_ir"],
-        ascending=False
-    ).reset_index(drop=True)
-
-
+    return res.sort_values(by=["abs_mean_ic", "ic_ir"], ascending=False).reset_index(drop=True)
 
 
 def fetch_prices(tickers, start, end=None, interval: Interval = Interval.DAILY):
@@ -140,24 +133,24 @@ def fetch_prices(tickers, start, end=None, interval: Interval = Interval.DAILY):
     Adjusted Close includes dividends & splits => total-return compatible.
     """
     px = yf.download(
-        tickers=tickers, start=start, end=end, interval=interval,
-        group_by="ticker", auto_adjust=False, progress=False
+        tickers=tickers, start=start, end=end, interval=interval, group_by="ticker", auto_adjust=False, progress=False
     )
     # Normalize shape across yfinance versions
     if isinstance(px.columns, pd.MultiIndex):
         # Multi-index columns: level 0 = ticker, level 1 = field
         adj = []
         for tk in tickers:
-            if (tk, 'Adj Close') in px.columns:
-                s = px[(tk, 'Adj Close')].rename(tk)
+            if (tk, "Adj Close") in px.columns:
+                s = px[(tk, "Adj Close")].rename(tk)
                 adj.append(s)
         adj = pd.concat(adj, axis=1)
     else:
         # Single-index columns: use 'Adj Close' directly (single ticker)
-        adj = px[['Adj Close']].rename(columns={'Adj Close': tickers[0]})
+        adj = px[["Adj Close"]].rename(columns={"Adj Close": tickers[0]})
     adj = adj.dropna(how="all")
     adj.index = pd.to_datetime(adj.index)
     return adj
+
 
 def fetch_rf_daily(start, end=None, interval: Interval = Interval.DAILY):
     """
@@ -172,10 +165,7 @@ def fetch_rf_daily(start, end=None, interval: Interval = Interval.DAILY):
     # Handle both single-index and MultiIndex column shapes
     if isinstance(rf.columns, pd.MultiIndex):
         col = None
-        candidates = [
-            ("Adj Close", "^IRX"), ("Close", "^IRX"),
-            ("^IRX", "Adj Close"), ("^IRX", "Close")
-        ]
+        candidates = [("Adj Close", "^IRX"), ("Close", "^IRX"), ("^IRX", "Adj Close"), ("^IRX", "Close")]
         for c in candidates:
             if c in rf.columns:
                 col = rf.loc[:, c].astype(float)
@@ -205,9 +195,10 @@ def fetch_rf_daily(start, end=None, interval: Interval = Interval.DAILY):
     rf_daily_cont.name = "rf_daily_cont"
     return rf_daily_cont
 
-def compute_excess_future_return_calendar(adj_close: pd.Series,
-                                          rf_daily_cont: pd.Series,
-                                          horizon: Horizon= Horizon.MONTHLY):
+
+def compute_excess_future_return_calendar(
+    adj_close: pd.Series, rf_daily_cont: pd.Series, horizon: Horizon = Horizon.MONTHLY
+):
     """
     Calendar-aligned future excess return for one asset.
     y_excess = exp( log(P_{t1}) - log(P_t) - ∑_{(t,t1]} rf_daily_cont ) - 1
@@ -229,7 +220,7 @@ def compute_excess_future_return_calendar(adj_close: pd.Series,
     rf_log = pd.Series(rf_log, index=log_r_price.index)
 
     # Use numpy arrays to avoid dtype gotchas, then rebuild Series
-    delta = (log_r_price.values - rf_log.values)
+    delta = log_r_price.values - rf_log.values
     y_excess_vals = np.exp(delta) - 1.0
     y_excess = pd.Series(y_excess_vals, index=log_r_price.index, name="y_excess_lead")
     return y_excess
@@ -257,6 +248,7 @@ def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHL
     panel = pd.concat(rows, axis=0).sort_values(["date", "asset_id"]).reset_index(drop=True)
     return panel
 
+
 def compute_max_drawdown(log_price: pd.Series, window: int = 63):
     """
     Rolling max drawdown over a given window.
@@ -266,6 +258,7 @@ def compute_max_drawdown(log_price: pd.Series, window: int = 63):
     drawdown = log_price - roll_max
     return drawdown.rolling(window).min()
 
+
 def add_cross_sectional_momentum_rank(
     df: pd.DataFrame,
     momentum_col: str = "mom12m",
@@ -273,7 +266,7 @@ def add_cross_sectional_momentum_rank(
 ):
     """
     Compute cross-sectional momentum rank by date. Not only how good is asset
-    to its past but how good is it relative to the others? 
+    to its past but how good is it relative to the others?
 
     Parameters
     ----------
@@ -288,12 +281,10 @@ def add_cross_sectional_momentum_rank(
 
     df = df.copy()
 
-    df[out_col] = (
-        df.groupby("date")[momentum_col]
-          .rank(pct=True, method="average")
-    )
+    df[out_col] = df.groupby("date")[momentum_col].rank(pct=True, method="average")
 
     return df
+
 
 def fetch_etf_features(
     tickers: list[str] | str,
@@ -336,7 +327,7 @@ def fetch_etf_features(
     # --- Resample (monthly, weekly, etc.) with feature-specific rules ---
     agg_map = {
         "price": "last",
-        "log_ret": "sum",          # cumulative log return over period
+        "log_ret": "sum",  # cumulative log return over period
         "mom1m": "last",
         "mom6m": "last",
         "mom12m": "last",
@@ -366,7 +357,6 @@ def fetch_etf_features(
         "baspread": "mean",
         "max_dd_3m": "mean",
         "max_dd_6m": "mean",
-        
     }
 
     if isinstance(tickers, str):
@@ -381,6 +371,7 @@ def fetch_etf_features(
         progress=False,
         group_by="ticker",
     )
+
     def _extract_single_ticker_features(df, ticker: str) -> pd.DataFrame:
         """Extract and compute ETF-local features for one ticker."""
         px, vol = None, None
@@ -453,7 +444,6 @@ def fetch_etf_features(
         data["ma_3m"] = data["price"].rolling(63).mean()
         data["ma_signal"] = data["ma_1m"] / data["ma_3m"] - 1
         data["ma_regime"] = (data["ma_signal"] > 0).astype(int)
-        
 
         # Trend slope (simple linear regression over last 21 days)
         def _slope(x):
@@ -461,11 +451,9 @@ def fetch_etf_features(
             # np.polyfit returns [slope, intercept]
             return np.polyfit(idx, x, 1)[0] if np.all(np.isfinite(x)) else np.nan
 
-        data["trend_slope"] = (
-            data["price"].rolling(21).apply(_slope, raw=False)
-        )
-        
-        # Max drawdown 
+        data["trend_slope"] = data["price"].rolling(21).apply(_slope, raw=False)
+
+        # Max drawdown
         log_price = np.log(data["price"])
         data["max_dd_3m"] = compute_max_drawdown(log_price, window=63)
         data["max_dd_6m"] = compute_max_drawdown(log_price, window=126)
@@ -478,12 +466,8 @@ def fetch_etf_features(
             s = pd.Series(x)
             return s.autocorr() if s.notna().sum() > 2 else np.nan
 
-        data["ret_autocorr"] = (
-            data["log_ret"].rolling(21).apply(_autocorr, raw=False)
-        )
-        data["vol_autocorr"] = (
-            data["vol_1m"].rolling(63).apply(_autocorr, raw=False)
-        )
+        data["ret_autocorr"] = data["log_ret"].rolling(21).apply(_autocorr, raw=False)
+        data["vol_autocorr"] = data["vol_1m"].rolling(63).apply(_autocorr, raw=False)
 
         data["ret_skew"] = data["log_ret"].rolling(63).skew()
         data["ret_kurt"] = data["log_ret"].rolling(63).kurt()
@@ -491,12 +475,12 @@ def fetch_etf_features(
         # --- Approximate Bid-Ask Spread (Corwin-Schultz 2012) ---
         high = low = None
         if isinstance(df.columns, pd.MultiIndex):
-            if ('High', ticker) in df.columns and ('Low', ticker) in df.columns:
-                high = df[('High', ticker)]
-                low = df[('Low', ticker)]
-            elif (ticker, 'High') in df.columns and (ticker, 'Low') in df.columns:
-                high = df[(ticker, 'High')]
-                low = df[(ticker, 'Low')]
+            if ("High", ticker) in df.columns and ("Low", ticker) in df.columns:
+                high = df[("High", ticker)]
+                low = df[("Low", ticker)]
+            elif (ticker, "High") in df.columns and (ticker, "Low") in df.columns:
+                high = df[(ticker, "High")]
+                low = df[(ticker, "Low")]
         else:
             if "High" in df.columns and "Low" in df.columns:
                 high = df["High"]
@@ -518,11 +502,7 @@ def fetch_etf_features(
         data_resampled = data_resampled.fillna(0)
 
         # Metadata & column normalization
-        data_resampled = (
-            data_resampled
-            .reset_index()
-            .rename(columns={data_resampled.index.name or "index": "date"})
-        )
+        data_resampled = data_resampled.reset_index().rename(columns={data_resampled.index.name or "index": "date"})
         data_resampled.columns = [c.lower() for c in data_resampled.columns]
         data_resampled["asset_id"] = ticker
 
@@ -541,10 +521,6 @@ def fetch_etf_features(
         raise RuntimeError("No ETF features were generated for the requested tickers.")
 
     # Combine into one long DataFrame
-    df_all = (
-        pd.concat(results, axis=0)
-        .sort_values(["date", "asset_id"])
-        .reset_index(drop=True)
-    )
+    df_all = pd.concat(results, axis=0).sort_values(["date", "asset_id"]).reset_index(drop=True)
 
     return df_all
