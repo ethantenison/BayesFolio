@@ -15,10 +15,10 @@ from bayesfolio.schemas.configs.core import (
     RiskfolioConfig, OptModel, RiskMeasure, Objective, MuEstimator, CovEstimator)
 from bayesfolio.visualization.eda import correlation_matrix
 from bayesfolio.data.gp_data_prep import prepare_multitask_gp_data
-from bayesfolio.engine.models.cv import rolling_time_splits_multitask
-from bayesfolio.engine.models.scaling import MultitaskScaler
+from bayesfolio.engine.forecast.cv import rolling_time_splits_multitask
+from bayesfolio.engine.forecast.scaling import MultitaskScaler
 device = torch.device("cpu")
-from bayesfolio.engine.models.gp.multitask import train_model_hadamard
+from bayesfolio.engine.forecast.gp.multitask import train_model_hadamard
 from math import log, sqrt
 from bayesfolio.engine.backtest.evaluate_asset_pricing import evaluate_asset_pricing
 from bayesfolio.utils import check_equal_occurrences
@@ -26,7 +26,7 @@ from bayesfolio.visualization.evaluation import plot_ls_cumulative_compare, plot
 from bayesfolio.visualization.variable_importance import xgboost_variable_importance
 from bayesfolio.portfolio.helpers import assessing_long_short_performance, long_short_returns,long_short_returns_topk, assess_performance
 from bayesfolio.models.old_kernels import KernelType, initialize_kernel, adaptive_lengthscale_prior, KernelConfig
-from bayesfolio.engine.models.gp.means import MeanF, initialize_mean
+from bayesfolio.engine.forecast.gp.means import MeanF, initialize_mean
 from bayesfolio.engine.report.mlflow_helpers import (
     MultiTaskConfig, long_to_panel, compute_benchmark_panel, r2_os, log_r2_os,
     model_error_by_time_index, log_kernel_to_mlflow, log_gpytorch_state_dict, log_gp_hyperparameters
