@@ -5,15 +5,16 @@ from pathlib import Path
 
 import pandas as pd
 
+from bayesfolio.contracts.base import Meta
+from bayesfolio.contracts.results.report import ArtifactPointer
 from bayesfolio.io.fingerprints import sha256_fingerprint
-from bayesfolio.schemas.common import ArtifactRef, SchemaMetadata
 
 
 def write_parquet_with_metadata(
     frame: pd.DataFrame,
     output_path: str | Path,
-    metadata: SchemaMetadata,
-) -> ArtifactRef:
+    metadata: Meta,
+) -> ArtifactPointer:
     """Persist DataFrame parquet plus JSON metadata sidecar.
 
     Args:
@@ -22,7 +23,7 @@ def write_parquet_with_metadata(
         metadata: Cross-boundary metadata to save as sidecar JSON.
 
     Returns:
-        ArtifactRef: Artifact pointer with integrity fingerprint.
+        ArtifactPointer: Artifact pointer with integrity fingerprint.
     """
 
     path = Path(output_path)
@@ -32,4 +33,5 @@ def write_parquet_with_metadata(
     metadata_path = path.with_suffix(path.suffix + ".meta.json")
     metadata_path.write_text(json.dumps(metadata.model_dump(mode="json"), indent=2), encoding="utf-8")
 
-    return ArtifactRef(path=str(path), format="parquet", fingerprint=sha256_fingerprint(path))
+    digest, byte_size = sha256_fingerprint(path)
+    return ArtifactPointer(path=str(path), artifact_format="parquet", digest=digest, byte_size=byte_size)

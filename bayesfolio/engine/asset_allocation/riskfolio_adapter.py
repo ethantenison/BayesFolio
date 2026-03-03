@@ -3,15 +3,15 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from bayesfolio.schemas.common import SchemaMetadata
-from bayesfolio.schemas.contracts.optimize import OptimizationRequest, OptimizationResult
-from bayesfolio.schemas.contracts.scenarios import ScenarioPanel
+from bayesfolio.contracts.commands.optimize import OptimizeCommand
+from bayesfolio.contracts.commands.scenario import ScenarioCommand
+from bayesfolio.contracts.results.optimize import OptimizeResult
 
 
 def optimize_from_scenarios(
-    scenarios: ScenarioPanel,
-    request: OptimizationRequest,
-) -> OptimizationResult:
+    scenarios: ScenarioCommand,
+    request: OptimizeCommand,
+) -> OptimizeResult:
     """Build simple normalized weights from scenario expected returns.
 
     This adapter preserves the schema-first boundary while allowing downstream
@@ -26,8 +26,7 @@ def optimize_from_scenarios(
         raw = np.ones_like(raw, dtype=float)
     weights = raw / float(raw.sum())
 
-    return OptimizationResult(
-        metadata=SchemaMetadata(**request.metadata.model_dump()),
+    return OptimizeResult(
         asset_order=scenarios.asset_order,
         weights=weights.astype(float).tolist(),
     )

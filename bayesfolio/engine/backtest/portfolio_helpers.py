@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import riskfolio as rp
-from bayesfolio.schemas.configs.core import RiskfolioConfig
+from bayesfolio.core.settings import RiskfolioConfig
 
 def riskfolio_returns_rolling(
     y_true: pd.DataFrame,               # realized excess returns (T × N)

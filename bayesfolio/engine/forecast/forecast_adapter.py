@@ -2,21 +2,18 @@ from __future__ import annotations
 
 import numpy as np
 
-from bayesfolio.schemas.common import SchemaMetadata
-from bayesfolio.schemas.contracts.forecast import ForecastPayload
+from bayesfolio.contracts.results.forecast import ForecastResult
 
 
 def build_forecast_payload(
     asset_order: list[str],
     mean: np.ndarray,
     covariance: np.ndarray,
-    metadata: SchemaMetadata,
     return_unit: str = "decimal",
-) -> ForecastPayload:
+) -> ForecastResult:
     """Build forecast transport payload from numerical model outputs."""
 
-    return ForecastPayload(
-        metadata=metadata,
+    return ForecastResult(
         asset_order=asset_order,
         mean=mean.astype(float).tolist(),
         covariance=covariance.astype(float).tolist(),

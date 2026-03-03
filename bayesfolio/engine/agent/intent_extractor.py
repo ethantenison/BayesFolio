@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from bayesfolio.schemas.contracts.intent import OptimizationIntent
+from bayesfolio.contracts.chat.intent import ParsedIntent
 
 
-def extract_intent(payload: dict[str, str | float | bool]) -> OptimizationIntent:
-    """Build OptimizationIntent from structured key-value payload."""
+def extract_intent(payload: dict[str, str | float | bool]) -> ParsedIntent:
+    """Build ParsedIntent from structured key-value payload."""
 
-    return OptimizationIntent(
+    return ParsedIntent(
         objective=str(payload.get("objective", "Sharpe")),
         risk_measure=str(payload.get("risk_measure", "CVaR")),
         long_only=bool(payload.get("long_only", True)),

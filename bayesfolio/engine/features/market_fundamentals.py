@@ -7,7 +7,7 @@ import pandas as pd
 import yfinance as yf
 from sklearn.decomposition import PCA
 import pandas_datareader.data as pdr
-from bayesfolio.schemas.configs.core import Interval, Horizon
+from bayesfolio.core.settings import Interval, Horizon
 from typing import Literal
 import io
 import sys
@@ -20,7 +20,8 @@ except Exception:
     te = None
 
 import requests
-+
+
+
 def fetch_global_yields(
     start: str = "2010-01-01",
     end: str | None = None,
