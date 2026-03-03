@@ -3,14 +3,13 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from bayesfolio.schemas.common import SchemaMetadata
-from bayesfolio.schemas.contracts.backtest import BacktestResult
-from bayesfolio.schemas.contracts.optimize import OptimizationResult
+from bayesfolio.contracts.results.backtest import BacktestResult
+from bayesfolio.contracts.results.optimize import OptimizeResult
 
 
 def run_weighted_backtest(
     realized_returns: pd.DataFrame,
-    optimization: OptimizationResult,
+    optimization: OptimizeResult,
     periods_per_year: int = 12,
 ) -> BacktestResult:
     """Run weighted backtest and return summary metrics in decimal units."""
@@ -25,7 +24,6 @@ def run_weighted_backtest(
     sharpe = float(annualized / annualized_vol) if annualized_vol > 0 else 0.0
 
     return BacktestResult(
-        metadata=SchemaMetadata(**optimization.metadata.model_dump()),
         cumulative_return=cumulative,
         annualized_return=annualized,
         annualized_volatility=annualized_vol,
