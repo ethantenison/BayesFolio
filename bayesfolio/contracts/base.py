@@ -59,6 +59,8 @@ class SchemaName(str, enum.Enum):
     CHAT_TOOL_RESULT = "bayesfolio.chat.tool_result"
     BELIEFS_COMMAND = "bayesfolio.beliefs.command"
     BELIEFS_RESULT = "bayesfolio.beliefs.result"
+    UNIVERSE_COMMAND = "bayesfolio.universe.command"
+    SCENARIO_COMMAND = "bayesfolio.scenario.command"
 
 
 class ContractModel(BaseModel):

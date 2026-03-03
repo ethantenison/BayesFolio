@@ -16,7 +16,7 @@ class ScenarioCommand(VersionedContract):
         seed: RNG seed for deterministic scenario generation.
     """
 
-    schema: SchemaName = Field(default=SchemaName.SCENARIO_RECORD, const=True)
+    schema: SchemaName = Field(default=SchemaName.SCENARIO_COMMAND, const=True)
     schema_version: str = Field(default="0.1.0", const=True)
     asset_order: list[str]
     n_scenarios: int = Field(ge=1)

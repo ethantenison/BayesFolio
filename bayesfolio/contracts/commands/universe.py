@@ -15,7 +15,7 @@ class UniverseCommand(VersionedContract):
         return_unit: Unit of returns; 'decimal' or 'percent_points'.
     """
 
-    schema: SchemaName = Field(default=SchemaName.UNIVERSE_RECORD, const=True)
+    schema: SchemaName = Field(default=SchemaName.UNIVERSE_COMMAND, const=True)
     schema_version: str = Field(default="0.1.0", const=True)
     tickers: list[str] = Field(default_factory=list)
     start_date: str
