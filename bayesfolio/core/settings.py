@@ -216,7 +216,7 @@ class ExperimentConfig(BaseModel):
     evaluation: EvaluationConfig
 
 
-# riskfolio config
+######## Riskfolio Config ########
 class RiskMeasure(StrEnum):
     """Supported risk measures for portfolio optimization."""
 

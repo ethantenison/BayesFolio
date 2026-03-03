@@ -25,4 +25,5 @@ def sample_joint_scenarios(
         n_scenarios=n_scenarios,
         values=samples.astype(float).tolist(),
         return_unit=forecast.return_unit,
+        seed=seed,
     )
