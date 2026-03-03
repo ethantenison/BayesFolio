@@ -18,3 +18,4 @@ def log_artifact_ref(name: str, artifact: ArtifactPointer) -> None:
     mlflow.log_param(f"artifact.{name}.path", artifact.path)
     mlflow.log_param(f"artifact.{name}.format", artifact.artifact_format)
     mlflow.log_param(f"artifact.{name}.digest", artifact.digest)
+    mlflow.log_param(f"artifact.{name}.bytes", artifact.byte_size)

@@ -34,6 +34,7 @@ jupyter = "^1.0.0"
 
 [tool.ruff]
 extend-exclude = ["experiments"]
+line-length = 120
 
 [build-system]
 requires = ["poetry-core"]

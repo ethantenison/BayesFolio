@@ -20,7 +20,8 @@ except Exception:
     te = None
 
 import requests
-+
+
+
 def fetch_global_yields(
     start: str = "2010-01-01",
     end: str | None = None,
