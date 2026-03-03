@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
@@ -16,8 +18,8 @@ class ScenarioCommand(VersionedContract):
         seed: RNG seed for deterministic scenario generation.
     """
 
-    schema: SchemaName = Field(default=SchemaName.SCENARIO_COMMAND, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.SCENARIO_COMMAND] = SchemaName.SCENARIO_COMMAND
+    schema_version: Literal["0.1.0"] = "0.1.0"
     asset_order: list[str]
     n_scenarios: int = Field(ge=1)
     values: list[list[float]]

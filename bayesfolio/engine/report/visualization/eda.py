@@ -1,11 +1,13 @@
-import plotly.express as px
-import pandas as pd 
-import numpy as np
-import matplotlib.pyplot as plt
 from math import log
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import plotly.express as px
 from scipy.stats import lognorm
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+
 
 def correlation_matrix(data: pd.DataFrame, title: str = "Correlation Heatmap"):
     

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
@@ -16,8 +18,8 @@ class ParsedIntent(VersionedContract):
         max_weight: Maximum position weight as decimal.
     """
 
-    schema: SchemaName = Field(default=SchemaName.CHAT_INTENT_PARSED, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.CHAT_INTENT_PARSED] = SchemaName.CHAT_INTENT_PARSED
+    schema_version: Literal["0.1.0"] = "0.1.0"
     objective: str = Field(default="Sharpe")
     risk_measure: str = Field(default="CVaR")
     long_only: bool = True

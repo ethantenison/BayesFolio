@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
@@ -15,8 +17,8 @@ class ForecastResult(VersionedContract):
         return_unit: Unit of returns; always 'decimal'.
     """
 
-    schema: SchemaName = Field(default=SchemaName.FORECAST_RESULT, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.FORECAST_RESULT] = SchemaName.FORECAST_RESULT
+    schema_version: Literal["0.1.0"] = "0.1.0"
     asset_order: list[str]
     mean: list[float]
     covariance: list[list[float]]

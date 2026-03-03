@@ -1,7 +1,8 @@
 """Riskfolio Backtesting"""
-import pandas as pd 
 import numpy as np
+import pandas as pd
 import riskfolio as rp
+
 
 def summarize_backtest(bt_df: pd.DataFrame):
     """Compute summary performance metrics for the backtest."""

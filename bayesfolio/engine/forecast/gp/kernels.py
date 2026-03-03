@@ -23,10 +23,10 @@ from gpytorch.kernels import (
     PeriodicKernel,
     PiecewisePolynomialKernel,
     PolynomialKernel,
+    ProductKernel,
     RBFKernel,
     RQKernel,
     ScaleKernel,
-    ProductKernel
 )
 from gpytorch.priors import LogNormalPrior
 from pydantic import BaseModel, Field

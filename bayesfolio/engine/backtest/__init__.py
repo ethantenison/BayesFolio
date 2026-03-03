@@ -1,6 +1,5 @@
 """Backtest stage adapters."""
 
-from bayesfolio.engine.backtest.runner import run_weighted_backtest
 from bayesfolio.engine.backtest.backtest_summary import (
 	backtest_portfolio,
 	opt_weights,
@@ -15,7 +14,7 @@ from bayesfolio.engine.backtest.portfolio_helpers import (
 	portfolio_stats,
 	riskfolio_returns_rolling,
 )
-
+from bayesfolio.engine.backtest.runner import run_weighted_backtest
 
 __all__ = ["run_weighted_backtest", 	"assess_performance",
 	"assessing_long_short_performance",

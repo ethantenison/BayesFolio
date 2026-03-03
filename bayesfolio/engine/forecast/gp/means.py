@@ -4,12 +4,13 @@ Means for GPs
 This module provides functions to calculate various types of means used in Gaussian Processes.
 """
 
-from gpytorch.priors import Prior
-from gpytorch.constraints import Positive
-from gpytorch.means import ConstantMean, ZeroMean, LinearMean, MultitaskMean, Mean
 from enum import StrEnum
-import torch
+
 import gpytorch
+import torch
+from gpytorch.constraints import Positive
+from gpytorch.means import ConstantMean, LinearMean, Mean, MultitaskMean, ZeroMean
+from gpytorch.priors import Prior
 
 
 class GPMean(StrEnum):
@@ -20,7 +21,12 @@ class GPMean(StrEnum):
     EXPONENTIAL_SATURATION = "exponential_saturation"
     ZERO = "zero"
 
-def compute_ewma2_means_torch(returns: torch.Tensor, task_ids: torch.Tensor, num_tasks: int, d: float = 0.94) -> torch.Tensor:
+def compute_ewma2_means_torch(
+    returns: torch.Tensor,
+    task_ids: torch.Tensor,
+    num_tasks: int,
+    d: float = 0.94,
+) -> torch.Tensor:
     """
     Compute per-task EWMA2 means (adjust=False) directly from tensors.
 

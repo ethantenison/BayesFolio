@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime, timezone
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -88,8 +89,8 @@ class Meta(ContractModel):
         model_fingerprint: Optional SHA-256 hex digest of the model artifact.
     """
 
-    schema: SchemaName = Field(default=SchemaName.COMMON_META, const=True)
-    schema_version: str = "0.1.0"
+    schema: Literal[SchemaName.COMMON_META] = SchemaName.COMMON_META
+    schema_version: Literal["0.1.0"] = "0.1.0"
     created_at: datetime = Field(default_factory=utc_now)
     correlation_id: str | None = None
     request_id: str | None = None
@@ -152,7 +153,7 @@ class ProblemDetails(ContractModel):
 class VersionedContract(ContractModel):
     """Abstract base for all versioned BayesFolio contracts.
 
-    Subclasses must override ``schema`` with a ``Field(default=SchemaName.X, const=True)``
+    Subclasses must override ``schema`` with a ``Literal[SchemaName.X]`` default
     to enforce schema identity at the boundary.
 
     Attributes:

@@ -2,11 +2,13 @@
 Module to fetch asset prices and compute future excess returns over risk-free rate.
 
 """
-import yfinance as yf
-import pandas as pd
 import numpy as np
-from bayesfolio.core.settings import Interval, Horizon
+import pandas as pd
+import yfinance as yf
 from scipy.stats import spearmanr
+
+from bayesfolio.core.settings import Horizon, Interval
+
 
 def cross_sectional_zscore(
     df: pd.DataFrame,

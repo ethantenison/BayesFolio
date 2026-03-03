@@ -1,8 +1,8 @@
 """
 This module contains functions for preparing and processing financial market data
 """
-import torch
 import pandas as pd
+import torch
 
 
 def prepare_multitask_gp_data(

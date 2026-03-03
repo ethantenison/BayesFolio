@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import Field
+from typing import Literal
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
 
@@ -13,7 +13,7 @@ class OptimizeResult(VersionedContract):
         weights: Portfolio weights as decimals (0.02 = 2%). Sum should equal 1.0.
     """
 
-    schema: SchemaName = Field(default=SchemaName.OPTIMIZE_RESULT, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.OPTIMIZE_RESULT] = SchemaName.OPTIMIZE_RESULT
+    schema_version: Literal["0.1.0"] = "0.1.0"
     asset_order: list[str]
     weights: list[float]

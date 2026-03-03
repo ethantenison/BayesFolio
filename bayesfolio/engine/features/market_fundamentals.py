@@ -2,16 +2,17 @@
 Module for fetching fundamental financial data for assets.
 
 """
-import numpy as np
-import pandas as pd
-import yfinance as yf
-from sklearn.decomposition import PCA
-import pandas_datareader.data as pdr
-from bayesfolio.core.settings import Interval, Horizon
-from typing import Literal
 import io
 import sys
+from typing import Literal
 
+import numpy as np
+import pandas as pd
+import pandas_datareader.data as pdr
+import yfinance as yf
+from sklearn.decomposition import PCA
+
+from bayesfolio.core.settings import Horizon, Interval
 
 # Optional: only needed if you set use_tradingeconomics=True
 try:
@@ -423,30 +424,42 @@ def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Ho
             - vix: 1-month implied volatility index level (VIX).
             - vix3m: 3-month implied volatility index level (VIX3M).
             - vix_ts_level: Log difference between VIX3M and VIX
-                • > 0 (contango): market expects future volatility to be higher than near-term → risk-on, carry/momentum strategies often work.
-                • < 0 (backwardation): near-term volatility higher than long-term → risk-off regime, drawdowns more likely.
+                                • > 0 (contango): market expects future volatility to be
+                                    higher than near-term → risk-on, carry/momentum
+                                    strategies often work.
+                                • < 0 (backwardation): near-term volatility higher than
+                                    long-term → risk-off regime, drawdowns more likely.
             - vix_ts_chg_1m: 1-period change in term structure slope
                 • Captures regime shifts (e.g., transition from contango to backwardation).
                 • Useful as a short-term predictor for heightened risk or opportunity.
             - vix_ts_z_12m: 12-period rolling z-score of the slope
                 • Standardized measure of how extreme the slope is relative to its recent history.
-                • Helps flag unusually steep or inverted curves as distinct volatility regimes.
+                                • Helps flag unusually steep or inverted curves as
+                                    distinct volatility regimes.
 
     Notes:
         - The VIX term structure is widely used as a forward-looking "fear vs. complacency" indicator.
-        - These features are especially relevant at **monthly or weekly horizons** for ETF or portfolio return forecasting.
+                - These features are especially relevant at **monthly or weekly
+                    horizons** for ETF or portfolio return forecasting.
         - Requires both ^VIX and ^VIX3M from Yahoo Finance; data may be missing before ~2010.
     """
     # ^VIX = 1M implied vol, ^VIX3M = 3M implied vol (Yahoo symbols)
-    px = yf.download(["^VIX", "^VIX3M"], start=start, end=end, interval=Interval.DAILY,
-                     auto_adjust=False, progress=False, group_by="ticker")
+    px = yf.download(
+        ["^VIX", "^VIX3M"],
+        start=start,
+        end=end,
+        interval=Interval.DAILY,
+        auto_adjust=False,
+        progress=False,
+        group_by="ticker",
+    )
     # normalize across yfinance versions
     if isinstance(px.columns, pd.MultiIndex):
-        vix   = px[("^VIX",   "Adj Close")].rename("vix")
+        vix = px[("^VIX", "Adj Close")].rename("vix")
         vix3m = px[("^VIX3M", "Adj Close")].rename("vix3m")
     else:
-        vix   = px["Adj Close"].rename("vix")      # single ticker fallback
-        vix3m = None                                # (but we need both)
+        vix = px["Adj Close"].rename("vix")  # single ticker fallback
+        vix3m = None  # (but we need both)
 
     df = pd.concat([vix, vix3m], axis=1).dropna().sort_index()
     # monthly period-end
@@ -904,10 +917,11 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         - ACM term premium from FRED
     """
 
-    import pandas as pd
     import numpy as np
-    import yfinance as yf
+    import pandas as pd
     import pandas_datareader.data as pdr
+    import yfinance as yf
+
     from bayesfolio.features.asset_prices import fetch_etf_features
 
     # ------------------------------------------------------------

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import pandas as pd
 
-from bayesfolio.engine.backtest.runner import run_weighted_backtest
-from bayesfolio.engine.forecast.forecast_adapter import build_forecast_payload
-from bayesfolio.engine.asset_allocation.riskfolio_adapter import optimize_from_scenarios
-from bayesfolio.engine.report.assembler import assemble_report
-from bayesfolio.engine.scenarios.sampler import sample_joint_scenarios
 from bayesfolio.contracts.commands.optimize import OptimizeCommand
 from bayesfolio.contracts.results.report import ReportResult
+from bayesfolio.engine.asset_allocation.riskfolio_adapter import optimize_from_scenarios
+from bayesfolio.engine.backtest.runner import run_weighted_backtest
+from bayesfolio.engine.forecast.forecast_adapter import build_forecast_payload
+from bayesfolio.engine.report.assembler import assemble_report
+from bayesfolio.engine.scenarios.sampler import sample_joint_scenarios
 
 
 def run_schema_first_pipeline(

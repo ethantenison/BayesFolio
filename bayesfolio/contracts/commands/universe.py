@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
@@ -15,8 +17,8 @@ class UniverseCommand(VersionedContract):
         return_unit: Unit of returns; 'decimal' or 'percent_points'.
     """
 
-    schema: SchemaName = Field(default=SchemaName.UNIVERSE_COMMAND, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.UNIVERSE_COMMAND] = SchemaName.UNIVERSE_COMMAND
+    schema_version: Literal["0.1.0"] = "0.1.0"
     tickers: list[str] = Field(default_factory=list)
     start_date: str
     end_date: str

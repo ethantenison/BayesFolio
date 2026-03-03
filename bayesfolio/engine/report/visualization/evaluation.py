@@ -1,11 +1,10 @@
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import mlflow
-import matplotlib.dates as mdates
-
+import numpy as np
+import pandas as pd
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 ARTIFACT_DIR = BASE_DIR / "mlflow" / "artifacts"

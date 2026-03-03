@@ -1,13 +1,14 @@
-import pandas as pd
-import numpy as np
-from riskfolio.src.ParamsEstimation import mean_vector
-from pydantic import BaseModel, ConfigDict
-from bayesfolio.engine.forecast.gp.kernels import KernelConfig
-from bayesfolio.engine.forecast.gp.means import MeanF
 import mlflow
+import numpy as np
+import pandas as pd
 from gpytorch.kernels import Kernel
-from gpytorch.priors import Prior, LKJCovariancePrior
-from bayesfolio.engine.forecast.gp.kernels import KernelArchitectureConfig
+from gpytorch.priors import LKJCovariancePrior, Prior
+from pydantic import BaseModel, ConfigDict
+from riskfolio.src.ParamsEstimation import mean_vector
+
+from bayesfolio.engine.forecast.gp.kernels import KernelArchitectureConfig, KernelConfig
+from bayesfolio.engine.forecast.gp.means import MeanF
+
 
 def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, prefix: str = "kernel"):
     """Log kernel architecture with separated block information."""

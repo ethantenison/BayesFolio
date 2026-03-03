@@ -1,8 +1,9 @@
 
-import xgboost as xgb 
 import numpy as np
-import plotly.graph_objects as go
 import pandas as pd
+import plotly.graph_objects as go
+import xgboost as xgb
+
 
 def xgboost_variable_importance(X, y, xgb_params=None) -> dict:
     """

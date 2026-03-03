@@ -1,8 +1,10 @@
 """Cross Validation"""
 from collections.abc import Iterator
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
 
 def rolling_time_splits(
     dates: pd.DatetimeIndex,

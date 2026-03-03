@@ -1,7 +1,8 @@
 """Scaling utilities for MarketMaven models."""
-import torch
 import numpy as np
+import torch
 from scipy.stats import boxcox
+
 
 class MultitaskScaler:
     """

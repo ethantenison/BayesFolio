@@ -1,14 +1,17 @@
-import gpytorch
-from gpytorch.likelihoods import HadamardGaussianLikelihood
-from gpytorch.models import ExactGP
 from math import sqrt
-from gpytorch.priors import LogNormalPrior, GammaPrior, LKJCovariancePrior
-from gpytorch.constraints import GreaterThan
+
+import gpytorch
 import torch
-from bayesfolio.ml.legacy.old_kernels import PositiveIndexKernel
+from gpytorch.constraints import GreaterThan
 from gpytorch.distributions import MultivariateNormal
-from torch import Tensor
+from gpytorch.likelihoods import HadamardGaussianLikelihood
 from gpytorch.means import MultitaskMean
+from gpytorch.models import ExactGP
+from gpytorch.priors import GammaPrior, LKJCovariancePrior, LogNormalPrior
+from torch import Tensor
+
+from bayesfolio.ml.legacy.old_kernels import PositiveIndexKernel
+
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 

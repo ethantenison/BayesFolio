@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
@@ -15,8 +17,8 @@ class BeliefsCommand(VersionedContract):
         return_unit: Unit of returns; always 'decimal'.
     """
 
-    schema: SchemaName = Field(default=SchemaName.BELIEFS_COMMAND, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.BELIEFS_COMMAND] = SchemaName.BELIEFS_COMMAND
+    schema_version: Literal["0.1.0"] = "0.1.0"
     expected_return: dict[str, float] = Field(default_factory=dict)
     volatility: dict[str, float] = Field(default_factory=dict)
     pairwise_correlation: dict[str, dict[str, float]] = Field(default_factory=dict)

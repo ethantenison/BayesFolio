@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
@@ -15,8 +17,8 @@ class ArtifactPointer(VersionedContract):
         byte_size: File size in bytes.
     """
 
-    schema: SchemaName = Field(default=SchemaName.ARTIFACT_POINTER, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.ARTIFACT_POINTER] = SchemaName.ARTIFACT_POINTER
+    schema_version: Literal["0.1.0"] = "0.1.0"
     path: str
     artifact_format: str
     digest: str
@@ -31,7 +33,7 @@ class ReportResult(VersionedContract):
         artifacts: List of artifact pointers for charts and data exports.
     """
 
-    schema: SchemaName = Field(default=SchemaName.REPORT_RESULT, const=True)
-    schema_version: str = Field(default="0.1.0", const=True)
+    schema: Literal[SchemaName.REPORT_RESULT] = SchemaName.REPORT_RESULT
+    schema_version: Literal["0.1.0"] = "0.1.0"
     headline_metrics: dict[str, float] = Field(default_factory=dict)
     artifacts: list[ArtifactPointer] = Field(default_factory=list)

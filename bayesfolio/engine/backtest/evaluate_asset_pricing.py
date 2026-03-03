@@ -1,9 +1,11 @@
 
+from typing import Any, cast
+
 import numpy as np
 import pandas as pd
-from sklearn.metrics import r2_score
 from scipy.stats import spearmanr, ttest_1samp
-from typing import Any, cast
+from sklearn.metrics import r2_score
+
 
 def evaluate_asset_pricing(y_test: pd.DataFrame, y_pred: pd.DataFrame):
     """
