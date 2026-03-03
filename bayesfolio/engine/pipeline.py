@@ -4,7 +4,7 @@ import pandas as pd
 
 from bayesfolio.engine.backtest.runner import run_weighted_backtest
 from bayesfolio.engine.models.forecast_adapter import build_forecast_payload
-from bayesfolio.engine.optimize.riskfolio_adapter import optimize_from_scenarios
+from bayesfolio.engine.asset_allocation.riskfolio_adapter import optimize_from_scenarios
 from bayesfolio.engine.report.assembler import assemble_report
 from bayesfolio.engine.scenarios.sampler import sample_joint_scenarios
 from bayesfolio.schemas.common import SchemaMetadata
