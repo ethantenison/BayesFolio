@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "BayesFolio"
-version = "0.2.0"
+version = "0.3.0"
 description = "BayesFolio is a research-driven Python framework for building forward-looking portfolios using Bayesian machine learning methods."
 authors = ["ethantenison <tenison.ethan@gmail.com>"]
 readme = "README.md"
