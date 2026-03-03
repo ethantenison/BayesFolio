@@ -1,36 +1,31 @@
 """Need to downgrade to python 3.12 for this"""
 
-#scratch 
+# scratch
 
 import pandas as pd
 from autogluon.timeseries import TimeSeriesDataFrame, TimeSeriesPredictor
 
-df = pd.read_csv('20251021_etfs_ts.csv')
-df['date'] = pd.to_datetime(df['date'])
-df['asset_id'] = df['asset_id'].astype('category')
+df = pd.read_csv("20251021_etfs_ts.csv")
+df["date"] = pd.to_datetime(df["date"])
+df["asset_id"] = df["asset_id"].astype("category")
 
-#remove rows with NaN
+# remove rows with NaN
 df = df.dropna().reset_index(drop=True)
 
-test_time = '2025-06-30'
+test_time = "2025-06-30"
 
 # Filter the DataFrame
-test = df[(df['date'] >= test_time)]
-train = df[(df['date'] < test_time)]
+test = df[(df["date"] >= test_time)]
+train = df[(df["date"] < test_time)]
 
 
-
-train_data = TimeSeriesDataFrame.from_data_frame(
-    train,
-    id_column="asset_id",
-    timestamp_column="date"
-)
+train_data = TimeSeriesDataFrame.from_data_frame(train, id_column="asset_id", timestamp_column="date")
 train_data.head()
 
 
 predictor = TimeSeriesPredictor(
     prediction_length=3,
-    freq='BME',
+    freq="BME",
     path="autogluon-timeseries-model",
     target="y_excess_lead",
     eval_metric="MASE",
@@ -43,11 +38,7 @@ predictor.fit(
 )
 
 # TimeSeriesDataFrame can also be loaded directly from a file
-test_data = TimeSeriesDataFrame.from_data_frame(
-    test,
-    id_column="asset_id",
-    timestamp_column="date"
-)
+test_data = TimeSeriesDataFrame.from_data_frame(test, id_column="asset_id", timestamp_column="date")
 
 predictions = predictor.predict(train_data)
 predictions.head()

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "BayesFolio"
-version = "0.2.0"
-description = ""
+version = "0.3.0"
+description = "BayesFolio is a research-driven Python framework for building forward-looking portfolios using Bayesian machine learning methods."
 authors = ["ethantenison <tenison.ethan@gmail.com>"]
 readme = "README.md"
 
@@ -21,15 +21,37 @@ optuna = "4.6.0"
 torch = "2.10.0"
 gpytorch = "1.15.1"
 mlflow = "^3.3.2"
-pydantic = "^2.11.7"
+pydantic = "2.12.5"
 botorch = "0.16.1"
 vectorbt = "0.28.1"
 pandas-datareader = "^0.10.0"
-
+scipy = "1.17.1"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
+ruff = "0.15.4"
+pytest = "9.0.2"
+pytest-cov = "7.0.0"
+pre-commit = "4.5.1"
+
+[tool.ruff]
+extend-exclude = ["experiments"]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+extend-select = ["A", "E501", "I"]
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = [
+    "--cov=bayesfolio",
+    "--cov-report=term-missing",
+]
