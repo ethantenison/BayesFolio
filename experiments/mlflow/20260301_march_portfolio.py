@@ -292,7 +292,7 @@ active_dims_e = [feature_cols.index(col) for col in etf_cols]
 active_dims_m = [feature_cols.index(col) for col in macro_cols]
 
 
-############### Data Preparation ###############
+############### ML Data Preparation ###############
 
 cv_config = CVConfig(
     step=1,
