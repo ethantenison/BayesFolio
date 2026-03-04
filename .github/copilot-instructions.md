@@ -113,14 +113,53 @@ Engine submodules (`agent`, `asset_allocation`, `backtest`, `features`, `forecas
 
 ## Testing Expectations
 
-- Use `pytest`; test files live in `tests/` and mirror the source layout (e.g., `tests/engine/backtest/test_runner.py`).
-- File names: `test_<module>.py`. Class names: `Test<ClassName>`. Function names: `test_<behavior>`.
-- Tests must be **deterministic**: fix all random seeds explicitly (pass a `seed` argument; never rely on global state or implicit defaults).
-- Cover both the happy path and meaningful edge cases (empty universes, single-asset portfolios, etc.).
-- Use small synthetic data (no network calls, no disk I/O) — mock or monkeypatch external dependencies.
-- Assert on **schema identity**: validate that engine outputs are valid `VersionedContract` instances with the expected `schema` field.
-- Never assert on float equality; use `pytest.approx` or `numpy.testing.assert_allclose` with an appropriate tolerance.
-- Do not import from `engine/` inside contract tests, and do not import from `contracts/` inside `io/` tests.
+Use `pytest` and keep tests architecture-aligned.
+
+### Test Layout (Mirror Source Tree)
+
+- Tests live under `tests/` and mirror source paths exactly.
+  - `bayesfolio/contracts/commands/features.py` → `tests/contracts/commands/test_features.py`
+  - `bayesfolio/engine/features/dataset_builder.py` → `tests/engine/features/test_dataset_builder.py`
+  - `bayesfolio/io/artifact_store.py` → `tests/io/test_artifact_store.py`
+- Naming conventions:
+  - file: `test_<module>.py`
+  - class: `Test<ClassName>` (optional)
+  - function: `test_<behavior>`
+
+### Layer-Safe Test Rules (STRICT)
+
+- Contract tests (`tests/contracts/**`):
+  - Validate schema identity (`schema` + `schema_version`) and `extra="forbid"` behavior.
+  - Do not import `engine` or `io`.
+- Engine tests (`tests/engine/**`):
+  - Test pure business logic only with synthetic in-memory DataFrames.
+  - Inject fakes/stubs for providers/stores; no file/network I/O in unit tests.
+  - Never call Yahoo/FRED/MLflow from engine tests.
+- IO tests (`tests/io/**`):
+  - Test persistence/fetch adapters and path/fingerprint behavior.
+  - Do not import engine business logic in IO tests.
+
+### Determinism and Numeric Assertions
+
+- Tests must be deterministic:
+  - set seeds explicitly for `random`, `numpy`, and `torch` when relevant.
+  - never rely on implicit global RNG state.
+- Never assert raw float equality; use `pytest.approx` or `numpy.testing.assert_allclose` with explicit tolerances.
+- Returns assertions must respect unit conventions (default: decimal, e.g. `0.02 = 2%`).
+
+### Runtime and External Dependency Policy
+
+- Keep unit tests fast and local-first.
+- No network calls and no dependency on external services.
+- Use small synthetic fixtures; prefer factory helpers over large fixture files.
+- Use `tmp_path` for filesystem tests and cleanly isolate side effects.
+
+### Execution Guidance
+
+- Run targeted tests first, then broader suite:
+  - `pytest tests/engine/features/test_dataset_builder.py -q`
+  - `pytest tests/contracts -q`
+  - `pytest -q`
 
 ---
 

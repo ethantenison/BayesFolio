@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "BayesFolio"
 version = "0.3.0"
-description = "BayesFolio is a research-driven Python framework for building forward-looking portfolios using Bayesian machine learning methods."
+description = "BayesFolio is a forward-looking portfolio builder that Bayesian machine learning methods."
 authors = ["ethantenison <tenison.ethan@gmail.com>"]
 readme = "README.md"
 
@@ -16,7 +16,6 @@ riskfolio-lib = "^7.0.1"
 mosek = "11.0.27"
 plotly = "6.3.0"
 seaborn = "^0.13.2"
-xgboost = "3.0.4"
 optuna = "4.6.0"
 torch = "2.10.0"
 gpytorch = "1.15.1"
@@ -53,5 +52,8 @@ python_classes = "Test*"
 python_functions = "test_*"
 addopts = [
     "--cov=bayesfolio",
-    "--cov-report=term-missing",
+]
+filterwarnings = [
+    'ignore:Field name "schema" in .* shadows an attribute in parent .*:UserWarning',
+    'ignore:distutils Version classes are deprecated\. Use packaging\.version instead\.:DeprecationWarning:pandas_datareader.compat',
 ]

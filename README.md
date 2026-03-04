@@ -1,6 +1,6 @@
 # BayesFolio
 
-BayesFolio is a research-driven Python framework for building forward-looking portfolios using Bayesian machine learning methods. It replaces purely historical optimization with predictive return distributions estimated via uncertainty-aware ML models, enabling scenario-based risk optimization and regime-aware allocation decisions.
+BayesFolio is a forward-looking portfolio builder that Bayesian machine learning methods. It replaces purely historical optimization with predictive return distributions estimated via uncertainty-aware ML models, enabling scenario-based risk optimization and regime-aware allocation decisions.
 
 ------------------------------------------------------------
 

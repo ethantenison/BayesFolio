@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from joblib import Parallel, delayed
 from pydantic import BaseModel
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 from bayesfolio.schemas.configs.core import TickerConfig, Interval, Horizon, CVConfig
 from bayesfolio.data.asset_prices import build_long_panel
 import numpy as np
@@ -71,27 +70,9 @@ mlflow.set_experiment(EXPERIMENT_NAME)
 warnings.filterwarnings("ignore")
 pd.options.display.float_format = '{:.3}'.format
 
-############### Experiment Configuration ###############
-
-description = "tracking experiments for march portfolio assets"
-
+############### Feature Preparation ###############
 """
-Setting the task matrix eigenvalues to see the effective dimensionality of the asset returns
-data = df[['date','asset_id', 'y_target']]
-
-# Pivot the dataframe to go from long to wide
-df_wide = data.pivot(index='date', columns='asset_id', values='y_target')
-
-# Reset index to make it a regular dataframe
-df_wide = df_wide.reset_index()
-df_wide = df_wide.iloc[:, 1:]
-
-cov = np.cov(df_wide.T)
-eigvals = np.linalg.eigvalsh(cov)[::-1]
-print(eigvals)
-print(np.cumsum(eigvals) / np.sum(eigvals))
-
-
+Feature preparation includes fetching raw data, engineering features, and merging into a final DataFrame for modeling.
 """
 
 
@@ -147,8 +128,8 @@ tickers = TickerConfig(
 )
 
 ############### Returns data ###############
-# return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
-# return_data.to_csv("20260228_etf_returns.csv", index=False)
+return_data = build_long_panel(tickers.tickers, tickers.lookback_date, tickers.end_date, horizon=tickers.horizon)
+return_data.to_csv("20260228_etf_returns.csv", index=False)
 return_data = pd.read_csv("20260228_etf_returns.csv")  # Updated to match the new filename
 return_data = return_data[~return_data['asset_id'].isin(assets_to_drop)]
 
@@ -168,14 +149,14 @@ fig = correlation_matrix(pivoted_returns)
 fig.show()
 
 # # # ############### Factor data ###############
-# macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
-# macro_features.to_csv("20260228_macro_features.csv", index=False)
+macro_features = fetch_enhanced_macro_features(start=tickers.lookback_date, end=tickers.end_date)
+macro_features.to_csv("20260228_macro_features.csv", index=False)
 macro_features = pd.read_csv("20260228_macro_features.csv")
 macro_features = macro_features.drop(columns=['vix_ts_level','vix3m','yc_pc1', 'yc_pc2', 'yc_pc3', 'y10_nominal' ])
 macro_cols = macro_features.columns[1:].tolist()
 
-# etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
-# etf_features.to_csv("20260228_etf_features.csv", index=False)
+etf_features = fetch_etf_features(tickers.tickers, tickers.lookback_date, tickers.end_date, tickers.horizon)
+etf_features.to_csv("20260228_etf_features.csv", index=False)
 etf_features = pd.read_csv("20260228_etf_features.csv")
 etf_features = etf_features[~etf_features['asset_id'].isin(assets_to_drop)]
 etf_features = etf_features.drop(columns=['ma_1m','ma_3m','vol_1w', 'price', 'overnight_gap'])
@@ -280,22 +261,23 @@ df = df.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(dr
 
 feature_cols = ['t_index'] + FEATURE_COLS
 
+######## Visualize Factors ########
+df = df[cols].copy()
+df_forecast = df[df['date'] > pd.Timestamp("2025-12-01")]
+df_forecast = df_forecast.reset_index(drop=True)
+df = df.dropna(subset=['y_excess_lead']).reset_index(drop=True)
+
+fig = correlation_matrix(df)
+fig.show()
+
+df.iloc[:, 2:].hist(bins=30, figsize=(20, 15))
 
 
-############### Preliminary XGBoost Variable Importance ###############
-# xgb_df = df.dropna().reset_index(drop=True)
-# X = xgb_df.drop(columns=['y_excess_lead', "date"]) # , "asset_id"
-# y = xgb_df[['y_excess_lead']]
-# X['asset_id'] = X['asset_id'].astype("category")
+############################### forecasting evaluation ##################################
+"""
+Forecasting evaluation entails preparing the data for modeling, defining the model and training procedure, and evaluating out-of-sample performance across different model configurations.
 
-# global_importance, interaction_fig = xgboost_variable_importance(X, y)
-# print("Global Importance:\n", global_importance)
-
-# interaction_fig.show()
-# px.bar(pd.DataFrame(global_importance).sort_values(by=0))
-
-
-############################### Game day dataset ##################################
+"""
 
 
 # === Build index lists ===
@@ -309,19 +291,8 @@ active_dims_e = [feature_cols.index(col) for col in etf_cols]
 # Macro features active dims
 active_dims_m = [feature_cols.index(col) for col in macro_cols]
 
-######## Visualize Factors ########
-# df = df[cols].copy()
-# #df.to_csv("marketmaven/datasets/20260228_tasks.csv", index=False)
-# df_forecast = df[df['date'] > pd.Timestamp("2025-12-01")]
-# df_forecast = df_forecast.reset_index(drop=True)
-# df = df.dropna(subset=['y_excess_lead']).reset_index(drop=True)
 
-# fig = correlation_matrix(df)
-# fig.show()
-
-# df.iloc[:, 2:].hist(bins=30, figsize=(20, 15))
-
-############### Data Preparation ###############
+############### ML Data Preparation ###############
 
 cv_config = CVConfig(
     step=1,
@@ -356,23 +327,11 @@ for tr_idx, te_idx in splits:
     test_dates = df.iloc[te_idx]['date'].unique().tolist()
     test_dates_splits.append(test_dates)
 
-risk_config = RiskfolioConfig(
-    model=OptModel.CLASSIC,
-    rm=RiskMeasure.CVaR,
-    obj=Objective.SHARPE,
-    method_mu=MuEstimator.EWMA2,
-    method_cov=CovEstimator.GERBER2,
-    nea=10
-
-)
 
 ############### Model Setup ###############
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
 
-
-# ard_num_dims = len(feature_cols)
-# active_dims_features = list(range(1, ard_num_dims + 1))
 
 train_idx_1_ahead = list(range(X.shape[0] - len(tickers.tickers)))
 test_idx_1_ahead = list(range(X.shape[0] - len(tickers.tickers), X.shape[0]))
@@ -412,6 +371,9 @@ class ExperimentConfig(BaseModel):
    
 
 #KERNEL GRID SEARCH
+"""
+The kernel grid defines the different kernel configurations to evaluate in the experiment. Each entry specifies a kernel type and its associated hyperparameters (e.g., smoothness for Matern kernels). The experiment will iterate over all combinations of these kernel configurations to find the best performing model.
+"""
 ETF_KERNEL_GRID = { 
     KernelType.MATERN:        [0.5],
 }
@@ -425,23 +387,21 @@ MACRO_KERNEL_GRID = {
 # Time kernels
 TIME_KERNEL_GRID = {
    KernelType.MATERN: [0.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
-   #KernelType.MATERN_LINEAR: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
-   #KernelType.PERIODIC_MATERN: [2.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
-    #KernelType.EXPONENTIAL_DECAY_MATERN: [1.5, 2.5],   
-    # KernelType.EXPONENTIAL_DECAY: [None],
-
+   KernelType.MATERN_LINEAR: [2.5],   # Matern 3/2 good for SPY, IJR, MGK, VTV
+   KernelType.PERIODIC_MATERN: [2.5],   # Matern 5/2 + periodic kinda good for SPY, IJR, MGK, VTV
 }
 
 
-RANK_GRID = [5]
-MEAN_F_GRID = [MeanF.MULTITASK_ZERO] #etf_mean_spec MeanF.MULTITASK_CONSTANT, 
+RANK_GRID = [4, 5]
+MEAN_F_GRID = [MeanF.MULTITASK_ZERO, MeanF.MULTITASK_CONSTANT] 
 
 
-
-# Best before leaving out extra : etf=matern_s=0.5_macro=maternlinearrq_s=0.5_time=periodicmatern_s=0.5
-# periodic smoothness doesn't so much matter, macro smoothness of 0.5 seems better. 
 
 def build_experiment_grid():
+    """
+    Build a list of all possible experiment configurations by combining different kernel types,
+    smoothness values, ranks, and mean functions.
+    """
     experiment_list = []
 
     for etf_k, etf_s_list in ETF_KERNEL_GRID.items():
@@ -464,7 +424,11 @@ def build_experiment_grid():
     return experiment_list
     
 experiment_grid = build_experiment_grid()
-############### Run ###############
+############### Run Forecasting Evaluation ###############
+"""
+The forecasting evaluation loop iterates over each experiment configuration defined in the grid, fits a multitask Gaussian Process model using the specified kernels and mean functions, and evaluates the out-of-sample performance. The results, including predictions and model configurations, are logged to MLFlow for later analysis and comparison.
+The evaluation includes: comparing long-short portfolios based on predicted returns, visualizing actual vs predicted returns, and analyzing model performance over time.Evaluating the top-k long-short portfolio performance is also done to provide a more reliable and stable measure. Metrics like sharpe, IC, and max drawdown are computed to assess the risk-adjusted returns and consistency of the model's predictions.
+"""
 seed = 27
 
 if mlflow.active_run() is not None:
@@ -823,230 +787,15 @@ for cfg in experiment_grid:
         plot_ls_cumulative_compare(ls_gpk, ls_meank, ls_ewmak, strategy="ls_topk")
 
 
-################################################### Get the predictions. 
+#########################Building the Final Portfolio ########################## 
 
-full_data = pd.read_csv("20260228_return_data.csv")
-full_data = full_data.loc[:, KEEP_COLS].copy()
-full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
-full_data['date'] = pd.to_datetime(full_data['date'])
-full_data = full_data[col_order]
-full_data['t_index'] = pd.factorize(full_data['date'])[0]
-cols = full_data.columns.tolist()       
-cols.insert(0, cols.pop(cols.index("t_index")))
-full_data = full_data[cols]
-full_data = full_data.sort_values(["date", "asset_id"], ascending=[True, True]).reset_index(drop=True)
-full_data = full_data[full_data['date'] > pd.Timestamp("2016-11-28")]
-
-full_train_data = full_data[full_data['date'] < pd.Timestamp("2026-02-27")].copy()
-full_test_data = full_data[full_data['date'] >= pd.Timestamp("2026-02-27")].copy()
-
-   
-X, I, y, task_map = prepare_multitask_gp_data(
-    full_train_data,
-    target_col="y_excess_lead",
-    asset_col="asset_id",
-    drop_cols=["date", "asset_id"],
-    dtype=torch.float32
-)
-
-
-cfg = experiment_grid[0]
-
-# Kernel 
-multiconfig = MultiTaskConfig(
-    num_tasks=len(tickers.tickers),
-    mean=cfg.mean_f,
-    rank=cfg.rank,
-    scaling="per_task",   
-    min_noise=5e-3,
-        )
-
-# Convert ExperimentConfig → your KernelConfig
-kernel_e = KernelConfig(
-    type=cfg.etf.type,
-    features=etf_cols,
-    active_dims=active_dims_e,
-    smoothness=cfg.etf.smoothness or 1.5,
-    gamma=1.2,
-    q=1,
-)
-
-kernel_m = KernelConfig(
-    type=cfg.macro.type,
-    features=macro_cols,
-    active_dims=active_dims_m,
-    smoothness=cfg.macro.smoothness or 1.5,
-    gamma=1.2,
-    q=1,
-)
-
-kernel_t = KernelConfig(
-    type=cfg.time.type,
-    features=[time_col],
-    active_dims=active_dims_t,
-    smoothness=cfg.time.smoothness or 1.5,
-    gamma=1.2,
-    q=1,
-    n_mixtures=1,
-)
-
-torch.manual_seed(seed)
-np.random.seed(seed)
-random.seed(seed)
-torch.use_deterministic_algorithms(True)
-
-
-# # ---- Scaling ----
-scaler = MultitaskScaler(scale_y="per_task", exclude_time_col=False)
-scaler.fit_x(X)
-X_trs = scaler.transform_x(X)
-y_trs = scaler.fit_y(y, I)
-
-# Append task index as last column
-X_trs = torch.cat([X_trs, I.to(X_trs.dtype)], dim=-1)
-X_trs = X_trs.to(device)
-y_trs = y_trs.to(device)
-# ---- Mean and Kernels ----
-mean_f = initialize_mean(
-    multiconfig.mean,
-    num_tasks=multiconfig.num_tasks,
-    input_size=X.shape[1],
-)
-
-# Periods
-n_months = len(np.unique(X.numpy()[:, 0]))
-
-# Kernels
-kernele = create_kernel_initialization(kernel_e, n_months)
-kernelm = create_kernel_initialization(kernel_m, n_months)
-kernelt = create_kernel_initialization(kernel_t, n_months)
-kernel_total = kernele + kernelm + kernelt + (kernelm + kernele) * kernelt
-
-# ---- Train model ----
-model, likelihood = train_model_hadamard(
-    X_trs,
-    y_trs,
-    rank=multiconfig.rank,
-    mean_f=mean_f,
-    kernel=kernel_total,
-    visualize=True,
-    dtype=torch.float32,
-    device=torch.device("cpu"),
-    min_noise=multiconfig.min_noise,
-    patience=50,
-)
-
-model_str = repr(model)
-
-######## Forecasting ###################
-full_test_data = full_test_data.reset_index(drop=True)
-X_t = full_test_data.copy()
-# move t
-X_t["__task_idx__"] = X_t['asset_id'].map(task_map)
-
-# Drop columns not used for training
-X_t = X_t.drop(columns=["date", "asset_id"], errors="ignore")
-feature_df = X_t.drop(columns=["__task_idx__", "y_excess_lead"], errors="ignore")
-x_np = feature_df.to_numpy()
-i_np = X_t["__task_idx__"].to_numpy().reshape(-1, 1)
-
-# Convert to tensors
-full_train_x = torch.tensor(x_np, dtype=torch.float32)
-full_train_i = torch.tensor(i_np, dtype=torch.float32)
-
-X_test = scaler.transform_x(full_train_x)
-X_test = torch.cat([X_test, full_train_i.to(X_test.dtype)], dim=-1)
-X_test = X_test.to(torch.device("cpu"))
-
-# ---- Predict ----
-model.eval()
-likelihood.eval()
-with torch.no_grad():
-    f_dist = model(X_test)
-    pred = likelihood(f_dist, X_test)
-
-y_hat = scaler.inverse_y(pred.mean, full_train_i)
-y_std = scaler.inverse_std(pred.variance.sqrt(), full_train_i)
-
-
-# Saving 
-asset_cols = list(task_map.keys())  # task_map assumed defined elsewhere
-# Reshape y_hat and y_std to match the number of assets in asset_cols
-y_hat = y_hat.reshape(-1, len(asset_cols))
-y_std = y_std.reshape(-1, len(asset_cols))
-
-preds_df = pd.DataFrame(y_hat, columns=[f"{c}_pred" for c in asset_cols])
-unc_df = pd.DataFrame(y_std, columns=[f"{c}_unc" for c in asset_cols])
-
-# Step 1 — rename columns to remove the "_pred" / "_unc" suffix
-preds = preds_df.rename(columns=lambda c: c.replace("_pred", ""))
-unc = unc_df.rename(columns=lambda c: c.replace("_unc", ""))
-
-# Step 2 — melt both to long format
-preds_long = preds.melt(var_name="asset", value_name="prediction")
-unc_long = unc.melt(var_name="asset", value_name="uncertainty")
-
-# Step 3 — merge into one long dataframe
-df_long = preds_long.merge(unc_long, on="asset")
-
-df_long["score"] = df_long["prediction"] / df_long["uncertainty"]
-df_sorted = df_long.sort_values("score", ascending=False)
-df_sorted.to_csv("20260228_gameday_predictions.csv", index=False)
-
-
-
-####plotting
-
-##### Task Rank Matrix #####
-
-model.eval()
-
-# Construct dummy inputs 0...num_tasks-1
-I = torch.arange(model.num_tasks)
-
-# True covariance matrix
-K = model.task_covar_module(I, I).to_dense().detach().cpu()
-
-# Convert to correlation
-diag = K.diag().sqrt().clamp_min(1e-12)
-corr = K / (diag.unsqueeze(1) * diag.unsqueeze(0))
-
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
-#✔ GP task correlations measure co-movement in predictive structure,
-#possibly need to use a separate kernel for fixed-income assets. or add MOVE index (you already have a proxy!)
-
-labels = list(task_map.keys())
-corr_df = pd.DataFrame(corr.numpy(), index=labels, columns=labels)
-
-plt.figure(figsize=(9, 7))
-sns.heatmap(corr_df, cmap="YlGnBu", annot=False, square=True)
-plt.title("MTGP Task Correlation Matrix (Correct)")
-plt.tight_layout()
-plt.show()
-
-
-########## TBDDDDDD Build Riskfolio ############
-
-
-########## Build Riskfolio ############
-risk_config = RiskfolioConfig(
-    model=OptModel.CLASSIC,
-    rm=RiskMeasure.CVaR,
-    obj=Objective.SHARPE,
-    method_mu=MuEstimator.EWMA2,
-    method_cov=CovEstimator.GERBER2,
-    nea=10
-
-)
 
 ###################################################
 # BASIC HISTORICAL PORTFOLIO  vs  GP-POSTERIOR (1M) CVaR PORTFOLIO
-# - Train MT Hadamard GP on full universe (including MGK/BND/BNDX)
+# - Train MT Hadamard GP on full universe
 # - Forecast next-month distribution for ONE rebalance date
 # - Sample posterior scenarios and optimize CVaR on those scenarios
-# - Exclude MGK/BND/BNDX ONLY at portfolio construction time
+# - Compare to basic historical portfolio optimized on past returns
 ###################################################
 
 import numpy as np
@@ -1056,6 +805,7 @@ import random
 import riskfolio as rp
 from IPython.display import display
 
+# These assets will be excluded from the portfolio optimization step, but can still be included in the GP training to help learn the relationships between assets.
 EXCLUDE = {"MGK", "BND", "BNDX"}
 device = torch.device("cpu")
 
@@ -1075,7 +825,7 @@ pivoted_returns = (
 final_pivoted_returns = pivoted_returns.drop(columns=[c for c in EXCLUDE if c in pivoted_returns.columns])
 
 # -----------------------------
-# 1) BASIC HISTORICAL PORTFOLIO (unchanged idea, but no percent-strings)
+# 1) BASIC HISTORICAL PORTFOLIO
 # -----------------------------
 risk_config = RiskfolioConfig(
     model=OptModel.CLASSIC,
@@ -1116,7 +866,7 @@ ax = rp.plot_pie(
     ax=None
 )
 
-# (Optional) efficient frontier for basic historical portfolio
+# Efficient frontier for basic historical portfolio
 mu_hist = port_hist.mu
 cov_hist = port_hist.cov
 returns_hist = port_hist.returns
@@ -1249,6 +999,7 @@ model, likelihood = train_model_hadamard(
     patience=50
 )
 
+
 # -----------------------------
 # 3) FORECAST ONE REBALANCE DATE -> FULL posterior mean/cov -> sample scenarios
 # -----------------------------
@@ -1325,6 +1076,96 @@ scen = mv.sample((n_scen,)).numpy()
 scenario_returns = pd.DataFrame(scen, columns=asset_order)
 scenario_returns.to_csv("20260228_gp_posterior_scenarios.csv", index=False)
 
+
+###### Store predictions, uncertainty, and generate an asset score for portfolio construction #######
+asset_cols = list(task_map.keys())  # task_map assumed defined elsewhere
+X_t["__task_idx__"] = X_t['asset_id'].map(task_map)
+
+# Drop columns not used for training
+X_t = X_t.drop(columns=["date", "asset_id"], errors="ignore")
+feature_df = X_t.drop(columns=["__task_idx__", "y_excess_lead"], errors="ignore")
+x_np = feature_df.to_numpy()
+i_np = X_t["__task_idx__"].to_numpy().reshape(-1, 1)
+
+# Convert to tensors
+full_train_x = torch.tensor(x_np, dtype=torch.float32)
+full_train_i = torch.tensor(i_np, dtype=torch.float32)
+
+X_test = scaler.transform_x(full_train_x)
+X_test = torch.cat([X_test, full_train_i.to(X_test.dtype)], dim=-1)
+X_test = X_test.to(torch.device("cpu"))
+
+# ---- Predict ----
+model.eval()
+likelihood.eval()
+with torch.no_grad():
+    f_dist = model(X_test)
+    pred = likelihood(f_dist, X_test)
+
+y_hat = scaler.inverse_y(pred.mean, full_train_i)
+y_std = scaler.inverse_std(pred.variance.sqrt(), full_train_i)
+
+
+# Saving 
+asset_cols = list(task_map.keys())  # task_map assumed defined elsewhere
+# Reshape y_hat and y_std to match the number of assets in asset_cols
+y_hat = y_hat.reshape(-1, len(asset_cols))
+y_std = y_std.reshape(-1, len(asset_cols))
+
+preds_df = pd.DataFrame(y_hat, columns=[f"{c}_pred" for c in asset_cols])
+unc_df = pd.DataFrame(y_std, columns=[f"{c}_unc" for c in asset_cols])
+
+# Step 1 — rename columns to remove the "_pred" / "_unc" suffix
+preds = preds_df.rename(columns=lambda c: c.replace("_pred", ""))
+unc = unc_df.rename(columns=lambda c: c.replace("_unc", ""))
+
+# Step 2 — melt both to long format
+preds_long = preds.melt(var_name="asset", value_name="prediction")
+unc_long = unc.melt(var_name="asset", value_name="uncertainty")
+
+# Step 3 — merge into one long dataframe
+df_long = preds_long.merge(unc_long, on="asset")
+
+df_long["score"] = df_long["prediction"] / df_long["uncertainty"]
+df_sorted = df_long.sort_values("score", ascending=False)
+df_sorted.to_csv("20260228_gameday_predictions.csv", index=False)
+
+
+
+# Task Rank Matrix #####
+"""
+The task rank matrix is visualized to see how the model is learning to share information across tasks.
+In a multitask GP, the rank of the task covariance matrix can indicate how many latent factors are being used to explain the relationships between tasks. 
+Visualizing this matrix can help diagnose whether the model is effectively leveraging shared information or if it's treating tasks as mostly independent.
+"""
+
+model.eval()
+
+# Construct dummy inputs 0...num_tasks-1
+I = torch.arange(model.num_tasks)
+
+# True covariance matrix
+K = model.task_covar_module(I, I).to_dense().detach().cpu()
+
+# Convert to correlation
+diag = K.diag().sqrt().clamp_min(1e-12)
+corr = K / (diag.unsqueeze(1) * diag.unsqueeze(0))
+
+import seaborn as sns
+import pandas as pd
+import matplotlib.pyplot as plt
+#✔ GP task correlations measure co-movement in predictive structure,
+#possibly need to use a separate kernel for fixed-income assets. or add MOVE index (you already have a proxy!)
+
+labels = list(task_map.keys())
+corr_df = pd.DataFrame(corr.numpy(), index=labels, columns=labels)
+
+plt.figure(figsize=(9, 7))
+sns.heatmap(corr_df, cmap="YlGnBu", annot=False, square=True)
+plt.title("MTGP Task Correlation Matrix (Correct)")
+plt.tight_layout()
+plt.show()
+
 # -----------------------------
 # 4) RISKFOLIO ON GP POSTERIOR SCENARIOS (CVaR uses uncertainty via scenarios)
 # -----------------------------
@@ -1373,6 +1214,10 @@ display(w_compare.T)
 w_compare.to_csv("20260228_weights_hist_vs_gp.csv")
 
 
+"""
+These are some additional diagnostics to understand the model's behavior and the data characteristics before finalizing the portfolio construction.
+
+"""
 ################### Determining if the rank is good enough. 
 K = model.task_covar_module(I, I).to_dense().detach().cpu()
 d = torch.sqrt(torch.diag(K)).clamp_min(1e-12)
