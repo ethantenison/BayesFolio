@@ -1,6 +1,10 @@
 __pycache__/
 *.pyc
 .DS_Store
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
 
 mlflow.db
 

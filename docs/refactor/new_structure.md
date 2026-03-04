@@ -24,7 +24,6 @@
 - Each `VersionedContract` subclass overrides `schema` with `Field(default=SchemaName.X, const=True)`.
 - This enforces identity at the boundary: no contract can be deserialized under the wrong schema name.
 - Versioning is embedded in `schema_version` (semver string, e.g., `"0.1.0"`).
-- No `/v1/` folder versioning is used — version is a field, not a path segment.
 
 ## Return Units Convention
 
