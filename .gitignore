@@ -6,6 +6,11 @@ __pycache__/
 htmlcov/
 .pytest_cache/
 
+# High-churn local artifacts
+artifacts/
+*.parquet
+*.parquet.meta.json
+
 mlflow.db
 
 scratch/
