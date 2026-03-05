@@ -28,3 +28,7 @@ Never mix decimal and percent-point units implicitly.
 Feature rows used for prediction at time `t` must only contain information available before `t`.
 Apply predictor lagging (`t-1`) in engine feature transforms, and keep `y_excess_lead` as the target outcome
 at `t` (next-period excess return label).
+
+## Package Map
+
+For a concise ownership map and public entry-point index, see `docs/package_map.md`.

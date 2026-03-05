@@ -4,6 +4,22 @@ BayesFolio aims to be an AI-powered portfolio optimization platform.
 
 These instructions are **STRICT**. Generated code must follow them.
 
+## Documentation Source of Truth (Anti-Duplication)
+
+To keep maintenance cost low, use this split:
+
+- Keep this file (`.github/copilot-instructions.md`) for **normative rules only**
+  (must/must-not constraints for architecture, typing, testing, and units).
+- Keep package/component descriptions and entry-point maps in
+  `docs/package_map.md`.
+- Keep architecture rationale and guardrails in `docs/copilot_architecture.md`.
+
+When adding or changing functionality:
+
+- Update this file only if a **rule** changes.
+- Update docs files if **structure, ownership, or public entry points** change.
+- Do not duplicate long package maps or explanatory prose in this file.
+
 ---
 
 ## Language & Style
