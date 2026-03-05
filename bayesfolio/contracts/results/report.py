@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import Field
 
 from bayesfolio.contracts.base import SchemaName, VersionedContract
+from bayesfolio.contracts.results.features import MarketStructureDiagnostics
 
 
 class ArtifactPointer(VersionedContract):
@@ -31,9 +32,11 @@ class ReportResult(VersionedContract):
     Attributes:
         headline_metrics: Key performance metrics as decimals.
         artifacts: List of artifact pointers for charts and data exports.
+        market_structure: Optional model-free feature-dataset diagnostics.
     """
 
     schema: Literal[SchemaName.REPORT_RESULT] = SchemaName.REPORT_RESULT
     schema_version: Literal["0.1.0"] = "0.1.0"
     headline_metrics: dict[str, float] = Field(default_factory=dict)
     artifacts: list[ArtifactPointer] = Field(default_factory=list)
+    market_structure: MarketStructureDiagnostics | None = None

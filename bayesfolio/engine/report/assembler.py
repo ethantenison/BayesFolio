@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 from bayesfolio.contracts.results.backtest import BacktestResult
+from bayesfolio.contracts.results.features import FeaturesDatasetResult
 from bayesfolio.contracts.results.report import ReportResult
 
 
-def assemble_report(backtest_result: BacktestResult) -> ReportResult:
+def assemble_report(
+    backtest_result: BacktestResult,
+    features_result: FeaturesDatasetResult | None = None,
+) -> ReportResult:
     """Build report result from a backtest result."""
 
     return ReportResult(
@@ -14,4 +18,5 @@ def assemble_report(backtest_result: BacktestResult) -> ReportResult:
             "annualized_volatility": backtest_result.annualized_volatility,
             "sharpe_ratio": backtest_result.sharpe_ratio,
         },
+        market_structure=features_result.market_structure if features_result is not None else None,
     )

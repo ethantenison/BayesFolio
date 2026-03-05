@@ -188,15 +188,6 @@ def build_features_dataset(
     artifact_name = command.artifact_name or (
         f"features_dataset_{command.start_date.isoformat()}_{command.end_date.isoformat()}.parquet"
     )
-    metadata = {
-        "command": command.model_dump(mode="json"),
-        "diagnostics": diagnostics,
-        "columns": output_cols,
-    }
-    artifact = artifact_store.save_parquet(dataset, artifact_name=artifact_name, metadata=metadata)
-
-    index_info = _build_index_info(dataset, command)
-    column_specs = _build_column_specs(dataset.columns.tolist(), selected_etf_cols, selected_macro_cols)
     feature_cols = [
         *selected_etf_cols,
         *selected_macro_cols,
@@ -207,6 +198,17 @@ def build_features_dataset(
         feature_cols=feature_cols,
         target_missing_rate_before_drop=target_missing_rate_before_drop,
     )
+
+    metadata = {
+        "command": command.model_dump(mode="json"),
+        "diagnostics": diagnostics,
+        "columns": output_cols,
+        "market_structure": market_structure.model_dump(mode="json"),
+    }
+    artifact = artifact_store.save_parquet(dataset, artifact_name=artifact_name, metadata=metadata)
+
+    index_info = _build_index_info(dataset, command)
+    column_specs = _build_column_specs(dataset.columns.tolist(), selected_etf_cols, selected_macro_cols)
 
     return FeaturesDatasetResult(
         artifact=artifact,

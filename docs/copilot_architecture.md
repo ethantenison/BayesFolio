@@ -32,3 +32,24 @@ at `t` (next-period excess return label).
 ## Package Map
 
 For a concise ownership map and public entry-point index, see `docs/package_map.md`.
+
+## Assembler vs Mapper Boundary
+
+Use this rule to separate responsibilities inside `engine/`:
+
+- **Assembler (`engine/report/assembler.py`)**:
+	- Composes one or more engine outputs into a report-shaped engine payload.
+	- May select and combine values from multiple engine-domain results (for example,
+		backtest metrics plus feature diagnostics).
+	- Must stay pure: no file/network I/O and no persistence side effects.
+
+- **Mapper (`engine/mappers/report.py`)**:
+	- Translates between boundary contracts and engine call signatures/results.
+	- Should only perform schema/field mapping (rename/re-shape/default handling),
+		not cross-domain composition logic.
+
+Practical guidance:
+
+- If logic answers "what goes into the report," put it in the assembler.
+- If logic answers "how this contract maps to/from engine args/results," put it
+	in a mapper.

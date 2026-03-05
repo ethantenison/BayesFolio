@@ -151,6 +151,11 @@ def test_build_features_dataset_happy_path(sample_frames: tuple[pd.DataFrame, pd
     assert result.market_structure.asset_count == 2
     assert result.market_structure.target_summary.count == 6
     assert artifact_store.saved_frame is not None
+    assert artifact_store.saved_metadata is not None
+    assert "market_structure" in artifact_store.saved_metadata
+    market_structure_metadata = artifact_store.saved_metadata["market_structure"]
+    assert isinstance(market_structure_metadata, dict)
+    assert market_structure_metadata["asset_count"] == 2
 
     saved = artifact_store.saved_frame
     assert saved.columns[0] == "t_index"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import date
 from pathlib import Path
 
@@ -129,6 +130,11 @@ def test_feature_preparation_workflow_via_new_pipeline(tmp_path: Path) -> None:
 
     saved_path = tmp_path / "features_workflow_test.parquet"
     assert saved_path.exists()
+    meta_path = tmp_path / "features_workflow_test.parquet.meta.json"
+    assert meta_path.exists()
+
+    metadata_payload = json.loads(meta_path.read_text(encoding="utf-8"))
+    assert metadata_payload["metadata"]["market_structure"]["date_count"] == 3
 
     frame = pd.read_parquet(saved_path)
     assert "t_index" in frame.columns

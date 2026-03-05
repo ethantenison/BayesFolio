@@ -68,6 +68,16 @@ All generated code MUST pass linting.
 - Provide `seed` in configs where relevant
 - Avoid nondeterministic ops unless explicitly justified
 
+### Pylance Quality Gate (STRICT)
+
+- Generated/modified Python code must be **Pylance-clean** in edited files.
+- After edits, validate diagnostics in touched files before finalizing.
+- Prefer fixing root typing issues (narrowing, casts, typed helpers) over suppressions.
+- Avoid blanket `# type: ignore` usage; if unavoidable, use the narrowest code and explain why.
+- Keep workspace analysis focused on maintained code paths:
+  - include `bayesfolio/` and `tests/`
+  - exclude experimental folders (`experiments/`, `scratch/`) from default type-check scope
+
 ---
 
 ## Architecture Rules (STRICT)
@@ -124,6 +134,19 @@ Engine submodules (`agent`, `asset_allocation`, `backtest`, `features`, `forecas
 - Commands go in `contracts/commands/`, results in `contracts/results/`, UI inputs in `contracts/ui/`.
 - Use canonical primitive types from `core/types.py` (`Ticker`, `Weight`, `HorizonDays`, `ReturnDecimal`) wherever applicable.
 - Schema models are **data-only**: no methods with side effects, no imports from `engine/` or `io/`.
+
+### Schema Documentation Rules (STRICT)
+
+- Every contract/schema class must include a Google-style docstring with an `Attributes:` section.
+- The `Attributes:` section must document **every public field** defined on that class.
+- Field documentation must include, when applicable:
+  - units (especially returns: decimal vs percent points)
+  - allowed literals/enums
+  - nullability/optional semantics
+  - shape expectations for arrays/tables
+- For nested schema fields, state what nested contract is expected and its role.
+- Keep attribute docs concise and schema-specific; avoid boilerplate text.
+- When a schema field is renamed/added/removed, update the class docstring in the same change.
 
 ---
 

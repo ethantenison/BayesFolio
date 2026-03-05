@@ -81,3 +81,26 @@ def test_parquet_artifact_store_uses_root_uri_env(monkeypatch, tmp_path: Path) -
     expected_path = tmp_path / "artifacts" / "features" / "features_env.parquet"
     assert expected_path.exists()
     assert pointer.uri == expected_path.as_uri()
+
+
+def test_parquet_artifact_store_persists_nested_market_structure_metadata() -> None:
+    backend = FakeBackend()
+    store = ParquetArtifactStore(base_dir="features", backend=backend)
+
+    pointer = store.save_parquet(
+        frame=_sample_frame(),
+        artifact_name="features_with_diagnostics",
+        metadata={
+            "market_structure": {
+                "asset_count": 2,
+                "date_count": 2,
+                "target_summary": {"count": 2, "mean": 0.015},
+            }
+        },
+    )
+
+    assert pointer.uri == "memory://features/features_with_diagnostics.parquet"
+    metadata_key = "features/features_with_diagnostics.parquet.meta.json"
+    metadata_payload = json.loads(backend.payloads[metadata_key].decode("utf-8"))
+    assert metadata_payload["metadata"]["market_structure"]["asset_count"] == 2
+    assert metadata_payload["metadata"]["market_structure"]["target_summary"]["count"] == 2

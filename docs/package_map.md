@@ -27,8 +27,8 @@ or public entry points change.
 - `engine/asset_allocation/`: portfolio optimization logic
 - `engine/backtest/`: backtest execution and performance summaries
 - `engine/scenarios/`: scenario sampling from predictive distributions
-- `engine/report/`: report payload assembly
-- `engine/mappers/`: contract ↔ engine mapping bridge (intentional exception)
+- `engine/report/`: report payload assembly/composition from engine outputs (no I/O)
+- `engine/mappers/`: contract ↔ engine field mapping bridge (no business orchestration)
 
 ## IO Subpackages
 
