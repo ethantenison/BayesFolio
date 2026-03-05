@@ -24,55 +24,15 @@ BayesFolio is evolving toward an Agentic AI-powered portfolio optimization platf
 
 ------------------------------------------------------------
 
-## Current Capabilities
-
-### Gaussian Process Modeling
-
-- MultiTask GP implementation
-- Heteroskedastic task noise modeling
-- Per-task or global scaling options
-- Rank-controlled task covariance structure
-- Feature-conditioned predictive distributions
-
-### Intelligent Modeling Workflow
-
-- Rolling time-series cross-validation
-- Kernel grid search and selection
-- Intelligent feature grouping (macro vs ETF-specific)
-- Diagnostic evaluation tools
-
-### Posterior Scenario Generation
-
-- Full posterior mean and covariance extraction
-- Joint sampling from predictive distribution
-- Scenario-based optimization integration
-
-### Portfolio Optimization
-
-- Integration with Riskfolio
-- CVaR optimization on GP posterior scenarios
-- Comparison against traditional historical portfolios
-- Long/short and top-k evaluation workflows
-
-### Evaluation & Diagnostics
-
-- Out-of-sample R² metrics
-- Long-short performance tracking
-- Task covariance inspection
-- Portfolio weight comparison tools
-
-
-------------------------------------------------------------
-
-## Architecture Overview
+## Workflow Overview
 
     Market Data
         ↓
     Feature Engineering
         ↓
-    Multitask GP
+    Build Forecasting Model
         ↓
-    Posterior Mean & Covariance
+    Generate Posterior Mean & Covariance
         ↓
     Scenario Sampling
         ↓
