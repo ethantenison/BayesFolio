@@ -4,6 +4,7 @@ Module for fetching fundamental financial data for assets.
 """
 
 import io
+import os
 import sys
 from typing import Any, Literal, cast
 
@@ -11,6 +12,7 @@ import numpy as np
 import pandas as pd
 import pandas_datareader.data as pdr
 import yfinance as yf
+from pandas_datareader.fred import FredReader
 from sklearn.decomposition import PCA
 
 from bayesfolio.core.settings import Horizon, Interval
@@ -22,6 +24,25 @@ except Exception:
     te = None
 
 import requests
+
+FRED_TIMEOUT_SECONDS = float(os.getenv("BAYESFOLIO_FRED_TIMEOUT_SECONDS", "30"))
+FRED_RETRY_COUNT = int(os.getenv("BAYESFOLIO_FRED_RETRY_COUNT", "1"))
+FRED_RETRY_PAUSE_SECONDS = float(os.getenv("BAYESFOLIO_FRED_RETRY_PAUSE_SECONDS", "0.1"))
+
+
+def _read_fred(symbols: str | list[str], start: str, end: str | None) -> pd.DataFrame:
+    """Read FRED series with configurable timeout/retry behavior."""
+
+    reader = FredReader(
+        symbols=symbols,
+        start=start,
+        end=end,
+        retry_count=FRED_RETRY_COUNT,
+        pause=FRED_RETRY_PAUSE_SECONDS,
+        timeout=FRED_TIMEOUT_SECONDS,
+    )
+    data = reader.read()
+    return cast(pd.DataFrame, data)
 
 
 def _download_frame(*args: Any, **kwargs: Any) -> pd.DataFrame:
@@ -101,7 +122,7 @@ def fetch_global_yields(
     def _fred_one(symbols: list[str]):
         for sym in symbols:
             try:
-                s = pdr.DataReader(sym, "fred", start, end)[sym]
+                s = _read_fred(sym, start=start, end=end)[sym]
                 s = s / 100.0
                 s.index = pd.to_datetime(s.index)
                 _log(f"FRED ok for {sym}")
@@ -661,22 +682,40 @@ def fetch_yield_curve_pcs(start="2010-01-01", end=None, horizon: Horizon = Horiz
         except Exception:
             continue
 
-    if not cols:
-        # fallback: fetch from FRED
-        fred_data = {label: pdr.DataReader(tk, "fred", start, end) for tk, label in tickers_fred.items()}
-        df = pd.concat(fred_data.values(), axis=1)
-        df.columns = tickers_fred.values()
-    else:
+    if cols:
         df = pd.concat(cols, axis=1)
+    else:
+        # Fallback: fetch from FRED symbol-by-symbol so one timeout does not
+        # fail the entire yield-curve feature block.
+        fred_cols: list[pd.Series] = []
+        for tk, label in tickers_fred.items():
+            try:
+                series_df = _read_fred(tk, start=start, end=end)
+                if tk not in series_df.columns:
+                    continue
+                series = series_df[tk].rename(label)
+                fred_cols.append(series)
+            except Exception:
+                continue
+
+        if not fred_cols:
+            msg = "No yield-curve series available from Yahoo or FRED."
+            raise RuntimeError(msg)
+
+        df = pd.concat(fred_cols, axis=1)
 
     df = df.dropna().resample(horizon).last()
+
+    if df.empty or df.shape[1] == 0:
+        msg = "Yield-curve series are unavailable after alignment/resampling."
+        raise RuntimeError(msg)
 
     # PCA
     pca = PCA(n_components=min(n_components, df.shape[1]))
     pcs = pca.fit_transform(df.values)
     pcs_df = pd.DataFrame(pcs, index=df.index, columns=[f"yc_pc{i + 1}" for i in range(pcs.shape[1])])
 
-    return pcs_df.reset_index().rename(columns={"DATE": "date"})
+    return pcs_df.reset_index().rename(columns={"index": "date", "DATE": "date"})
 
 
 def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
@@ -713,7 +752,7 @@ def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Hor
     df = None
     for fred_code, colname in fred_series:
         try:
-            raw = pdr.DataReader(fred_code, "fred", start, end)
+            raw = _read_fred(fred_code, start=start, end=end)
             raw = raw.rename(columns={fred_code: colname})
             # Convert basis points → decimals
             raw[colname] = raw[colname] / 100.0
@@ -751,7 +790,7 @@ def fetch_earnings_yield(start, end, horizon):
     """
 
     try:
-        cape = pdr.DataReader("CAPE", "fred", start, end)  # Shiller PE
+        cape = _read_fred("CAPE", start=start, end=end)  # Shiller PE
         cape = cape.resample(horizon).last().dropna()
         cape["earnings_yield"] = 1.0 / cape["CAPE"]
         df = cape[["earnings_yield"]].reset_index().rename(columns={"index": "date", "DATE": "date", "Date": "date"})
@@ -762,7 +801,7 @@ def fetch_earnings_yield(start, end, horizon):
 
 def fetch_cpi_inflation(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
 
-    cpi = pdr.DataReader("CPIAUCSL", "fred", start, end)  # headline CPI level
+    cpi = _read_fred("CPIAUCSL", start=start, end=end)  # headline CPI level
     cpi = cpi.resample(horizon).last().dropna()  # monthly
 
     cpi["cpi_yoy"] = cpi["CPIAUCSL"].pct_change(12)
@@ -797,7 +836,10 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     cred_df = fetch_credit_spread(start=start, end=end, horizon=horizon)
     # tbill_df = fetch_tbill_rate(start=start, end=end, horizon=horizon)
     dxy_df = fetch_dxy(start=start, end=end, horizon=horizon)
-    yc_df = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
+    try:
+        yc_df = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
+    except Exception:
+        yc_df = pd.DataFrame(columns=["date", "yc_pc1", "yc_pc2", "yc_pc3"])
 
     # Merge on date
     dfs = [vix_df, term_df, cred_df, dxy_df, yc_df]  # tbill_df,
@@ -930,7 +972,6 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
 
     import numpy as np
     import pandas as pd
-    import pandas_datareader.data as pdr
 
     from bayesfolio.engine.features.asset_prices import fetch_etf_features
 
@@ -1051,7 +1092,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     # 5. ACM term premium (FRED)
     # ------------------------------------------------------------
     try:
-        acm = pdr.DataReader("TE10", "fred", start, end)
+        acm = _read_fred("TE10", start=start, end=end)
         acm = acm.resample(horizon).last().rename(columns={"TE10": "term_premium"})
         acm_df = acm.reset_index().rename(columns={"index": "date"})
     except Exception:
