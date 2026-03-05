@@ -1,4 +1,5 @@
 from math import log
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,6 +8,8 @@ import plotly.express as px
 from scipy.stats import lognorm
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+
+from bayesfolio.contracts.results.features import FeaturesDatasetResult, HistogramDiagnostics
 
 
 def correlation_matrix(data: pd.DataFrame, title: str = "Correlation Heatmap"):
@@ -28,6 +31,92 @@ def correlation_matrix(data: pd.DataFrame, title: str = "Correlation Heatmap"):
     )
 
     fig.update_layout(width=800, height=800)
+    return fig
+
+
+def build_feature_diagnostic_figures(features_result: FeaturesDatasetResult) -> dict[str, Any]:
+    """Build feature diagnostic figures from feature dataset result diagnostics.
+
+    Args:
+        features_result: Built feature dataset contract containing optional
+            market structure diagnostics.
+
+    Returns:
+        Dictionary of Plotly figures keyed by diagnostic name. Returns an empty
+        dictionary when market structure diagnostics are unavailable.
+    """
+
+    market_structure = features_result.market_structure
+    if market_structure is None:
+        return {}
+
+    figures: dict[str, Any] = {}
+
+    feature_target_fig = _correlation_heatmap_from_nested_matrix(
+        matrix=market_structure.feature_target_correlation_matrix,
+        title="Feature/Target Correlation Heatmap",
+    )
+    if feature_target_fig is not None:
+        figures["feature_target_correlation_heatmap"] = feature_target_fig
+
+    pivoted_returns_fig = _correlation_heatmap_from_nested_matrix(
+        matrix=market_structure.pivoted_returns_correlation_matrix,
+        title="Pivoted Returns Correlation Heatmap",
+    )
+    if pivoted_returns_fig is not None:
+        figures["pivoted_returns_correlation_heatmap"] = pivoted_returns_fig
+
+    target_histogram_fig = _target_histogram_from_diagnostics(
+        histogram=market_structure.target_histogram,
+        title="Target Return Histogram",
+    )
+    if target_histogram_fig is not None:
+        figures["target_histogram"] = target_histogram_fig
+
+    return figures
+
+
+def _correlation_heatmap_from_nested_matrix(
+    matrix: dict[str, dict[str, float]],
+    title: str,
+):
+    if not matrix:
+        return None
+
+    corr_matrix = pd.DataFrame.from_dict(matrix, orient="index").fillna(0.0)
+    corr_matrix = corr_matrix.sort_index(axis=0).sort_index(axis=1)
+
+    fig = px.imshow(
+        corr_matrix,
+        labels={"color": "Correlation"},
+        x=corr_matrix.columns,
+        y=corr_matrix.index,
+        color_continuous_scale="RdYlBu",
+        title=title,
+        zmin=-1,
+        zmax=1,
+    )
+    fig.update_layout(width=800, height=800)
+    return fig
+
+
+def _target_histogram_from_diagnostics(
+    histogram: HistogramDiagnostics,
+    title: str,
+):
+    if not histogram.counts or len(histogram.bin_edges) != (len(histogram.counts) + 1):
+        return None
+
+    bin_edges = np.array(histogram.bin_edges, dtype=float)
+    bin_mids = ((bin_edges[:-1] + bin_edges[1:]) / 2.0).tolist()
+
+    fig = px.bar(
+        x=bin_mids,
+        y=histogram.counts,
+        labels={"x": "y_excess_lead (decimal)", "y": "Count"},
+        title=title,
+    )
+    fig.update_layout(width=800, height=500)
     return fig
 
 

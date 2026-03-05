@@ -6,9 +6,10 @@ from pathlib import Path
 import pandas as pd
 
 from bayesfolio.contracts.base import Meta
-from bayesfolio.contracts.results.report import ArtifactPointer
-from bayesfolio.io.artifacts import save_dataframe_csv, save_json_contract
+from bayesfolio.contracts.results.report import ArtifactPointer, ReportResult
+from bayesfolio.io.artifacts import save_dataframe_csv, save_json_contract, save_plotly_figure_html
 from bayesfolio.io.parquet_store import write_parquet_with_metadata
+from bayesfolio.io.report_artifacts import persist_report_diagnostic_figures
 
 
 class FakeBackend:
@@ -23,6 +24,17 @@ class FakeBackend:
 
     def exists(self, key: str) -> bool:
         return key in self.payloads
+
+
+class FakeFigure:
+    def __init__(self, text: str) -> None:
+        self._text = text
+
+    def to_html(self, *, full_html: bool, include_plotlyjs: str) -> str:
+        return (
+            f"<html><head><title>{include_plotlyjs}</title></head>"
+            f"<body data-full='{full_html}'>{self._text}</body></html>"
+        )
 
 
 def _sample_frame() -> pd.DataFrame:
@@ -87,3 +99,43 @@ def test_write_parquet_with_metadata_absolute_path_is_backward_compatible(tmp_pa
 
     assert output_path.exists()
     assert pointer.path == output_path.as_uri()
+
+
+def test_save_plotly_figure_html_uses_backend_factory() -> None:
+    backend = FakeBackend()
+
+    pointer = save_plotly_figure_html(
+        figure=FakeFigure("diagnostic"),
+        output_path="reports/diagnostic.html",
+        backend=backend,
+    )
+
+    assert pointer.path == "memory://reports/diagnostic.html"
+    assert pointer.artifact_format == "html"
+    assert pointer.byte_size > 0
+    assert "reports/diagnostic.html" in backend.payloads
+
+
+def test_persist_report_diagnostic_figures_appends_artifacts() -> None:
+    backend = FakeBackend()
+    base_report = {
+        "headline_metrics": {"sharpe_ratio": 0.5},
+        "market_structure": None,
+        "diagnostic_figures": [],
+    }
+
+    report_result = ReportResult(**base_report)
+    updated = persist_report_diagnostic_figures(
+        report_result=report_result,
+        figures={
+            "feature_target_correlation_heatmap": FakeFigure("heatmap"),
+            "target_histogram": FakeFigure("hist"),
+        },
+        output_dir="reports/diagnostics",
+        backend=backend,
+    )
+
+    assert len(updated.artifacts) == 2
+    paths = [artifact.path for artifact in updated.artifacts]
+    assert "memory://reports/diagnostics/feature_target_correlation_heatmap.html" in paths
+    assert "memory://reports/diagnostics/target_histogram.html" in paths

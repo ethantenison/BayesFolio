@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from bayesfolio.contracts.base import SchemaName, VersionedContract
+from bayesfolio.contracts.base import ContractModel, SchemaName, VersionedContract
 from bayesfolio.contracts.results.features import MarketStructureDiagnostics
 
 
@@ -26,6 +26,20 @@ class ArtifactPointer(VersionedContract):
     byte_size: int = Field(ge=0)
 
 
+class DiagnosticFigureSummary(ContractModel):
+    """Metadata summary for a generated report diagnostic figure.
+
+    Attributes:
+        name: Stable figure identifier key.
+        title: Human-readable figure title.
+        trace_count: Number of traces in the generated figure.
+    """
+
+    name: str
+    title: str
+    trace_count: int = Field(ge=0)
+
+
 class ReportResult(VersionedContract):
     """Final report payload with metrics and artifact pointers.
 
@@ -33,6 +47,7 @@ class ReportResult(VersionedContract):
         headline_metrics: Key performance metrics as decimals.
         artifacts: List of artifact pointers for charts and data exports.
         market_structure: Optional model-free feature-dataset diagnostics.
+        diagnostic_figures: Metadata for generated diagnostic visualizations.
     """
 
     schema: Literal[SchemaName.REPORT_RESULT] = SchemaName.REPORT_RESULT
@@ -40,3 +55,4 @@ class ReportResult(VersionedContract):
     headline_metrics: dict[str, float] = Field(default_factory=dict)
     artifacts: list[ArtifactPointer] = Field(default_factory=list)
     market_structure: MarketStructureDiagnostics | None = None
+    diagnostic_figures: list[DiagnosticFigureSummary] = Field(default_factory=list)

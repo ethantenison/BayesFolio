@@ -8,6 +8,7 @@ from bayesfolio.contracts.results.features import (
     CrossSectionalBreadthDiagnostics,
     FeatureQualityDiagnostics,
     FeaturesDatasetResult,
+    HistogramDiagnostics,
     IndexInfo,
     MarketStructureDiagnostics,
     TargetSummaryDiagnostics,
@@ -41,6 +42,18 @@ def _sample_features_result() -> FeaturesDatasetResult:
             median_assets_per_date=2.0,
             max_assets_per_date=2,
         ),
+        feature_target_correlation_matrix={
+            "y_excess_lead": {"y_excess_lead": 1.0, "mom12m": 0.25},
+            "mom12m": {"y_excess_lead": 0.25, "mom12m": 1.0},
+        },
+        pivoted_returns_correlation_matrix={
+            "AAA": {"AAA": 1.0, "BBB": 0.15},
+            "BBB": {"AAA": 0.15, "BBB": 1.0},
+        },
+        target_histogram=HistogramDiagnostics(
+            bin_edges=[-0.02, -0.01, 0.0, 0.01],
+            counts=[1, 2, 3],
+        ),
     )
 
     return FeaturesDatasetResult(
@@ -71,6 +84,7 @@ def test_assemble_report_headline_metrics_only() -> None:
     assert report.headline_metrics["annualized_volatility"] == 0.12
     assert report.headline_metrics["sharpe_ratio"] == 0.67
     assert report.market_structure is None
+    assert report.diagnostic_figures == []
 
 
 def test_assemble_report_includes_market_structure_when_available() -> None:
@@ -82,3 +96,7 @@ def test_assemble_report_includes_market_structure_when_available() -> None:
     assert report.market_structure is not None
     assert report.market_structure.asset_count == 2
     assert report.market_structure.date_count == 3
+    figure_names = {item.name for item in report.diagnostic_figures}
+    assert "feature_target_correlation_heatmap" in figure_names
+    assert "pivoted_returns_correlation_heatmap" in figure_names
+    assert "target_histogram" in figure_names

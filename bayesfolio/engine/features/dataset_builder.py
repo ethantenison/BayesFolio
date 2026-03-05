@@ -14,6 +14,7 @@ from bayesfolio.contracts.results.features import (
     FeatureQualityDiagnostics,
     FeaturesDatasetResult,
     FeatureTargetAssociation,
+    HistogramDiagnostics,
     IndexInfo,
     MarketStructureDiagnostics,
     TargetSummaryDiagnostics,
@@ -396,6 +397,13 @@ def _build_market_structure_diagnostics(
     feature_cols: list[str],
     target_missing_rate_before_drop: float,
 ) -> MarketStructureDiagnostics:
+    available_feature_cols = [col for col in feature_cols if col in dataset.columns]
+
+    target_series = dataset["y_excess_lead"] if not dataset.empty else pd.Series(dtype=float)
+    target_histogram = _build_histogram(values=target_series)
+    feature_target_corr = _build_correlation_matrix(dataset, [*available_feature_cols, "y_excess_lead"])
+    pivoted_returns_corr = _build_pivoted_returns_correlation_matrix(dataset)
+
     if dataset.empty:
         return MarketStructureDiagnostics(
             row_count=0,
@@ -404,8 +412,14 @@ def _build_market_structure_diagnostics(
             rows_per_asset_min=0,
             rows_per_asset_median=0.0,
             rows_per_asset_max=0,
-            target_summary=TargetSummaryDiagnostics(target_missing_rate_before_drop=target_missing_rate_before_drop),
-            feature_quality=FeatureQualityDiagnostics(feature_count=len(feature_cols)),
+            target_summary=TargetSummaryDiagnostics(
+                count=0,
+                target_missing_rate_before_drop=target_missing_rate_before_drop,
+            ),
+            feature_quality=FeatureQualityDiagnostics(
+                feature_count=len(feature_cols),
+                features_with_missing_count=0,
+            ),
             cross_sectional_breadth=CrossSectionalBreadthDiagnostics(
                 date_count=0,
                 min_assets_per_date=0,
@@ -413,6 +427,9 @@ def _build_market_structure_diagnostics(
                 max_assets_per_date=0,
             ),
             top_feature_target_correlations=[],
+            feature_target_correlation_matrix=feature_target_corr,
+            pivoted_returns_correlation_matrix=pivoted_returns_corr,
+            target_histogram=target_histogram,
         )
 
     rows_per_asset = dataset.groupby("asset_id", sort=False).size()
@@ -477,4 +494,45 @@ def _build_market_structure_diagnostics(
             max_assets_per_date=int(breadth.max()),
         ),
         top_feature_target_correlations=associations,
+        feature_target_correlation_matrix=feature_target_corr,
+        pivoted_returns_correlation_matrix=pivoted_returns_corr,
+        target_histogram=target_histogram,
+    )
+
+
+def _build_correlation_matrix(dataset: pd.DataFrame, columns: list[str]) -> dict[str, dict[str, float]]:
+    selected = [col for col in columns if col in dataset.columns]
+    if not selected:
+        return {}
+
+    numeric = dataset.loc[:, selected].apply(pd.to_numeric, errors="coerce")
+    corr = numeric.corr().fillna(0.0)
+    result: dict[str, dict[str, float]] = {}
+    for row_name, row_values in corr.iterrows():
+        result[str(row_name)] = {str(col_name): float(value) for col_name, value in row_values.items()}
+    return result
+
+
+def _build_pivoted_returns_correlation_matrix(dataset: pd.DataFrame) -> dict[str, dict[str, float]]:
+    required = {"date", "asset_id", "y_excess_lead"}
+    if not required.issubset(dataset.columns):
+        return {}
+
+    pivoted = dataset.pivot(index="date", columns="asset_id", values="y_excess_lead")
+    corr = pivoted.corr().fillna(0.0)
+    result: dict[str, dict[str, float]] = {}
+    for row_name, row_values in corr.iterrows():
+        result[str(row_name)] = {str(col_name): float(value) for col_name, value in row_values.items()}
+    return result
+
+
+def _build_histogram(values: pd.Series, bins: int = 20) -> HistogramDiagnostics:
+    numeric = pd.to_numeric(values, errors="coerce").dropna()
+    if numeric.empty:
+        return HistogramDiagnostics()
+
+    counts, bin_edges = np.histogram(numeric.to_numpy(dtype=float), bins=bins)
+    return HistogramDiagnostics(
+        bin_edges=[float(value) for value in bin_edges.tolist()],
+        counts=[int(value) for value in counts.tolist()],
     )

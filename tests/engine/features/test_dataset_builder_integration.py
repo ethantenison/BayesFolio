@@ -135,6 +135,9 @@ def test_feature_preparation_workflow_via_new_pipeline(tmp_path: Path) -> None:
 
     metadata_payload = json.loads(meta_path.read_text(encoding="utf-8"))
     assert metadata_payload["metadata"]["market_structure"]["date_count"] == 3
+    assert "feature_target_correlation_matrix" in metadata_payload["metadata"]["market_structure"]
+    assert "pivoted_returns_correlation_matrix" in metadata_payload["metadata"]["market_structure"]
+    assert "target_histogram" in metadata_payload["metadata"]["market_structure"]
 
     frame = pd.read_parquet(saved_path)
     assert "t_index" in frame.columns

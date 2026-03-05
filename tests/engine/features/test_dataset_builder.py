@@ -150,12 +150,21 @@ def test_build_features_dataset_happy_path(sample_frames: tuple[pd.DataFrame, pd
     assert result.market_structure is not None
     assert result.market_structure.asset_count == 2
     assert result.market_structure.target_summary.count == 6
+    assert "y_excess_lead" in result.market_structure.feature_target_correlation_matrix
+    assert "AAA" in result.market_structure.pivoted_returns_correlation_matrix
+    assert len(result.market_structure.target_histogram.counts) > 0
+    assert len(result.market_structure.target_histogram.bin_edges) == (
+        len(result.market_structure.target_histogram.counts) + 1
+    )
     assert artifact_store.saved_frame is not None
     assert artifact_store.saved_metadata is not None
     assert "market_structure" in artifact_store.saved_metadata
     market_structure_metadata = artifact_store.saved_metadata["market_structure"]
     assert isinstance(market_structure_metadata, dict)
     assert market_structure_metadata["asset_count"] == 2
+    assert "feature_target_correlation_matrix" in market_structure_metadata
+    assert "pivoted_returns_correlation_matrix" in market_structure_metadata
+    assert "target_histogram" in market_structure_metadata
 
     saved = artifact_store.saved_frame
     assert saved.columns[0] == "t_index"

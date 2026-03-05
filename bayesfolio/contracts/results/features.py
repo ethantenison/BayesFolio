@@ -113,8 +113,41 @@ class CrossSectionalBreadthDiagnostics(ContractModel):
     max_assets_per_date: int = Field(ge=0)
 
 
+class HistogramDiagnostics(ContractModel):
+    """Histogram summary for a numeric series.
+
+    Attributes:
+        bin_edges: Monotonic bin boundaries of length ``len(counts) + 1``.
+        counts: Non-negative counts per histogram bin.
+    """
+
+    bin_edges: list[float] = Field(default_factory=list)
+    counts: list[int] = Field(default_factory=list)
+
+
 class MarketStructureDiagnostics(ContractModel):
-    """Model-free market structure diagnostics for the built dataset."""
+    """Model-free market structure diagnostics for the built dataset.
+
+    Attributes:
+        row_count: Total long-panel row count in the persisted dataset.
+        asset_count: Number of unique assets.
+        date_count: Number of unique dates.
+        rows_per_asset_min: Minimum rows per asset.
+        rows_per_asset_median: Median rows per asset.
+        rows_per_asset_max: Maximum rows per asset.
+        target_summary: Distribution diagnostics for ``y_excess_lead`` in
+            decimal units.
+        feature_quality: Missingness and stability diagnostics for selected
+            feature columns.
+        cross_sectional_breadth: Date-level panel breadth diagnostics.
+        top_feature_target_correlations: Top absolute univariate feature-target
+            Pearson correlations.
+        feature_target_correlation_matrix: Correlation matrix for selected
+            feature columns plus ``y_excess_lead``.
+        pivoted_returns_correlation_matrix: Correlation matrix of pivoted
+            ``y_excess_lead`` returns by ``asset_id``.
+        target_histogram: Histogram summary of ``y_excess_lead`` values.
+    """
 
     row_count: int = Field(ge=0)
     asset_count: int = Field(ge=0)
@@ -126,6 +159,9 @@ class MarketStructureDiagnostics(ContractModel):
     feature_quality: FeatureQualityDiagnostics
     cross_sectional_breadth: CrossSectionalBreadthDiagnostics
     top_feature_target_correlations: list[FeatureTargetAssociation] = Field(default_factory=list)
+    feature_target_correlation_matrix: dict[str, dict[str, float]] = Field(default_factory=dict)
+    pivoted_returns_correlation_matrix: dict[str, dict[str, float]] = Field(default_factory=dict)
+    target_histogram: HistogramDiagnostics = Field(default_factory=HistogramDiagnostics)
 
 
 class FeaturesDatasetResult(VersionedContract):
@@ -143,8 +179,8 @@ class FeaturesDatasetResult(VersionedContract):
         diagnostics: Build-time informational diagnostics and warnings.
     """
 
-    schema: Literal[SchemaName.FEATURES_DATASET_RESULT] = SchemaName.FEATURES_DATASET_RESULT
-    schema_version: Literal["0.1.0"] = "0.1.0"
+    schema: SchemaName = SchemaName.FEATURES_DATASET_RESULT
+    schema_version: str = "0.1.0"
     return_unit: Literal["decimal"] = "decimal"
     artifact: ArtifactPointer
     columns: list[FeatureColumnSpec] = Field(default_factory=list)
