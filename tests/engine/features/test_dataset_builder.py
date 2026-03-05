@@ -147,6 +147,9 @@ def test_build_features_dataset_happy_path(sample_frames: tuple[pd.DataFrame, pd
     assert result.artifact.row_count == 6
     assert result.index_info.start_date == date(2020, 1, 31)
     assert result.index_info.end_date == date(2020, 3, 31)
+    assert result.market_structure is not None
+    assert result.market_structure.asset_count == 2
+    assert result.market_structure.target_summary.count == 6
     assert artifact_store.saved_frame is not None
 
     saved = artifact_store.saved_frame

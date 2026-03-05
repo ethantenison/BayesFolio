@@ -5,7 +5,7 @@ Module for fetching fundamental financial data for assets.
 
 import io
 import sys
-from typing import Literal
+from typing import Any, Literal, cast
 
 import numpy as np
 import pandas as pd
@@ -17,11 +17,20 @@ from bayesfolio.core.settings import Horizon, Interval
 
 # Optional: only needed if you set use_tradingeconomics=True
 try:
-    import tradingeconomics as te  # pip install tradingeconomics
+    import tradingeconomics as te  # pyright: ignore[reportMissingImports]
 except Exception:
     te = None
 
 import requests
+
+
+def _download_frame(*args: Any, **kwargs: Any) -> pd.DataFrame:
+    """Download market data and return a DataFrame for type-safe processing."""
+
+    data = yf.download(*args, **kwargs)
+    if data is None:
+        return pd.DataFrame()
+    return cast(pd.DataFrame, data)
 
 
 def fetch_global_yields(
@@ -101,7 +110,7 @@ def fetch_global_yields(
                 _log(f"FRED fail {sym}: {e}")
         return None
 
-    def _stooq_csv_one(ticker: str):
+    def _stooq_csv_one(ticker: str | None):
         if not ticker:
             return None
         # Try .com first, then .pl
@@ -128,7 +137,9 @@ def fetch_global_yields(
                 _log(f"Stooq CSV fail {ticker} via {base}: {e}")
         return None
 
-    def _stooq_pdr_one(ticker: str):
+    def _stooq_pdr_one(ticker: str | None):
+        if not ticker:
+            return None
         # pandas_datareader 'stooq' sometimes works for bonds; try anyway
         try:
             df = pdr.DataReader(ticker, "stooq", start, end)
@@ -277,8 +288,8 @@ def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTH
             return px.select_dtypes("number").iloc[:, 0]
 
     # --- Download data ---
-    vix_px = yf.download("^VIX", start=start, end=end, progress=False, group_by="ticker")
-    spy_px = yf.download("SPY", start=start, end=end, progress=False, group_by="ticker")
+    vix_px = _download_frame("^VIX", start=start, end=end, progress=False, group_by="ticker")
+    spy_px = _download_frame("SPY", start=start, end=end, progress=False, group_by="ticker")
 
     vix = _safe_adj_close(vix_px, "^VIX")
     spy = _safe_adj_close(spy_px, "SPY")
@@ -290,7 +301,8 @@ def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTH
     spy = spy.astype(float)
 
     # --- Realized volatility (21-day) ---
-    rv = np.log(spy / spy.shift(1)).rolling(21).std() * np.sqrt(252)
+    log_spy = pd.Series(np.log(spy.to_numpy(dtype=float)), index=spy.index)
+    rv = log_spy.diff().rolling(21).std() * np.sqrt(252)
 
     df = pd.DataFrame(
         {
@@ -316,7 +328,7 @@ def fetch_dealer_gamma_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTH
 
 
 def fetch_put_call_ratio(start, end=None, horizon=Horizon.MONTHLY):
-    px = yf.download("^PPC", start=start, end=end, progress=False)
+    px = _download_frame("^PPC", start=start, end=end, progress=False)
 
     if px.empty:
         return None
@@ -334,7 +346,7 @@ def fetch_spy_flow_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
     standardized as a 12m z-score.
     """
 
-    px = yf.download(
+    px = _download_frame(
         "SPY",
         start=start,
         end=end,
@@ -440,7 +452,7 @@ def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Ho
         - Requires both ^VIX and ^VIX3M from Yahoo Finance; data may be missing before ~2010.
     """
     # ^VIX = 1M implied vol, ^VIX3M = 3M implied vol (Yahoo symbols)
-    px = yf.download(
+    px = _download_frame(
         ["^VIX", "^VIX3M"],
         start=start,
         end=end,
@@ -479,7 +491,7 @@ def fetch_term_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.M
     Falls back to FRED DTB3 for 3M if ^IRX not available.
     """
     tickers = ["^TNX", "^IRX"]
-    px = yf.download(
+    px = _download_frame(
         tickers, start=start, end=end, interval=Interval.DAILY, auto_adjust=False, progress=False, group_by="ticker"
     )
 
@@ -499,7 +511,9 @@ def fetch_term_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.M
     # Fallback for missing ^IRX (3M T-bill)
     if tbill3m is None or tbill3m.isna().all():
         print("⚠️ ^IRX not found — falling back to FRED DTB3 (3M T-bill).")
-        tbill3m = yf.download("DTB3", start=start, end=end, interval=Interval.DAILY)["Adj Close"]
+        dtb3 = _download_frame("DTB3", start=start, end=end, interval=Interval.DAILY)
+        base = "Adj Close" if "Adj Close" in dtb3.columns else "Close"
+        tbill3m = dtb3[base]
 
     df = pd.concat([tnote10y, tbill3m], axis=1)
     df.columns = ["tnote10y", "tbill3m"]
@@ -528,9 +542,8 @@ def fetch_credit_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon
     """
     import numpy as np
     import pandas as pd
-    import yfinance as yf
 
-    px = yf.download(
+    px = _download_frame(
         ["HYG", "LQD"],
         start=start,
         end=end,
@@ -585,13 +598,11 @@ def fetch_tbill_rate(start="2010-01-01", end=None, horizon: Horizon = Horizon.MO
       - date
       - tbill3m (decimal yield)
     """
-    import yfinance as yf
-
-    px = yf.download("^IRX", start=start, end=end, interval=Interval.DAILY, progress=False)
+    px = _download_frame("^IRX", start=start, end=end, interval=Interval.DAILY, progress=False)
 
     if px.empty:
         print("⚠️ ^IRX not available from Yahoo, falling back to FRED DTB3.")
-        fred = yf.download("DTB3", start=start, end=end, interval=Interval.DAILY, progress=False)
+        fred = _download_frame("DTB3", start=start, end=end, interval=Interval.DAILY, progress=False)
         base = "Adj Close" if "Adj Close" in fred.columns else "Close"
         tbill3m = fred[base] / 100.0
     else:
@@ -610,7 +621,7 @@ def fetch_dxy(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
     tickers = ["DX-Y.NYB", "DX=F", "UUP"]
     for tk in tickers:
-        px = yf.download(tk, start=start, end=end, interval=Interval.DAILY, progress=False)
+        px = _download_frame(tk, start=start, end=end, interval=Interval.DAILY, progress=False)
         if px.empty:
             continue
 
@@ -637,7 +648,7 @@ def fetch_yield_curve_pcs(start="2010-01-01", end=None, horizon: Horizon = Horiz
     tickers_fred = {"DTB3": "3m", "DGS5": "5y", "DGS10": "10y", "DGS30": "30y"}
 
     # Try Yahoo first
-    px = yf.download(list(tickers_yahoo.keys()), start=start, end=end, interval=Interval.DAILY, progress=False)
+    px = _download_frame(list(tickers_yahoo.keys()), start=start, end=end, interval=Interval.DAILY, progress=False)
     cols = []
 
     for tk, label in tickers_yahoo.items():
@@ -826,7 +837,7 @@ def fetch_core_global_macro(start="2010-01-01", end=None, horizon: Horizon = Hor
     """
 
     def _yf_series(ticker, name):
-        px = yf.download(ticker, start=start, end=end, progress=False, group_by="ticker")
+        px = _download_frame(ticker, start=start, end=end, progress=False, group_by="ticker")
 
         if px.empty:
             return None
@@ -920,9 +931,8 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     import numpy as np
     import pandas as pd
     import pandas_datareader.data as pdr
-    import yfinance as yf
 
-    from bayesfolio.features.asset_prices import fetch_etf_features
+    from bayesfolio.engine.features.asset_prices import fetch_etf_features
 
     # ------------------------------------------------------------
     # Helper to convert ANY Series into a 2-col DataFrame with date
@@ -974,7 +984,7 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     # ------------------------------------------------------------
     def _safe_yf(ticker, name):
         try:
-            px = yf.download(ticker, start=start, end=end, progress=False)
+            px = _download_frame(ticker, start=start, end=end, progress=False)
             if px.empty:
                 return None
             base = "Adj Close" if "Adj Close" in px.columns else "Close"

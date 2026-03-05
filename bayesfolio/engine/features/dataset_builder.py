@@ -3,14 +3,20 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+import numpy as np
 import pandas as pd
 
 from bayesfolio.contracts.commands.features import BuildFeaturesDatasetCommand
 from bayesfolio.contracts.results.features import (
     ArtifactPointer,
+    CrossSectionalBreadthDiagnostics,
     FeatureColumnSpec,
+    FeatureQualityDiagnostics,
     FeaturesDatasetResult,
+    FeatureTargetAssociation,
     IndexInfo,
+    MarketStructureDiagnostics,
+    TargetSummaryDiagnostics,
 )
 from bayesfolio.core.settings import Horizon
 from bayesfolio.engine.features.engineering import (
@@ -153,8 +159,11 @@ def build_features_dataset(
     merged["date"] = pd.to_datetime(merged["date"])
     start_ts = pd.Timestamp(command.start_date)
     end_ts = pd.Timestamp(command.end_date)
-    merged = merged[(merged["date"] >= start_ts) & (merged["date"] <= end_ts)]
-    merged = merged.dropna(subset=["y_excess_lead"]).reset_index(drop=True)
+    merged_window = merged[(merged["date"] >= start_ts) & (merged["date"] <= end_ts)].copy()
+    target_missing_rate_before_drop = (
+        float(merged_window["y_excess_lead"].isna().mean()) if not merged_window.empty else 0.0
+    )
+    merged = merged_window.dropna(subset=["y_excess_lead"]).reset_index(drop=True)
 
     lag_cols = ["lag_y_excess_lead", "lag2_y_excess_lead"]
     output_cols = [
@@ -188,11 +197,22 @@ def build_features_dataset(
 
     index_info = _build_index_info(dataset, command)
     column_specs = _build_column_specs(dataset.columns.tolist(), selected_etf_cols, selected_macro_cols)
+    feature_cols = [
+        *selected_etf_cols,
+        *selected_macro_cols,
+        *[col for col in lag_cols if col in dataset.columns],
+    ]
+    market_structure = _build_market_structure_diagnostics(
+        dataset=dataset,
+        feature_cols=feature_cols,
+        target_missing_rate_before_drop=target_missing_rate_before_drop,
+    )
 
     return FeaturesDatasetResult(
         artifact=artifact,
         columns=column_specs,
         index_info=index_info,
+        market_structure=market_structure,
         diagnostics=diagnostics,
     )
 
@@ -367,3 +387,92 @@ def _build_column_specs(
             )
 
     return specs
+
+
+def _build_market_structure_diagnostics(
+    dataset: pd.DataFrame,
+    feature_cols: list[str],
+    target_missing_rate_before_drop: float,
+) -> MarketStructureDiagnostics:
+    if dataset.empty:
+        return MarketStructureDiagnostics(
+            row_count=0,
+            asset_count=0,
+            date_count=0,
+            rows_per_asset_min=0,
+            rows_per_asset_median=0.0,
+            rows_per_asset_max=0,
+            target_summary=TargetSummaryDiagnostics(target_missing_rate_before_drop=target_missing_rate_before_drop),
+            feature_quality=FeatureQualityDiagnostics(feature_count=len(feature_cols)),
+            cross_sectional_breadth=CrossSectionalBreadthDiagnostics(
+                date_count=0,
+                min_assets_per_date=0,
+                median_assets_per_date=0.0,
+                max_assets_per_date=0,
+            ),
+            top_feature_target_correlations=[],
+        )
+
+    rows_per_asset = dataset.groupby("asset_id", sort=False).size()
+    breadth = dataset.groupby("date", sort=False)["asset_id"].nunique()
+    target = dataset["y_excess_lead"].astype(float)
+
+    quantiles = target.quantile([0.01, 0.50, 0.99])
+    missing_rates = {col: float(dataset[col].isna().mean()) for col in feature_cols if col in dataset.columns}
+    worst_missing = dict(sorted(missing_rates.items(), key=lambda item: item[1], reverse=True)[:5])
+    constant_features = [
+        col for col in feature_cols if col in dataset.columns and dataset[col].nunique(dropna=True) <= 1
+    ]
+
+    associations: list[FeatureTargetAssociation] = []
+    for col in feature_cols:
+        if col not in dataset.columns:
+            continue
+        pair = dataset[[col, "y_excess_lead"]].dropna()
+        if len(pair) < 3 or pair[col].nunique() <= 1 or pair["y_excess_lead"].nunique() <= 1:
+            continue
+        corr_value = float(pair[col].corr(pair["y_excess_lead"]))
+        if np.isnan(corr_value):
+            continue
+        associations.append(
+            FeatureTargetAssociation(
+                feature_name=col,
+                pearson_corr=corr_value,
+                abs_pearson_corr=abs(corr_value),
+                sample_size=int(len(pair)),
+            )
+        )
+
+    associations = sorted(associations, key=lambda item: item.abs_pearson_corr, reverse=True)[:10]
+
+    return MarketStructureDiagnostics(
+        row_count=int(len(dataset)),
+        asset_count=int(dataset["asset_id"].nunique()),
+        date_count=int(dataset["date"].nunique()),
+        rows_per_asset_min=int(rows_per_asset.min()),
+        rows_per_asset_median=float(rows_per_asset.median()),
+        rows_per_asset_max=int(rows_per_asset.max()),
+        target_summary=TargetSummaryDiagnostics(
+            count=int(target.count()),
+            mean=float(target.mean()),
+            std=float(target.std(ddof=1)) if target.count() > 1 else 0.0,
+            p01=float(quantiles.loc[0.01]),
+            p50=float(quantiles.loc[0.50]),
+            p99=float(quantiles.loc[0.99]),
+            positive_share=float((target > 0).mean()),
+            target_missing_rate_before_drop=target_missing_rate_before_drop,
+        ),
+        feature_quality=FeatureQualityDiagnostics(
+            feature_count=len(feature_cols),
+            features_with_missing_count=sum(rate > 0.0 for rate in missing_rates.values()),
+            constant_feature_names=constant_features,
+            worst_missing_features=worst_missing,
+        ),
+        cross_sectional_breadth=CrossSectionalBreadthDiagnostics(
+            date_count=int(len(breadth)),
+            min_assets_per_date=int(breadth.min()),
+            median_assets_per_date=float(breadth.median()),
+            max_assets_per_date=int(breadth.max()),
+        ),
+        top_feature_target_correlations=associations,
+    )

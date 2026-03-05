@@ -3,6 +3,8 @@ Module to fetch asset prices and compute future excess returns over risk-free ra
 
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
@@ -98,7 +100,8 @@ def cross_sectional_ic_screening(
             if len(g) < min_assets:
                 continue
 
-            ic, _ = spearmanr(g[feat], g[target_col])
+            ic_raw = spearmanr(g[feat], g[target_col])[0]
+            ic = np.asarray(ic_raw, dtype=np.float64).item() if np.isscalar(ic_raw) else np.nan
             if np.isfinite(ic):
                 ic_series.append(ic)
 
@@ -132,9 +135,14 @@ def fetch_prices(tickers, start, end=None, interval: Interval = Interval.DAILY):
     Returns a tidy df with MultiIndex (date, ticker) and column 'Adj Close'.
     Adjusted Close includes dividends & splits => total-return compatible.
     """
-    px = yf.download(
+    px_raw = yf.download(
         tickers=tickers, start=start, end=end, interval=interval, group_by="ticker", auto_adjust=False, progress=False
     )
+    if px_raw is None or px_raw.empty:
+        msg = "Could not download price data from yfinance."
+        raise RuntimeError(msg)
+
+    px = cast(pd.DataFrame, px_raw)
     # Normalize shape across yfinance versions
     if isinstance(px.columns, pd.MultiIndex):
         # Multi-index columns: level 0 = ticker, level 1 = field
@@ -157,7 +165,12 @@ def fetch_rf_daily(start, end=None, interval: Interval = Interval.DAILY):
     Fetch ^IRX (13-week T-bill), robust to MultiIndex columns and auto_adjust True/False.
     Returns a daily series of *continuous* daily rate ≈ (annual_fraction / 252).
     """
-    rf = yf.download("^IRX", start=start, end=end, interval=interval, progress=False, auto_adjust=False)
+    rf_raw = yf.download("^IRX", start=start, end=end, interval=interval, progress=False, auto_adjust=False)
+    if rf_raw is None:
+        msg = "Could not download ^IRX from yfinance."
+        raise RuntimeError(msg)
+
+    rf = cast(pd.DataFrame, rf_raw)
 
     if rf.empty:
         raise RuntimeError("Could not download ^IRX. Try expanding the date range.")
@@ -168,30 +181,32 @@ def fetch_rf_daily(start, end=None, interval: Interval = Interval.DAILY):
         candidates = [("Adj Close", "^IRX"), ("Close", "^IRX"), ("^IRX", "Adj Close"), ("^IRX", "Close")]
         for c in candidates:
             if c in rf.columns:
-                col = rf.loc[:, c].astype(float)
+                col = cast(pd.Series, rf.loc[:, c].astype(float))
                 break
         if col is None:
             # Fallback: slice by level name, then pick the first column
             if "Adj Close" in rf.columns.get_level_values(0):
-                col = rf.xs("Adj Close", level=0, axis=1).iloc[:, 0].astype(float)
+                adj_df = cast(pd.DataFrame, rf.xs("Adj Close", level=0, axis=1))
+                col = cast(pd.Series, adj_df.iloc[:, 0].astype(float))
             else:
-                col = rf.xs("Close", level=0, axis=1).iloc[:, 0].astype(float)
+                close_df = cast(pd.DataFrame, rf.xs("Close", level=0, axis=1))
+                col = cast(pd.Series, close_df.iloc[:, 0].astype(float))
     else:
         if "Adj Close" in rf.columns:
-            col = rf["Adj Close"].astype(float)
+            col = cast(pd.Series, rf["Adj Close"].astype(float))
         elif "Close" in rf.columns:
-            col = rf["Close"].astype(float)
+            col = cast(pd.Series, rf["Close"].astype(float))
         else:
             raise KeyError(f"^IRX: Neither 'Adj Close' nor 'Close' in columns: {rf.columns.tolist()}")
 
     # Convert annualized percent -> fraction
     ann_frac = col / 100.0
-    rf_daily_cont = ann_frac / 252.0
+    rf_daily_cont = cast(pd.Series, ann_frac / 252.0)
     rf_daily_cont.index = pd.to_datetime(rf_daily_cont.index)
 
     # Fill to business-day grid and forward-fill small gaps
     all_bd = pd.date_range(rf_daily_cont.index.min(), rf_daily_cont.index.max(), freq="B")
-    rf_daily_cont = rf_daily_cont.reindex(all_bd).ffill()
+    rf_daily_cont = cast(pd.Series, rf_daily_cont.reindex(all_bd).ffill())
     rf_daily_cont.name = "rf_daily_cont"
     return rf_daily_cont
 
@@ -210,7 +225,10 @@ def compute_excess_future_return_calendar(
     px_fwd = px_period.shift(-1)
 
     # Price log-return for t -> t1
-    log_r_price = (np.log(px_fwd) - np.log(px_period)).iloc[:-1]
+    log_r_price = pd.Series(
+        np.log(px_fwd.to_numpy(dtype=float)) - np.log(px_period.to_numpy(dtype=float)),
+        index=px_period.index,
+    ).iloc[:-1]
 
     # Integrate RF over (t, t1] by summing continuous daily rates
     rf_log = []
@@ -220,7 +238,7 @@ def compute_excess_future_return_calendar(
     rf_log = pd.Series(rf_log, index=log_r_price.index)
 
     # Use numpy arrays to avoid dtype gotchas, then rebuild Series
-    delta = log_r_price.values - rf_log.values
+    delta = log_r_price.to_numpy(dtype=float) - rf_log.to_numpy(dtype=float)
     y_excess_vals = np.exp(delta) - 1.0
     y_excess = pd.Series(y_excess_vals, index=log_r_price.index, name="y_excess_lead")
     return y_excess
@@ -289,7 +307,7 @@ def add_cross_sectional_momentum_rank(
 def fetch_etf_features(
     tickers: list[str] | str,
     start: str,
-    end: str = None,
+    end: str | None = None,
     horizon: Horizon = Horizon.MONTHLY,  # or your Horizon enum
 ):
     """

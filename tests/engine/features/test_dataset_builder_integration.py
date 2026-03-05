@@ -124,6 +124,8 @@ def test_feature_preparation_workflow_via_new_pipeline(tmp_path: Path) -> None:
     assert result.artifact.format == "parquet"
     assert result.artifact.row_count == 6
     assert result.artifact.column_count > 0
+    assert result.market_structure is not None
+    assert result.market_structure.date_count == 3
 
     saved_path = tmp_path / "features_workflow_test.parquet"
     assert saved_path.exists()
