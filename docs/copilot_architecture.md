@@ -33,6 +33,13 @@ at `t` (next-period excess return label).
 
 For a concise ownership map and public entry-point index, see `docs/package_map.md`.
 
+## Agent Contract Boundary
+
+- Multi-agent and LLM workflows must exchange chat/tool data through
+	`contracts/chat/` schemas (`ChatMessage*`, `ChatTool*`, `ChatTurn`, `ParsedIntent`).
+- Keep framework SDK payloads (LangChain/LangSmith/OpenAI/LlamaIndex) out of
+	contracts; adapt them at orchestration or IO adapter boundaries.
+
 ## Assembler vs Mapper Boundary
 
 Use this rule to separate responsibilities inside `engine/`:

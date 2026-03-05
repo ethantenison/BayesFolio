@@ -13,5 +13,6 @@
   "pythonVersion": "3.13",
   "typeCheckingMode": "standard",
   "useLibraryCodeForTypes": true,
-  "reportMissingTypeStubs": "none"
+  "reportMissingTypeStubs": "none",
+  "reportIncompatibleVariableOverride": "none"
 }
