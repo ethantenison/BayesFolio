@@ -18,7 +18,13 @@ or public entry points change.
 - `contracts/commands/`: execution inputs (command contracts)
 - `contracts/results/`: execution outputs (result contracts)
 - `contracts/ui/`: UI-facing data shapes
-- `contracts/chat/`: chat intent/tool schemas
+- `contracts/chat/`: chat intent and tool protocol schemas (`ChatMessage*`, `ChatTool*`, `ChatTurn`)
+
+### Agent Boundary (Phase 1)
+
+Agent and LLM runtime integrations must treat `contracts/chat/` as the canonical
+I/O surface. Framework-specific payloads (LangChain/LangSmith/OpenAI/LlamaIndex)
+should be translated at adapters/orchestrators, not leaked into contracts.
 
 ## Engine Subpackages
 

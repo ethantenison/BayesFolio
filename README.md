@@ -75,6 +75,25 @@ This is not a black-box allocation engine. It is designed to make risk structure
 
 ------------------------------------------------------------
 
+## Contributor Workflow (Agents)
+
+BayesFolio includes repository-level agent roles in [AGENTS.md](AGENTS.md) to
+improve maintainability and prevent architecture/documentation drift.
+
+Recommended PR workflow:
+
+1. Run **Boundary Inspector** checks for package/layer import violations.
+2. Run **Documentation Drift Inspector** checks for public docstring and docs sync.
+3. If findings exist, use **Patch Proposer** in propose mode for minimal diffs.
+4. Apply patches only after explicit approval.
+5. Re-run lint/tests and include verification output in PR notes.
+
+Agent details, guardrails, and output format requirements are defined in
+[AGENTS.md](AGENTS.md).
+
+
+------------------------------------------------------------
+
 ## License
 
 MIT License

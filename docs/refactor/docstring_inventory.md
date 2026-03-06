@@ -1,0 +1,126 @@
+# Docstring Coverage Audit
+
+- Scanned files: **90**
+- Included tests: **False**
+- Files missing module docstrings: **54**
+- Public symbols missing docstrings: **60**
+
+## Missing Module Docstrings
+
+- bayesfolio/contracts/base.py
+- bayesfolio/contracts/chat/intent.py
+- bayesfolio/contracts/chat/protocol.py
+- bayesfolio/contracts/commands/__init__.py
+- bayesfolio/contracts/commands/backtest.py
+- bayesfolio/contracts/commands/beliefs.py
+- bayesfolio/contracts/commands/features.py
+- bayesfolio/contracts/commands/forecast.py
+- bayesfolio/contracts/commands/optimize.py
+- bayesfolio/contracts/commands/report.py
+- bayesfolio/contracts/commands/scenario.py
+- bayesfolio/contracts/commands/universe.py
+- bayesfolio/contracts/results/__init__.py
+- bayesfolio/contracts/results/backtest.py
+- bayesfolio/contracts/results/features.py
+- bayesfolio/contracts/results/forecast.py
+- bayesfolio/contracts/results/optimize.py
+- bayesfolio/contracts/results/report.py
+- bayesfolio/contracts/ui/scenario.py
+- bayesfolio/contracts/ui/universe.py
+- bayesfolio/core/types.py
+- bayesfolio/engine/agent/intent_extractor.py
+- bayesfolio/engine/agent/orchestrator.py
+- bayesfolio/engine/agent/planner.py
+- bayesfolio/engine/agent/prompts.py
+- bayesfolio/engine/asset_allocation/riskfolio_adapter.py
+- bayesfolio/engine/backtest/evaluate_asset_pricing.py
+- bayesfolio/engine/backtest/portfolio_helpers.py
+- bayesfolio/engine/backtest/runner.py
+- bayesfolio/engine/features/dataset_builder.py
+- bayesfolio/engine/features/engineering.py
+- bayesfolio/engine/features/universe_loader.py
+- bayesfolio/engine/forecast/forecast_adapter.py
+- bayesfolio/engine/forecast/gp/multitask.py
+- bayesfolio/engine/forecast/legacy/old_gp.py
+- bayesfolio/engine/mappers/backtest.py
+- bayesfolio/engine/mappers/forecast.py
+- bayesfolio/engine/mappers/optimize.py
+- bayesfolio/engine/mappers/report.py
+- bayesfolio/engine/mappers/scenario.py
+- bayesfolio/engine/mappers/universe.py
+- bayesfolio/engine/pipeline.py
+- bayesfolio/engine/report/assembler.py
+- bayesfolio/engine/report/mlflow_helpers.py
+- bayesfolio/engine/report/visualization/eda.py
+- bayesfolio/engine/scenarios/sampler.py
+- bayesfolio/io/agent_tool_executor.py
+- bayesfolio/io/artifact_store.py
+- bayesfolio/io/artifacts.py
+- bayesfolio/io/backends.py
+- bayesfolio/io/fingerprints.py
+- bayesfolio/io/mlflow_logger.py
+- bayesfolio/io/parquet_store.py
+- bayesfolio/io/report_artifacts.py
+
+## Missing Public Symbol Docstrings
+
+- bayesfolio/engine/backtest/backtest_summary.py:34 — function `opt_weights`
+- bayesfolio/engine/backtest/portfolio_helpers.py:420 — function `assessing_long_short_performance`
+- bayesfolio/engine/backtest/portfolio_helpers.py:427 — function `assess_performance`
+- bayesfolio/engine/features/market_fundamentals.py:352 — function `fetch_put_call_ratio`
+- bayesfolio/engine/features/market_fundamentals.py:803 — function `fetch_cpi_inflation`
+- bayesfolio/engine/forecast/cv.py:119 — function `plot_multitask_time_series_cv`
+- bayesfolio/engine/forecast/gp/extra_model_info.py:4 — function `serialize_prior`
+- bayesfolio/engine/forecast/gp/extra_model_info.py:21 — function `serialize_constraint`
+- bayesfolio/engine/forecast/gp/extra_model_info.py:92 — function `describe_task_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:140 — function `make_period_length_prior2`
+- bayesfolio/engine/forecast/gp/kernels.py:175 — class `MaternKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:181 — class `RQKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:186 — class `RBFKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:191 — class `LinearKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:196 — class `PeriodicKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:203 — class `PolynomialKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:209 — class `PiecewisePolynomialKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:215 — class `CategoricalKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:220 — class `ExpoDecayKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:225 — class `InfiniteBNNKernelConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:245 — function `build_matern_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:258 — function `build_rbf_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:270 — function `build_rq_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:282 — function `build_linear_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:290 — function `build_periodic_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:305 — function `build_polynomial_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:320 — function `build_piecewise_polynomial_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:333 — function `build_categorical_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:343 — function `build_expo_decay_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:364 — function `build_infinite_width_bnn_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:409 — class `KernelBlockConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:416 — class `KernelArchitectureConfig`
+- bayesfolio/engine/forecast/gp/kernels.py:448 — function `build_block_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:586 — function `build_kernel`
+- bayesfolio/engine/forecast/gp/kernels.py:616 — function `make_default_kernel_architecture`
+- bayesfolio/engine/forecast/gp/means.py:223 — class `MacroLinearMean`
+- bayesfolio/engine/forecast/gp/multitask.py:193 — function `train_model_hadamard`
+- bayesfolio/engine/forecast/legacy/old_gp.py:178 — function `train_model_hadamard`
+- bayesfolio/engine/forecast/legacy/old_kernels.py:148 — function `adaptive_lengthscale_prior`
+- bayesfolio/engine/forecast/legacy/old_kernels.py:152 — function `adaptive_lengthscale_constraint`
+- bayesfolio/engine/forecast/legacy/old_kernels.py:675 — class `KernelConfig`
+- bayesfolio/engine/forecast/legacy/old_kernels.py:689 — function `create_kernel_initialization`
+- bayesfolio/engine/forecast/legacy/root_kernels.py:358 — function `create_kernel_initialization`
+- bayesfolio/engine/report/mlflow_helpers.py:76 — function `log_kernel_to_mlflow`
+- bayesfolio/engine/report/mlflow_helpers.py:82 — function `extract_gp_hyperparameters`
+- bayesfolio/engine/report/mlflow_helpers.py:164 — function `log_gp_hyperparameters`
+- bayesfolio/engine/report/mlflow_helpers.py:169 — function `log_gpytorch_state_dict`
+- bayesfolio/engine/report/mlflow_helpers.py:175 — class `MultiTaskConfig`
+- bayesfolio/engine/report/mlflow_helpers.py:206 — function `compute_benchmark_panel`
+- bayesfolio/engine/report/mlflow_helpers.py:259 — function `log_r2_os`
+- bayesfolio/engine/report/mlflow_helpers.py:273 — function `describe_task_kernel`
+- bayesfolio/engine/report/visualization/eda.py:15 — function `correlation_matrix`
+- bayesfolio/engine/report/visualization/eda.py:123 — function `visualize_lognormal_distribution`
+- bayesfolio/engine/report/visualization/evaluation.py:140 — function `plot_ic_hist`
+- bayesfolio/engine/report/visualization/evaluation.py:151 — function `plot_ls_cumulative`
+- bayesfolio/engine/report/visualization/evaluation.py:161 — function `plot_ls_drawdown`
+- bayesfolio/engine/report/visualization/evaluation.py:173 — function `plot_rolling_sharpe`
+- bayesfolio/engine/report/visualization/evaluation.py:186 — function `plot_gp_uncertainty`
+- bayesfolio/engine/report/visualization/evaluation.py:205 — function `plot_uncertainty_calibration`
+- bayesfolio/engine/report/visualization/evaluation.py:246 — function `plot_actual_vs_pred_matrix`

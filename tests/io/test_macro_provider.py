@@ -1,3 +1,5 @@
+"""Tests for IO macro provider retry, fallback, and cache behavior."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -66,3 +68,49 @@ def test_macro_provider_raises_when_no_fallback_available() -> None:
 
     with pytest.raises(TimeoutError):
         provider.get_macro_features(start="2026-01-01", end="2026-02-28", horizon=Horizon.MONTHLY)
+
+
+def test_macro_provider_writes_cache_on_miss(tmp_path: Path) -> None:
+    calls = {"count": 0}
+
+    def fetcher(*, start: str, end: str, horizon: Horizon) -> pd.DataFrame:
+        calls["count"] += 1
+        return pd.DataFrame(
+            {
+                "date": ["2024-01-31", "2024-02-29"],
+                "hy_spread": [0.02, 0.025],
+            }
+        )
+
+    provider = MacroProvider(fetcher=fetcher, max_retries=0, retry_backoff_seconds=0.0, cache_dir=tmp_path)
+
+    first = provider.get_macro_features(start="2024-01-01", end="2024-02-29", horizon=Horizon.MONTHLY)
+    second = provider.get_macro_features(start="2024-01-01", end="2024-02-29", horizon=Horizon.MONTHLY)
+
+    assert calls["count"] == 1
+    assert len(first) == 2
+    assert len(second) == 2
+
+
+def test_macro_provider_reads_cache_for_subset_window(tmp_path: Path) -> None:
+    cached = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-31", "2024-02-29", "2024-03-29"]),
+            "hy_spread": [0.02, 0.025, 0.03],
+        }
+    )
+    cached.to_parquet(tmp_path / "macro_bme.parquet", index=False)
+
+    calls = {"count": 0}
+
+    def fetcher(*, start: str, end: str, horizon: Horizon) -> pd.DataFrame:
+        calls["count"] += 1
+        return _sample_macro_frame()
+
+    provider = MacroProvider(fetcher=fetcher, max_retries=0, retry_backoff_seconds=0.0, cache_dir=tmp_path)
+
+    frame = provider.get_macro_features(start="2024-01-01", end="2024-02-29", horizon=Horizon.MONTHLY)
+
+    assert calls["count"] == 0
+    assert len(frame) == 2
+    assert frame["date"].max() <= pd.Timestamp("2024-02-29")
