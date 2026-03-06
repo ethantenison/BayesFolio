@@ -7,7 +7,11 @@ from bayesfolio.contracts.chat.protocol import (
     ChatToolResult,
     ChatTurn,
 )
-from bayesfolio.engine.agent.orchestrator import OrchestratorAction, evaluate_turn
+from bayesfolio.engine.agent.orchestrator import (
+    OrchestratorAction,
+    evaluate_turn,
+    run_orchestration_cycle,
+)
 
 
 def _base_turn() -> ChatTurn:
@@ -92,3 +96,70 @@ def test_evaluate_turn_marks_invalid_when_duplicate_tool_call_ids() -> None:
 
     assert decision.action is OrchestratorAction.INVALID_TURN
     assert decision.diagnostics["error"] == "Duplicate tool call IDs in turn."
+
+
+def test_run_orchestration_cycle_executes_pending_tool_calls() -> None:
+    turn = _base_turn()
+    turn.tool_calls = [
+        ChatToolCall(call_id="call_001", tool_name="build_features", arguments={}),
+        ChatToolCall(call_id="call_002", tool_name="optimize_portfolio", arguments={"objective": "Sharpe"}),
+    ]
+    turn.tool_results = [
+        ChatToolResult(
+            call_id="call_001",
+            tool_name="build_features",
+            success=True,
+            payload={"artifact": "features.parquet"},
+        )
+    ]
+
+    def _executor(call: ChatToolCall) -> ChatToolResult:
+        return ChatToolResult(
+            call_id=call.call_id,
+            tool_name=call.tool_name,
+            success=True,
+            payload={"status": "ok"},
+        )
+
+    updated_turn = run_orchestration_cycle(turn, tool_executor=_executor)
+
+    assert len(turn.tool_results) == 1
+    assert len(updated_turn.tool_results) == 2
+    assert updated_turn.tool_results[-1].call_id == "call_002"
+    assert updated_turn.diagnostics["orchestrator_action"] == OrchestratorAction.RUN_TOOLS.value
+
+
+def test_run_orchestration_cycle_records_tool_executor_exception() -> None:
+    turn = _base_turn()
+    turn.tool_calls = [
+        ChatToolCall(call_id="call_001", tool_name="optimize_portfolio", arguments={}),
+    ]
+
+    def _executor(call: ChatToolCall) -> ChatToolResult:
+        raise RuntimeError(f"tool failure for {call.tool_name}")
+
+    updated_turn = run_orchestration_cycle(turn, tool_executor=_executor)
+
+    assert len(updated_turn.tool_results) == 1
+    assert updated_turn.tool_results[0].success is False
+    assert "tool failure" in (updated_turn.tool_results[0].error_message or "")
+
+
+def test_run_orchestration_cycle_skips_executor_when_not_in_run_tools_state() -> None:
+    turn = _base_turn()
+
+    calls = {"count": 0}
+
+    def _executor(call: ChatToolCall) -> ChatToolResult:
+        calls["count"] += 1
+        return ChatToolResult(
+            call_id=call.call_id,
+            tool_name=call.tool_name,
+            success=True,
+            payload={"status": "ok"},
+        )
+
+    updated_turn = run_orchestration_cycle(turn, tool_executor=_executor)
+
+    assert calls["count"] == 0
+    assert updated_turn.diagnostics["orchestrator_action"] == OrchestratorAction.NEEDS_ASSISTANT_MESSAGE.value

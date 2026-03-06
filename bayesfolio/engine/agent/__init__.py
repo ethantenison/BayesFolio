@@ -4,7 +4,9 @@ from bayesfolio.engine.agent.intent_extractor import extract_intent
 from bayesfolio.engine.agent.orchestrator import (
     OrchestratorAction,
     OrchestratorDecision,
+    ToolExecutor,
     evaluate_turn,
+    run_orchestration_cycle,
 )
 from bayesfolio.engine.agent.planner import PipelinePlan, PlanStep, default_plan
 
@@ -16,4 +18,6 @@ __all__ = [
     "OrchestratorAction",
     "OrchestratorDecision",
     "evaluate_turn",
+    "run_orchestration_cycle",
+    "ToolExecutor",
 ]

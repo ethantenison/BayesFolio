@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Callable
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from bayesfolio.contracts.chat.protocol import ChatToolCall, ChatTurn
+from bayesfolio.contracts.chat.protocol import ChatToolCall, ChatToolResult, ChatTurn
 
 
 class OrchestratorAction(StrEnum):
@@ -30,6 +31,9 @@ class OrchestratorDecision(BaseModel):
     diagnostics: dict[str, object] = Field(default_factory=dict)
 
     model_config = ConfigDict(extra="forbid")
+
+
+ToolExecutor = Callable[[ChatToolCall], ChatToolResult]
 
 
 def evaluate_turn(turn: ChatTurn) -> OrchestratorDecision:
@@ -84,3 +88,52 @@ def evaluate_turn(turn: ChatTurn) -> OrchestratorDecision:
 
     diagnostics["reason"] = "Assistant message present and no pending tool executions."
     return OrchestratorDecision(action=OrchestratorAction.FINALIZE_TURN, diagnostics=diagnostics)
+
+
+def run_orchestration_cycle(turn: ChatTurn, tool_executor: ToolExecutor) -> ChatTurn:
+    """Execute one deterministic orchestration cycle for a chat turn.
+
+    The cycle evaluates turn state, runs any pending tool calls through the
+    provided executor, and appends resulting ``ChatToolResult`` entries.
+
+    Args:
+        turn: Input turn state to evaluate.
+        tool_executor: Callback used to execute one ``ChatToolCall``.
+
+    Returns:
+        Updated turn snapshot after one cycle.
+    """
+
+    updated_turn = turn.model_copy(deep=True)
+    decision = evaluate_turn(updated_turn)
+
+    updated_turn.diagnostics["orchestrator_action"] = decision.action.value
+    updated_turn.diagnostics["orchestrator"] = decision.diagnostics
+
+    if decision.action is not OrchestratorAction.RUN_TOOLS:
+        return updated_turn
+
+    for call in decision.pending_tool_calls:
+        try:
+            result = tool_executor(call)
+        except Exception as exc:
+            result = ChatToolResult(
+                call_id=call.call_id,
+                tool_name=call.tool_name,
+                success=False,
+                payload={},
+                error_message=str(exc),
+            )
+
+        if result.call_id != call.call_id or result.tool_name != call.tool_name:
+            result = ChatToolResult(
+                call_id=call.call_id,
+                tool_name=call.tool_name,
+                success=False,
+                payload={},
+                error_message="Tool executor returned mismatched call identity.",
+            )
+
+        updated_turn.tool_results.append(result)
+
+    return updated_turn

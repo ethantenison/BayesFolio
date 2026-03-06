@@ -1,5 +1,6 @@
 """Input/output and persistence utilities."""
 
+from bayesfolio.io.agent_tool_executor import RegistryToolExecutor, ToolHandler
 from bayesfolio.io.artifact_store import ParquetArtifactStore
 from bayesfolio.io.artifacts import (
     save_dataframe_csv,
@@ -24,6 +25,8 @@ from bayesfolio.io.report_artifacts import persist_report_diagnostic_figures
 __all__ = [
     "log_artifact_ref",
     "log_contract",
+    "RegistryToolExecutor",
+    "ToolHandler",
     "ParquetArtifactStore",
     "ArtifactBackend",
     "LocalArtifactBackend",
