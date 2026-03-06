@@ -22,6 +22,7 @@ from __future__ import annotations
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
+from pathlib import Path
 from typing import Callable
 
 import pandas as pd
@@ -72,6 +73,8 @@ class HistoricalMvpRequest:
         max_weight: Maximum portfolio weight as decimal.
         build_features: Whether to run the feature agent.
         lookback_days: Additional lookback window for feature generation.
+        use_local_cache: Whether to read/write local market-data cache.
+        cache_dir: Base directory for local market-data cache files.
     """
 
     tickers: list[str]
@@ -83,6 +86,8 @@ class HistoricalMvpRequest:
     max_weight: float = 0.35
     build_features: bool = True
     lookback_days: int = 365
+    use_local_cache: bool = True
+    cache_dir: str = "artifacts/cache"
 
 
 @dataclass(frozen=True)
@@ -350,7 +355,11 @@ def _run_universe_agent(request: HistoricalMvpRequest) -> tuple[UniverseRecord, 
         ValueError: If upstream returns fetch or filtered return matrix is empty.
     """
 
-    returns_long = build_long_panel(
+    returns_provider = ReturnsProvider(
+        fetcher=build_long_panel,
+        cache_dir=_cache_dir_for(request=request, dataset="returns"),
+    )
+    returns_long = returns_provider.get_y_excess_lead_long(
         tickers=request.tickers,
         start=request.start_date.isoformat(),
         end=request.end_date.isoformat(),
@@ -400,9 +409,20 @@ def _run_feature_agent(request: HistoricalMvpRequest) -> FeaturesDatasetResult:
         artifact_name=(f"mvp_features_{request.start_date.isoformat()}_{request.end_date.isoformat()}"),
     )
     providers = FeatureProviders(
-        returns_provider=ReturnsProvider(fetcher=build_long_panel),
-        macro_provider=MacroProvider(fetcher=fetch_macro_features, max_retries=1, retry_backoff_seconds=0.0),
-        etf_features_provider=EtfFeaturesProvider(fetcher=fetch_etf_features),
+        returns_provider=ReturnsProvider(
+            fetcher=build_long_panel,
+            cache_dir=_cache_dir_for(request=request, dataset="returns"),
+        ),
+        macro_provider=MacroProvider(
+            fetcher=fetch_macro_features,
+            max_retries=1,
+            retry_backoff_seconds=0.0,
+            cache_dir=_cache_dir_for(request=request, dataset="macro"),
+        ),
+        etf_features_provider=EtfFeaturesProvider(
+            fetcher=fetch_etf_features,
+            cache_dir=_cache_dir_for(request=request, dataset="etf_features"),
+        ),
     )
     artifact_store = ParquetArtifactStore(base_dir="artifacts/features")
     return build_features_dataset(feature_command, providers=providers, artifact_store=artifact_store)
@@ -495,10 +515,14 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
     min_weight_raw = payload.get("min_weight", 0.0)
     max_weight_raw = payload.get("max_weight", 0.35)
     lookback_days_raw = payload.get("lookback_days", 365)
+    use_local_cache_raw = payload.get("use_local_cache", True)
+    cache_dir_raw = payload.get("cache_dir", "artifacts/cache")
 
     min_weight = float(str(min_weight_raw))
     max_weight = float(str(max_weight_raw))
     lookback_days = int(str(lookback_days_raw))
+    use_local_cache = bool(use_local_cache_raw)
+    cache_dir = str(cache_dir_raw)
 
     return HistoricalMvpRequest(
         tickers=tickers,
@@ -510,7 +534,25 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         max_weight=max_weight,
         build_features=bool(payload.get("build_features", True)),
         lookback_days=lookback_days,
+        use_local_cache=use_local_cache,
+        cache_dir=cache_dir,
     )
+
+
+def _cache_dir_for(request: HistoricalMvpRequest, dataset: str) -> str | None:
+    """Resolve optional local cache directory for a market-data dataset.
+
+    Args:
+        request: Historical MVP request with cache settings.
+        dataset: Dataset bucket name (for example ``returns``).
+
+    Returns:
+        Dataset-specific local cache path, or ``None`` when cache is disabled.
+    """
+
+    if not request.use_local_cache:
+        return None
+    return str(Path(request.cache_dir) / dataset)
 
 
 def _run_mvp_tool(arguments: dict[str, object], progress: Callable[[str], None] | None) -> dict[str, object]:
