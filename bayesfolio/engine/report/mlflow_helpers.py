@@ -1,3 +1,5 @@
+from typing import Protocol, Sequence
+
 import mlflow
 import numpy as np
 import pandas as pd
@@ -6,8 +8,36 @@ from gpytorch.priors import LKJCovariancePrior, Prior
 from pydantic import BaseModel, ConfigDict
 from riskfolio.src.ParamsEstimation import mean_vector
 
-from bayesfolio.engine.forecast.gp.kernels import KernelArchitectureConfig, KernelConfig
-from bayesfolio.engine.forecast.gp.means import MeanF
+
+class _HasValue(Protocol):
+    value: str
+
+
+class _KernelConfigLike(Protocol):
+    kernel_type: _HasValue
+    ard: bool
+
+    def model_dump(self) -> dict[str, object]: ...
+
+
+class _KernelBlockLike(Protocol):
+    variable_type: _HasValue
+    block_structure: _HasValue
+    dims: Sequence[int]
+    base_kernel: _KernelConfigLike
+
+
+class _KernelArchitectureConfigLike(Protocol):
+    global_structure: _HasValue
+    interaction_policy: _HasValue
+    blocks: Sequence[_KernelBlockLike]
+
+    def model_dump(self) -> dict[str, object]: ...
+
+
+KernelArchitectureConfig = _KernelArchitectureConfigLike
+KernelConfig = _KernelConfigLike
+MeanFunctionType = str
 
 
 def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, prefix: str = "kernel"):
@@ -144,7 +174,7 @@ def log_gpytorch_state_dict(model, artifact_name="gp_state.json"):
 
 class MultiTaskConfig(BaseModel):
     num_tasks: int
-    mean: MeanF | dict[str, MeanF]
+    mean: MeanFunctionType | dict[str, MeanFunctionType]
     rank: int
     scaling: str
     min_noise: float
