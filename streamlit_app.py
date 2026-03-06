@@ -1,3 +1,7 @@
+"""
+To run streamlit app: poetry run streamlit run streamlit_app.py
+"""
+
 from __future__ import annotations
 
 import streamlit as st
