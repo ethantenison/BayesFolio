@@ -480,16 +480,36 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         Parsed HistoricalMvpRequest with typed dates and numeric settings.
     """
 
+    tickers_value = payload.get("tickers", [])
+    if isinstance(tickers_value, list):
+        tickers = [str(ticker) for ticker in tickers_value]
+    else:
+        tickers = []
+
+    start_raw = payload.get("start_date")
+    end_raw = payload.get("end_date")
+    if start_raw is None or end_raw is None:
+        msg = "Request payload must include start_date and end_date."
+        raise ValueError(msg)
+
+    min_weight_raw = payload.get("min_weight", 0.0)
+    max_weight_raw = payload.get("max_weight", 0.35)
+    lookback_days_raw = payload.get("lookback_days", 365)
+
+    min_weight = float(str(min_weight_raw))
+    max_weight = float(str(max_weight_raw))
+    lookback_days = int(str(lookback_days_raw))
+
     return HistoricalMvpRequest(
-        tickers=[str(ticker) for ticker in payload.get("tickers", [])],
-        start_date=date.fromisoformat(str(payload["start_date"])),
-        end_date=date.fromisoformat(str(payload["end_date"])),
+        tickers=tickers,
+        start_date=date.fromisoformat(str(start_raw)),
+        end_date=date.fromisoformat(str(end_raw)),
         objective=str(payload.get("objective", "Sharpe")),
         risk_measure=str(payload.get("risk_measure", "CVaR")),
-        min_weight=float(payload.get("min_weight", 0.0)),
-        max_weight=float(payload.get("max_weight", 0.35)),
+        min_weight=min_weight,
+        max_weight=max_weight,
         build_features=bool(payload.get("build_features", True)),
-        lookback_days=int(payload.get("lookback_days", 365)),
+        lookback_days=lookback_days,
     )
 
 
