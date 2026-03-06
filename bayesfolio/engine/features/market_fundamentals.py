@@ -25,7 +25,7 @@ except Exception:
 
 import requests
 
-FRED_TIMEOUT_SECONDS = float(os.getenv("BAYESFOLIO_FRED_TIMEOUT_SECONDS", "30"))
+FRED_TIMEOUT_SECONDS = int(float(os.getenv("BAYESFOLIO_FRED_TIMEOUT_SECONDS", "30")))
 FRED_RETRY_COUNT = int(os.getenv("BAYESFOLIO_FRED_RETRY_COUNT", "1"))
 FRED_RETRY_PAUSE_SECONDS = float(os.getenv("BAYESFOLIO_FRED_RETRY_PAUSE_SECONDS", "0.1"))
 
@@ -48,6 +48,7 @@ def _read_fred(symbols: str | list[str], start: str, end: str | None) -> pd.Data
 def _download_frame(*args: Any, **kwargs: Any) -> pd.DataFrame:
     """Download market data and return a DataFrame for type-safe processing."""
 
+    kwargs.setdefault("auto_adjust", False)
     data = yf.download(*args, **kwargs)
     if data is None:
         return pd.DataFrame()
