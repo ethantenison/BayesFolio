@@ -20,6 +20,44 @@ When adding or changing functionality:
 - Update docs files if **structure, ownership, or public entry points** change.
 - Do not duplicate long package maps or explanatory prose in this file.
 
+### Documentation Coverage & Maintenance (STRICT)
+
+Goal: no undocumented public surface, with minimal maintenance overhead.
+
+#### Required Documentation Coverage
+
+- Every new/modified **module** must include a top-level docstring that covers:
+  - purpose,
+  - layer/boundary responsibility,
+  - key inputs/outputs (include units for financial values).
+- Every **public** function/class/method must include a Google-style docstring.
+- Every package `__init__.py` should include:
+  - a 1-3 line package purpose,
+  - curated exports in `__all__` where applicable.
+- Every runnable script/entrypoint (including apps and CLI scripts) must include:
+  - a module docstring,
+  - a short Usage section (docstring or README-linked note).
+
+#### Efficient Update Rules (Anti-Drift)
+
+When changing code, update docs in the same change using this matrix:
+
+- Behavior/business rule change -> update docstring in the touched module/class/function.
+- Public API/export change -> update `__init__.py` exports and `docs/package_map.md`.
+- Architecture/ownership change -> update `docs/copilot_architecture.md`.
+- Contract field add/remove/rename -> update schema `Attributes:` docs in the same change.
+
+Keep this file normative-only. Keep structural maps/rationale in docs files.
+
+#### Minimum Documentation Gate
+
+A change is incomplete if any of the following are true:
+
+- New public symbol has no docstring.
+- Touched module has no top-level docstring or has stale behavior docs.
+- Contract field changes without matching `Attributes:` updates.
+- Public package surface changes without `docs/package_map.md` updates.
+
 ---
 
 ## Language & Style

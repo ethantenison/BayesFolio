@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,6 +25,18 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --no-interaction
+
+      - name: Check docstrings for new public symbols
+        run: |
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AM "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- '*.py')
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No changed Python files found."
+            exit 0
+          fi
+          poetry run python scripts/check_new_public_docstrings.py \
+            --base-sha "${{ github.event.pull_request.base.sha }}" \
+            --head-sha "${{ github.sha }}" \
+            --files $CHANGED_FILES
 
       - name: Run pytest
         run: poetry run python -m pytest -q
