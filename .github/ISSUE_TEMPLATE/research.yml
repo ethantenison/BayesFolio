@@ -1,0 +1,20 @@
+name: Research Task
+description: Investigate a modeling or portfolio method
+labels: ["type:research"]
+
+body:
+  - type: textarea
+    attributes:
+      label: Research question
+
+  - type: textarea
+    attributes:
+      label: Motivation
+
+  - type: textarea
+    attributes:
+      label: Proposed methodology
+
+  - type: textarea
+    attributes:
+      label: Expected deliverables

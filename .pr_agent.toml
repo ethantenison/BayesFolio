@@ -1,0 +1,54 @@
+[config]
+model = "gpt-4.1"
+fallback_models = ["gpt-4o-mini"]
+response_language = "en-US"
+
+[github_action_config]
+auto_describe = true
+auto_review = false
+auto_improve = false
+
+[pr_description]
+publish_description_as_comment = false
+publish_labels = false
+use_description_markers = true
+include_generated_by_header = false
+extra_instructions = """
+Fill the existing pull request template rather than replacing it with a generic summary.
+
+Priorities for this repository:
+1. Clearly state problem, approach, and expected impact.
+2. Identify whether the PR changes model behavior, optimization outputs, backtest results, or uncertainty estimates.
+3. Call out backtest-integrity risks, including look-ahead bias, leakage, timestamp alignment, and benchmark comparability.
+4. Summarize added/modified/removed modules or files.
+5. Keep claims evidence-based and avoid overstating validation.
+6. Prefer concise, reviewer-oriented language.
+"""
+
+[pr_reviewer]
+require_tests_review = true
+require_score_review = true
+require_estimate_effort_to_review = true
+num_code_suggestions = 0
+extra_instructions = """
+Review with special attention to:
+- data leakage
+- look-ahead bias
+- timestamp correctness
+- train/validation/test contamination
+- unintended changes to optimization objectives or constraints
+- uncertainty estimation changes
+Flag high-risk modeling or backtesting changes clearly.
+"""
+
+[pr_code_suggestions]
+num_code_suggestions = 4
+extra_instructions = """
+Prefer suggestions that improve:
+- typing
+- validation
+- reproducibility
+- numerical stability
+- testability
+Do not suggest speculative refactors unless they materially improve correctness or maintainability.
+"""

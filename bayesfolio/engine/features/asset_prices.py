@@ -245,6 +245,20 @@ def compute_excess_future_return_calendar(
 
 
 def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHLY):
+    """Build long-format excess-return labels for a ticker universe.
+
+    Args:
+        tickers: List of ETF tickers.
+        start: Inclusive start date in ISO format.
+        end: Optional inclusive end date in ISO format.
+        horizon: Forecast horizon/calendar frequency (for example ``BME``).
+
+    Returns:
+        Long-format dataframe with columns ``date``, ``asset_id``, and
+        ``y_excess_lead`` where return values are decimal units
+        (``0.02`` means ``2%``).
+    """
+
     prices = fetch_prices(tickers, start, end)
     rf_daily_cont = fetch_rf_daily(start, end)
 

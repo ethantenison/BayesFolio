@@ -1,3 +1,9 @@
+"""Evaluation visualizations for forecast and long-short diagnostics.
+
+This module generates and logs Matplotlib figures used for model evaluation,
+cross-sectional diagnostics, and uncertainty inspection.
+"""
+
 from pathlib import Path
 
 import matplotlib.dates as mdates
@@ -27,6 +33,13 @@ def save_plot(fig, name):
 # 1. TRUE vs PREDICTED
 # =========================================================
 def plot_true_vs_pred(y_true: pd.DataFrame, y_pred: pd.DataFrame):
+    """Plot realized vs predicted returns per asset and log artifacts.
+
+    Args:
+        y_true: Realized return panel with assets as columns.
+        y_pred: Predicted return panel aligned to ``y_true``.
+    """
+
     for asset in y_true.columns:
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(y_true[asset], label="True", lw=2)
@@ -41,6 +54,13 @@ def plot_true_vs_pred(y_true: pd.DataFrame, y_pred: pd.DataFrame):
 # 2. SCATTER: PREDICTED vs TRUE
 # =========================================================
 def plot_scatter_pooled(y_true: pd.DataFrame, y_pred: pd.DataFrame):
+    """Plot pooled scatter of predicted vs realized returns.
+
+    Args:
+        y_true: Realized return panel with assets as columns.
+        y_pred: Predicted return panel aligned to ``y_true``.
+    """
+
     fig, ax = plt.subplots(figsize=(5, 5))
 
     x = y_pred.values.flatten()
@@ -62,6 +82,13 @@ def plot_scatter_pooled(y_true: pd.DataFrame, y_pred: pd.DataFrame):
 # 3. RESIDUALS OVER TIME
 # =========================================================
 def plot_residuals(y_true: pd.DataFrame, y_pred: pd.DataFrame):
+    """Plot residual time series per asset and log artifacts.
+
+    Args:
+        y_true: Realized return panel with assets as columns.
+        y_pred: Predicted return panel aligned to ``y_true``.
+    """
+
     residuals = y_true - y_pred
 
     for asset in y_true.columns:
@@ -77,6 +104,16 @@ def plot_residuals(y_true: pd.DataFrame, y_pred: pd.DataFrame):
 # 4. INFORMATION COEFFICIENT (IC) OVER TIME
 # =========================================================
 def compute_ic_series(y_true, y_pred):
+    """Compute period-by-period Spearman information coefficient.
+
+    Args:
+        y_true: Realized return panel indexed by period.
+        y_pred: Predicted return panel indexed by period.
+
+    Returns:
+        Series of IC values by period.
+    """
+
     ic_list = []
     for t in range(len(y_true)):
         ic = y_true.iloc[t].corr(y_pred.iloc[t], method="spearman")
@@ -85,6 +122,12 @@ def compute_ic_series(y_true, y_pred):
 
 
 def plot_ic_timeseries(ic_series: pd.Series):
+    """Plot IC time series with rolling average and log artifact.
+
+    Args:
+        ic_series: Information-coefficient series.
+    """
+
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(ic_series, label="IC", lw=1.8)
     ax.plot(ic_series.rolling(3).mean(), label="3-period MA", lw=2)
