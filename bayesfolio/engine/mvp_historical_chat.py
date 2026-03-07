@@ -39,7 +39,7 @@ from bayesfolio.contracts.commands.universe import UniverseCommand
 from bayesfolio.contracts.results.features import FeaturesDatasetResult
 from bayesfolio.contracts.results.optimize import OptimizeResult
 from bayesfolio.contracts.ui.universe import UniverseRecord
-from bayesfolio.core.settings import Horizon, Interval
+from bayesfolio.core.settings import Horizon, Interval, RiskfolioConfig
 from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
 from bayesfolio.engine.backtest import run_weighted_backtest
@@ -59,6 +59,8 @@ from bayesfolio.io import (
     ReturnsProvider,
 )
 
+_DEFAULT_RISKFOLIO = RiskfolioConfig()
+
 
 @dataclass(frozen=True)
 class HistoricalMvpRequest:
@@ -71,7 +73,8 @@ class HistoricalMvpRequest:
         objective: Riskfolio objective (for example ``Sharpe``).
         risk_measure: Riskfolio risk measure (for example ``CVaR``).
         min_weight: Minimum portfolio weight as decimal.
-        max_weight: Maximum portfolio weight as decimal.
+        max_weight: Maximum portfolio weight as decimal (Riskfolio ``upperlng``).
+        nea: Target number of assets for Riskfolio optimization.
         build_features: Whether to run the feature agent.
         lookback_days: Additional lookback window for feature generation.
         use_local_cache: Whether to read/write local market-data cache.
@@ -84,7 +87,8 @@ class HistoricalMvpRequest:
     objective: str = "Sharpe"
     risk_measure: str = "CVaR"
     min_weight: float = 0.0
-    max_weight: float = 0.35
+    max_weight: float = _DEFAULT_RISKFOLIO.upperlng
+    nea: int = _DEFAULT_RISKFOLIO.nea
     build_features: bool = True
     lookback_days: int = 365
     use_local_cache: bool = True
@@ -173,12 +177,16 @@ def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvp
 
     objective = _extract_objective(message)
     risk_measure = _extract_risk_measure(message)
+    nea = _extract_nea(message)
+    max_weight = _extract_upperlng(message)
     return HistoricalMvpRequest(
         tickers=parsed_tickers,
         start_date=start_date,
         end_date=end_date,
         objective=objective,
         risk_measure=risk_measure,
+        max_weight=max_weight,
+        nea=nea,
     )
 
 
@@ -267,6 +275,7 @@ def run_historical_mvp_pipeline(
         risk_measure=request.risk_measure,
         min_weight=request.min_weight,
         max_weight=request.max_weight,
+        nea=request.nea,
         hist=True,
     )
     optimize_result = optimize_from_historical_returns(returns=returns_matrix, request=optimize_command)
@@ -531,13 +540,15 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         raise ValueError(msg)
 
     min_weight_raw = payload.get("min_weight", 0.0)
-    max_weight_raw = payload.get("max_weight", 0.35)
+    max_weight_raw = payload.get("max_weight", _DEFAULT_RISKFOLIO.upperlng)
+    nea_raw = payload.get("nea", _DEFAULT_RISKFOLIO.nea)
     lookback_days_raw = payload.get("lookback_days", 365)
     use_local_cache_raw = payload.get("use_local_cache", True)
     cache_dir_raw = payload.get("cache_dir", "artifacts/cache")
 
     min_weight = float(str(min_weight_raw))
     max_weight = float(str(max_weight_raw))
+    nea = int(str(nea_raw))
     lookback_days = int(str(lookback_days_raw))
     use_local_cache = bool(use_local_cache_raw)
     cache_dir = str(cache_dir_raw)
@@ -550,6 +561,7 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         risk_measure=str(payload.get("risk_measure", "CVaR")),
         min_weight=min_weight,
         max_weight=max_weight,
+        nea=nea,
         build_features=bool(payload.get("build_features", True)),
         lookback_days=lookback_days,
         use_local_cache=use_local_cache,
@@ -638,11 +650,14 @@ def _extract_tickers(message: str) -> list[str]:
     if explicit:
         tokens = [token.strip().upper() for token in explicit.group(1).split(",") if token.strip()]
     else:
-        raw_tokens = re.findall(r"\b[A-Z]{1,6}\b", message.upper())
+        raw_tokens = re.findall(r"\b[A-Z]{2,6}\b", message.upper())
         blocked = {
             "FOR",
             "FROM",
             "TO",
+            "WITH",
+            "AND",
+            "OF",
             "RISK",
             "MEASURE",
             "OBJECTIVE",
@@ -655,6 +670,10 @@ def _extract_tickers(message: str) -> list[str]:
             "UTILITY",
             "PORTFOLIO",
             "BUILD",
+            "MAX",
+            "WEIGHT",
+            "UPPERLNG",
+            "NEA",
         }
         tokens = [token for token in raw_tokens if token not in blocked]
 
@@ -705,3 +724,51 @@ def _extract_risk_measure(message: str) -> str:
     if "cdar" in lowered:
         return "CDaR"
     return "CVaR"
+
+
+def _extract_nea(message: str) -> int:
+    """Extract Riskfolio ``nea`` override from chat text.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        Parsed ``nea`` value when present; otherwise default config value.
+    """
+
+    match = re.search(r"\bnea\s*[:=]?\s*(\d+)\b", message, flags=re.IGNORECASE)
+    if match is None:
+        return int(_DEFAULT_RISKFOLIO.nea)
+
+    parsed = int(match.group(1))
+    return parsed if parsed >= 1 else int(_DEFAULT_RISKFOLIO.nea)
+
+
+def _extract_upperlng(message: str) -> float:
+    """Extract Riskfolio upper long bound from chat text.
+
+    Supports ``upperlng`` and ``max_weight`` aliases, with decimal or percent
+    input values.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        Parsed upper-long bound in decimal units, or default when absent/invalid.
+    """
+
+    match = re.search(
+        r"\b(?:upperlng|max_weight)\s*[:=]?\s*(-?\d+(?:\.\d+)?)\s*(%)?",
+        message,
+        flags=re.IGNORECASE,
+    )
+    if match is None:
+        return float(_DEFAULT_RISKFOLIO.upperlng)
+
+    value = float(match.group(1))
+    if match.group(2) == "%" or value > 1.0:
+        value = value / 100.0
+
+    if value <= 0.0 or value > 1.0:
+        return float(_DEFAULT_RISKFOLIO.upperlng)
+    return value
