@@ -40,6 +40,7 @@ from bayesfolio.contracts.results.features import FeaturesDatasetResult
 from bayesfolio.contracts.results.optimize import OptimizeResult
 from bayesfolio.contracts.ui.universe import UniverseRecord
 from bayesfolio.core.settings import Horizon, Interval, RiskfolioConfig
+from bayesfolio.engine.agent.intent_extractor import extract_intent_overrides_from_text
 from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
 from bayesfolio.engine.backtest import run_weighted_backtest
@@ -177,14 +178,24 @@ def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvp
 
     objective = _extract_objective(message)
     risk_measure = _extract_risk_measure(message)
+    min_weight = 0.0
     nea = _extract_nea(message)
     max_weight = _extract_upperlng(message)
+    llm_overrides = extract_intent_overrides_from_text(message)
+    if llm_overrides:
+        objective = str(llm_overrides.get("objective", objective))
+        risk_measure = str(llm_overrides.get("risk_measure", risk_measure))
+        min_weight = float(llm_overrides.get("min_weight", min_weight))
+        max_weight = float(llm_overrides.get("max_weight", max_weight))
+        nea = int(llm_overrides.get("nea", nea))
+
     return HistoricalMvpRequest(
         tickers=parsed_tickers,
         start_date=start_date,
         end_date=end_date,
         objective=objective,
         risk_measure=risk_measure,
+        min_weight=min_weight,
         max_weight=max_weight,
         nea=nea,
     )
@@ -736,12 +747,18 @@ def _extract_nea(message: str) -> int:
         Parsed ``nea`` value when present; otherwise default config value.
     """
 
-    match = re.search(r"\bnea(?:\s*(?:of|:=|=|:))?\s*(\d+)\b", message, flags=re.IGNORECASE)
-    if match is None:
-        return int(_DEFAULT_RISKFOLIO.nea)
+    patterns = [
+        r"\bnea(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
+        r"\bnumber\s+of\s+effective\s+assets(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
+        r"\beffective\s+assets(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, message, flags=re.IGNORECASE)
+        if match is not None:
+            parsed = int(match.group(1))
+            return parsed if parsed >= 1 else int(_DEFAULT_RISKFOLIO.nea)
 
-    parsed = int(match.group(1))
-    return parsed if parsed >= 1 else int(_DEFAULT_RISKFOLIO.nea)
+    return int(_DEFAULT_RISKFOLIO.nea)
 
 
 def _extract_upperlng(message: str) -> float:

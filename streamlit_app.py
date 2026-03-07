@@ -21,8 +21,9 @@ if "messages" not in st.session_state:
             "role": "assistant",
             "content": (
                 "Ask for a portfolio with tickers and optional settings. "
-                "Example: 'Build a portfolio for SPY, QQQ, TLT from 2019-01-01 to 2024-12-31 "
-                "objective sharpe risk cvar'."
+                "Example: Build a portfolio for SPY, IJR, VNQ, VWO, VEA, VNQI, IEF, LQD, "
+                "EWX, VWOB from 2021-01-01 to 2025-12-31 "
+                "objective sharpe risk cvar, max weight of 35%, and number of effective assets of 8 (nea)."
             ),
         }
     ]

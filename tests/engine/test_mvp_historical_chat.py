@@ -51,6 +51,14 @@ def test_parse_chat_request_extracts_max_weight_percent_alias() -> None:
     assert request.max_weight == 0.35
 
 
+def test_parse_chat_request_extracts_number_of_effective_assets_phrase() -> None:
+    request = parse_chat_request(
+        "Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31 with number of effective assets of 8"
+    )
+
+    assert request.nea == 8
+
+
 def test_parse_chat_request_does_not_treat_article_as_ticker() -> None:
     request = parse_chat_request(
         "Build a portfolio for SPY, IJR, VNQ, VWO, VEA, VNQI, IEF, LQD, EWX, VWOB "
@@ -60,6 +68,27 @@ def test_parse_chat_request_does_not_treat_article_as_ticker() -> None:
     assert request.tickers == ["SPY", "IJR", "VNQ", "VWO", "VEA", "VNQI", "IEF", "LQD", "EWX", "VWOB"]
     assert request.max_weight == 0.35
     assert request.nea == 8
+
+
+def test_parse_chat_request_applies_llm_overrides(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "bayesfolio.engine.mvp_historical_chat.extract_intent_overrides_from_text",
+        lambda message: {
+            "objective": "MinRisk",
+            "risk_measure": "MV",
+            "min_weight": 0.01,
+            "max_weight": 0.20,
+            "nea": 7,
+        },
+    )
+
+    request = parse_chat_request("Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31")
+
+    assert request.objective == "MinRisk"
+    assert request.risk_measure == "MV"
+    assert request.min_weight == 0.01
+    assert request.max_weight == 0.20
+    assert request.nea == 7
 
 
 def test_assess_data_quality_flags_stale_and_insufficient_assets() -> None:
