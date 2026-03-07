@@ -736,7 +736,7 @@ def _extract_nea(message: str) -> int:
         Parsed ``nea`` value when present; otherwise default config value.
     """
 
-    match = re.search(r"\bnea\s*[:=]?\s*(\d+)\b", message, flags=re.IGNORECASE)
+    match = re.search(r"\bnea(?:\s*(?:of|:=|=|:))?\s*(\d+)\b", message, flags=re.IGNORECASE)
     if match is None:
         return int(_DEFAULT_RISKFOLIO.nea)
 
@@ -762,6 +762,12 @@ def _extract_upperlng(message: str) -> float:
         message,
         flags=re.IGNORECASE,
     )
+    if match is None:
+        match = re.search(
+            r"\bmax(?:\s+weight)?\s*(?:of|=|:)?\s*(-?\d+(?:\.\d+)?)\s*(%)?\s*(?:upperlng)?\b",
+            message,
+            flags=re.IGNORECASE,
+        )
     if match is None:
         return float(_DEFAULT_RISKFOLIO.upperlng)
 

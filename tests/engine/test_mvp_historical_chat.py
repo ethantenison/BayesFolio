@@ -58,6 +58,8 @@ def test_parse_chat_request_does_not_treat_article_as_ticker() -> None:
     )
 
     assert request.tickers == ["SPY", "IJR", "VNQ", "VWO", "VEA", "VNQI", "IEF", "LQD", "EWX", "VWOB"]
+    assert request.max_weight == 0.35
+    assert request.nea == 8
 
 
 def test_assess_data_quality_flags_stale_and_insufficient_assets() -> None:
