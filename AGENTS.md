@@ -62,7 +62,7 @@ Enforce package/layer boundaries and prevent architecture erosion.
 
 ### Trigger
 
-- Pull request touching `bayesfolio/**`.
+- Pull requests touching `bayesfolio/**`.
 - Manual run before merge.
 
 ### Allowed Actions
@@ -94,13 +94,13 @@ Ensure documentation remains complete and synchronized with code changes.
 
 ### Trigger
 
-- Pull request touching public symbols or contracts.
+- Pull requests touching public symbols or contracts.
 - Manual run before release.
 
 ### Allowed Actions
 
 - Inspect and report by default.
-- Propose doc updates in same patch set as code changes.
+- Propose doc updates in the same patch set as code changes.
 - Apply only with explicit approval.
 
 ### Suggested Verification
@@ -140,6 +140,44 @@ Generate minimal, safe, and verifiable patches for approved findings.
 - Propose diffs always.
 - Apply diffs only with explicit approval.
 
+### Suggested Verification
+
+- `poetry run ruff check <touched_files>`
+- `poetry run pytest -q` (or targeted tests for touched modules)
+- Pylance diagnostics for touched files.
+
+## Role 4: Simplicity & Redundancy Inspector
+
+### Mission
+
+Keep the codebase lean by identifying duplication, unnecessary indirection, and maintainability drag.
+
+### Checks
+
+- Duplicate or near-duplicate logic across modules/functions.
+- Redundant modules/files that overlap in responsibility.
+- Dead code paths, stale helpers, and unused exports.
+- One-off wrappers/adapters that add layers without clear reuse.
+- Complexity hotspots (long functions, branching-heavy flows, repeated special-casing).
+
+### Trigger
+
+- Pull requests touching multiple modules in the same domain.
+- Periodic cleanup runs before release.
+- Tiny, single-file changes that do not touch public surface area may skip this role unless duplication or complexity risk is present.
+
+### Allowed Actions
+
+- Inspect and report by default with concrete consolidation candidates.
+- Propose minimal deduplication/simplification patches with risk notes.
+- Apply only with explicit approval.
+
+### Suggested Verification
+
+- `poetry run ruff check bayesfolio tests`
+- `poetry run pytest -q` (or targeted tests for simplified areas)
+- Pylance diagnostics for touched files.
+
 ## Escalation Policy
 
 Agent must stop and request human decision when:
@@ -153,9 +191,12 @@ Agent must stop and request human decision when:
 
 1. Run **Boundary Inspector**.
 2. Run **Documentation Drift Inspector**.
-3. If findings exist, run **Patch Proposer** in Propose mode.
-4. After approval, run Patch Proposer in Apply mode.
-5. Re-run verifications and attach outputs.
+3. Run **Simplicity & Redundancy Inspector**.
+4. If findings exist, run **Patch Proposer** in Propose mode.
+5. After approval, run Patch Proposer in Apply mode.
+6. Re-run verifications and attach outputs.
+
+Note: Role 4 may be skipped for tiny, single-file changes that do not touch public surface area, unless there is clear duplication or complexity risk.
 
 ## Ownership Notes
 

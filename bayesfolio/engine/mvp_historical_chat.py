@@ -20,7 +20,7 @@ Execution Flow:
 from __future__ import annotations
 
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Callable, Literal
@@ -39,7 +39,7 @@ from bayesfolio.contracts.commands.universe import UniverseCommand
 from bayesfolio.contracts.results.features import FeaturesDatasetResult
 from bayesfolio.contracts.results.optimize import OptimizeResult
 from bayesfolio.contracts.ui.universe import UniverseRecord
-from bayesfolio.core.settings import Horizon, Interval, RiskfolioConfig
+from bayesfolio.core.settings import Horizon, Interval, Objective, RiskfolioConfig, RiskMeasure
 from bayesfolio.engine.agent.intent_extractor import extract_intent_overrides_with_status
 from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
@@ -59,8 +59,10 @@ from bayesfolio.io import (
     RegistryToolExecutor,
     ReturnsProvider,
 )
+from bayesfolio.io.providers.chat_knowledge_provider import ChatKnowledgeProvider
 
 _DEFAULT_RISKFOLIO = RiskfolioConfig()
+_RISKFOLIO_KNOWLEDGE_PROVIDER = ChatKnowledgeProvider()
 ParserMode = Literal["rule-based", "llm-based"]
 
 
@@ -73,7 +75,11 @@ class HistoricalMvpRequest:
         start_date: Inclusive start date for historical returns.
         end_date: Inclusive end date for historical returns.
         objective: Riskfolio objective (for example ``Sharpe``).
-        risk_measure: Riskfolio risk measure (for example ``CVaR``).
+        risk_measure: Riskfolio risk measure (for example ``MV``).
+        model: Riskfolio model code (for example ``Classic``).
+        rf: Risk-free rate in decimal units for the same return frequency.
+        hist: Whether to use historical scenarios for non-MV risk measures.
+        kelly: Optional Kelly mode (``approx`` or ``exact``).
         min_weight: Minimum portfolio weight as decimal.
         max_weight: Maximum portfolio weight as decimal (Riskfolio ``upperlng``).
         nea: Target number of assets for Riskfolio optimization.
@@ -88,8 +94,12 @@ class HistoricalMvpRequest:
     tickers: list[str]
     start_date: date
     end_date: date
-    objective: str = "Sharpe"
-    risk_measure: str = "CVaR"
+    objective: str = _DEFAULT_RISKFOLIO.obj.value
+    risk_measure: str = _DEFAULT_RISKFOLIO.rm.value
+    model: str = _DEFAULT_RISKFOLIO.model.value
+    rf: float = _DEFAULT_RISKFOLIO.rf
+    hist: bool = _DEFAULT_RISKFOLIO.hist
+    kelly: str | None = None
     min_weight: float = 0.0
     max_weight: float = _DEFAULT_RISKFOLIO.upperlng
     nea: int = _DEFAULT_RISKFOLIO.nea
@@ -191,6 +201,10 @@ def parse_chat_request(
 
     objective = _extract_objective(message)
     risk_measure = _extract_risk_measure(message)
+    model = _extract_model(message)
+    rf = _extract_rf(message)
+    hist = _extract_hist(message)
+    kelly = _extract_kelly(message)
     min_weight = 0.0
     nea = _extract_nea(message)
     max_weight = _extract_upperlng(message)
@@ -205,8 +219,13 @@ def parse_chat_request(
             )
             raise ValueError(msg)
 
-        objective = str(llm_overrides.get("objective", "Sharpe"))
-        risk_measure = str(llm_overrides.get("risk_measure", "CVaR"))
+        objective = str(llm_overrides.get("objective", _DEFAULT_RISKFOLIO.obj.value))
+        risk_measure = str(llm_overrides.get("risk_measure", _DEFAULT_RISKFOLIO.rm.value))
+        model = str(llm_overrides.get("model", _DEFAULT_RISKFOLIO.model.value))
+        rf = float(llm_overrides.get("rf", _DEFAULT_RISKFOLIO.rf))
+        hist = _coerce_bool(llm_overrides.get("hist", _DEFAULT_RISKFOLIO.hist), default=_DEFAULT_RISKFOLIO.hist)
+        kelly_raw = llm_overrides.get("kelly", None)
+        kelly = str(kelly_raw) if isinstance(kelly_raw, str) else None
         min_weight = float(llm_overrides.get("min_weight", 0.0))
         max_weight = float(llm_overrides.get("max_weight", _DEFAULT_RISKFOLIO.upperlng))
         nea = int(llm_overrides.get("nea", _DEFAULT_RISKFOLIO.nea))
@@ -218,6 +237,10 @@ def parse_chat_request(
         end_date=end_date,
         objective=objective,
         risk_measure=risk_measure,
+        model=model,
+        rf=rf,
+        hist=hist,
+        kelly=kelly,
         min_weight=min_weight,
         max_weight=max_weight,
         nea=nea,
@@ -309,10 +332,13 @@ def run_historical_mvp_pipeline(
     optimize_command = OptimizeCommand(
         objective=request.objective,
         risk_measure=request.risk_measure,
+        model=request.model,
+        rf=request.rf,
+        kelly=request.kelly,
         min_weight=request.min_weight,
         max_weight=request.max_weight,
         nea=request.nea,
-        hist=True,
+        hist=request.hist,
     )
     optimize_result = optimize_from_historical_returns(returns=returns_matrix, request=optimize_command)
 
@@ -375,27 +401,63 @@ def run_historical_mvp_chat_turn(
     """
 
     request = parse_chat_request(message, parser_mode=parser_mode)
+    is_ambiguous = _is_ambiguous_request(message=message)
+    knowledge_payload: dict[str, object] | None = None
+    normalization_payload: dict[str, object] = {
+        "applied": {},
+        "reason": "not_ambiguous" if not is_ambiguous else "no_change",
+    }
+
+    if is_ambiguous:
+        knowledge_payload = _run_riskfolio_knowledge_tool(
+            arguments={"message": message},
+            provider=_RISKFOLIO_KNOWLEDGE_PROVIDER,
+        )
+        request, normalization_payload = _apply_knowledge_normalization(
+            request=request,
+            knowledge_payload=knowledge_payload,
+        )
+        knowledge_payload["normalization"] = normalization_payload
+
     turn = ChatTurn(user_message=ChatMessageUser(content=message))
-    turn.tool_calls = [
+    turn.tool_calls = []
+    if is_ambiguous:
+        turn.tool_calls.append(
+            ChatToolCall(
+                call_id="call_000",
+                tool_name="retrieve_riskfolio_knowledge",
+                arguments={
+                    "message": message,
+                    "knowledge_payload": knowledge_payload,
+                },
+            )
+        )
+    turn.tool_calls.append(
         ChatToolCall(
             call_id="call_001",
             tool_name="run_historical_mvp_pipeline",
             arguments={"request": _request_to_payload(request)},
         )
-    ]
+    )
 
     executor = RegistryToolExecutor(
         handlers={
+            "retrieve_riskfolio_knowledge": lambda arguments: _run_riskfolio_knowledge_tool(
+                arguments=arguments,
+                provider=_RISKFOLIO_KNOWLEDGE_PROVIDER,
+            ),
             "run_historical_mvp_pipeline": lambda arguments: _run_mvp_tool(
                 arguments=arguments,
                 progress=progress,
-            )
+            ),
         }
     )
 
     updated_turn = run_orchestration_cycle(turn=turn, tool_executor=executor)
     updated_turn.diagnostics["parser_mode"] = parser_mode
     updated_turn.diagnostics["llm_overrides_applied"] = request.llm_overrides_applied
+    updated_turn.diagnostics["ambiguous_request"] = is_ambiguous
+    updated_turn.diagnostics["knowledge_normalization"] = normalization_payload
     if not updated_turn.tool_results:
         updated_turn.assistant_message = ChatMessageAssistant(content="No tool result was produced.")
         return updated_turn
@@ -403,10 +465,166 @@ def run_historical_mvp_chat_turn(
     latest = updated_turn.tool_results[-1]
     if latest.success:
         assistant_text = str(latest.payload.get("report_markdown", "Historical MVP run completed."))
+        retrieval_payload = _find_retrieval_payload(turn=updated_turn)
+        if retrieval_payload is not None:
+            assistant_text = f"{assistant_text}\n\n{_render_knowledge_summary(retrieval_payload)}"
     else:
         assistant_text = f"MVP run failed: {latest.error_message or 'unknown tool error'}"
     updated_turn.assistant_message = ChatMessageAssistant(content=assistant_text)
     return updated_turn
+
+
+def _run_riskfolio_knowledge_tool(
+    arguments: dict[str, object],
+    provider: ChatKnowledgeProvider,
+) -> dict[str, object]:
+    """Execute deterministic Riskfolio knowledge retrieval for chat grounding.
+
+    Args:
+        arguments: Tool arguments including query text and optional precomputed
+            payload.
+        provider: IO provider used to retrieve snippets and normalization hints.
+
+    Returns:
+        Retrieval payload with snippets and canonical suggestion hints.
+
+    Raises:
+        ValueError: If query message is missing.
+    """
+
+    precomputed = arguments.get("knowledge_payload")
+    if isinstance(precomputed, dict):
+        return {str(key): value for key, value in precomputed.items()}
+
+    message = arguments.get("message")
+    if not isinstance(message, str) or not message.strip():
+        msg = "Knowledge tool requires a non-empty 'message' argument."
+        raise ValueError(msg)
+
+    top_k_raw = arguments.get("top_k", 5)
+    top_k = int(top_k_raw) if isinstance(top_k_raw, int | float | str) else 5
+    return provider.retrieve_and_suggest(query=message, top_k=max(top_k, 1))
+
+
+def _is_ambiguous_request(message: str) -> bool:
+    """Determine whether a chat request lacks explicit optimization settings.
+
+    Args:
+        message: User request text.
+
+    Returns:
+        ``True`` when objective or risk measure appears underspecified.
+    """
+
+    lowered = message.lower()
+    objective_explicit = bool(re.search(r"\b(min\s*risk|minrisk|max\s*ret(?:urn)?|maxret|utility|sharpe)\b", lowered))
+    risk_explicit = bool(
+        re.search(
+            r"\b(cvar|mv|variance|mad|cdar|edar|rldar|evar|rlvar|mdd|uci|gmd|sortino|flpm|slpm)\b",
+            lowered,
+        )
+    )
+    return not (objective_explicit and risk_explicit)
+
+
+def _apply_knowledge_normalization(
+    request: HistoricalMvpRequest,
+    knowledge_payload: dict[str, object],
+) -> tuple[HistoricalMvpRequest, dict[str, object]]:
+    """Apply canonical objective/risk normalization from retrieval hints.
+
+    Args:
+        request: Parsed request prior to normalization.
+        knowledge_payload: Retrieval payload including ``suggested_overrides``.
+
+    Returns:
+        Tuple of normalized request and normalization diagnostics.
+    """
+
+    suggested = knowledge_payload.get("suggested_overrides")
+    if not isinstance(suggested, dict):
+        return request, {"applied": {}, "reason": "no_suggestions"}
+
+    normalized = request
+    applied: dict[str, dict[str, str]] = {}
+
+    objective_raw = suggested.get("objective")
+    if isinstance(objective_raw, str) and objective_raw in {objective.value for objective in Objective}:
+        if objective_raw != request.objective:
+            normalized = replace(normalized, objective=objective_raw)
+            applied["objective"] = {"from": request.objective, "to": objective_raw}
+
+    risk_raw = suggested.get("risk_measure")
+    if isinstance(risk_raw, str) and risk_raw in {risk.value for risk in RiskMeasure}:
+        if risk_raw != request.risk_measure:
+            normalized = replace(normalized, risk_measure=risk_raw)
+            applied["risk_measure"] = {"from": request.risk_measure, "to": risk_raw}
+
+    model_raw = suggested.get("model")
+    if isinstance(model_raw, str) and model_raw in {"Classic", "BL", "FM", "BLFM"}:
+        if model_raw != request.model:
+            normalized = replace(normalized, model=model_raw)
+            applied["model"] = {"from": request.model, "to": model_raw}
+
+    rf_raw = suggested.get("rf")
+    if isinstance(rf_raw, int | float):
+        rf_value = float(rf_raw)
+        if rf_value != request.rf:
+            normalized = replace(normalized, rf=rf_value)
+            applied["rf"] = {"from": f"{request.rf}", "to": f"{rf_value}"}
+
+    hist_raw = suggested.get("hist")
+    if isinstance(hist_raw, bool) and hist_raw != request.hist:
+        normalized = replace(normalized, hist=hist_raw)
+        applied["hist"] = {"from": f"{request.hist}", "to": f"{hist_raw}"}
+
+    kelly_raw = suggested.get("kelly")
+    if isinstance(kelly_raw, str) and kelly_raw in {"approx", "exact"}:
+        if kelly_raw != request.kelly:
+            normalized = replace(normalized, kelly=kelly_raw)
+            applied["kelly"] = {"from": f"{request.kelly}", "to": kelly_raw}
+
+    reason = "applied" if applied else "no_change"
+    return normalized, {"applied": applied, "reason": reason}
+
+
+def _find_retrieval_payload(turn: ChatTurn) -> dict[str, object] | None:
+    """Return the retrieval payload from tool results if available."""
+
+    for result in turn.tool_results:
+        if result.tool_name == "retrieve_riskfolio_knowledge" and result.success:
+            return result.payload
+    return None
+
+
+def _render_knowledge_summary(payload: dict[str, object]) -> str:
+    """Render compact retrieval provenance for assistant output."""
+
+    snippets_raw = payload.get("snippets")
+    snippets = snippets_raw if isinstance(snippets_raw, list) else []
+    normalization_raw = payload.get("normalization")
+    normalization = normalization_raw if isinstance(normalization_raw, dict) else {}
+    applied_raw = normalization.get("applied")
+    applied = applied_raw if isinstance(applied_raw, dict) else {}
+
+    source_entries: list[str] = []
+    for snippet in snippets[:2]:
+        if not isinstance(snippet, dict):
+            continue
+        source = snippet.get("source")
+        if isinstance(source, str):
+            source_entries.append(source)
+
+    source_text = "none"
+    if source_entries:
+        source_text = ", ".join(source_entries)
+
+    if applied:
+        normalized_text = ", ".join(f"{field}: {change.get('to', '')}" for field, change in applied.items())
+    else:
+        normalized_text = "none"
+
+    return f"Knowledge used: sources={source_text}; normalized={normalized_text}."
 
 
 def _run_universe_agent(request: HistoricalMvpRequest) -> tuple[UniverseRecord, pd.DataFrame]:
@@ -537,6 +755,7 @@ def _render_report_markdown(
         f"- Universe size: {len(universe.asset_order)} assets\n"
         f"- Date range: {request.start_date.isoformat()} to {request.end_date.isoformat()}\n"
         f"- Objective / Risk: {request.objective} / {request.risk_measure}\n"
+        f"- Model / rf / hist / kelly: {request.model} / {request.rf:.4f} / {request.hist} / {request.kelly}\n"
         f"- Data quality gate: {'PASS' if data_quality.pass_gate else 'FLAGGED'}\n"
         f"- Top weights: {top_assets}\n"
         f"- {feature_text}\n"
@@ -602,8 +821,12 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         tickers=tickers,
         start_date=date.fromisoformat(str(start_raw)),
         end_date=date.fromisoformat(str(end_raw)),
-        objective=str(payload.get("objective", "Sharpe")),
-        risk_measure=str(payload.get("risk_measure", "CVaR")),
+        objective=str(payload.get("objective", _DEFAULT_RISKFOLIO.obj.value)),
+        risk_measure=str(payload.get("risk_measure", _DEFAULT_RISKFOLIO.rm.value)),
+        model=str(payload.get("model", _DEFAULT_RISKFOLIO.model.value)),
+        rf=float(str(payload.get("rf", _DEFAULT_RISKFOLIO.rf))),
+        hist=_coerce_bool(payload.get("hist", _DEFAULT_RISKFOLIO.hist), default=_DEFAULT_RISKFOLIO.hist),
+        kelly=(str(payload.get("kelly")) if isinstance(payload.get("kelly"), str) else None),
         min_weight=min_weight,
         max_weight=max_weight,
         nea=nea,
@@ -760,7 +983,7 @@ def _extract_risk_measure(message: str) -> str:
         message: User prompt text.
 
     Returns:
-        Risk measure string. Defaults to ``"CVaR"``.
+        Risk measure string. Defaults to ``"MV"``.
     """
 
     lowered = message.lower().replace("-", "")
@@ -772,7 +995,112 @@ def _extract_risk_measure(message: str) -> str:
         return "MAD"
     if "cdar" in lowered:
         return "CDaR"
-    return "CVaR"
+    return _DEFAULT_RISKFOLIO.rm.value
+
+
+def _extract_model(message: str) -> str:
+    """Infer Riskfolio model from chat text keywords.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        Model code. Defaults to ``Classic``.
+    """
+
+    lowered = message.lower()
+    if "blfm" in lowered or "black litterman factor" in lowered:
+        return "BLFM"
+    if re.search(r"\bfm\b", lowered) or "factor model" in lowered:
+        return "FM"
+    if "black litterman" in lowered or re.search(r"\bbl\b", lowered):
+        return "BL"
+    return _DEFAULT_RISKFOLIO.model.value
+
+
+def _extract_rf(message: str) -> float:
+    """Extract risk-free rate in decimal units from chat text.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        Decimal risk-free rate. Defaults to configured Riskfolio value.
+    """
+
+    match = re.search(
+        r"\b(?:rf|risk\s*free(?:\s*rate)?)\s*[:=]?\s*(-?\d+(?:\.\d+)?)\s*(%)?",
+        message,
+        flags=re.IGNORECASE,
+    )
+    if match is None:
+        return float(_DEFAULT_RISKFOLIO.rf)
+
+    value = float(match.group(1))
+    if match.group(2) == "%" or value > 1.0:
+        value = value / 100.0
+    return value
+
+
+def _extract_hist(message: str) -> bool:
+    """Extract Riskfolio ``hist`` flag from chat text.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        Parsed boolean flag. Defaults to configured Riskfolio value.
+    """
+
+    lowered = message.lower()
+    if "hist false" in lowered or "no historical" in lowered or "non historical" in lowered:
+        return False
+    if "hist true" in lowered or "historical" in lowered:
+        return True
+    return bool(_DEFAULT_RISKFOLIO.hist)
+
+
+def _extract_kelly(message: str) -> str | None:
+    """Extract Kelly mode from chat text.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        ``approx``, ``exact``, or ``None`` when not requested.
+    """
+
+    lowered = message.lower()
+    if "kelly exact" in lowered or "exact kelly" in lowered:
+        return "exact"
+    if "kelly approx" in lowered or "approx kelly" in lowered or "approximate kelly" in lowered:
+        return "approx"
+    return None
+
+
+def _coerce_bool(value: object, default: bool) -> bool:
+    """Coerce arbitrary user/tool input into a boolean value.
+
+    Args:
+        value: Candidate boolean-like value.
+        default: Fallback value when parsing is not possible.
+
+    Returns:
+        Parsed or fallback boolean.
+    """
+
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        if lowered in {"true", "1", "yes", "y"}:
+            return True
+        if lowered in {"false", "0", "no", "n"}:
+            return False
+        return default
+    if isinstance(value, int | float):
+        return bool(value)
+    return default
 
 
 def _extract_nea(message: str) -> int:

@@ -79,20 +79,22 @@ def optimize_from_historical_returns(
 
         try:
             weights_df = portfolio.optimization(
-                model="Classic",
+                model=request.model,
                 rm=request.risk_measure,
                 obj=request.objective,
-                rf=0,
+                kelly=request.kelly,
+                rf=request.rf,
                 l=max(float(request.min_weight), 0.0),
                 u=max(float(request.max_weight), 0.0),
                 hist=request.hist,
             )
         except TypeError:
             weights_df = portfolio.optimization(
-                model="Classic",
+                model=request.model,
                 rm=request.risk_measure,
                 obj=request.objective,
-                rf=0,
+                kelly=request.kelly,
+                rf=request.rf,
                 hist=request.hist,
             )
 
