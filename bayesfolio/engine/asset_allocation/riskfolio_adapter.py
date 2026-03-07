@@ -43,6 +43,7 @@ def optimize_from_historical_returns(
         returns: Historical periodic returns with columns as ticker symbols.
             Returns must be decimal units (0.02 = 2%).
         request: Optimization command with objective/risk settings.
+            ``max_weight`` maps to Riskfolio upper-long bound (``u``).
 
     Returns:
         OptimizeResult with stable ``asset_order`` and decimal weights.
@@ -72,17 +73,28 @@ def optimize_from_historical_returns(
     weights_array: np.ndarray
 
     try:
-        portfolio = rp.Portfolio(returns=clean_returns)
+        portfolio = rp.Portfolio(returns=clean_returns, nea=max(int(request.nea), 1))
+        portfolio.card = None
         portfolio.assets_stats(method_mu="hist", method_cov="hist")
 
-        weights_df = portfolio.optimization(
-            model="Classic",
-            rm=request.risk_measure,
-            obj=request.objective,
-            rf=0,
-            l=1,
-            hist=request.hist,
-        )
+        try:
+            weights_df = portfolio.optimization(
+                model="Classic",
+                rm=request.risk_measure,
+                obj=request.objective,
+                rf=0,
+                l=max(float(request.min_weight), 0.0),
+                u=max(float(request.max_weight), 0.0),
+                hist=request.hist,
+            )
+        except TypeError:
+            weights_df = portfolio.optimization(
+                model="Classic",
+                rm=request.risk_measure,
+                obj=request.objective,
+                rf=0,
+                hist=request.hist,
+            )
 
         if weights_df is None or weights_df.empty:
             raise RuntimeError("Riskfolio returned empty weights.")

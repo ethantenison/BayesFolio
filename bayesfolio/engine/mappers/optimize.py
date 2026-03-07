@@ -11,13 +11,15 @@ def command_to_engine_inputs(command: OptimizeCommand) -> dict[str, object]:
         command: The optimization command contract.
 
     Returns:
-        Dict of engine keyword arguments (objective, risk_measure, min_weight, max_weight, hist).
+        Dict of engine keyword arguments
+        (objective, risk_measure, min_weight, max_weight, nea, hist).
     """
     return {
         "objective": command.objective,
         "risk_measure": command.risk_measure,
         "min_weight": command.min_weight,
         "max_weight": command.max_weight,
+        "nea": command.nea,
         "hist": command.hist,
     }
 

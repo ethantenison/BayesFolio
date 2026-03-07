@@ -4,6 +4,8 @@ To run streamlit app: poetry run streamlit run streamlit_app.py
 
 from __future__ import annotations
 
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from bayesfolio.engine.mvp_historical_chat import (
@@ -13,14 +15,24 @@ from bayesfolio.engine.mvp_historical_chat import (
 st.set_page_config(page_title="BayesFolio MVP Chat", page_icon="📈", layout="wide")
 st.title("BayesFolio Historical MVP Chat")
 
+parser_mode_label = st.sidebar.radio(
+    "Parser Mode",
+    options=("Rule-based", "LLM-based"),
+    index=0,
+    help="Choose deterministic rule parsing or LLM override extraction with fallback.",
+)
+parser_mode = "llm-based" if parser_mode_label == "LLM-based" else "rule-based"
+st.sidebar.caption(f"Current parser mode: {parser_mode_label}")
+
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant",
             "content": (
                 "Ask for a portfolio with tickers and optional settings. "
-                "Example: 'Build a portfolio for SPY, QQQ, TLT from 2019-01-01 to 2024-12-31 "
-                "objective sharpe risk cvar'."
+                "Example: Build a portfolio for SPY, IJR, VNQ, VWO, VEA, VNQI, IEF, LQD, "
+                "EWX, VWOB from 2021-01-01 to 2025-12-31 "
+                "objective sharpe risk cvar, max weight of 35%, and number of effective assets of 8 (nea)."
             ),
         }
     ]
@@ -38,7 +50,7 @@ if prompt:
     with st.chat_message("assistant"):
         try:
             with st.status("Running MVP agent workflow...", expanded=True) as status:
-                turn = run_historical_mvp_chat_turn(prompt, progress=status.write)
+                turn = run_historical_mvp_chat_turn(prompt, progress=status.write, parser_mode=parser_mode)
                 status.update(label="MVP workflow complete.", state="complete")
 
             if not turn.tool_results:
@@ -50,7 +62,68 @@ if prompt:
 
             weights = payload.get("weights", [])
             st.subheader("Optimized Weights")
-            st.dataframe(weights, hide_index=True, use_container_width=True)
+            st.dataframe(weights, hide_index=True, width="stretch")
+
+            if isinstance(weights, list) and weights:
+                weights_df = pd.DataFrame(weights)
+                if {"asset", "weight"}.issubset(weights_df.columns):
+                    donut = px.pie(
+                        weights_df,
+                        names="asset",
+                        values="weight",
+                        hole=0.5,
+                        title="Portfolio Weight Allocation",
+                    )
+                    donut.update_traces(textposition="inside", texttemplate="%{label}<br>%{percent}")
+                    st.plotly_chart(donut, width="stretch")
+
+            metrics = payload.get("metrics", {})
+            if isinstance(metrics, dict) and metrics:
+                st.subheader("Portfolio Metrics")
+                percent_keys = {
+                    "cumulative_return",
+                    "annualized_return",
+                    "annualized_volatility",
+                    "max_drawdown",
+                }
+                ratio_keys = {"sharpe_ratio", "sortino_ratio", "calmar_ratio"}
+                metric_labels = {
+                    "cumulative_return": "Cumulative Return",
+                    "annualized_return": "Annualized Return (CAGR)",
+                    "annualized_volatility": "Annualized Volatility",
+                    "max_drawdown": "Max Drawdown",
+                    "sharpe_ratio": "Sharpe Ratio",
+                    "sortino_ratio": "Sortino Ratio",
+                    "calmar_ratio": "Calmar Ratio",
+                }
+
+                rows: list[dict[str, str]] = []
+                for key in [
+                    "cumulative_return",
+                    "annualized_return",
+                    "annualized_volatility",
+                    "max_drawdown",
+                    "sharpe_ratio",
+                    "sortino_ratio",
+                    "calmar_ratio",
+                ]:
+                    value = metrics.get(key)
+                    if isinstance(value, int | float):
+                        if key in percent_keys:
+                            display_value = f"{float(value) * 100:.2f}%"
+                        elif key in ratio_keys:
+                            display_value = f"{float(value):.2f}"
+                        else:
+                            display_value = str(value)
+                        rows.append(
+                            {
+                                "Metric": metric_labels.get(key, key.replace("_", " ").title()),
+                                "Value": display_value,
+                            }
+                        )
+
+                if rows:
+                    st.table(pd.DataFrame(rows))
 
             quality = payload.get("data_quality", {})
             quality_table = {
@@ -64,7 +137,7 @@ if prompt:
                 ],
             }
             st.subheader("Data Quality")
-            st.dataframe(quality_table, hide_index=True, use_container_width=True)
+            st.dataframe(quality_table, hide_index=True, width="stretch")
 
             feature_artifact = payload.get("feature_artifact")
             if feature_artifact:

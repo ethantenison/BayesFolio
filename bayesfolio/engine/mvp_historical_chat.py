@@ -21,9 +21,9 @@ from __future__ import annotations
 
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Literal
 
 import pandas as pd
 
@@ -39,9 +39,11 @@ from bayesfolio.contracts.commands.universe import UniverseCommand
 from bayesfolio.contracts.results.features import FeaturesDatasetResult
 from bayesfolio.contracts.results.optimize import OptimizeResult
 from bayesfolio.contracts.ui.universe import UniverseRecord
-from bayesfolio.core.settings import Horizon, Interval
+from bayesfolio.core.settings import Horizon, Interval, RiskfolioConfig
+from bayesfolio.engine.agent.intent_extractor import extract_intent_overrides_with_status
 from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
+from bayesfolio.engine.backtest import run_weighted_backtest
 from bayesfolio.engine.features import (
     build_features_dataset,
     build_long_panel,
@@ -58,6 +60,9 @@ from bayesfolio.io import (
     ReturnsProvider,
 )
 
+_DEFAULT_RISKFOLIO = RiskfolioConfig()
+ParserMode = Literal["rule-based", "llm-based"]
+
 
 @dataclass(frozen=True)
 class HistoricalMvpRequest:
@@ -70,11 +75,14 @@ class HistoricalMvpRequest:
         objective: Riskfolio objective (for example ``Sharpe``).
         risk_measure: Riskfolio risk measure (for example ``CVaR``).
         min_weight: Minimum portfolio weight as decimal.
-        max_weight: Maximum portfolio weight as decimal.
+        max_weight: Maximum portfolio weight as decimal (Riskfolio ``upperlng``).
+        nea: Target number of assets for Riskfolio optimization.
         build_features: Whether to run the feature agent.
         lookback_days: Additional lookback window for feature generation.
         use_local_cache: Whether to read/write local market-data cache.
         cache_dir: Base directory for local market-data cache files.
+        parser_mode: Parsing mode used for request normalization.
+        llm_overrides_applied: Whether LLM intent overrides were applied.
     """
 
     tickers: list[str]
@@ -83,11 +91,14 @@ class HistoricalMvpRequest:
     objective: str = "Sharpe"
     risk_measure: str = "CVaR"
     min_weight: float = 0.0
-    max_weight: float = 0.35
+    max_weight: float = _DEFAULT_RISKFOLIO.upperlng
+    nea: int = _DEFAULT_RISKFOLIO.nea
     build_features: bool = True
     lookback_days: int = 365
     use_local_cache: bool = True
     cache_dir: str = "artifacts/cache"
+    parser_mode: ParserMode = "rule-based"
+    llm_overrides_applied: bool = False
 
 
 @dataclass(frozen=True)
@@ -120,6 +131,9 @@ class HistoricalMvpResult:
         universe: Universe snapshot from the universe agent.
         data_quality: Data quality diagnostics.
         optimize_result: Optimization output weights.
+        portfolio_metrics: Backtest metrics where return and volatility values are
+            decimals (0.10 = 10%), max_drawdown is decimal (negative or zero),
+            and ratio values are dimensionless.
         report_markdown: Human-readable report text.
         weights_table: Weights table for display.
         agent_logs: Ordered coordinator logs.
@@ -131,6 +145,7 @@ class HistoricalMvpResult:
     universe: UniverseRecord
     data_quality: DataQualityResult
     optimize_result: OptimizeResult
+    portfolio_metrics: dict[str, float]
     report_markdown: str
     weights_table: pd.DataFrame
     agent_logs: list[str]
@@ -138,18 +153,26 @@ class HistoricalMvpResult:
     features_result: FeaturesDatasetResult | None = None
 
 
-def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvpRequest:
+def parse_chat_request(
+    message: str,
+    today: date | None = None,
+    parser_mode: ParserMode = "rule-based",
+) -> HistoricalMvpRequest:
     """Parse a free-form chat request into a normalized coordinator request.
 
     Args:
         message: User message containing tickers and optional settings.
         today: Optional date override for deterministic tests.
+        parser_mode: Parsing mode selector. ``"rule-based"`` skips LLM
+            extraction while ``"llm-based"`` applies LLM override extraction.
 
     Returns:
         Parsed and normalized request object.
 
     Raises:
         ValueError: If no tickers can be parsed.
+        ValueError: If ``parser_mode`` is ``"llm-based"`` and no LLM
+            overrides can be extracted.
     """
 
     anchors = today or date.today()
@@ -158,22 +181,48 @@ def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvp
         msg = "Could not parse any tickers. Include tickers like SPY, QQQ, TLT."
         raise ValueError(msg)
 
-    parsed_dates = re.findall(r"\b\d{4}-\d{2}-\d{2}\b", message)
+    parsed_dates = re.findall(r"\b(?:\d{4}-\d{2}-\d{2}|\d{8})\b", message)
     if len(parsed_dates) >= 2:
-        start_date = date.fromisoformat(parsed_dates[0])
-        end_date = date.fromisoformat(parsed_dates[1])
+        start_date = _parse_chat_date(parsed_dates[0])
+        end_date = _parse_chat_date(parsed_dates[1])
     else:
         end_date = anchors
         start_date = end_date - timedelta(days=365 * 5)
 
     objective = _extract_objective(message)
     risk_measure = _extract_risk_measure(message)
+    min_weight = 0.0
+    nea = _extract_nea(message)
+    max_weight = _extract_upperlng(message)
+    llm_overrides_applied = False
+    if parser_mode == "llm-based":
+        llm_overrides, llm_status = extract_intent_overrides_with_status(message)
+        if not llm_overrides:
+            msg = (
+                "LLM-based parser selected, but no LLM overrides were extracted. "
+                f"Reason: {llm_status}. "
+                "Check OPENAI_API_KEY/model access or switch to rule-based mode."
+            )
+            raise ValueError(msg)
+
+        objective = str(llm_overrides.get("objective", "Sharpe"))
+        risk_measure = str(llm_overrides.get("risk_measure", "CVaR"))
+        min_weight = float(llm_overrides.get("min_weight", 0.0))
+        max_weight = float(llm_overrides.get("max_weight", _DEFAULT_RISKFOLIO.upperlng))
+        nea = int(llm_overrides.get("nea", _DEFAULT_RISKFOLIO.nea))
+        llm_overrides_applied = True
+
     return HistoricalMvpRequest(
         tickers=parsed_tickers,
         start_date=start_date,
         end_date=end_date,
         objective=objective,
         risk_measure=risk_measure,
+        min_weight=min_weight,
+        max_weight=max_weight,
+        nea=nea,
+        parser_mode=parser_mode,
+        llm_overrides_applied=llm_overrides_applied,
     )
 
 
@@ -262,9 +311,22 @@ def run_historical_mvp_pipeline(
         risk_measure=request.risk_measure,
         min_weight=request.min_weight,
         max_weight=request.max_weight,
+        nea=request.nea,
         hist=True,
     )
     optimize_result = optimize_from_historical_returns(returns=returns_matrix, request=optimize_command)
+
+    _log("Backtest Agent: computing weighted portfolio performance metrics.")
+    backtest_result = run_weighted_backtest(realized_returns=returns_matrix, optimization=optimize_result)
+    portfolio_metrics = {
+        "cumulative_return": backtest_result.cumulative_return,
+        "annualized_return": backtest_result.annualized_return,
+        "annualized_volatility": backtest_result.annualized_volatility,
+        "max_drawdown": backtest_result.max_drawdown,
+        "sharpe_ratio": backtest_result.sharpe_ratio,
+        "sortino_ratio": backtest_result.sortino_ratio,
+        "calmar_ratio": backtest_result.calmar_ratio,
+    }
 
     _log("Report Agent: assembling summary report output.")
     weights_table = pd.DataFrame(
@@ -287,6 +349,7 @@ def run_historical_mvp_pipeline(
         universe=universe,
         data_quality=quality,
         optimize_result=optimize_result,
+        portfolio_metrics=portfolio_metrics,
         report_markdown=report_markdown,
         weights_table=weights_table,
         agent_logs=agent_logs,
@@ -295,18 +358,23 @@ def run_historical_mvp_pipeline(
     )
 
 
-def run_historical_mvp_chat_turn(message: str, progress: Callable[[str], None] | None = None) -> ChatTurn:
+def run_historical_mvp_chat_turn(
+    message: str,
+    progress: Callable[[str], None] | None = None,
+    parser_mode: ParserMode = "rule-based",
+) -> ChatTurn:
     """Run one chat turn through the orchestrator using a real tool execution path.
 
     Args:
         message: User chat message containing portfolio request context.
         progress: Optional callback for streaming progress updates.
+        parser_mode: Parsing mode selector.
 
     Returns:
         ChatTurn containing executed tool result payload and assistant message.
     """
 
-    request = parse_chat_request(message)
+    request = parse_chat_request(message, parser_mode=parser_mode)
     turn = ChatTurn(user_message=ChatMessageUser(content=message))
     turn.tool_calls = [
         ChatToolCall(
@@ -326,6 +394,8 @@ def run_historical_mvp_chat_turn(message: str, progress: Callable[[str], None] |
     )
 
     updated_turn = run_orchestration_cycle(turn=turn, tool_executor=executor)
+    updated_turn.diagnostics["parser_mode"] = parser_mode
+    updated_turn.diagnostics["llm_overrides_applied"] = request.llm_overrides_applied
     if not updated_turn.tool_results:
         updated_turn.assistant_message = ChatMessageAssistant(content="No tool result was produced.")
         return updated_turn
@@ -513,16 +583,20 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         raise ValueError(msg)
 
     min_weight_raw = payload.get("min_weight", 0.0)
-    max_weight_raw = payload.get("max_weight", 0.35)
+    max_weight_raw = payload.get("max_weight", _DEFAULT_RISKFOLIO.upperlng)
+    nea_raw = payload.get("nea", _DEFAULT_RISKFOLIO.nea)
     lookback_days_raw = payload.get("lookback_days", 365)
     use_local_cache_raw = payload.get("use_local_cache", True)
     cache_dir_raw = payload.get("cache_dir", "artifacts/cache")
+    parser_mode_raw = str(payload.get("parser_mode", "rule-based"))
 
     min_weight = float(str(min_weight_raw))
     max_weight = float(str(max_weight_raw))
+    nea = int(str(nea_raw))
     lookback_days = int(str(lookback_days_raw))
     use_local_cache = bool(use_local_cache_raw)
     cache_dir = str(cache_dir_raw)
+    parser_mode: ParserMode = "llm-based" if parser_mode_raw == "llm-based" else "rule-based"
 
     return HistoricalMvpRequest(
         tickers=tickers,
@@ -532,10 +606,12 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         risk_measure=str(payload.get("risk_measure", "CVaR")),
         min_weight=min_weight,
         max_weight=max_weight,
+        nea=nea,
         build_features=bool(payload.get("build_features", True)),
         lookback_days=lookback_days,
         use_local_cache=use_local_cache,
         cache_dir=cache_dir,
+        parser_mode=parser_mode,
     )
 
 
@@ -590,6 +666,7 @@ def _run_mvp_tool(arguments: dict[str, object], progress: Callable[[str], None] 
     return {
         "report_markdown": result.report_markdown,
         "weights": result.weights_table.to_dict(orient="records"),
+        "metrics": result.portfolio_metrics,
         "data_quality": {
             "pass_gate": result.data_quality.pass_gate,
             "n_periods": result.data_quality.n_periods,
@@ -619,11 +696,17 @@ def _extract_tickers(message: str) -> list[str]:
     if explicit:
         tokens = [token.strip().upper() for token in explicit.group(1).split(",") if token.strip()]
     else:
-        raw_tokens = re.findall(r"\b[A-Z]{1,6}\b", message.upper())
+        raw_tokens = re.findall(r"\b[A-Z]{2,6}\b", message.upper())
         blocked = {
             "FOR",
             "FROM",
             "TO",
+            "WITH",
+            "AND",
+            "OF",
+            "ASSET",
+            "ASSETS",
+            "EFFECTIVE",
             "RISK",
             "MEASURE",
             "OBJECTIVE",
@@ -636,6 +719,10 @@ def _extract_tickers(message: str) -> list[str]:
             "UTILITY",
             "PORTFOLIO",
             "BUILD",
+            "MAX",
+            "WEIGHT",
+            "UPPERLNG",
+            "NEA",
         }
         tokens = [token for token in raw_tokens if token not in blocked]
 
@@ -686,3 +773,78 @@ def _extract_risk_measure(message: str) -> str:
     if "cdar" in lowered:
         return "CDaR"
     return "CVaR"
+
+
+def _extract_nea(message: str) -> int:
+    """Extract Riskfolio ``nea`` override from chat text.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        Parsed ``nea`` value when present; otherwise default config value.
+    """
+
+    patterns = [
+        r"\bnea(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
+        r"\bnumber\s+of\s+effective\s+assets(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
+        r"\beffective\s+assets(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, message, flags=re.IGNORECASE)
+        if match is not None:
+            parsed = int(match.group(1))
+            return parsed if parsed >= 1 else int(_DEFAULT_RISKFOLIO.nea)
+
+    return int(_DEFAULT_RISKFOLIO.nea)
+
+
+def _parse_chat_date(raw_value: str) -> date:
+    """Parse supported date token formats from chat text.
+
+    Args:
+        raw_value: Date token in ``YYYY-MM-DD`` or ``YYYYMMDD`` format.
+
+    Returns:
+        Parsed calendar date.
+    """
+
+    if "-" in raw_value:
+        return date.fromisoformat(raw_value)
+    return datetime.strptime(raw_value, "%Y%m%d").date()
+
+
+def _extract_upperlng(message: str) -> float:
+    """Extract Riskfolio upper long bound from chat text.
+
+    Supports ``upperlng`` and ``max_weight`` aliases, with decimal or percent
+    input values.
+
+    Args:
+        message: User prompt text.
+
+    Returns:
+        Parsed upper-long bound in decimal units, or default when absent/invalid.
+    """
+
+    match = re.search(
+        r"\b(?:upperlng|max_weight)\s*[:=]?\s*(-?\d+(?:\.\d+)?)\s*(%)?",
+        message,
+        flags=re.IGNORECASE,
+    )
+    if match is None:
+        match = re.search(
+            r"\bmax(?:\s+weight)?\s*(?:of|=|:)?\s*(-?\d+(?:\.\d+)?)\s*(%)?\s*(?:upperlng)?\b",
+            message,
+            flags=re.IGNORECASE,
+        )
+    if match is None:
+        return float(_DEFAULT_RISKFOLIO.upperlng)
+
+    value = float(match.group(1))
+    if match.group(2) == "%" or value > 1.0:
+        value = value / 100.0
+
+    if value <= 0.0 or value > 1.0:
+        return float(_DEFAULT_RISKFOLIO.upperlng)
+    return value
