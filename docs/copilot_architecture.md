@@ -33,6 +33,14 @@ at `t` (next-period excess return label).
 
 For a concise ownership map and public entry-point index, see `docs/package_map.md`.
 
+## MVP Historical Chat Orchestration Note
+
+`engine/mvp_historical_chat.py` is an approved orchestration module for the
+historical MVP chat workflow. It may compose engine steps with injected
+`io` adapters/providers and tool executors to run a full chat turn, while
+keeping business logic in engine domains and persistence/fetch implementation
+inside `io` modules.
+
 ## Agent Contract Boundary
 
 - Multi-agent and LLM workflows must exchange chat/tool data through

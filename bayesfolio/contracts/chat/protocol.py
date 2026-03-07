@@ -1,3 +1,9 @@
+"""Chat protocol boundary contracts.
+
+This module defines versioned, data-only schemas for chat messages, tool calls,
+tool results, and end-to-end chat turns exchanged across agent boundaries.
+"""
+
 from __future__ import annotations
 
 from typing import Literal

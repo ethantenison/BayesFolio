@@ -45,8 +45,11 @@ should be translated at adapters/orchestrators, not leaked into contracts.
 ## Public Entry Points (Current)
 
 - Pipeline orchestration: `engine.run_schema_first_pipeline`
+- Historical chat orchestration: `engine.run_historical_mvp_chat_turn`
 - Feature workflow: `engine.features.build_features_dataset`
 - IO dataset persistence: `io.ParquetArtifactStore`
+- IO providers: `io.EtfFeaturesProvider`, `io.MacroProvider`, `io.ReturnsProvider`
+- IO fingerprint helpers: `io.sha256_digest`, `io.sha256_fingerprint`
 
 ## Documentation Workflow (Efficient + RAG-Friendly)
 

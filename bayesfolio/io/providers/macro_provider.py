@@ -15,6 +15,13 @@ import pandas as pd
 import requests
 
 from bayesfolio.core.settings import Horizon
+from bayesfolio.io.providers._cache_frame_ops import (
+    concat_frames,
+    dedupe_rows,
+    has_date_coverage,
+    normalize_date_column,
+    slice_requested,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -72,15 +79,15 @@ class MacroProvider:
             return self._fetch_with_retries_or_fallback(start=start, end=end, horizon=horizon)
 
         cache_frame = self._read_cache_frame(horizon=horizon)
-        if self._has_coverage(frame=cache_frame, start=start, end=end, horizon=horizon):
+        if has_date_coverage(frame=cache_frame, start=start, end=end, freq=horizon.value):
             logger.info("Using cached macro features from %s to %s.", start, end)
-            return self._slice_requested(frame=cache_frame, start=start, end=end)
+            return slice_requested(frame=cache_frame, start=start, end=end)
 
         logger.info("Macro cache miss/partial for %s to %s; fetching live data.", start, end)
         fetched = self._fetch_with_retries_or_fallback(start=start, end=end, horizon=horizon)
-        updated_cache = self._dedupe_rows(self._concat_frames(cache_frame, fetched))
+        updated_cache = dedupe_rows(concat_frames(cache_frame, fetched), subset=["date"], sort_by=["date"])
         self._write_cache_frame(frame=updated_cache, horizon=horizon)
-        return self._slice_requested(frame=updated_cache, start=start, end=end)
+        return slice_requested(frame=updated_cache, start=start, end=end)
 
     def _fetch_with_retries_or_fallback(self, *, start: str, end: str, horizon: Horizon) -> pd.DataFrame:
         logger.info("Fetching macro features from %s to %s.", start, end)
@@ -145,12 +152,7 @@ class MacroProvider:
         if "date" not in frame.columns:
             return frame
 
-        frame = frame.copy()
-        frame["date"] = pd.to_datetime(frame["date"])
-        start_ts = pd.Timestamp(start)
-        end_ts = pd.Timestamp(end)
-        filtered = frame[(frame["date"] >= start_ts) & (frame["date"] <= end_ts)].copy()
-        return filtered.reset_index(drop=True)
+        return slice_requested(frame=frame, start=start, end=end)
 
     def _cache_file_path(self, horizon: Horizon) -> Path:
         safe_horizon = str(horizon.value).replace("-", "_").lower()
@@ -162,9 +164,7 @@ class MacroProvider:
             return pd.DataFrame(columns=["date"])
 
         frame = pd.read_parquet(cache_path)
-        if "date" in frame.columns:
-            frame["date"] = pd.to_datetime(frame["date"])
-        return frame
+        return normalize_date_column(frame)
 
     def _write_cache_frame(self, *, frame: pd.DataFrame, horizon: Horizon) -> None:
         if self._cache_dir is None:
@@ -173,44 +173,3 @@ class MacroProvider:
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         cache_path = self._cache_file_path(horizon)
         frame.to_parquet(cache_path, index=False)
-
-    def _slice_requested(self, *, frame: pd.DataFrame, start: str, end: str) -> pd.DataFrame:
-        if frame.empty or "date" not in frame.columns:
-            return frame.copy()
-
-        output = frame.copy()
-        output["date"] = pd.to_datetime(output["date"])
-        start_ts = pd.Timestamp(start)
-        end_ts = pd.Timestamp(end)
-        return output[(output["date"] >= start_ts) & (output["date"] <= end_ts)].copy().reset_index(drop=True)
-
-    def _has_coverage(self, *, frame: pd.DataFrame, start: str, end: str, horizon: Horizon) -> bool:
-        if frame.empty or "date" not in frame.columns:
-            return False
-
-        start_ts = pd.Timestamp(start)
-        end_ts = pd.Timestamp(end)
-        expected_dates = pd.DatetimeIndex(pd.date_range(start=start_ts, end=end_ts, freq=horizon.value))
-        if len(expected_dates) == 0:
-            return True
-
-        available = pd.DatetimeIndex(pd.to_datetime(frame["date"]).drop_duplicates().sort_values())
-        return bool(expected_dates.isin(available).all())
-
-    def _dedupe_rows(self, frame: pd.DataFrame) -> pd.DataFrame:
-        if frame.empty:
-            return frame
-
-        output = frame.copy()
-        if "date" in output.columns:
-            output["date"] = pd.to_datetime(output["date"])
-            output = output.drop_duplicates(subset=["date"], keep="last")
-            output = output.sort_values("date")
-        return output.reset_index(drop=True)
-
-    def _concat_frames(self, left: pd.DataFrame, right: pd.DataFrame) -> pd.DataFrame:
-        if left.empty:
-            return right.copy()
-        if right.empty:
-            return left.copy()
-        return pd.concat([left, right], ignore_index=True)

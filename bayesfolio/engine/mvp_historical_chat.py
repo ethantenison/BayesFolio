@@ -199,12 +199,14 @@ def parse_chat_request(
         end_date = anchors
         start_date = end_date - timedelta(days=365 * 5)
 
-    objective = _extract_objective(message)
-    risk_measure = _extract_risk_measure(message)
-    model = _extract_model(message)
-    rf = _extract_rf(message)
-    hist = _extract_hist(message)
-    kelly = _extract_kelly(message)
+    rule_overrides = _RISKFOLIO_KNOWLEDGE_PROVIDER.suggest_overrides(message)
+    objective = str(rule_overrides.get("objective", _DEFAULT_RISKFOLIO.obj.value))
+    risk_measure = str(rule_overrides.get("risk_measure", _DEFAULT_RISKFOLIO.rm.value))
+    model = str(rule_overrides.get("model", _DEFAULT_RISKFOLIO.model.value))
+    rf = float(rule_overrides.get("rf", _DEFAULT_RISKFOLIO.rf))
+    hist = _coerce_bool(rule_overrides.get("hist", _DEFAULT_RISKFOLIO.hist), default=_DEFAULT_RISKFOLIO.hist)
+    kelly_raw = rule_overrides.get("kelly", None)
+    kelly = str(kelly_raw) if isinstance(kelly_raw, str) else None
     min_weight = 0.0
     nea = _extract_nea(message)
     max_weight = _extract_upperlng(message)
@@ -954,128 +956,6 @@ def _extract_tickers(message: str) -> list[str]:
         if token not in deduped:
             deduped.append(token)
     return deduped
-
-
-def _extract_objective(message: str) -> str:
-    """Infer optimization objective from chat text keywords.
-
-    Args:
-        message: User prompt text.
-
-    Returns:
-        Riskfolio objective string. Defaults to ``"Sharpe"``.
-    """
-
-    lowered = message.lower()
-    if "minrisk" in lowered or "min risk" in lowered:
-        return "MinRisk"
-    if "maxret" in lowered or "max ret" in lowered or "max return" in lowered:
-        return "MaxRet"
-    if "utility" in lowered:
-        return "Utility"
-    return "Sharpe"
-
-
-def _extract_risk_measure(message: str) -> str:
-    """Infer optimization risk measure from chat text keywords.
-
-    Args:
-        message: User prompt text.
-
-    Returns:
-        Risk measure string. Defaults to ``"MV"``.
-    """
-
-    lowered = message.lower().replace("-", "")
-    if "cvar" in lowered:
-        return "CVaR"
-    if "mv" in lowered or "variance" in lowered:
-        return "MV"
-    if "mad" in lowered:
-        return "MAD"
-    if "cdar" in lowered:
-        return "CDaR"
-    return _DEFAULT_RISKFOLIO.rm.value
-
-
-def _extract_model(message: str) -> str:
-    """Infer Riskfolio model from chat text keywords.
-
-    Args:
-        message: User prompt text.
-
-    Returns:
-        Model code. Defaults to ``Classic``.
-    """
-
-    lowered = message.lower()
-    if "blfm" in lowered or "black litterman factor" in lowered:
-        return "BLFM"
-    if re.search(r"\bfm\b", lowered) or "factor model" in lowered:
-        return "FM"
-    if "black litterman" in lowered or re.search(r"\bbl\b", lowered):
-        return "BL"
-    return _DEFAULT_RISKFOLIO.model.value
-
-
-def _extract_rf(message: str) -> float:
-    """Extract risk-free rate in decimal units from chat text.
-
-    Args:
-        message: User prompt text.
-
-    Returns:
-        Decimal risk-free rate. Defaults to configured Riskfolio value.
-    """
-
-    match = re.search(
-        r"\b(?:rf|risk\s*free(?:\s*rate)?)\s*[:=]?\s*(-?\d+(?:\.\d+)?)\s*(%)?",
-        message,
-        flags=re.IGNORECASE,
-    )
-    if match is None:
-        return float(_DEFAULT_RISKFOLIO.rf)
-
-    value = float(match.group(1))
-    if match.group(2) == "%" or value > 1.0:
-        value = value / 100.0
-    return value
-
-
-def _extract_hist(message: str) -> bool:
-    """Extract Riskfolio ``hist`` flag from chat text.
-
-    Args:
-        message: User prompt text.
-
-    Returns:
-        Parsed boolean flag. Defaults to configured Riskfolio value.
-    """
-
-    lowered = message.lower()
-    if "hist false" in lowered or "no historical" in lowered or "non historical" in lowered:
-        return False
-    if "hist true" in lowered or "historical" in lowered:
-        return True
-    return bool(_DEFAULT_RISKFOLIO.hist)
-
-
-def _extract_kelly(message: str) -> str | None:
-    """Extract Kelly mode from chat text.
-
-    Args:
-        message: User prompt text.
-
-    Returns:
-        ``approx``, ``exact``, or ``None`` when not requested.
-    """
-
-    lowered = message.lower()
-    if "kelly exact" in lowered or "exact kelly" in lowered:
-        return "exact"
-    if "kelly approx" in lowered or "approx kelly" in lowered or "approximate kelly" in lowered:
-        return "approx"
-    return None
 
 
 def _coerce_bool(value: object, default: bool) -> bool:

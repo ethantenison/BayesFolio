@@ -4,6 +4,19 @@ import hashlib
 from pathlib import Path
 
 
+def sha256_digest(content: bytes) -> str:
+    """Compute SHA-256 digest for in-memory bytes.
+
+    Args:
+        content: Byte payload to hash.
+
+    Returns:
+        Lowercase SHA-256 hexadecimal digest.
+    """
+
+    return hashlib.sha256(content).hexdigest()
+
+
 def sha256_fingerprint(file_path: str | Path) -> tuple[str, int]:
     """Compute SHA-256 digest and byte size for a persisted artifact.
 
@@ -15,5 +28,5 @@ def sha256_fingerprint(file_path: str | Path) -> tuple[str, int]:
     """
 
     path = Path(file_path)
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    digest = sha256_digest(path.read_bytes())
     return digest, path.stat().st_size

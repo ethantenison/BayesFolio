@@ -16,7 +16,7 @@ from bayesfolio.io.backends import (
     make_artifact_backend,
     resolve_backend_and_key,
 )
-from bayesfolio.io.fingerprints import sha256_fingerprint
+from bayesfolio.io.fingerprints import sha256_digest, sha256_fingerprint
 from bayesfolio.io.mlflow_logger import log_artifact_ref, log_contract
 from bayesfolio.io.parquet_store import write_parquet_with_metadata
 from bayesfolio.io.providers import EtfFeaturesProvider, MacroProvider, ReturnsProvider
@@ -42,6 +42,7 @@ __all__ = [
     "EtfFeaturesProvider",
     "MacroProvider",
     "ReturnsProvider",
+    "sha256_digest",
     "sha256_fingerprint",
     "write_parquet_with_metadata",
 ]

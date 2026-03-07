@@ -1,3 +1,10 @@
+"""Universe UI input and snapshot contracts.
+
+This module defines UI-facing boundary schemas for selecting a universe and
+recording the canonical universe snapshot used by downstream workflows.
+Contracts are data-only and versioned.
+"""
+
 from __future__ import annotations
 
 from typing import Literal

@@ -13,6 +13,14 @@ from pathlib import Path
 import pandas as pd
 
 from bayesfolio.core.settings import Horizon
+from bayesfolio.io.providers._cache_frame_ops import (
+    concat_frames,
+    dedupe_rows,
+    missing_tickers,
+    normalize_asset_id_column,
+    normalize_date_column,
+    slice_requested,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -68,21 +76,21 @@ class EtfFeaturesProvider:
             return self._call_fetcher(tickers=normalized_tickers, start=start, end=end, horizon=horizon)
 
         cache_frame = self._read_cache_frame(horizon)
-        requested_cached = self._slice_requested(
+        requested_cached = slice_requested(
             frame=cache_frame,
             tickers=normalized_tickers,
             start=start,
             end=end,
         )
-        missing_tickers = self._missing_tickers(
+        missing_ticker_values = missing_tickers(
             cache_frame=cache_frame,
             tickers=normalized_tickers,
             start=start,
             end=end,
-            horizon=horizon,
+            freq=horizon.value,
         )
 
-        if not missing_tickers:
+        if not missing_ticker_values:
             logger.info(
                 "Using cached ETF features for %d tickers from %s to %s.",
                 len(normalized_tickers),
@@ -94,19 +102,23 @@ class EtfFeaturesProvider:
         logger.info(
             "ETF feature cache partial/miss for %d tickers; fetching live data for %d tickers.",
             len(normalized_tickers),
-            len(missing_tickers),
+            len(missing_ticker_values),
         )
-        fetched = self._call_fetcher(tickers=missing_tickers, start=start, end=end, horizon=horizon)
-        merged_request = self._concat_frames(requested_cached, fetched)
-        merged_request = self._dedupe_rows(merged_request)
-        merged_request = self._slice_requested(
+        fetched = self._call_fetcher(tickers=missing_ticker_values, start=start, end=end, horizon=horizon)
+        merged_request = concat_frames(requested_cached, fetched)
+        merged_request = dedupe_rows(merged_request, subset=["date", "asset_id"], sort_by=["date", "asset_id"])
+        merged_request = slice_requested(
             frame=merged_request,
             tickers=normalized_tickers,
             start=start,
             end=end,
         )
 
-        updated_cache = self._dedupe_rows(self._concat_frames(cache_frame, fetched))
+        updated_cache = dedupe_rows(
+            concat_frames(cache_frame, fetched),
+            subset=["date", "asset_id"],
+            sort_by=["date", "asset_id"],
+        )
         self._write_cache_frame(frame=updated_cache, horizon=horizon)
         return merged_request.sort_values(["date", "asset_id"]).reset_index(drop=True)
 
@@ -140,11 +152,7 @@ class EtfFeaturesProvider:
             return pd.DataFrame(columns=["date", "asset_id"])
 
         frame = pd.read_parquet(cache_path)
-        if "date" in frame.columns:
-            frame["date"] = pd.to_datetime(frame["date"])
-        if "asset_id" in frame.columns:
-            frame["asset_id"] = frame["asset_id"].astype(str).str.upper()
-        return frame
+        return normalize_asset_id_column(normalize_date_column(frame))
 
     def _write_cache_frame(self, frame: pd.DataFrame, horizon: Horizon) -> None:
         if self._cache_dir is None:
@@ -153,76 +161,3 @@ class EtfFeaturesProvider:
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         cache_path = self._cache_file_path(horizon)
         frame.to_parquet(cache_path, index=False)
-
-    def _slice_requested(
-        self,
-        *,
-        frame: pd.DataFrame,
-        tickers: list[str],
-        start: str,
-        end: str,
-    ) -> pd.DataFrame:
-        if frame.empty:
-            return frame
-
-        output = frame.copy()
-        output["date"] = pd.to_datetime(output["date"])
-        output["asset_id"] = output["asset_id"].astype(str).str.upper()
-        start_ts = pd.Timestamp(start)
-        end_ts = pd.Timestamp(end)
-        return output[
-            output["asset_id"].isin(tickers) & (output["date"] >= start_ts) & (output["date"] <= end_ts)
-        ].copy()
-
-    def _missing_tickers(
-        self,
-        *,
-        cache_frame: pd.DataFrame,
-        tickers: list[str],
-        start: str,
-        end: str,
-        horizon: Horizon,
-    ) -> list[str]:
-        if cache_frame.empty:
-            return tickers
-
-        frame = cache_frame.copy()
-        frame["date"] = pd.to_datetime(frame["date"])
-        frame["asset_id"] = frame["asset_id"].astype(str).str.upper()
-        start_ts = pd.Timestamp(start)
-        end_ts = pd.Timestamp(end)
-        expected_dates = pd.DatetimeIndex(pd.date_range(start=start_ts, end=end_ts, freq=horizon.value))
-
-        missing: list[str] = []
-        for ticker in tickers:
-            per_ticker = frame.loc[
-                (frame["asset_id"] == ticker) & (frame["date"] >= start_ts) & (frame["date"] <= end_ts),
-                "date",
-            ]
-            if per_ticker.empty:
-                missing.append(ticker)
-                continue
-
-            if len(expected_dates) == 0:
-                continue
-            available = pd.DatetimeIndex(per_ticker.drop_duplicates().sort_values())
-            if not expected_dates.isin(available).all():
-                missing.append(ticker)
-        return missing
-
-    def _dedupe_rows(self, frame: pd.DataFrame) -> pd.DataFrame:
-        if frame.empty:
-            return frame
-
-        output = frame.copy()
-        output["date"] = pd.to_datetime(output["date"])
-        output["asset_id"] = output["asset_id"].astype(str).str.upper()
-        output = output.drop_duplicates(subset=["date", "asset_id"], keep="last")
-        return output.sort_values(["date", "asset_id"]).reset_index(drop=True)
-
-    def _concat_frames(self, left: pd.DataFrame, right: pd.DataFrame) -> pd.DataFrame:
-        if left.empty:
-            return right.copy()
-        if right.empty:
-            return left.copy()
-        return pd.concat([left, right], ignore_index=True)
