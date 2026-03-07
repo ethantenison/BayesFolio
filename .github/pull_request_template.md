@@ -1,10 +1,15 @@
 ## Summary
-<!-- pr_agent:summary -->
+pr_agent:summary
 Problem:
 Approach:
 Expected impact:
 
+## Manual Refresh (if needed)
+If auto-fill does not run, comment `/describe` on this PR to regenerate the AI sections.
+
 ## Change Type
+pr_agent:type
+
 - [ ] Bug fix
 - [ ] Feature
 - [ ] Refactor
@@ -23,24 +28,8 @@ Expected impact:
 - [ ] RAG
 - [ ] Agent workflow
 
-## What Changed
-<!-- pr_agent:what_changed -->
-
-Added:
-Modified:
-Removed:
-
-## Modeling Impact
-<!-- pr_agent:modeling_impact -->
-
-Does this change:
-
-- model forecasts?
-- optimization outputs?
-- uncertainty estimates?
-- backtest results?
-
-Explain if yes.
+## Changes Walkthrough
+pr_agent:walkthrough
 
 ## Backtest Integrity Checklist
 
@@ -50,25 +39,15 @@ Explain if yes.
 - [ ] Benchmark comparability preserved
 
 ## Validation
-<!-- pr_agent:validation -->
-
-Tests added/updated:
-Commands executed:
+- [ ] Tests added/updated
+- [ ] Commands executed and pasted in PR discussion
 
 ## Results
-<!-- pr_agent:results -->
-
-Before:
-
-After:
+- [ ] Before/after impact is documented (if applicable)
 
 ## Risks
-<!-- pr_agent:risks -->
-
-Risk level:
-Rollback plan:
+- [ ] Risk level stated
+- [ ] Rollback plan stated
 
 ## Reviewer Guide
-<!-- pr_agent:reviewer_guide -->
-
-Focus areas:
+- [ ] Focus areas listed
