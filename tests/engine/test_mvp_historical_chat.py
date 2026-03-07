@@ -59,6 +59,15 @@ def test_parse_chat_request_extracts_number_of_effective_assets_phrase() -> None
     assert request.nea == 8
 
 
+def test_parse_chat_request_supports_compact_yyyymmdd_dates() -> None:
+    request = parse_chat_request(
+        "Build a portfolio for SPY, IJR, VNQ from 20210101 to 20251231 objective sharpe risk cvar"
+    )
+
+    assert request.start_date == date(2021, 1, 1)
+    assert request.end_date == date(2025, 12, 31)
+
+
 def test_parse_chat_request_does_not_treat_article_as_ticker() -> None:
     request = parse_chat_request(
         "Build a portfolio for SPY, IJR, VNQ, VWO, VEA, VNQI, IEF, LQD, EWX, VWOB "
@@ -70,25 +79,84 @@ def test_parse_chat_request_does_not_treat_article_as_ticker() -> None:
     assert request.nea == 8
 
 
-def test_parse_chat_request_applies_llm_overrides(monkeypatch) -> None:
-    monkeypatch.setattr(
-        "bayesfolio.engine.mvp_historical_chat.extract_intent_overrides_from_text",
-        lambda message: {
-            "objective": "MinRisk",
-            "risk_measure": "MV",
-            "min_weight": 0.01,
-            "max_weight": 0.20,
-            "nea": 7,
-        },
+def test_parse_chat_request_does_not_treat_assets_word_as_ticker() -> None:
+    request = parse_chat_request(
+        "Build a portfolio for SPY, IJR, VNQ, VWO, VEA, VNQI, IEF, LQD, EWX, VWOB "
+        "from 20210101 to 20251231 objective sharpe risk cvar, max weight of 20%, and effective assets of 8."
     )
 
-    request = parse_chat_request("Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31")
+    assert "ASSETS" not in request.tickers
+    assert request.nea == 8
+
+
+def test_parse_chat_request_applies_llm_overrides(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "bayesfolio.engine.mvp_historical_chat.extract_intent_overrides_with_status",
+        lambda message: (
+            {
+                "objective": "MinRisk",
+                "risk_measure": "MV",
+                "min_weight": 0.01,
+                "max_weight": 0.20,
+                "nea": 7,
+            },
+            "ok",
+        ),
+    )
+
+    request = parse_chat_request(
+        "Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31",
+        parser_mode="llm-based",
+    )
 
     assert request.objective == "MinRisk"
     assert request.risk_measure == "MV"
     assert request.min_weight == 0.01
     assert request.max_weight == 0.20
     assert request.nea == 7
+    assert request.llm_overrides_applied is True
+
+
+def test_parse_chat_request_rule_mode_ignores_llm_overrides(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "bayesfolio.engine.mvp_historical_chat.extract_intent_overrides_with_status",
+        lambda message: (
+            {
+                "objective": "MinRisk",
+                "risk_measure": "MV",
+                "max_weight": 0.20,
+                "nea": 7,
+            },
+            "ok",
+        ),
+    )
+
+    request = parse_chat_request(
+        "Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31",
+        parser_mode="rule-based",
+    )
+
+    assert request.objective == "Sharpe"
+    assert request.risk_measure == "CVaR"
+    assert request.max_weight == 0.35
+    assert request.nea == RiskfolioConfig().nea
+    assert request.llm_overrides_applied is False
+
+
+def test_parse_chat_request_llm_mode_raises_when_no_overrides(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "bayesfolio.engine.mvp_historical_chat.extract_intent_overrides_with_status",
+        lambda message: ({}, "missing_openai_api_key"),
+    )
+
+    try:
+        _ = parse_chat_request(
+            "Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31",
+            parser_mode="llm-based",
+        )
+        raise AssertionError("Expected ValueError when llm-based mode returns no overrides.")
+    except ValueError as exc:
+        assert "LLM-based parser selected" in str(exc)
 
 
 def test_assess_data_quality_flags_stale_and_insufficient_assets() -> None:
@@ -162,8 +230,23 @@ def test_run_historical_mvp_chat_turn_executes_tool_cycle(monkeypatch) -> None:
         )
 
     monkeypatch.setattr("bayesfolio.engine.mvp_historical_chat.run_historical_mvp_pipeline", _fake_pipeline)
+    monkeypatch.setattr(
+        "bayesfolio.engine.mvp_historical_chat.extract_intent_overrides_with_status",
+        lambda message: (
+            {
+                "objective": "Sharpe",
+                "risk_measure": "CVaR",
+                "max_weight": 0.35,
+                "nea": 6,
+            },
+            "ok",
+        ),
+    )
 
-    turn = run_historical_mvp_chat_turn("Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31")
+    turn = run_historical_mvp_chat_turn(
+        "Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31",
+        parser_mode="llm-based",
+    )
 
     assert turn.tool_results
     assert turn.tool_results[-1].success is True
@@ -173,6 +256,8 @@ def test_run_historical_mvp_chat_turn_executes_tool_cycle(monkeypatch) -> None:
     assert metrics_payload["max_drawdown"] <= 0.0
     assert "sortino_ratio" in metrics_payload
     assert "calmar_ratio" in metrics_payload
+    assert turn.diagnostics["parser_mode"] == "llm-based"
+    assert turn.diagnostics["llm_overrides_applied"] is True
     assert turn.assistant_message is not None
     assert "Historical MVP Portfolio Report" in turn.assistant_message.content
 

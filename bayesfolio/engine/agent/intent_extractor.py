@@ -37,9 +37,33 @@ def extract_intent_overrides_from_text(message: str, timeout_seconds: float = 8.
         and ``nea`` (number of effective assets).
     """
 
+    overrides, _status = extract_intent_overrides_with_status(message=message, timeout_seconds=timeout_seconds)
+    return overrides
+
+
+def extract_intent_overrides_with_status(
+    message: str,
+    timeout_seconds: float = 8.0,
+) -> tuple[dict[str, str | float | int], str]:
+    """Extract optimization-intent overrides and return a status code.
+
+    Args:
+        message: User free-form request text.
+        timeout_seconds: HTTP timeout in seconds for the LLM request.
+
+    Returns:
+        Tuple of ``(overrides, status)`` where ``status`` is one of:
+        ``ok``, ``empty_message``, ``missing_openai_api_key``,
+        ``http_error_<code>``, ``url_error``, ``invalid_response_json``,
+        ``no_choices``, ``empty_content``, ``invalid_content_json``,
+        ``non_object_json``, ``no_supported_fields``.
+    """
+
     api_key = os.getenv("OPENAI_API_KEY")
-    if api_key is None or not message.strip():
-        return {}
+    if not message.strip():
+        return {}, "empty_message"
+    if api_key is None:
+        return {}, "missing_openai_api_key"
 
     base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
     model = os.getenv("BAYESFOLIO_INTENT_MODEL", "gpt-4o-mini")
@@ -74,26 +98,33 @@ def extract_intent_overrides_from_text(message: str, timeout_seconds: float = 8.
     try:
         with urllib_request.urlopen(request_obj, timeout=timeout_seconds) as response:
             response_payload = json.loads(response.read().decode("utf-8"))
-    except (urllib_error.URLError, TimeoutError, json.JSONDecodeError):
-        return {}
+    except urllib_error.HTTPError as exc:
+        return {}, f"http_error_{exc.code}"
+    except (urllib_error.URLError, TimeoutError):
+        return {}, "url_error"
+    except json.JSONDecodeError:
+        return {}, "invalid_response_json"
 
     choices = response_payload.get("choices", [])
     if not isinstance(choices, list) or not choices:
-        return {}
+        return {}, "no_choices"
 
     message_content = choices[0].get("message", {}).get("content", "")
     if not isinstance(message_content, str) or not message_content.strip():
-        return {}
+        return {}, "empty_content"
 
     try:
         raw_overrides = json.loads(message_content)
     except json.JSONDecodeError:
-        return {}
+        return {}, "invalid_content_json"
 
     if not isinstance(raw_overrides, dict):
-        return {}
+        return {}, "non_object_json"
 
-    return _sanitize_intent_overrides(raw_overrides)
+    cleaned = _sanitize_intent_overrides(raw_overrides)
+    if not cleaned:
+        return {}, "no_supported_fields"
+    return cleaned, "ok"
 
 
 def _sanitize_intent_overrides(raw_overrides: dict[str, object]) -> dict[str, str | float | int]:

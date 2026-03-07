@@ -15,6 +15,15 @@ from bayesfolio.engine.mvp_historical_chat import (
 st.set_page_config(page_title="BayesFolio MVP Chat", page_icon="📈", layout="wide")
 st.title("BayesFolio Historical MVP Chat")
 
+parser_mode_label = st.sidebar.radio(
+    "Parser Mode",
+    options=("Rule-based", "LLM-based"),
+    index=0,
+    help="Choose deterministic rule parsing or LLM override extraction with fallback.",
+)
+parser_mode = "llm-based" if parser_mode_label == "LLM-based" else "rule-based"
+st.sidebar.caption(f"Current parser mode: {parser_mode_label}")
+
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
@@ -41,7 +50,7 @@ if prompt:
     with st.chat_message("assistant"):
         try:
             with st.status("Running MVP agent workflow...", expanded=True) as status:
-                turn = run_historical_mvp_chat_turn(prompt, progress=status.write)
+                turn = run_historical_mvp_chat_turn(prompt, progress=status.write, parser_mode=parser_mode)
                 status.update(label="MVP workflow complete.", state="complete")
 
             if not turn.tool_results:
@@ -53,7 +62,7 @@ if prompt:
 
             weights = payload.get("weights", [])
             st.subheader("Optimized Weights")
-            st.dataframe(weights, hide_index=True, use_container_width=True)
+            st.dataframe(weights, hide_index=True, width="stretch")
 
             if isinstance(weights, list) and weights:
                 weights_df = pd.DataFrame(weights)
@@ -66,7 +75,7 @@ if prompt:
                         title="Portfolio Weight Allocation",
                     )
                     donut.update_traces(textposition="inside", texttemplate="%{label}<br>%{percent}")
-                    st.plotly_chart(donut, use_container_width=True)
+                    st.plotly_chart(donut, width="stretch")
 
             metrics = payload.get("metrics", {})
             if isinstance(metrics, dict) and metrics:
@@ -128,7 +137,7 @@ if prompt:
                 ],
             }
             st.subheader("Data Quality")
-            st.dataframe(quality_table, hide_index=True, use_container_width=True)
+            st.dataframe(quality_table, hide_index=True, width="stretch")
 
             feature_artifact = payload.get("feature_artifact")
             if feature_artifact:

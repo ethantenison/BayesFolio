@@ -21,9 +21,9 @@ from __future__ import annotations
 
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Literal
 
 import pandas as pd
 
@@ -40,7 +40,7 @@ from bayesfolio.contracts.results.features import FeaturesDatasetResult
 from bayesfolio.contracts.results.optimize import OptimizeResult
 from bayesfolio.contracts.ui.universe import UniverseRecord
 from bayesfolio.core.settings import Horizon, Interval, RiskfolioConfig
-from bayesfolio.engine.agent.intent_extractor import extract_intent_overrides_from_text
+from bayesfolio.engine.agent.intent_extractor import extract_intent_overrides_with_status
 from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
 from bayesfolio.engine.backtest import run_weighted_backtest
@@ -61,6 +61,7 @@ from bayesfolio.io import (
 )
 
 _DEFAULT_RISKFOLIO = RiskfolioConfig()
+ParserMode = Literal["rule-based", "llm-based"]
 
 
 @dataclass(frozen=True)
@@ -80,6 +81,8 @@ class HistoricalMvpRequest:
         lookback_days: Additional lookback window for feature generation.
         use_local_cache: Whether to read/write local market-data cache.
         cache_dir: Base directory for local market-data cache files.
+        parser_mode: Parsing mode used for request normalization.
+        llm_overrides_applied: Whether LLM intent overrides were applied.
     """
 
     tickers: list[str]
@@ -94,6 +97,8 @@ class HistoricalMvpRequest:
     lookback_days: int = 365
     use_local_cache: bool = True
     cache_dir: str = "artifacts/cache"
+    parser_mode: ParserMode = "rule-based"
+    llm_overrides_applied: bool = False
 
 
 @dataclass(frozen=True)
@@ -148,18 +153,26 @@ class HistoricalMvpResult:
     features_result: FeaturesDatasetResult | None = None
 
 
-def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvpRequest:
+def parse_chat_request(
+    message: str,
+    today: date | None = None,
+    parser_mode: ParserMode = "rule-based",
+) -> HistoricalMvpRequest:
     """Parse a free-form chat request into a normalized coordinator request.
 
     Args:
         message: User message containing tickers and optional settings.
         today: Optional date override for deterministic tests.
+        parser_mode: Parsing mode selector. ``"rule-based"`` skips LLM
+            extraction while ``"llm-based"`` applies LLM override extraction.
 
     Returns:
         Parsed and normalized request object.
 
     Raises:
         ValueError: If no tickers can be parsed.
+        ValueError: If ``parser_mode`` is ``"llm-based"`` and no LLM
+            overrides can be extracted.
     """
 
     anchors = today or date.today()
@@ -168,10 +181,10 @@ def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvp
         msg = "Could not parse any tickers. Include tickers like SPY, QQQ, TLT."
         raise ValueError(msg)
 
-    parsed_dates = re.findall(r"\b\d{4}-\d{2}-\d{2}\b", message)
+    parsed_dates = re.findall(r"\b(?:\d{4}-\d{2}-\d{2}|\d{8})\b", message)
     if len(parsed_dates) >= 2:
-        start_date = date.fromisoformat(parsed_dates[0])
-        end_date = date.fromisoformat(parsed_dates[1])
+        start_date = _parse_chat_date(parsed_dates[0])
+        end_date = _parse_chat_date(parsed_dates[1])
     else:
         end_date = anchors
         start_date = end_date - timedelta(days=365 * 5)
@@ -181,13 +194,23 @@ def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvp
     min_weight = 0.0
     nea = _extract_nea(message)
     max_weight = _extract_upperlng(message)
-    llm_overrides = extract_intent_overrides_from_text(message)
-    if llm_overrides:
-        objective = str(llm_overrides.get("objective", objective))
-        risk_measure = str(llm_overrides.get("risk_measure", risk_measure))
-        min_weight = float(llm_overrides.get("min_weight", min_weight))
-        max_weight = float(llm_overrides.get("max_weight", max_weight))
-        nea = int(llm_overrides.get("nea", nea))
+    llm_overrides_applied = False
+    if parser_mode == "llm-based":
+        llm_overrides, llm_status = extract_intent_overrides_with_status(message)
+        if not llm_overrides:
+            msg = (
+                "LLM-based parser selected, but no LLM overrides were extracted. "
+                f"Reason: {llm_status}. "
+                "Check OPENAI_API_KEY/model access or switch to rule-based mode."
+            )
+            raise ValueError(msg)
+
+        objective = str(llm_overrides.get("objective", "Sharpe"))
+        risk_measure = str(llm_overrides.get("risk_measure", "CVaR"))
+        min_weight = float(llm_overrides.get("min_weight", 0.0))
+        max_weight = float(llm_overrides.get("max_weight", _DEFAULT_RISKFOLIO.upperlng))
+        nea = int(llm_overrides.get("nea", _DEFAULT_RISKFOLIO.nea))
+        llm_overrides_applied = True
 
     return HistoricalMvpRequest(
         tickers=parsed_tickers,
@@ -198,6 +221,8 @@ def parse_chat_request(message: str, today: date | None = None) -> HistoricalMvp
         min_weight=min_weight,
         max_weight=max_weight,
         nea=nea,
+        parser_mode=parser_mode,
+        llm_overrides_applied=llm_overrides_applied,
     )
 
 
@@ -333,18 +358,23 @@ def run_historical_mvp_pipeline(
     )
 
 
-def run_historical_mvp_chat_turn(message: str, progress: Callable[[str], None] | None = None) -> ChatTurn:
+def run_historical_mvp_chat_turn(
+    message: str,
+    progress: Callable[[str], None] | None = None,
+    parser_mode: ParserMode = "rule-based",
+) -> ChatTurn:
     """Run one chat turn through the orchestrator using a real tool execution path.
 
     Args:
         message: User chat message containing portfolio request context.
         progress: Optional callback for streaming progress updates.
+        parser_mode: Parsing mode selector.
 
     Returns:
         ChatTurn containing executed tool result payload and assistant message.
     """
 
-    request = parse_chat_request(message)
+    request = parse_chat_request(message, parser_mode=parser_mode)
     turn = ChatTurn(user_message=ChatMessageUser(content=message))
     turn.tool_calls = [
         ChatToolCall(
@@ -364,6 +394,8 @@ def run_historical_mvp_chat_turn(message: str, progress: Callable[[str], None] |
     )
 
     updated_turn = run_orchestration_cycle(turn=turn, tool_executor=executor)
+    updated_turn.diagnostics["parser_mode"] = parser_mode
+    updated_turn.diagnostics["llm_overrides_applied"] = request.llm_overrides_applied
     if not updated_turn.tool_results:
         updated_turn.assistant_message = ChatMessageAssistant(content="No tool result was produced.")
         return updated_turn
@@ -556,6 +588,7 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
     lookback_days_raw = payload.get("lookback_days", 365)
     use_local_cache_raw = payload.get("use_local_cache", True)
     cache_dir_raw = payload.get("cache_dir", "artifacts/cache")
+    parser_mode_raw = str(payload.get("parser_mode", "rule-based"))
 
     min_weight = float(str(min_weight_raw))
     max_weight = float(str(max_weight_raw))
@@ -563,6 +596,7 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
     lookback_days = int(str(lookback_days_raw))
     use_local_cache = bool(use_local_cache_raw)
     cache_dir = str(cache_dir_raw)
+    parser_mode: ParserMode = "llm-based" if parser_mode_raw == "llm-based" else "rule-based"
 
     return HistoricalMvpRequest(
         tickers=tickers,
@@ -577,6 +611,7 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         lookback_days=lookback_days,
         use_local_cache=use_local_cache,
         cache_dir=cache_dir,
+        parser_mode=parser_mode,
     )
 
 
@@ -669,6 +704,9 @@ def _extract_tickers(message: str) -> list[str]:
             "WITH",
             "AND",
             "OF",
+            "ASSET",
+            "ASSETS",
+            "EFFECTIVE",
             "RISK",
             "MEASURE",
             "OBJECTIVE",
@@ -759,6 +797,21 @@ def _extract_nea(message: str) -> int:
             return parsed if parsed >= 1 else int(_DEFAULT_RISKFOLIO.nea)
 
     return int(_DEFAULT_RISKFOLIO.nea)
+
+
+def _parse_chat_date(raw_value: str) -> date:
+    """Parse supported date token formats from chat text.
+
+    Args:
+        raw_value: Date token in ``YYYY-MM-DD`` or ``YYYYMMDD`` format.
+
+    Returns:
+        Parsed calendar date.
+    """
+
+    if "-" in raw_value:
+        return date.fromisoformat(raw_value)
+    return datetime.strptime(raw_value, "%Y%m%d").date()
 
 
 def _extract_upperlng(message: str) -> float:
