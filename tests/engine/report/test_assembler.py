@@ -23,6 +23,9 @@ def _sample_backtest_result() -> BacktestResult:
         annualized_return=0.08,
         annualized_volatility=0.12,
         sharpe_ratio=0.67,
+        max_drawdown=-0.21,
+        calmar_ratio=0.38,
+        sortino_ratio=0.74,
     )
 
 
@@ -83,6 +86,9 @@ def test_assemble_report_headline_metrics_only() -> None:
     assert report.headline_metrics["annualized_return"] == 0.08
     assert report.headline_metrics["annualized_volatility"] == 0.12
     assert report.headline_metrics["sharpe_ratio"] == 0.67
+    assert report.headline_metrics["max_drawdown"] == -0.21
+    assert report.headline_metrics["calmar_ratio"] == 0.38
+    assert report.headline_metrics["sortino_ratio"] == 0.74
     assert report.market_structure is None
     assert report.diagnostic_figures == []
 

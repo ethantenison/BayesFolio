@@ -4,6 +4,8 @@ To run streamlit app: poetry run streamlit run streamlit_app.py
 
 from __future__ import annotations
 
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from bayesfolio.engine.mvp_historical_chat import (
@@ -51,6 +53,67 @@ if prompt:
             weights = payload.get("weights", [])
             st.subheader("Optimized Weights")
             st.dataframe(weights, hide_index=True, use_container_width=True)
+
+            if isinstance(weights, list) and weights:
+                weights_df = pd.DataFrame(weights)
+                if {"asset", "weight"}.issubset(weights_df.columns):
+                    donut = px.pie(
+                        weights_df,
+                        names="asset",
+                        values="weight",
+                        hole=0.5,
+                        title="Portfolio Weight Allocation",
+                    )
+                    donut.update_traces(textposition="inside", texttemplate="%{label}<br>%{percent}")
+                    st.plotly_chart(donut, use_container_width=True)
+
+            metrics = payload.get("metrics", {})
+            if isinstance(metrics, dict) and metrics:
+                st.subheader("Portfolio Metrics")
+                percent_keys = {
+                    "cumulative_return",
+                    "annualized_return",
+                    "annualized_volatility",
+                    "max_drawdown",
+                }
+                ratio_keys = {"sharpe_ratio", "sortino_ratio", "calmar_ratio"}
+                metric_labels = {
+                    "cumulative_return": "Cumulative Return",
+                    "annualized_return": "Annualized Return (CAGR)",
+                    "annualized_volatility": "Annualized Volatility",
+                    "max_drawdown": "Max Drawdown",
+                    "sharpe_ratio": "Sharpe Ratio",
+                    "sortino_ratio": "Sortino Ratio",
+                    "calmar_ratio": "Calmar Ratio",
+                }
+
+                rows: list[dict[str, str]] = []
+                for key in [
+                    "cumulative_return",
+                    "annualized_return",
+                    "annualized_volatility",
+                    "max_drawdown",
+                    "sharpe_ratio",
+                    "sortino_ratio",
+                    "calmar_ratio",
+                ]:
+                    value = metrics.get(key)
+                    if isinstance(value, int | float):
+                        if key in percent_keys:
+                            display_value = f"{float(value) * 100:.2f}%"
+                        elif key in ratio_keys:
+                            display_value = f"{float(value):.2f}"
+                        else:
+                            display_value = str(value)
+                        rows.append(
+                            {
+                                "Metric": metric_labels.get(key, key.replace("_", " ").title()),
+                                "Value": display_value,
+                            }
+                        )
+
+                if rows:
+                    st.table(pd.DataFrame(rows))
 
             quality = payload.get("data_quality", {})
             quality_table = {

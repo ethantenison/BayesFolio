@@ -42,6 +42,7 @@ from bayesfolio.contracts.ui.universe import UniverseRecord
 from bayesfolio.core.settings import Horizon, Interval
 from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
+from bayesfolio.engine.backtest import run_weighted_backtest
 from bayesfolio.engine.features import (
     build_features_dataset,
     build_long_panel,
@@ -120,6 +121,9 @@ class HistoricalMvpResult:
         universe: Universe snapshot from the universe agent.
         data_quality: Data quality diagnostics.
         optimize_result: Optimization output weights.
+        portfolio_metrics: Backtest metrics where return and volatility values are
+            decimals (0.10 = 10%), max_drawdown is decimal (negative or zero),
+            and ratio values are dimensionless.
         report_markdown: Human-readable report text.
         weights_table: Weights table for display.
         agent_logs: Ordered coordinator logs.
@@ -131,6 +135,7 @@ class HistoricalMvpResult:
     universe: UniverseRecord
     data_quality: DataQualityResult
     optimize_result: OptimizeResult
+    portfolio_metrics: dict[str, float]
     report_markdown: str
     weights_table: pd.DataFrame
     agent_logs: list[str]
@@ -266,6 +271,18 @@ def run_historical_mvp_pipeline(
     )
     optimize_result = optimize_from_historical_returns(returns=returns_matrix, request=optimize_command)
 
+    _log("Backtest Agent: computing weighted portfolio performance metrics.")
+    backtest_result = run_weighted_backtest(realized_returns=returns_matrix, optimization=optimize_result)
+    portfolio_metrics = {
+        "cumulative_return": backtest_result.cumulative_return,
+        "annualized_return": backtest_result.annualized_return,
+        "annualized_volatility": backtest_result.annualized_volatility,
+        "max_drawdown": backtest_result.max_drawdown,
+        "sharpe_ratio": backtest_result.sharpe_ratio,
+        "sortino_ratio": backtest_result.sortino_ratio,
+        "calmar_ratio": backtest_result.calmar_ratio,
+    }
+
     _log("Report Agent: assembling summary report output.")
     weights_table = pd.DataFrame(
         {
@@ -287,6 +304,7 @@ def run_historical_mvp_pipeline(
         universe=universe,
         data_quality=quality,
         optimize_result=optimize_result,
+        portfolio_metrics=portfolio_metrics,
         report_markdown=report_markdown,
         weights_table=weights_table,
         agent_logs=agent_logs,
@@ -590,6 +608,7 @@ def _run_mvp_tool(arguments: dict[str, object], progress: Callable[[str], None] 
     return {
         "report_markdown": result.report_markdown,
         "weights": result.weights_table.to_dict(orient="records"),
+        "metrics": result.portfolio_metrics,
         "data_quality": {
             "pass_gate": result.data_quality.pass_gate,
             "n_periods": result.data_quality.n_periods,

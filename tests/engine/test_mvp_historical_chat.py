@@ -83,6 +83,15 @@ def test_run_historical_mvp_chat_turn_executes_tool_cycle(monkeypatch) -> None:
                 insufficient_history_assets=[],
             ),
             optimize_result=OptimizeResult(asset_order=["SPY", "QQQ"], weights=[0.6, 0.4]),
+            portfolio_metrics={
+                "cumulative_return": 0.12,
+                "annualized_return": 0.08,
+                "annualized_volatility": 0.11,
+                "max_drawdown": -0.09,
+                "sharpe_ratio": 0.73,
+                "sortino_ratio": 1.05,
+                "calmar_ratio": 0.89,
+            },
             report_markdown="### Historical MVP Portfolio Report\n- Top weights: SPY: 60.0%, QQQ: 40.0%",
             weights_table=pd.DataFrame(
                 {
@@ -102,5 +111,10 @@ def test_run_historical_mvp_chat_turn_executes_tool_cycle(monkeypatch) -> None:
     assert turn.tool_results
     assert turn.tool_results[-1].success is True
     assert "report_markdown" in turn.tool_results[-1].payload
+    assert "metrics" in turn.tool_results[-1].payload
+    metrics_payload = turn.tool_results[-1].payload["metrics"]
+    assert metrics_payload["max_drawdown"] <= 0.0
+    assert "sortino_ratio" in metrics_payload
+    assert "calmar_ratio" in metrics_payload
     assert turn.assistant_message is not None
     assert "Historical MVP Portfolio Report" in turn.assistant_message.content
