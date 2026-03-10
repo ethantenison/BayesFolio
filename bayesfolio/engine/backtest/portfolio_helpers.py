@@ -2,7 +2,14 @@ import numpy as np
 import pandas as pd
 import riskfolio as rp
 
-from bayesfolio.core.settings import RiskfolioConfig
+from bayesfolio.core.settings import (
+    CovEstimator,
+    MuEstimator,
+    Objective,
+    OptModel,
+    RiskfolioConfig,
+    RiskMeasure,
+)
 
 
 def riskfolio_returns_rolling(
@@ -10,7 +17,7 @@ def riskfolio_returns_rolling(
     y_pred: pd.DataFrame,  # predicted excess returns (T × N)
     y_unc: pd.DataFrame | None = None,  # optional uncertainty (T × N)
     window: int = 36,  # rolling window for risk estimation
-    config=None,  # RiskfolioConfig
+    config: RiskfolioConfig | None = None,  # RiskfolioConfig
     rf: float = 0.0,
     long_only: bool = True,
     leverage: float = 1.0,
@@ -33,7 +40,19 @@ def riskfolio_returns_rolling(
         Weights per period (index aligned to port_ret index, columns assets).
     """
     if config is None:
-        config = RiskfolioConfig()
+        config = RiskfolioConfig(
+            model=OptModel.CLASSIC,
+            rm=RiskMeasure.MV,
+            obj=Objective.SHARPE,
+            method_mu=MuEstimator.HIST,
+            method_cov=CovEstimator.HIST,
+            method_kurt=None,
+            nea=10,
+            rf=0.0,
+            ra=0.5,
+            hist=True,
+            upperlng=0.35,
+        )
 
     # --- Align assets ---
     common_assets = y_true.columns.intersection(y_pred.columns)
@@ -113,21 +132,10 @@ def riskfolio_returns_rolling(
         # 4) Optimize
         try:
             w = port.optimization(
-                model=getattr(config, "model", "Classic"),
-                rm=getattr(config, "rm", "MV"),
-                obj=getattr(config, "obj", "Sharpe"),
-                rf=rf,
-                l=0,
-                u=u_bound,
-                hist=True,
-            )
-        except TypeError:
-            # fallback for older versions
-            w = port.optimization(
-                model=getattr(config, "model", "Classic"),
-                rm=getattr(config, "rm", "MV"),
-                obj=getattr(config, "obj", "Sharpe"),
-                rf=rf,
+                model=getattr(config, "model", OptModel.CLASSIC),
+                rm=getattr(config, "rm", RiskMeasure.MV),
+                obj=getattr(config, "obj", Objective.SHARPE),
+                rf=int(rf),
                 hist=True,
             )
         except Exception:
@@ -152,8 +160,8 @@ def riskfolio_returns_rolling(
         if w_ser.isna().any():
             continue
 
-        w_t = w_ser.values
-        r_t = y_true.iloc[t].loc[valid].values.astype(float)
+        w_t = w_ser.to_numpy(dtype=float)
+        r_t = y_true.iloc[t].loc[valid].to_numpy(dtype=float)
 
         print("w_t:", w_t)
 
@@ -324,7 +332,12 @@ def long_short_returns_topk(
             continue
 
         # Determine K
-        k_t = k if k is not None else max(1, int(np.floor(q * n)))
+        if k is not None:
+            k_t = k
+        elif q is not None:
+            k_t = max(1, int(np.floor(q * n)))
+        else:
+            k_t = 1
         k_t = min(k_t, n // 2)  # safety cap
 
         if k_t == 0:
@@ -389,31 +402,32 @@ def portfolio_stats(ret: pd.Series, periods_per_year=12):
     ret = ret.dropna()
     if len(ret) == 0:
         return {
-            "cum_return": np.nan,
-            "ann_return": np.nan,
-            "ann_vol": np.nan,
-            "sharpe": np.nan,
-            "max_drawdown": np.nan,
+            "cum_return": float("nan"),
+            "ann_return": float("nan"),
+            "ann_vol": float("nan"),
+            "sharpe": float("nan"),
+            "max_drawdown": float("nan"),
         }
 
-    cum_return = (1 + ret).prod() - 1
-    ann_return = (1 + ret.mean()) ** periods_per_year - 1
-    ann_vol = ret.std() * np.sqrt(periods_per_year)
+    ret_arr = ret.to_numpy(dtype=float)
+    cum_return = float(np.prod(1 + ret_arr) - 1)
+    ann_return = float((1 + np.mean(ret_arr)) ** periods_per_year - 1)
+    ann_vol = float(np.std(ret_arr) * np.sqrt(periods_per_year))
 
     sharpe = np.nan if ann_vol == 0 else ann_return / ann_vol
 
     # Max drawdown
-    cumulative = (1 + ret).cumprod()
-    peak = cumulative.cummax()
+    cumulative = np.cumprod(1 + ret_arr)
+    peak = np.maximum.accumulate(cumulative)
     drawdown = (cumulative - peak) / peak
-    max_dd = drawdown.min()
+    max_dd = float(np.min(drawdown))
 
     return {
-        "cum_return": float(cum_return),
-        "ann_return": float(ann_return),
-        "ann_vol": float(ann_vol),
-        "sharpe": float(sharpe),
-        "max_drawdown": float(max_dd),
+        "cum_return": cum_return,
+        "ann_return": ann_return,
+        "ann_vol": ann_vol,
+        "sharpe": sharpe,
+        "max_drawdown": max_dd,
     }
 
 

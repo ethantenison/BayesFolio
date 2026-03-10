@@ -83,9 +83,7 @@ def optimize_from_historical_returns(
                 rm=request.risk_measure,
                 obj=request.objective,
                 kelly=request.kelly,
-                rf=request.rf,
-                l=max(float(request.min_weight), 0.0),
-                u=max(float(request.max_weight), 0.0),
+                rf=request.rf,  # type: ignore
                 hist=request.hist,
             )
         except TypeError:
@@ -94,7 +92,7 @@ def optimize_from_historical_returns(
                 rm=request.risk_measure,
                 obj=request.objective,
                 kelly=request.kelly,
-                rf=request.rf,
+                rf=request.rf,  # type: ignore
                 hist=request.hist,
             )
 

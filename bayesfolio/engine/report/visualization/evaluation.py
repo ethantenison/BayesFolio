@@ -291,7 +291,7 @@ def plot_actual_vs_pred_matrix(true_df, pred_df, asset_cols, save_path):
     fig.legend(handles, labels, loc="upper right", ncol=2, fontsize=12)
 
     fig.suptitle("Actual vs Predicted — Per ETF (Holdout Periods)", fontsize=16)
-    fig.tight_layout(rect=[0, 0, 1, 0.93])
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
 
     plt.savefig(save_path, dpi=200)
     plt.close(fig)
