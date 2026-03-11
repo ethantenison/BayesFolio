@@ -73,26 +73,32 @@ def optimize_from_historical_returns(
     weights_array: np.ndarray
 
     try:
-        portfolio = rp.Portfolio(returns=clean_returns, nea=max(int(request.nea), 1))
+        n_assets = clean_returns.shape[1]
+        # nea must be strictly less than n_assets; equal forces equal-weighting.
+        capped_nea = max(1, min(int(request.nea), n_assets - 1))
+        portfolio = rp.Portfolio(returns=clean_returns, nea=capped_nea)
         portfolio.card = None
+        # Apply per-asset weight bounds from the request.
+        portfolio.upperlng = max(float(request.max_weight), 1.0 / n_assets)
+        portfolio.lowerlng = max(0.0, float(request.min_weight))
         portfolio.assets_stats(method_mu="hist", method_cov="hist")
 
         try:
             weights_df = portfolio.optimization(
-                model="Classic",
+                model=request.model,
                 rm=request.risk_measure,
                 obj=request.objective,
-                rf=0,
-                l=max(float(request.min_weight), 0.0),
-                u=max(float(request.max_weight), 0.0),
+                kelly=request.kelly,
+                rf=request.rf,  # type: ignore
                 hist=request.hist,
             )
         except TypeError:
             weights_df = portfolio.optimization(
-                model="Classic",
+                model=request.model,
                 rm=request.risk_measure,
                 obj=request.objective,
-                rf=0,
+                kelly=request.kelly,
+                rf=request.rf,  # type: ignore
                 hist=request.hist,
             )
 

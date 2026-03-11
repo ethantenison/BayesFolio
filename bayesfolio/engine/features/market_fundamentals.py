@@ -860,8 +860,12 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     for df in dfs[1:]:
         merged = pd.merge(merged, df, on="date", how="left")
 
-    # Sort and forward-fill small gaps (e.g., missing DXY data)
-    merged = merged.sort_values("date").ffill().fillna(0)
+    # Sort and forward-fill small gaps (e.g., missing DXY data).
+    # Fill residual gaps on value columns only to avoid mixed-dtype downcasting.
+    merged = merged.sort_values("date")
+    value_columns = [column for column in merged.columns if column != "date"]
+    merged[value_columns] = merged[value_columns].apply(pd.to_numeric, errors="coerce")
+    merged[value_columns] = merged[value_columns].ffill().fillna(0.0)
 
     return merged
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from io import BytesIO
 from pathlib import Path
@@ -10,6 +9,7 @@ import pandas as pd
 from bayesfolio.contracts.base import Meta
 from bayesfolio.contracts.results.report import ArtifactPointer
 from bayesfolio.io.backends import ArtifactBackend, resolve_backend_and_key
+from bayesfolio.io.fingerprints import sha256_digest
 
 
 def write_parquet_with_metadata(
@@ -44,5 +44,5 @@ def write_parquet_with_metadata(
     metadata_bytes = json.dumps(metadata.model_dump(mode="json"), indent=2).encode("utf-8")
     resolved_backend.put_bytes(metadata_key, metadata_bytes)
 
-    digest = hashlib.sha256(parquet_bytes).hexdigest()
+    digest = sha256_digest(parquet_bytes)
     return ArtifactPointer(path=artifact_uri, artifact_format="parquet", digest=digest, byte_size=len(parquet_bytes))

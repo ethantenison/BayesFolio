@@ -311,7 +311,7 @@ class RiskfolioConfig(BaseModel):
         model: Portfolio optimization method.
         rm: Risk measure.
         rf: Risk-free rate.
-        ra: Risk aversion level.
+        ra: Risk aversion factor of the Utility objective function. Also known as lambda.
         hist: Use historical data for risk estimation.
         obj: Objective for portfolio optimization.
         method_mu: Expected return estimator.
@@ -324,7 +324,7 @@ class RiskfolioConfig(BaseModel):
     model: OptModel = Field(OptModel.CLASSIC, description="Portfolio optimization method")
     rm: RiskMeasure = Field(RiskMeasure.MV, description="Risk measure")
     rf: float = Field(0.0, description="Risk-free rate")
-    ra: float = Field(0.5, description="Risk aversion level")
+    ra: float = Field(0.5, description="Risk aversion factor of the Utility objective function. Also known as lambda.")
     hist: bool = Field(True, description="Use historical data for risk estimation")
     obj: Objective = Field(Objective.SHARPE, description="Objective for portfolio optimization")
     method_mu: MuEstimator = Field(MuEstimator.HIST, description="Expected return estimator")

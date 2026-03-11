@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 from datetime import datetime, timezone
@@ -11,6 +10,7 @@ import pandas as pd
 
 from bayesfolio.contracts.results.features import ArtifactPointer
 from bayesfolio.io.backends import ArtifactBackend, make_artifact_backend
+from bayesfolio.io.fingerprints import sha256_digest
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ class ParquetArtifactStore:
         metadata_bytes = json.dumps(payload, indent=2).encode("utf-8")
         self._backend.put_bytes(metadata_key, metadata_bytes)
 
-        fingerprint = hashlib.sha256(parquet_bytes).hexdigest()
+        fingerprint = sha256_digest(parquet_bytes)
 
         return ArtifactPointer(
             uri=artifact_uri,

@@ -1,3 +1,11 @@
+"""Feature dataset result and diagnostics contracts.
+
+This module defines result-layer boundary schemas returned by feature dataset
+build workflows. Schemas are data-only, versioned, and intended for
+cross-boundary exchange. Return values are expressed in decimal units where
+``0.02 = 2%``.
+"""
+
 from __future__ import annotations
 
 from datetime import date
@@ -82,7 +90,19 @@ class FeatureTargetAssociation(ContractModel):
 class TargetSummaryDiagnostics(ContractModel):
     """Distribution diagnostics for the target return column.
 
-    All return values are decimal units (`0.02 = 2%`).
+    All return values are decimal units (``0.02 = 2%``).
+
+    Attributes:
+        count: Number of non-null target observations.
+        mean: Arithmetic mean of target returns in decimal units.
+        std: Standard deviation of target returns in decimal units.
+        p01: 1st percentile of target returns in decimal units.
+        p50: 50th percentile (median) of target returns in decimal units.
+        p99: 99th percentile of target returns in decimal units.
+        positive_share: Share of observations with strictly positive returns in
+            ``[0, 1]``.
+        target_missing_rate_before_drop: Missing-rate of the target column
+            before rows with missing targets are removed, in ``[0, 1]``.
     """
 
     count: int = Field(ge=0)
@@ -96,7 +116,17 @@ class TargetSummaryDiagnostics(ContractModel):
 
 
 class FeatureQualityDiagnostics(ContractModel):
-    """Coverage and stability diagnostics for feature columns."""
+    """Coverage and stability diagnostics for feature columns.
+
+    Attributes:
+        feature_count: Total number of feature columns evaluated.
+        features_with_missing_count: Number of feature columns with one or more
+            missing observations.
+        constant_feature_names: Feature column names with no variance across
+            observed rows.
+        worst_missing_features: Mapping from feature name to missing-rate in
+            ``[0, 1]`` for the highest-missingness feature columns.
+    """
 
     feature_count: int = Field(ge=0)
     features_with_missing_count: int = Field(ge=0)
@@ -105,7 +135,14 @@ class FeatureQualityDiagnostics(ContractModel):
 
 
 class CrossSectionalBreadthDiagnostics(ContractModel):
-    """Cross-sectional panel breadth diagnostics by date."""
+    """Cross-sectional panel breadth diagnostics by date.
+
+    Attributes:
+        date_count: Number of unique panel dates evaluated.
+        min_assets_per_date: Minimum number of assets available on any date.
+        median_assets_per_date: Median number of assets available per date.
+        max_assets_per_date: Maximum number of assets available on any date.
+    """
 
     date_count: int = Field(ge=0)
     min_assets_per_date: int = Field(ge=0)

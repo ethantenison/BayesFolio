@@ -1,3 +1,11 @@
+"""Feature dataset build command contracts.
+
+This module defines command-layer boundary schemas used to request feature
+dataset construction. It is data-only and carries no business logic or I/O.
+Financial return fields are interpreted in decimal units unless documented
+otherwise.
+"""
+
 from __future__ import annotations
 
 from datetime import date
