@@ -1056,13 +1056,14 @@ def _extract_nea(message: str) -> int:
         r"\bnumber\s+of\s+effective\s+assets(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
         r"\beffective\s+assets(?:\s*(?:of|:=|=|:))?\s*(\d+)\b",
     ]
+    default_nea = int(_DEFAULT_RISKFOLIO.nea)
     for pattern in patterns:
         match = re.search(pattern, message, flags=re.IGNORECASE)
         if match is not None:
             parsed = int(match.group(1))
-            return parsed if parsed >= 1 else int(_DEFAULT_RISKFOLIO.nea)
+            return parsed if parsed >= 1 else default_nea
 
-    return int(_DEFAULT_RISKFOLIO.nea)
+    return default_nea
 
 
 def _parse_chat_date(raw_value: str) -> date:
@@ -1104,13 +1105,14 @@ def _extract_upperlng(message: str) -> float:
             message,
             flags=re.IGNORECASE,
         )
+    default_upperlng = float(_DEFAULT_RISKFOLIO.upperlng)
     if match is None:
-        return float(_DEFAULT_RISKFOLIO.upperlng)
+        return default_upperlng
 
     value = float(match.group(1))
     if match.group(2) == "%" or value > 1.0:
         value = value / 100.0
 
     if value <= 0.0 or value > 1.0:
-        return float(_DEFAULT_RISKFOLIO.upperlng)
+        return default_upperlng
     return value
