@@ -39,7 +39,16 @@ from bayesfolio.contracts.commands.universe import UniverseCommand
 from bayesfolio.contracts.results.features import FeaturesDatasetResult
 from bayesfolio.contracts.results.optimize import OptimizeResult
 from bayesfolio.contracts.ui.universe import UniverseRecord
-from bayesfolio.core.settings import Horizon, Interval, Objective, RiskfolioConfig, RiskMeasure
+from bayesfolio.core.settings import (
+    CovEstimator,
+    Horizon,
+    Interval,
+    MuEstimator,
+    Objective,
+    OptModel,
+    RiskfolioConfig,
+    RiskMeasure,
+)
 from bayesfolio.engine.agent.intent_extractor import extract_intent_overrides_with_status
 from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
@@ -61,7 +70,19 @@ from bayesfolio.io import (
 )
 from bayesfolio.io.providers.chat_knowledge_provider import ChatKnowledgeProvider
 
-_DEFAULT_RISKFOLIO = RiskfolioConfig()
+_DEFAULT_RISKFOLIO = RiskfolioConfig(
+    model=OptModel.CLASSIC,
+    rm=RiskMeasure.MV,
+    obj=Objective.SHARPE,
+    method_mu=MuEstimator.HIST,
+    method_cov=CovEstimator.HIST,
+    method_kurt=None,
+    nea=10,
+    rf=0.0,
+    ra=0.5,
+    hist=True,
+    upperlng=0.35,
+)
 _RISKFOLIO_KNOWLEDGE_PROVIDER = ChatKnowledgeProvider()
 ParserMode = Literal["rule-based", "llm-based"]
 
@@ -94,9 +115,9 @@ class HistoricalMvpRequest:
     tickers: list[str]
     start_date: date
     end_date: date
-    objective: str = _DEFAULT_RISKFOLIO.obj.value
-    risk_measure: str = _DEFAULT_RISKFOLIO.rm.value
-    model: str = _DEFAULT_RISKFOLIO.model.value
+    objective: str = _DEFAULT_RISKFOLIO.obj
+    risk_measure: str = _DEFAULT_RISKFOLIO.rm
+    model: str = _DEFAULT_RISKFOLIO.model
     rf: float = _DEFAULT_RISKFOLIO.rf
     hist: bool = _DEFAULT_RISKFOLIO.hist
     kelly: str | None = None
@@ -167,17 +188,24 @@ def parse_chat_request(
     message: str,
     today: date | None = None,
     parser_mode: ParserMode = "rule-based",
-) -> HistoricalMvpRequest:
+) -> tuple[HistoricalMvpRequest, list[str]]:
     """Parse a free-form chat request into a normalized coordinator request.
+
+    Tickers and dates are always extracted using rule-based parsing.
+    In LLM mode, the LLM overrides only the 5 optimization fields it supports:
+    ``objective``, ``risk_measure``, ``min_weight``, ``max_weight``, ``nea``.
+    Fields not returned by the LLM fall back to rule-based / default values.
 
     Args:
         message: User message containing tickers and optional settings.
         today: Optional date override for deterministic tests.
         parser_mode: Parsing mode selector. ``"rule-based"`` skips LLM
-            extraction while ``"llm-based"`` applies LLM override extraction.
+            extraction while ``"llm-based"`` applies LLM override extraction
+            for the supported optimization fields.
 
     Returns:
-        Parsed and normalized request object.
+        Tuple of ``(request, warnings)`` where ``warnings`` lists any fields
+        that fell back to defaults.
 
     Raises:
         ValueError: If no tickers can be parsed.
@@ -186,6 +214,10 @@ def parse_chat_request(
     """
 
     anchors = today or date.today()
+    warnings: list[str] = []
+
+    # Tickers and dates are always extracted rule-based — the LLM extractor
+    # only handles optimization settings (objective, risk_measure, weights, nea).
     parsed_tickers = _extract_tickers(message)
     if not parsed_tickers:
         msg = "Could not parse any tickers. Include tickers like SPY, QQQ, TLT."
@@ -199,18 +231,14 @@ def parse_chat_request(
         end_date = anchors
         start_date = end_date - timedelta(days=365 * 5)
 
+    # Rule-based knowledge provider for model/rf/hist/kelly (LLM never returns these).
     rule_overrides = _RISKFOLIO_KNOWLEDGE_PROVIDER.suggest_overrides(message)
-    objective = str(rule_overrides.get("objective", _DEFAULT_RISKFOLIO.obj.value))
-    risk_measure = str(rule_overrides.get("risk_measure", _DEFAULT_RISKFOLIO.rm.value))
-    model = str(rule_overrides.get("model", _DEFAULT_RISKFOLIO.model.value))
-    rf = float(rule_overrides.get("rf", _DEFAULT_RISKFOLIO.rf))
+    model = str(rule_overrides.get("model", _DEFAULT_RISKFOLIO.model))
+    rf = float(rule_overrides.get("rf", _DEFAULT_RISKFOLIO.rf))  # type: ignore
     hist = _coerce_bool(rule_overrides.get("hist", _DEFAULT_RISKFOLIO.hist), default=_DEFAULT_RISKFOLIO.hist)
     kelly_raw = rule_overrides.get("kelly", None)
     kelly = str(kelly_raw) if isinstance(kelly_raw, str) else None
-    min_weight = 0.0
-    nea = _extract_nea(message)
-    max_weight = _extract_upperlng(message)
-    llm_overrides_applied = False
+
     if parser_mode == "llm-based":
         llm_overrides, llm_status = extract_intent_overrides_with_status(message)
         if not llm_overrides:
@@ -221,18 +249,47 @@ def parse_chat_request(
             )
             raise ValueError(msg)
 
-        objective = str(llm_overrides.get("objective", _DEFAULT_RISKFOLIO.obj.value))
-        risk_measure = str(llm_overrides.get("risk_measure", _DEFAULT_RISKFOLIO.rm.value))
-        model = str(llm_overrides.get("model", _DEFAULT_RISKFOLIO.model.value))
-        rf = float(llm_overrides.get("rf", _DEFAULT_RISKFOLIO.rf))
-        hist = _coerce_bool(llm_overrides.get("hist", _DEFAULT_RISKFOLIO.hist), default=_DEFAULT_RISKFOLIO.hist)
-        kelly_raw = llm_overrides.get("kelly", None)
-        kelly = str(kelly_raw) if isinstance(kelly_raw, str) else None
+        # LLM extraction: objective, risk_measure, min_weight, max_weight, nea.
+        # Fall back to rule-based / default for any field the LLM did not return.
+        objective = str(llm_overrides.get("objective", _DEFAULT_RISKFOLIO.obj))
+        if "objective" not in llm_overrides:
+            warnings.append("Objective not found in LLM extraction; using default.")
+        risk_measure = str(llm_overrides.get("risk_measure", _DEFAULT_RISKFOLIO.rm))
+        if "risk_measure" not in llm_overrides:
+            warnings.append("Risk measure not found in LLM extraction; using default.")
         min_weight = float(llm_overrides.get("min_weight", 0.0))
+        if "min_weight" not in llm_overrides:
+            warnings.append("Min weight not found in LLM extraction; using default.")
         max_weight = float(llm_overrides.get("max_weight", _DEFAULT_RISKFOLIO.upperlng))
+        if "max_weight" not in llm_overrides:
+            warnings.append("Max weight not found in LLM extraction; using default.")
         nea = int(llm_overrides.get("nea", _DEFAULT_RISKFOLIO.nea))
-        llm_overrides_applied = True
+        if "nea" not in llm_overrides:
+            warnings.append("Number of effective assets not found in LLM extraction; using default.")
 
+        return HistoricalMvpRequest(
+            tickers=parsed_tickers,
+            start_date=start_date,
+            end_date=end_date,
+            objective=objective,
+            risk_measure=risk_measure,
+            model=model,
+            rf=rf,
+            hist=hist,
+            kelly=kelly,
+            min_weight=min_weight,
+            max_weight=max_weight,
+            nea=nea,
+            parser_mode=parser_mode,
+            llm_overrides_applied=True,
+        ), warnings
+
+    # Rule-based mode (default): all fields from knowledge provider / regex helpers.
+    objective = str(rule_overrides.get("objective", _DEFAULT_RISKFOLIO.obj))
+    risk_measure = str(rule_overrides.get("risk_measure", _DEFAULT_RISKFOLIO.rm))
+    min_weight = 0.0
+    nea = _extract_nea(message)
+    max_weight = _extract_upperlng(message)
     return HistoricalMvpRequest(
         tickers=parsed_tickers,
         start_date=start_date,
@@ -247,8 +304,8 @@ def parse_chat_request(
         max_weight=max_weight,
         nea=nea,
         parser_mode=parser_mode,
-        llm_overrides_applied=llm_overrides_applied,
-    )
+        llm_overrides_applied=False,
+    ), warnings
 
 
 def assess_data_quality(returns: pd.DataFrame, min_observations: int = 24) -> DataQualityResult:
@@ -402,7 +459,7 @@ def run_historical_mvp_chat_turn(
         ChatTurn containing executed tool result payload and assistant message.
     """
 
-    request = parse_chat_request(message, parser_mode=parser_mode)
+    request_obj, warnings = parse_chat_request(message, parser_mode=parser_mode)
     is_ambiguous = _is_ambiguous_request(message=message)
     knowledge_payload: dict[str, object] | None = None
     normalization_payload: dict[str, object] = {
@@ -415,8 +472,8 @@ def run_historical_mvp_chat_turn(
             arguments={"message": message},
             provider=_RISKFOLIO_KNOWLEDGE_PROVIDER,
         )
-        request, normalization_payload = _apply_knowledge_normalization(
-            request=request,
+        request_obj, normalization_payload = _apply_knowledge_normalization(
+            request=request_obj,
             knowledge_payload=knowledge_payload,
         )
         knowledge_payload["normalization"] = normalization_payload
@@ -438,7 +495,7 @@ def run_historical_mvp_chat_turn(
         ChatToolCall(
             call_id="call_001",
             tool_name="run_historical_mvp_pipeline",
-            arguments={"request": _request_to_payload(request)},
+            arguments={"request": _request_to_payload(request_obj)},
         )
     )
 
@@ -457,9 +514,10 @@ def run_historical_mvp_chat_turn(
 
     updated_turn = run_orchestration_cycle(turn=turn, tool_executor=executor)
     updated_turn.diagnostics["parser_mode"] = parser_mode
-    updated_turn.diagnostics["llm_overrides_applied"] = request.llm_overrides_applied
+    updated_turn.diagnostics["llm_overrides_applied"] = request_obj.llm_overrides_applied
     updated_turn.diagnostics["ambiguous_request"] = is_ambiguous
     updated_turn.diagnostics["knowledge_normalization"] = normalization_payload
+    updated_turn.diagnostics["parser_warnings"] = warnings
     if not updated_turn.tool_results:
         updated_turn.assistant_message = ChatMessageAssistant(content="No tool result was produced.")
         return updated_turn
@@ -823,9 +881,9 @@ def _payload_to_request(payload: dict[str, object]) -> HistoricalMvpRequest:
         tickers=tickers,
         start_date=date.fromisoformat(str(start_raw)),
         end_date=date.fromisoformat(str(end_raw)),
-        objective=str(payload.get("objective", _DEFAULT_RISKFOLIO.obj.value)),
-        risk_measure=str(payload.get("risk_measure", _DEFAULT_RISKFOLIO.rm.value)),
-        model=str(payload.get("model", _DEFAULT_RISKFOLIO.model.value)),
+        objective=str(payload.get("objective", _DEFAULT_RISKFOLIO.obj)),
+        risk_measure=str(payload.get("risk_measure", _DEFAULT_RISKFOLIO.rm)),
+        model=str(payload.get("model", _DEFAULT_RISKFOLIO.model)),
         rf=float(str(payload.get("rf", _DEFAULT_RISKFOLIO.rf))),
         hist=_coerce_bool(payload.get("hist", _DEFAULT_RISKFOLIO.hist), default=_DEFAULT_RISKFOLIO.hist),
         kelly=(str(payload.get("kelly")) if isinstance(payload.get("kelly"), str) else None),
