@@ -35,7 +35,7 @@ class ReturnsProvider:
 
     def __init__(
         self,
-        fetcher: Callable[..., pd.DataFrame] | None = None,
+        fetcher: Callable[..., pd.DataFrame],
         *,
         cache_dir: str | Path | None = None,
     ) -> None:
@@ -46,7 +46,7 @@ class ReturnsProvider:
             cache_dir: Optional local directory for parquet cache files.
         """
 
-        self._fetcher = fetcher
+        self._fetcher: Callable[..., pd.DataFrame] = fetcher
         self._cache_dir = Path(cache_dir) if cache_dir is not None else None
 
     def get_y_excess_lead_long(
@@ -149,6 +149,7 @@ class ReturnsProvider:
         return frame
 
     def _cache_file_path(self, horizon: Horizon) -> Path:
+        assert self._cache_dir is not None
         safe_horizon = str(horizon.value).replace("-", "_").lower()
         return self._cache_dir / f"returns_{safe_horizon}.parquet"
 
