@@ -310,3 +310,12 @@ if __name__ == "__main__":
     mll = ExactMarginalLogLikelihood(likelihood, model)
 
     fit_gpytorch_mll(mll)  # fits model hyperparameters
+
+    # Removing features led to great speed up.
+
+    # ---- Predict ----
+    model.eval()
+    likelihood.eval()
+    with torch.no_grad():
+        f_dist = model(Xn)
+        pred = likelihood(f_dist, Xn)
