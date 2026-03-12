@@ -42,23 +42,23 @@ from bayesfolio.io import (
 
 ETF_TICKERS: list[str] = [
     "SPY",  # total US market large cap
-    "MGK",  # US growth
+    # "MGK",  # US growth
     "VTV",  # US value
     "IJR",  # US small cap (S&P 600)
-    "IWM",  # US small cap (Russell)
-    "VNQ",  # US REIT
-    "VNQI",  # international REIT
+    # "IWM",  # US small cap (Russell)
+    # "VNQ",  # US REIT
+    # "VNQI",  # international REIT
     "VEA",  # developed international equity
     "VWO",  # emerging market equity
-    "VSS",  # foreign small/mid cap
-    "BND",  # total US bond market
+    # "VSS",  # foreign small/mid cap
+    # "BND",  # total US bond market
     "IEF",  # 7-10 yr treasury
-    "BNDX",  # total international bond (USD hedged)
-    "LQD",  # investment grade corporate bonds
-    "HYG",  # high yield bonds
-    "EWX",  # emerging market small cap
-    "VWOB",  # emerging market government bonds
-    "HYEM",  # emerging market high yield corporate bonds
+    # "BNDX",  # total international bond (USD hedged)
+    # "LQD",  # investment grade corporate bonds
+    # "HYG",  # high yield bonds
+    # "EWX",  # emerging market small cap
+    # "VWOB",  # emerging market government bonds
+    # "HYEM",  # emerging market high yield corporate bonds
 ]
 
 # Assets to exclude from the portfolio universe.
@@ -66,8 +66,8 @@ ETF_TICKERS: list[str] = [
 DROP_ASSETS: list[str] = []
 
 # Date range
-LOOKBACK_DATE = date(2014, 7, 1)  # Earliest history for feature engineering
-START_DATE = date(2016, 11, 29)  # First row in the output panel
+LOOKBACK_DATE = date(2019, 7, 1)  # Earliest history for feature engineering
+START_DATE = date(2021, 11, 29)  # First row in the output panel
 END_DATE = date(2026, 2, 28)  # Last row in the output panel
 
 # ---------------------------------------------------------------------------
@@ -91,6 +91,20 @@ DROP_ETF_COLS: list[str] = [
     "vol_1w",
     "price",
     "overnight_gap",
+    "lag2_y_excess_lead",
+    "mom1m",
+    "mom6m",
+    "vol_1m",
+    "vol_3m",
+    "vol_of_vol",
+    "vol_accel",
+    "ret_skew",
+    "ill_log",
+    "dolvol_log",
+    "log_ret",
+    "sd_turn",
+    "turnover",
+    "volume",
 ]
 
 # ---------------------------------------------------------------------------
@@ -238,8 +252,13 @@ if __name__ == "__main__":
     # --- GP section placeholder ---
     # TODO: Add GP data preparation and model training below.
     #
-    # from bayesfolio.engine.features import prepare_multitask_gp_data
-    # import torch
+    import torch
+    from botorch.fit import fit_gpytorch_mll
+    from botorch.models.multitask import MultiTaskGP
+    from botorch.models.transforms.outcome import StratifiedStandardize
+    from gpytorch.mlls import ExactMarginalLogLikelihood
+
+    from bayesfolio.engine.features import prepare_multitask_gp_data_with_task_feature
     #
     # X, I, y, task_map = prepare_multitask_gp_data(
     #     features_df,
@@ -248,3 +267,46 @@ if __name__ == "__main__":
     #     drop_cols=["date", "asset_id"],
     #     dtype=torch.float32,
     # )
+
+    X, y, task_map = prepare_multitask_gp_data_with_task_feature(
+        features_df,
+        target_col="y_excess_lead",
+        asset_col="asset_id",
+        drop_cols=["date"],
+        dtype=torch.float64,
+    )
+
+    task_feature = -1  # or the actual column index holding the task id
+    all_task_values = X[:, task_feature].to(torch.long).unique(sorted=True)
+    task_idx = X.shape[-1] - 1
+    non_task_indices = [i for i in range(X.shape[-1]) if i != task_idx]
+
+    Xn = X.clone()
+
+    mins = X[:, non_task_indices].amin(dim=0)
+    maxs = X[:, non_task_indices].amax(dim=0)
+    ranges = (maxs - mins).clamp_min(1e-12)
+
+    Xn[:, non_task_indices] = (X[:, non_task_indices] - mins) / ranges
+
+    outcome_transform = StratifiedStandardize(
+        stratification_idx=task_feature,
+        all_task_values=all_task_values,
+        observed_task_values=X[:, task_feature].to(torch.long),
+        batch_shape=y.shape[:-2],  # usually torch.Size([])
+    )
+
+    model = MultiTaskGP(
+        train_X=Xn,
+        train_Y=y,
+        task_feature=-1,
+        input_transform=None,
+        outcome_transform=outcome_transform,
+        rank=2,
+    )
+
+    model.train()
+    likelihood = model.likelihood  # MultiTaskGP has a likelihood attribute
+    mll = ExactMarginalLogLikelihood(likelihood, model)
+
+    fit_gpytorch_mll(mll)  # fits model hyperparameters
