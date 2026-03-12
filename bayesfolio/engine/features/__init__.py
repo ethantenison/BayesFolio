@@ -7,7 +7,10 @@ from bayesfolio.engine.features.asset_prices import (
     fetch_etf_features,
 )
 from bayesfolio.engine.features.dataset_builder import FeatureProviders, build_features_dataset
-from bayesfolio.engine.features.gp_data_prep import prepare_multitask_gp_data
+from bayesfolio.engine.features.gp_data_prep import (
+    prepare_multitask_gp_data,
+    prepare_multitask_gp_data_with_task_feature,
+)
 from bayesfolio.engine.features.market_fundamentals import (
     fetch_core_global_macro,
     fetch_enhanced_macro_features,
@@ -24,6 +27,7 @@ __all__ = [
     "cross_sectional_zscore",
     "fetch_etf_features",
     "prepare_multitask_gp_data",
+    "prepare_multitask_gp_data_with_task_feature",
     "fetch_core_global_macro",
     "fetch_enhanced_macro_features",
     "fetch_macro_features",
