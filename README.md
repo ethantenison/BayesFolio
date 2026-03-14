@@ -157,11 +157,6 @@ Recommended PR workflow:
 4. Apply patches only after explicit approval.
 5. Re-run linting, targeted tests, and touched-file diagnostics before handoff.
 
-------------------------------------------------------------
-
-## License
-
-MIT License
 
 ------------------------------------------------------------
 
