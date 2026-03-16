@@ -19,7 +19,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from enum import StrEnum
 from math import log, sqrt
-from typing import Any, cast
+from typing import Annotated, Any, Literal, cast
 
 import torch
 from botorch.models.multitask import MultiTaskGP
@@ -34,9 +34,10 @@ from gpytorch.kernels import (
     RQKernel,
     ScaleKernel,
 )
+from gpytorch.likelihoods import HadamardGaussianLikelihood
 from gpytorch.means import ConstantMean, LinearMean, Mean, MultitaskMean, ZeroMean
 from gpytorch.priors import LogNormalPrior
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -104,12 +105,6 @@ class LengthscalePolicyConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    @model_validator(mode="after")
-    def _validate_manual_for_policy(self) -> LengthscalePolicyConfig:
-        if self.policy == LengthscalePolicy.MANUAL_LOGNORMAL and self.manual is None:
-            raise ValueError("manual must be set when policy is MANUAL_LOGNORMAL")
-        return self
-
 
 class PeriodLengthPriorConfig(BaseModel):
     """Adaptive period-length prior for periodic kernels.
@@ -125,28 +120,70 @@ class PeriodLengthPriorConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class KernelComponentConfig(BaseModel):
-    """Single kernel component with explicit feature dimensions.
+class BaseKernelComponentConfig(BaseModel):
+    """Fields shared by all kernel component configurations.
 
     Attributes:
         kind: Base kernel type.
         dims: Active feature indices for this component, excluding task column.
-        ard: If True, use ARD over ``dims`` (where supported).
-        matern_nu: Smoothness for Matern kernels.
-        use_outputscale: If True, wrap this component in ``ScaleKernel``.
-        lengthscale_policy: Lengthscale prior/constraint policy.
-        period_prior: Optional period prior for periodic kernels.
+        use_outputscale: If True, wraps this component in ``ScaleKernel``.
     """
 
     kind: KernelKind
     dims: list[int]
+    use_outputscale: bool = True
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class MaternKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``MaternKernel``."""
+
+    kind: Literal[KernelKind.MATERN] = KernelKind.MATERN
     ard: bool = True
     matern_nu: float = 2.5
-    use_outputscale: bool = True
+    lengthscale_policy: LengthscalePolicyConfig = Field(default_factory=LengthscalePolicyConfig)
+
+
+class RBFKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``RBFKernel``."""
+
+    kind: Literal[KernelKind.RBF] = KernelKind.RBF
+    ard: bool = True
+    lengthscale_policy: LengthscalePolicyConfig = Field(default_factory=LengthscalePolicyConfig)
+
+
+class RQKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``RQKernel``."""
+
+    kind: Literal[KernelKind.RQ] = KernelKind.RQ
+    ard: bool = True
+    lengthscale_policy: LengthscalePolicyConfig = Field(default_factory=LengthscalePolicyConfig)
+
+
+class PeriodicKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``PeriodicKernel``."""
+
+    kind: Literal[KernelKind.PERIODIC] = KernelKind.PERIODIC
+    ard: bool = True
     lengthscale_policy: LengthscalePolicyConfig = Field(default_factory=LengthscalePolicyConfig)
     period_prior: PeriodLengthPriorConfig | None = None
 
-    model_config = ConfigDict(extra="forbid")
+
+class LinearKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``LinearKernel``."""
+
+    kind: Literal[KernelKind.LINEAR] = KernelKind.LINEAR
+
+
+KernelComponentConfig = Annotated[
+    MaternKernelComponentConfig
+    | RBFKernelComponentConfig
+    | RQKernelComponentConfig
+    | PeriodicKernelComponentConfig
+    | LinearKernelComponentConfig,
+    Field(discriminator="kind"),
+]
 
 
 class KernelTermConfig(BaseModel):
@@ -216,6 +253,9 @@ def _resolve_lengthscale_prior_and_constraint(
     if ard_num_dims < 1:
         raise ValueError("ard_num_dims must be >= 1")
 
+    if policy.policy == LengthscalePolicy.MANUAL_LOGNORMAL and policy.manual is None:
+        raise ValueError("manual must be set when policy is MANUAL_LOGNORMAL")
+
     if policy.policy == LengthscalePolicy.BOTORCH_STANDARD:
         prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
         minimum = 2.5e-2
@@ -237,18 +277,17 @@ def _resolve_lengthscale_prior_and_constraint(
 
 
 def _build_kernel_component(component: KernelComponentConfig, batch_shape: torch.Size = torch.Size()) -> Kernel:
-    ard_num_dims = len(component.dims) if component.ard else 1
-
-    if component.kind == KernelKind.LINEAR:
+    if isinstance(component, LinearKernelComponentConfig):
         kernel: Kernel = LinearKernel(active_dims=tuple(component.dims), ard_num_dims=None, batch_shape=batch_shape)
         return ScaleKernel(kernel, batch_shape=batch_shape) if component.use_outputscale else kernel
 
+    ard_num_dims = len(component.dims) if component.ard else 1
     prior, constraint = _resolve_lengthscale_prior_and_constraint(
         policy=component.lengthscale_policy,
         ard_num_dims=ard_num_dims,
     )
 
-    if component.kind == KernelKind.MATERN:
+    if isinstance(component, MaternKernelComponentConfig):
         kernel = MaternKernel(
             nu=component.matern_nu,
             ard_num_dims=ard_num_dims,
@@ -257,7 +296,7 @@ def _build_kernel_component(component: KernelComponentConfig, batch_shape: torch
             lengthscale_prior=prior,
             lengthscale_constraint=constraint,
         )
-    elif component.kind == KernelKind.RBF:
+    elif isinstance(component, RBFKernelComponentConfig):
         kernel = RBFKernel(
             ard_num_dims=ard_num_dims,
             active_dims=tuple(component.dims),
@@ -265,7 +304,7 @@ def _build_kernel_component(component: KernelComponentConfig, batch_shape: torch
             lengthscale_prior=prior,
             lengthscale_constraint=constraint,
         )
-    elif component.kind == KernelKind.RQ:
+    elif isinstance(component, RQKernelComponentConfig):
         kernel = RQKernel(
             ard_num_dims=ard_num_dims,
             active_dims=tuple(component.dims),
@@ -273,17 +312,16 @@ def _build_kernel_component(component: KernelComponentConfig, batch_shape: torch
             lengthscale_prior=prior,
             lengthscale_constraint=constraint,
         )
-    elif component.kind == KernelKind.PERIODIC:
-        period_prior = make_period_length_prior(
-            component.period_prior.p0 if component.period_prior is not None else 0.25,
-            component.period_prior.cv if component.period_prior is not None else 0.5,
-        )
+    elif isinstance(component, PeriodicKernelComponentConfig):
+        period_length = component.period_prior.p0 if component.period_prior is not None else 0.25
+        period_prior_cv = component.period_prior.cv if component.period_prior is not None else 0.5
+        period_prior = make_period_length_prior(period_length, period_prior_cv)
         kernel = PeriodicKernel(
             ard_num_dims=ard_num_dims,
             active_dims=tuple(component.dims),
             batch_shape=batch_shape,
             period_length_prior=period_prior,
-            period_length=period_prior.median,
+            period_length=period_length,
             lengthscale_prior=prior,
             lengthscale_constraint=constraint,
         )
@@ -385,8 +423,7 @@ def default_covar_config_for_non_task_dims(
         terms=[
             KernelTermConfig(
                 components=[
-                    KernelComponentConfig(
-                        kind=KernelKind.MATERN,
+                    MaternKernelComponentConfig(
                         dims=list(non_task_dims),
                         ard=True,
                         matern_nu=2.5,
@@ -407,6 +444,7 @@ def build_multitask_gp(
     covar_config: CovarModuleConfig | None = None,
     mean_config: MeanModuleConfig | None = None,
     rank: int | None = 1,
+    min_inferred_noise_level: float | None = None,
     outcome_transform: object | None = None,
     input_transform: object | None = None,
     validate_task_values: bool = True,
@@ -422,6 +460,8 @@ def build_multitask_gp(
         mean_config: Optional mean configuration. If ``None``, uses
             ``MULTITASK_CONSTANT``.
         rank: Task covariance rank.
+        min_inferred_noise_level: Optional minimum inferred noise floor for
+            the multitask likelihood. If ``None``, uses BoTorch defaults.
         outcome_transform: Optional BoTorch outcome transform.
         input_transform: Optional BoTorch input transform.
         validate_task_values: Whether ``MultiTaskGP`` validates task values.
@@ -445,6 +485,18 @@ def build_multitask_gp(
     if mean_config.input_size is None and mean_config.kind in {MeanKind.MULTITASK_LINEAR, MeanKind.LINEAR}:
         mean_config = mean_config.model_copy(update={"input_size": len(non_task_dims)})
     mean_module = build_mean_module(mean_config)
+
+    likelihood: HadamardGaussianLikelihood | None = None
+    if min_inferred_noise_level is not None:
+        noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
+        likelihood = HadamardGaussianLikelihood(
+            num_tasks=num_tasks,
+            batch_shape=train_X.shape[:-2],
+            task_feature_index=task_feature_idx,
+            noise_prior=noise_prior,
+            noise_constraint=GreaterThan(min_inferred_noise_level, initial_value=noise_prior.mode),
+        )
+
     outcome_t = cast(Any, outcome_transform)
     input_t = cast(Any, input_transform)
     return MultiTaskGP(
@@ -453,6 +505,7 @@ def build_multitask_gp(
         task_feature=task_feature,
         covar_module=covar_module,
         mean_module=mean_module,
+        likelihood=likelihood,
         rank=rank,
         outcome_transform=outcome_t,
         input_transform=input_t,
@@ -462,6 +515,7 @@ def build_multitask_gp(
 
 __all__ = [
     "CovarModuleConfig",
+    "LinearKernelComponentConfig",
     "KernelComponentConfig",
     "KernelKind",
     "KernelTermConfig",
@@ -470,7 +524,11 @@ __all__ = [
     "LengthscalePriorConfig",
     "MeanKind",
     "MeanModuleConfig",
+    "MaternKernelComponentConfig",
     "PeriodLengthPriorConfig",
+    "PeriodicKernelComponentConfig",
+    "RBFKernelComponentConfig",
+    "RQKernelComponentConfig",
     "build_covar_module",
     "build_mean_module",
     "build_multitask_gp",

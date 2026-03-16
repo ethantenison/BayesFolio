@@ -41,13 +41,13 @@ from bayesfolio.engine.forecast import (
 )
 from bayesfolio.engine.forecast.gp.multitask_builder import (
     CovarModuleConfig,
-    KernelComponentConfig,
-    KernelKind,
     KernelTermConfig,
     LengthscalePolicy,
     LengthscalePolicyConfig,
+    MaternKernelComponentConfig,
     MeanKind,
     MeanModuleConfig,
+    PeriodicKernelComponentConfig,
     build_multitask_gp,
 )
 from bayesfolio.io import (
@@ -93,42 +93,72 @@ END_DATE = date(2026, 2, 28)  # Last row in the output panel
 # Column selection
 # ---------------------------------------------------------------------------
 
-# Macro columns to drop (low-signal or redundant)
-DROP_MACRO_COLS: list[str] = [
-    "vix_ts_level",
-    "vix3m",
-    "yc_pc1",
-    "yc_pc2",
-    "yc_pc3",
-    "y10_nominal",
-    "de10y",
-    "jp10y",
-    "uk10y",
-    "cn10y",
-]
+# Block-based feature selection
+# Keep blocks instead of manually listing columns to drop.
+FEATURE_BLOCK_COLUMNS: dict[str, list[str]] = {
+    "time": [
+        "t_index",
+    ],
+    "etf": [
+        "mom12m",
+        "mom36m",
+        "chmom",
+        "vol_z",
+        "ma_signal",
+        "ma_regime",
+        "trend_slope",
+        "ret_autocorr",
+        "vol_autocorr",
+        "ret_kurt",
+        "baspread",
+        "max_dd_3m",
+        "max_dd_6m",
+        "cs_mom_rank",
+        "lag_y_excess_lead",
+    ],
+    "macro": [
+        "vix",
+        "vix_ts_chg_1m",
+        "vix_ts_z_12m",
+        "tnote10y",
+        "tbill3m",
+        "term_spread",
+        "credit_spread",
+        "credit_spread_chg_1p",
+        "dxy",
+        "spy_ret",
+        "erp",
+        "skew_proxy",
+        "move_proxy",
+        "vix_slope",
+        "rsp_spy",
+        "rsp_spy_roc_1m",
+        "spy_flow_z_12m",
+        "dealer_gamma_proxy",
+        "pct_above_50dma",
+        "hy_spread",
+        "hy_spread_chg_1m",
+        "hy_spread_z_12m",
+        "oil",
+        "copper",
+        "gold",
+        "schp",
+        "schp_ret",
+        "em_fx",
+        "em_fx_ret",
+        "oil_ret",
+        "copper_ret",
+        "gold_crude_ratio",
+        "y10_real_proxy",
+        "breakeven_proxy",
+        "cpiaucsl",
+        "cpi_yoy",
+        "cpi_mom",
+    ],
+}
 
-# ETF feature columns to drop
-DROP_ETF_COLS: list[str] = [
-    "ma_1m",
-    "ma_3m",
-    "vol_1w",
-    "price",
-    "overnight_gap",
-    "lag2_y_excess_lead",
-    "mom1m",
-    "mom6m",
-    "vol_1m",
-    "vol_3m",
-    "vol_of_vol",
-    "vol_accel",
-    "ret_skew",
-    "ill_log",
-    "dolvol_log",
-    "log_ret",
-    "sd_turn",
-    "turnover",
-    "volume",
-]
+# Choose which blocks to include in GP inputs.
+SELECTED_FEATURE_BLOCKS: tuple[str, ...] = ("time", "etf", "macro")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -211,8 +241,8 @@ def build_full_feature_panel() -> pd.DataFrame:
         end_date=END_DATE,
         interval=Interval.DAILY,
         horizon=Horizon.MONTHLY,
-        drop_macro_cols=DROP_MACRO_COLS,
-        drop_etf_cols=DROP_ETF_COLS,
+        drop_macro_cols=[],
+        drop_etf_cols=[],
         clip_quantile=0.99,
         seed=27,
         artifact_name="march_2026_features.parquet",
@@ -235,6 +265,86 @@ def build_full_feature_panel() -> pd.DataFrame:
     return pd.read_parquet(result.artifact.uri)
 
 
+def get_gp_feature_columns(
+    df: pd.DataFrame,
+    *,
+    target_col: str,
+    asset_col: str,
+    drop_cols: list[str],
+) -> list[str]:
+    """Return feature column names in the exact order used by GP data prep.
+
+    Args:
+        df: Input frame containing features, target, and asset/task id.
+        target_col: Name of the prediction target column.
+        asset_col: Name of the asset/task column.
+        drop_cols: Columns dropped before tensor conversion.
+
+    Returns:
+        list[str]: Ordered non-task feature columns used in ``X`` before the
+            appended task-index column.
+    """
+    df_proc = df.drop(columns=drop_cols + [asset_col], errors="ignore")
+    feature_df = df_proc.drop(columns=[target_col, "__task_idx__"], errors="ignore")
+    return feature_df.columns.tolist()
+
+
+def build_feature_index_groups_from_blocks(
+    feature_columns: list[str],
+    *,
+    block_columns: dict[str, list[str]],
+    blocks: tuple[str, ...] = ("time", "etf", "macro"),
+) -> dict[str, list[int]]:
+    """Build feature index groups directly from explicit block columns.
+
+    Args:
+        feature_columns: Ordered non-task feature columns used by the GP model.
+        block_columns: Mapping of block name to explicit feature names.
+        blocks: Block names to derive indices for.
+
+    Returns:
+        dict[str, list[int]]: Block-to-index mapping in ``feature_columns`` order.
+    """
+    groups: dict[str, list[int]] = {block: [] for block in blocks}
+    feature_lookup = {name: idx for idx, name in enumerate(feature_columns)}
+    for block in blocks:
+        for column_name in block_columns.get(block, []):
+            idx = feature_lookup.get(column_name)
+            if idx is not None:
+                groups[block].append(idx)
+    return groups
+
+
+def select_feature_blocks(
+    df: pd.DataFrame,
+    *,
+    selected_blocks: tuple[str, ...],
+    block_columns: dict[str, list[str]],
+    required_columns: tuple[str, ...] = ("date", "asset_id", "y_excess_lead"),
+) -> pd.DataFrame:
+    """Select feature columns by named blocks and keep required columns.
+
+    Args:
+        df: Full feature panel.
+        selected_blocks: Block names to include.
+        block_columns: Mapping from block name to column names.
+        required_columns: Columns always retained.
+
+    Returns:
+        pd.DataFrame: A reduced panel preserving original column order.
+    """
+    unknown_blocks = [name for name in selected_blocks if name not in block_columns]
+    if unknown_blocks:
+        raise ValueError(f"Unknown feature blocks requested: {unknown_blocks}")
+
+    keep_columns: set[str] = set(required_columns)
+    for block_name in selected_blocks:
+        keep_columns.update(block_columns[block_name])
+
+    selected_existing = [col for col in df.columns if col in keep_columns]
+    return df[selected_existing].copy()
+
+
 # ---------------------------------------------------------------------------
 # Script entrypoint
 # ---------------------------------------------------------------------------
@@ -252,8 +362,15 @@ def build_full_feature_panel() -> pd.DataFrame:
 
 # --- Full feature panel (needed for GP modelling) ---
 print("\nBuilding full feature panel...")
-features_df = build_full_feature_panel()
-print(f"features_df shape: {features_df.shape}")
+features_df_full = build_full_feature_panel()
+features_df = select_feature_blocks(
+    features_df_full,
+    selected_blocks=SELECTED_FEATURE_BLOCKS,
+    block_columns=FEATURE_BLOCK_COLUMNS,
+)
+print(f"features_df_full shape: {features_df_full.shape}")
+print(f"features_df_selected shape: {features_df.shape}")
+print(f"selected blocks: {SELECTED_FEATURE_BLOCKS}")
 print(features_df.dtypes)
 print(features_df.tail())
 
@@ -268,10 +385,11 @@ print(features_df.tail())
 # Use BOTORCH_STANDARD for BoTorch's fixed lower bound or ADAPTIVE for the
 # dimension-scaled lower bound used in the older research code.
 GP_LENGTHSCALE_POLICY = LengthscalePolicy.ADAPTIVE
+GP_MIN_INFERRED_NOISE_LEVEL = 5e-3
 
 # Default kernel layout for the current script: one Matern block across all
 # non-task features.
-USE_SPLIT_KERNEL_BLOCKS_EXAMPLE = False
+USE_SPLIT_KERNEL_BLOCKS_EXAMPLE = True
 
 X, y, task_map = prepare_multitask_gp_data_with_task_feature(
     features_df,
@@ -279,6 +397,13 @@ X, y, task_map = prepare_multitask_gp_data_with_task_feature(
     asset_col="asset_id",
     drop_cols=["date"],
     dtype=torch.float64,
+)
+
+feature_columns = get_gp_feature_columns(
+    features_df,
+    target_col="y_excess_lead",
+    asset_col="asset_id",
+    drop_cols=["date"],
 )
 
 task_feature = -1  # or the actual column index holding the task id
@@ -306,8 +431,7 @@ covar_config = CovarModuleConfig(
     terms=[
         KernelTermConfig(
             components=[
-                KernelComponentConfig(
-                    kind=KernelKind.MATERN,
+                MaternKernelComponentConfig(
                     dims=non_task_indices,
                     ard=True,
                     matern_nu=2.5,
@@ -322,19 +446,29 @@ covar_config = CovarModuleConfig(
 )
 
 # Example split-block layout for future use.
-# Replace these placeholder index lists with the actual normalized feature
-# indices for your time, ETF, and macro feature groups.
 if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
-    time_feature_indices: list[int] = []
-    etf_feature_indices: list[int] = []
-    macro_feature_indices: list[int] = []
+    feature_groups = build_feature_index_groups_from_blocks(
+        feature_columns,
+        block_columns=FEATURE_BLOCK_COLUMNS,
+        blocks=("time", "etf", "macro"),
+    )
+
+    time_feature_indices = feature_groups["time"]
+    etf_feature_indices = feature_groups["etf"]
+    macro_feature_indices = feature_groups["macro"]
+
+    print(
+        "[gp] split kernel groups "
+        f"time={len(time_feature_indices)}, "
+        f"etf={len(etf_feature_indices)}, "
+        f"macro={len(macro_feature_indices)}"
+    )
 
     covar_config = CovarModuleConfig(
         terms=[
             KernelTermConfig(
                 components=[
-                    KernelComponentConfig(
-                        kind=KernelKind.PERIODIC,
+                    PeriodicKernelComponentConfig(
                         dims=time_feature_indices,
                         ard=False,
                         use_outputscale=True,
@@ -343,8 +477,7 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
             ),
             KernelTermConfig(
                 components=[
-                    KernelComponentConfig(
-                        kind=KernelKind.MATERN,
+                    MaternKernelComponentConfig(
                         dims=etf_feature_indices,
                         ard=True,
                         matern_nu=2.5,
@@ -357,8 +490,7 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
             ),
             KernelTermConfig(
                 components=[
-                    KernelComponentConfig(
-                        kind=KernelKind.MATERN,
+                    MaternKernelComponentConfig(
                         dims=macro_feature_indices,
                         ard=True,
                         matern_nu=2.5,
@@ -380,6 +512,7 @@ model = build_multitask_gp(
     task_feature=-1,
     covar_config=covar_config,
     mean_config=mean_config,
+    min_inferred_noise_level=GP_MIN_INFERRED_NOISE_LEVEL,
     outcome_transform=outcome_transform,
     input_transform=None,
     rank=1,

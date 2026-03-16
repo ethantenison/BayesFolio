@@ -1,22 +1,27 @@
 from __future__ import annotations
 
+from math import log
 from typing import Any, cast
 
 import pytest
 import torch
-from gpytorch.kernels import MaternKernel, ScaleKernel
+from gpytorch.kernels import MaternKernel, PeriodicKernel, ScaleKernel
 from gpytorch.means import MultitaskMean
+from pydantic import ValidationError
 
 from bayesfolio.engine.forecast.gp.multitask_builder import (
     CovarModuleConfig,
-    KernelComponentConfig,
-    KernelKind,
     KernelTermConfig,
     LengthscalePolicy,
     LengthscalePolicyConfig,
     LengthscalePriorConfig,
+    LinearKernelComponentConfig,
+    MaternKernelComponentConfig,
     MeanKind,
     MeanModuleConfig,
+    PeriodicKernelComponentConfig,
+    PeriodLengthPriorConfig,
+    RBFKernelComponentConfig,
     build_covar_module,
     build_multitask_gp,
 )
@@ -32,8 +37,7 @@ def test_build_covar_module_legacy_policy_scales_min_constraint() -> None:
         terms=[
             KernelTermConfig(
                 components=[
-                    KernelComponentConfig(
-                        kind=KernelKind.MATERN,
+                    MaternKernelComponentConfig(
                         dims=[0, 1, 2, 3],
                         lengthscale_policy=LengthscalePolicyConfig(policy=LengthscalePolicy.ADAPTIVE),
                     )
@@ -56,8 +60,7 @@ def test_build_covar_module_manual_policy_uses_custom_prior() -> None:
         terms=[
             KernelTermConfig(
                 components=[
-                    KernelComponentConfig(
-                        kind=KernelKind.RBF,
+                    RBFKernelComponentConfig(
                         dims=[0, 1],
                         lengthscale_policy=LengthscalePolicyConfig(
                             policy=LengthscalePolicy.MANUAL_LOGNORMAL,
@@ -82,6 +85,11 @@ def test_build_covar_module_manual_policy_uses_custom_prior() -> None:
     assert float(transformed) == pytest.approx(0.42)
 
 
+def test_rbf_component_rejects_matern_nu_field() -> None:
+    with pytest.raises(ValidationError):
+        RBFKernelComponentConfig(dims=[0, 1], matern_nu=2.5)
+
+
 def test_build_multitask_gp_builds_modules_from_configs() -> None:
     train_x = torch.tensor(
         [
@@ -98,8 +106,8 @@ def test_build_multitask_gp_builds_modules_from_configs() -> None:
         terms=[
             KernelTermConfig(
                 components=[
-                    KernelComponentConfig(kind=KernelKind.MATERN, dims=[0]),
-                    KernelComponentConfig(kind=KernelKind.LINEAR, dims=[1], use_outputscale=False),
+                    MaternKernelComponentConfig(dims=[0]),
+                    LinearKernelComponentConfig(dims=[1], use_outputscale=False),
                 ],
                 use_outputscale=True,
             )
@@ -120,3 +128,49 @@ def test_build_multitask_gp_builds_modules_from_configs() -> None:
     assert model.num_tasks == 2
     assert model.train_inputs is not None
     assert model.train_inputs[0].shape == train_x.shape
+
+
+def test_build_covar_module_periodic_component_uses_configured_period_length() -> None:
+    config = CovarModuleConfig(
+        terms=[
+            KernelTermConfig(
+                components=[
+                    PeriodicKernelComponentConfig(
+                        dims=[0],
+                        period_prior=PeriodLengthPriorConfig(p0=0.33, cv=0.4),
+                    )
+                ]
+            )
+        ]
+    )
+
+    kernel = build_covar_module(config)
+    assert isinstance(kernel, ScaleKernel)
+    assert isinstance(kernel.base_kernel, PeriodicKernel)
+    period_prior = kernel.base_kernel.period_length_prior
+    assert period_prior is not None
+    prior_loc = float(period_prior.loc.detach().view(-1)[0])
+    assert prior_loc == pytest.approx(log(0.33), rel=1e-6)
+
+
+def test_build_multitask_gp_applies_custom_noise_floor() -> None:
+    train_x = torch.tensor(
+        [
+            [0.0, 0.0],
+            [0.3, 0.0],
+            [0.7, 1.0],
+            [1.0, 1.0],
+        ],
+        dtype=torch.double,
+    )
+    train_y = torch.tensor([[0.10], [0.11], [0.09], [0.12]], dtype=torch.double)
+
+    model = build_multitask_gp(
+        train_X=train_x,
+        train_Y=train_y,
+        task_feature=-1,
+        min_inferred_noise_level=5e-3,
+    )
+
+    lower_bound = float(cast(Any, model.likelihood.noise_covar).raw_noise_constraint.lower_bound)
+    assert lower_bound == pytest.approx(5e-3)
