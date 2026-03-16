@@ -17,13 +17,17 @@ Extend below the "GP section placeholder" comment to add your GP method.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import date
+from uuid import uuid4
 
 import pandas as pd
 import torch
 from botorch.fit import fit_gpytorch_mll
 from botorch.models.transforms.outcome import StratifiedStandardize
+from gpytorch.kernels import AdditiveKernel, Kernel, ProductKernel, ScaleKernel
 from gpytorch.mlls import ExactMarginalLogLikelihood
+from IPython.display import HTML, Markdown, display
 
 from bayesfolio.contracts.commands.features import BuildFeaturesDatasetCommand
 from bayesfolio.core.settings import Horizon, Interval
@@ -345,6 +349,188 @@ def select_feature_blocks(
     return df[selected_existing].copy()
 
 
+def _extract_active_dims(kernel: Kernel) -> list[int]:
+    """Return active dimensions from a kernel if available."""
+    dims = getattr(kernel, "active_dims", None)
+    if dims is None:
+        return []
+    if hasattr(dims, "tolist"):
+        return [int(v) for v in dims.tolist()]
+    return [int(v) for v in dims]
+
+
+def _infer_block_name(
+    *,
+    kernel: Kernel,
+    dims: list[int],
+    block_indices: Mapping[str, list[int]],
+) -> str:
+    """Infer a block label from kernel active dimensions."""
+    kernel_name = type(kernel).__name__
+    if "PositiveIndexKernel" in kernel_name:
+        return "task"
+    if not dims:
+        return "all"
+
+    dim_set = set(dims)
+    matching: list[str] = []
+    for block_name, indices in block_indices.items():
+        if not indices:
+            continue
+        block_set = set(indices)
+        if dim_set.issubset(block_set):
+            matching.append(block_name)
+    if len(matching) == 1:
+        return matching[0]
+    if len(matching) > 1:
+        return "+".join(sorted(matching))
+    return "custom"
+
+
+def _unwrap_scale(kernel: Kernel) -> Kernel:
+    """Unwrap ScaleKernel layers to get the semantic base kernel."""
+    current = kernel
+    while isinstance(current, ScaleKernel):
+        current = current.base_kernel
+    return current
+
+
+def build_kernel_expression(
+    kernel: Kernel,
+    *,
+    block_indices: Mapping[str, list[int]],
+) -> str:
+    """Build a readable symbolic expression for a covariance kernel tree."""
+
+    def visit(node: Kernel) -> tuple[str, bool]:
+        if isinstance(node, ScaleKernel):
+            return visit(node.base_kernel)
+
+        if isinstance(node, AdditiveKernel):
+            children = [visit(c) for c in node.kernels]
+            return " + ".join(part for part, _ in children), True
+
+        if isinstance(node, ProductKernel):
+            children = [visit(c) for c in node.kernels]
+            rendered: list[str] = []
+            for text, is_additive in children:
+                rendered.append(f"({text})" if is_additive else text)
+            return " * ".join(rendered), False
+
+        base = _unwrap_scale(node)
+        dims = _extract_active_dims(base)
+        block = _infer_block_name(kernel=base, dims=dims, block_indices=block_indices)
+        kernel_kind = type(base).__name__.replace("Kernel", "")
+        return f"Kernel_{block}[{kernel_kind}]", False
+
+    expression, _ = visit(kernel)
+    return expression
+
+
+def build_kernel_mermaid(
+    kernel: Kernel,
+    *,
+    block_indices: Mapping[str, list[int]],
+) -> str:
+    """Create a Mermaid flowchart showing additive/product kernel structure."""
+    lines: list[str] = ["flowchart TD"]
+    next_id = 0
+
+    def new_id() -> str:
+        nonlocal next_id
+        next_id += 1
+        return f"k{next_id}"
+
+    def class_for_kernel(kernel_name: str) -> str:
+        name = kernel_name.lower()
+        if "matern" in name:
+            return "kt_matern"
+        if "periodic" in name:
+            return "kt_periodic"
+        if "positiveindex" in name:
+            return "kt_index"
+        if "rbf" in name:
+            return "kt_rbf"
+        if "rq" in name:
+            return "kt_rq"
+        if "linear" in name:
+            return "kt_linear"
+        return "kt_other"
+
+    def add_node(node: Kernel, parent_id: str | None = None) -> str:
+        if isinstance(node, ScaleKernel):
+            return add_node(node.base_kernel, parent_id)
+
+        node_id = new_id()
+
+        if isinstance(node, AdditiveKernel):
+            lines.append(f'{node_id}["Additive (+)"]:::op_add')
+            if parent_id is not None:
+                lines.append(f"{parent_id} --> {node_id}")
+            for child in node.kernels:
+                add_node(child, node_id)
+            return node_id
+
+        if isinstance(node, ProductKernel):
+            lines.append(f'{node_id}["Product (*)"]:::op_mul')
+            if parent_id is not None:
+                lines.append(f"{parent_id} --> {node_id}")
+            for child in node.kernels:
+                add_node(child, node_id)
+            return node_id
+
+        base = _unwrap_scale(node)
+        dims = _extract_active_dims(base)
+        block_name = _infer_block_name(kernel=base, dims=dims, block_indices=block_indices)
+        kernel_name = type(base).__name__
+        label = f"Kernel_{block_name}<br/>{kernel_name}"
+        lines.append(f'{node_id}["{label}"]:::{class_for_kernel(kernel_name)}')
+        if parent_id is not None:
+            lines.append(f"{parent_id} --> {node_id}")
+        return node_id
+
+    root_id = new_id()
+    lines.append(f'{root_id}["Covariance Kernel"]:::op_root')
+    add_node(kernel, root_id)
+
+    lines.extend(
+        [
+            "classDef op_root fill:#2f2f2f,color:#ffffff,stroke:#1b1b1b,stroke-width:1px;",
+            "classDef op_add fill:#f2f2f2,color:#111111,stroke:#666666,stroke-width:1px;",
+            "classDef op_mul fill:#e6e6e6,color:#111111,stroke:#666666,stroke-width:1px;",
+            "classDef kt_matern fill:#4c78a8,color:#ffffff,stroke:#2f4f6f,stroke-width:1px;",
+            "classDef kt_periodic fill:#59a14f,color:#ffffff,stroke:#2f5f2b,stroke-width:1px;",
+            "classDef kt_index fill:#e15759,color:#ffffff,stroke:#8a2e2f,stroke-width:1px;",
+            "classDef kt_rbf fill:#f28e2b,color:#ffffff,stroke:#8c4f12,stroke-width:1px;",
+            "classDef kt_rq fill:#76b7b2,color:#ffffff,stroke:#3e6461,stroke-width:1px;",
+            "classDef kt_linear fill:#edc948,color:#111111,stroke:#8a7423,stroke-width:1px;",
+            "classDef kt_other fill:#bab0ab,color:#111111,stroke:#6a625f,stroke-width:1px;",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def render_mermaid_in_notebook(mermaid_markup: str) -> None:
+    """Render Mermaid diagram markup directly in notebook output."""
+    container_id = f"mermaid-{uuid4().hex}"
+    escaped_markup = mermaid_markup.replace("`", "\\`")
+    display(
+        HTML(
+            f"""
+<div id=\"{container_id}\" class=\"mermaid\">{escaped_markup}</div>
+<script type=\"module\">
+    import mermaid from \"https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs\";
+    mermaid.initialize({{ startOnLoad: true }});
+    const el = document.getElementById(\"{container_id}\");
+    if (el) {{
+        mermaid.run({{ nodes: [el] }});
+    }}
+</script>
+"""
+        )
+    )
+
+
 # ---------------------------------------------------------------------------
 # Script entrypoint
 # ---------------------------------------------------------------------------
@@ -480,7 +666,7 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
                     MaternKernelComponentConfig(
                         dims=etf_feature_indices,
                         ard=True,
-                        matern_nu=2.5,
+                        matern_nu=0.5,
                         use_outputscale=True,
                         lengthscale_policy=LengthscalePolicyConfig(
                             policy=GP_LENGTHSCALE_POLICY,
@@ -504,6 +690,12 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
         ]
     )
 
+kernel_block_indices = build_feature_index_groups_from_blocks(
+    feature_columns,
+    block_columns=FEATURE_BLOCK_COLUMNS,
+    blocks=("time", "etf", "macro"),
+)
+
 mean_config = MeanModuleConfig(kind=MeanKind.MULTITASK_CONSTANT)
 
 model = build_multitask_gp(
@@ -517,6 +709,21 @@ model = build_multitask_gp(
     input_transform=None,
     rank=1,
 )
+
+kernel_expression = build_kernel_expression(
+    model.covar_module,
+    block_indices=kernel_block_indices,
+)
+kernel_mermaid = build_kernel_mermaid(
+    model.covar_module,
+    block_indices=kernel_block_indices,
+)
+
+print("\n[gp] covariance expression:")
+print(kernel_expression)
+print("\n[gp] mermaid diagram markup:")
+print(kernel_mermaid)
+render_mermaid_in_notebook(kernel_mermaid)
 
 model.train()
 likelihood = model.likelihood  # MultiTaskGP has a likelihood attribute
@@ -532,8 +739,6 @@ likelihood.eval()
 with torch.no_grad():
     f_dist = model(Xn)
     pred = likelihood(f_dist, Xn)
-
-from IPython.display import display
 
 report = build_gp_interpretation_report(
     df=features_df,
