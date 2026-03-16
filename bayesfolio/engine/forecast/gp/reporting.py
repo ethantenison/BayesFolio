@@ -3,20 +3,17 @@
 This module belongs to the forecast layer and provides pure inspection helpers
 for fitted GPyTorch and BoTorch Gaussian Process models. It converts learned
 kernel and task hyperparameters into notebook-friendly pandas tables that map
-original input columns and output tasks to interpretable quantities such as
-lengthscales, task covariance, and noise.
+input columns and output tasks to interpretable quantities such as feature
+lengthscales, output scales, task covariance, and noise.
 
 Inputs:
-    - A pandas DataFrame containing the original model inputs and targets in
-      their raw units.
-    - A fitted GPyTorch or BoTorch model with accessible training inputs.
+        - A pandas DataFrame aligned row-for-row with the model training data.
+        - A fitted GPyTorch or BoTorch model with accessible training inputs.
 
 Outputs:
-    - A dictionary of pandas tables and metadata summaries suitable for direct
-      inspection in notebooks. Feature lengthscales are reported in the
-      original input units when an affine feature scaling relationship can be
-      inferred from the provided DataFrame and the model's stored training
-      inputs.
+        - A dictionary of pandas tables and metadata summaries suitable for direct
+            inspection in notebooks. Feature lengthscales are reported in model input
+            units so the report reflects the fitted kernel parameters directly.
 """
 
 from __future__ import annotations
@@ -29,7 +26,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import torch
 
-_AFFINE_R2_THRESHOLD = 0.999
 _EPSILON = 1e-12
 
 
@@ -72,11 +68,9 @@ def build_gp_interpretation_report(
     """Build a notebook-friendly interpretation report for a fitted GP model.
 
     The function assumes ``df`` is aligned row-for-row with the data used to fit
-    ``model``. Raw-unit feature lengthscales are recovered by inferring an affine
-    mapping between the provided raw feature columns and the model's stored
-    training inputs. This covers common preprocessing such as min-max scaling and
-    z-scoring. If a feature transform is non-affine, the report keeps the learned
-    model-unit lengthscale and marks raw-unit recovery as unavailable.
+    ``model``. Feature lengthscales are reported directly in model input units,
+    which makes the report reflect the fitted kernel parameters without trying to
+    invert any preprocessing transforms.
 
     Args:
         df: Training DataFrame in original units. The DataFrame must contain the
@@ -98,8 +92,7 @@ def build_gp_interpretation_report(
             ``kernel_summary`` (pd.DataFrame), ``task_summary``
             (pd.DataFrame | None), ``task_correlation`` (pd.DataFrame | None),
             ``noise_summary`` (pd.DataFrame), and ``interpretation_notes``
-            (list[str]). Feature lengthscales are reported in raw input units when
-            affine unscaling succeeds.
+            (list[str]). Feature lengthscales are reported in model input units.
 
     Raises:
         ValueError: If required columns are missing, if the DataFrame does not
@@ -128,12 +121,6 @@ def build_gp_interpretation_report(
             f"Got {len(df)} rows and {train_x.shape[0]} training rows."
         )
 
-    scale_report_by_dim = _infer_feature_scaling(
-        df=df,
-        feature_columns=resolved_feature_columns,
-        train_x=train_x,
-        model_feature_dims=model_feature_dims,
-    )
     feature_name_by_dim = {
         model_dim: feature_name
         for model_dim, feature_name in zip(model_feature_dims, resolved_feature_columns, strict=True)
@@ -153,7 +140,6 @@ def build_gp_interpretation_report(
     feature_summary = _build_feature_summary(
         kernel_components=kernel_components,
         feature_name_by_dim=feature_name_by_dim,
-        scale_report_by_dim=scale_report_by_dim,
     )
 
     task_kernel = _resolve_task_kernel(model)
@@ -367,87 +353,6 @@ def _resolve_feature_columns(
     return resolved_columns
 
 
-def _infer_feature_scaling(
-    df: pd.DataFrame,
-    feature_columns: Sequence[str],
-    train_x: torch.Tensor,
-    model_feature_dims: Sequence[int],
-) -> dict[int, dict[str, object]]:
-    report: dict[int, dict[str, object]] = {}
-
-    for feature_name, model_dim in zip(feature_columns, model_feature_dims, strict=True):
-        raw_values = pd.to_numeric(df[feature_name], errors="raise").to_numpy(dtype=float)
-        model_values = train_x[:, model_dim].numpy().astype(float)
-        report[model_dim] = {
-            "feature": feature_name,
-            **_infer_affine_relationship(raw_values, model_values),
-        }
-
-    return report
-
-
-def _infer_affine_relationship(raw_values: np.ndarray, model_values: np.ndarray) -> dict[str, object]:
-    valid_mask = np.isfinite(raw_values) & np.isfinite(model_values)
-    raw = raw_values[valid_mask]
-    transformed = model_values[valid_mask]
-
-    raw_std = float(np.std(raw))
-    transformed_std = float(np.std(transformed))
-
-    if raw.size == 0:
-        return {
-            "model_from_raw_slope": None,
-            "model_from_raw_intercept": None,
-            "raw_units_per_model_unit": None,
-            "affine_fit_r2": None,
-            "raw_lengthscale_available": False,
-            "scaling_note": "No finite observations were available to infer scaling.",
-        }
-
-    if raw_std < _EPSILON and transformed_std < _EPSILON:
-        return {
-            "model_from_raw_slope": 0.0,
-            "model_from_raw_intercept": float(transformed[0]),
-            "raw_units_per_model_unit": None,
-            "affine_fit_r2": 1.0,
-            "raw_lengthscale_available": False,
-            "scaling_note": "Feature is constant; a raw-unit lengthscale is not identifiable.",
-        }
-
-    if raw_std < _EPSILON:
-        return {
-            "model_from_raw_slope": None,
-            "model_from_raw_intercept": None,
-            "raw_units_per_model_unit": None,
-            "affine_fit_r2": 0.0,
-            "raw_lengthscale_available": False,
-            "scaling_note": "Feature has zero raw variance but non-constant model inputs.",
-        }
-
-    slope = float(np.cov(raw, transformed, bias=True)[0, 1] / max(np.var(raw), _EPSILON))
-    intercept = float(transformed.mean() - slope * raw.mean())
-    predicted = intercept + slope * raw
-    residual_ss = float(np.square(transformed - predicted).sum())
-    total_ss = float(np.square(transformed - transformed.mean()).sum())
-    affine_fit_r2 = 1.0 if total_ss < _EPSILON else 1.0 - residual_ss / total_ss
-    can_unscale = abs(slope) > _EPSILON and affine_fit_r2 >= _AFFINE_R2_THRESHOLD
-
-    scaling_note = (
-        "Recovered raw-unit lengthscale from inferred affine feature scaling."
-        if can_unscale
-        else "Could not verify an affine feature scaling relationship; raw-unit lengthscale is omitted."
-    )
-
-    return {
-        "model_from_raw_slope": slope,
-        "model_from_raw_intercept": intercept,
-        "raw_units_per_model_unit": (1.0 / abs(slope)) if can_unscale else None,
-        "affine_fit_r2": affine_fit_r2,
-        "raw_lengthscale_available": can_unscale,
-        "scaling_note": scaling_note,
-    }
-
-
 def _collect_kernel_components(
     kernel: Any,
     path: str,
@@ -531,8 +436,24 @@ def _describe_kernel_component(
         "alpha": _tensor_to_scalar(getattr(kernel, "alpha", None)),
         "period_length": _tensor_to_scalar(getattr(kernel, "period_length", None)),
         "num_tasks": getattr(kernel, "num_tasks", None),
-        "rank": getattr(kernel, "rank", None),
+        "rank": _extract_kernel_rank(kernel),
     }
+
+
+def _extract_kernel_rank(kernel: Any) -> int | None:
+    rank = getattr(kernel, "rank", None)
+    if rank is not None:
+        try:
+            return int(rank)
+        except (TypeError, ValueError):
+            return None
+
+    for attr_name in ["raw_covar_factor", "covar_factor"]:
+        factor = getattr(kernel, attr_name, None)
+        if isinstance(factor, torch.Tensor) and factor.ndim >= 2:
+            return int(factor.shape[-1])
+
+    return None
 
 
 def _normalize_dims(value: object) -> list[int] | None:
@@ -553,7 +474,6 @@ def _normalize_dims(value: object) -> list[int] | None:
 def _build_feature_summary(
     kernel_components: Sequence[dict[str, object]],
     feature_name_by_dim: dict[int, str],
-    scale_report_by_dim: dict[int, dict[str, object]],
 ) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
 
@@ -568,24 +488,13 @@ def _build_feature_summary(
             if feature_dim not in feature_name_by_dim:
                 continue
 
-            scaling = scale_report_by_dim[feature_dim]
-            raw_units_per_model_unit = cast(float | None, scaling["raw_units_per_model_unit"])
-            raw_lengthscale = None
-            if raw_units_per_model_unit is not None:
-                raw_lengthscale = float(model_lengthscale * raw_units_per_model_unit)
-
             rows.append(
                 {
                     "feature": feature_name_by_dim[feature_dim],
                     "model_input_dim": feature_dim,
                     "kernel_path": component["kernel_path"],
                     "kernel_type": component["kernel_type"],
-                    "lengthscale_raw_units": raw_lengthscale,
                     "lengthscale_model_units": float(model_lengthscale),
-                    "raw_units_per_model_unit": raw_units_per_model_unit,
-                    "affine_fit_r2": scaling["affine_fit_r2"],
-                    "raw_lengthscale_available": scaling["raw_lengthscale_available"],
-                    "scaling_note": scaling["scaling_note"],
                     "interpretation": (
                         "Shorter lengthscales imply the posterior can vary more quickly along this input."
                     ),
@@ -599,12 +508,7 @@ def _build_feature_summary(
                 "model_input_dim",
                 "kernel_path",
                 "kernel_type",
-                "lengthscale_raw_units",
                 "lengthscale_model_units",
-                "raw_units_per_model_unit",
-                "affine_fit_r2",
-                "raw_lengthscale_available",
-                "scaling_note",
                 "interpretation",
             ]
         )
@@ -860,17 +764,9 @@ def _build_interpretation_notes(
     task_summary: pd.DataFrame | None,
 ) -> list[str]:
     notes = [
-        "Feature lengthscales are reported in raw input units whenever the function can infer an affine scaling "
-        "relationship between the provided DataFrame and the model's stored training inputs.",
         "Shorter lengthscales indicate the GP can change more quickly as that input moves; longer lengthscales "
         "indicate smoother dependence.",
     ]
-
-    if not feature_summary.empty and not bool(feature_summary["raw_lengthscale_available"].all()):
-        notes.append(
-            "Some features could not be unscaled back to raw units. In those cases the model-unit lengthscale is "
-            "still reported, and the scaling_note column explains why."
-        )
     if task_summary is not None:
         notes.append(
             "Task variance and task correlation summarize how strongly the multitask kernel shares statistical "
@@ -883,20 +779,14 @@ def _prepare_feature_display_table(feature_summary: pd.DataFrame, max_feature_ro
     if feature_summary.empty:
         return feature_summary.copy()
 
-    sort_column = (
-        "lengthscale_raw_units" if feature_summary["lengthscale_raw_units"].notna().any() else "lengthscale_model_units"
-    )
     columns = [
         "feature",
         "kernel_type",
-        "lengthscale_raw_units",
         "lengthscale_model_units",
-        "raw_lengthscale_available",
-        "scaling_note",
     ]
     return (
         feature_summary.loc[:, columns]
-        .sort_values(by=[sort_column, "feature"], ascending=[True, True], na_position="last", kind="stable")
+        .sort_values(by=["lengthscale_model_units", "feature"], ascending=[True, True], kind="stable")
         .head(max_feature_rows)
         .reset_index(drop=True)
     )
@@ -951,10 +841,8 @@ def _build_summary_markdown(
 
     if not feature_summary.empty:
         top_row = feature_summary.iloc[0]
-        top_value = top_row.get("lengthscale_raw_units")
-        top_units = "raw units" if pd.notna(top_value) else "model units"
-        top_lengthscale = top_value if pd.notna(top_value) else top_row.get("lengthscale_model_units")
-        lines.append(f"- Most responsive feature shown: {top_row['feature']} ({top_lengthscale:.4g} {top_units})")
+        top_lengthscale = float(top_row["lengthscale_model_units"])
+        lines.append(f"- Most responsive feature shown: {top_row['feature']} ({top_lengthscale:.4g} model units)")
 
     return "\n".join(lines)
 

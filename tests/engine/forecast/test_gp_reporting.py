@@ -15,10 +15,21 @@ from bayesfolio.engine.forecast import (
     display_gp_interpretation_report,
     render_gp_interpretation_report,
 )
-from bayesfolio.engine.forecast.gp.reporting import GPInterpretationReport, RenderedGPInterpretationReport
+from bayesfolio.engine.forecast.gp.reporting import (
+    GPInterpretationReport,
+    RenderedGPInterpretationReport,
+    _describe_kernel_component,
+)
 
 
-def test_build_gp_interpretation_report_unscales_single_task_lengthscales() -> None:
+class _PositiveIndexKernelLike:
+    def __init__(self) -> None:
+        self.active_dims = torch.tensor([58])
+        self.num_tasks = 3
+        self.raw_covar_factor = torch.ones((3, 2), dtype=torch.double)
+
+
+def test_build_gp_interpretation_report_reports_single_task_lengthscales_in_model_units() -> None:
     df = pd.DataFrame(
         {
             "feature_a": [10.0, 20.0, 30.0, 40.0],
@@ -50,10 +61,9 @@ def test_build_gp_interpretation_report_unscales_single_task_lengthscales() -> N
     feature_summary = report["feature_summary"]
     by_feature = feature_summary.set_index("feature")
 
-    assert by_feature.loc["feature_a", "lengthscale_raw_units"] == pytest.approx(5.0)
-    assert by_feature.loc["feature_b", "lengthscale_raw_units"] == pytest.approx(2.5)
     assert by_feature.loc["feature_a", "lengthscale_model_units"] == pytest.approx(0.25)
     assert by_feature.loc["feature_b", "lengthscale_model_units"] == pytest.approx(0.50)
+    assert "scaling_note" not in feature_summary.columns
 
 
 def test_build_gp_interpretation_report_maps_multitask_outputs() -> None:
@@ -106,7 +116,7 @@ def test_build_gp_interpretation_report_maps_multitask_outputs() -> None:
     expected_scale = expected_covariance.diagonal().clip(min=1e-12) ** 0.5
     expected_correlation = expected_covariance / np.outer(expected_scale, expected_scale)
 
-    assert feature_summary.loc[0, "lengthscale_raw_units"] == pytest.approx(4.0)
+    assert feature_summary.loc[0, "lengthscale_model_units"] == pytest.approx(0.4)
     assert task_summary is not None
     assert task_covariance is not None
     assert list(task_summary["task_label"]) == ["SPY", "QQQ"]
@@ -115,6 +125,21 @@ def test_build_gp_interpretation_report_maps_multitask_outputs() -> None:
     np.testing.assert_allclose(task_correlation.to_numpy(), expected_correlation)
     assert list(task_correlation.index) == ["SPY", "QQQ"]
     assert list(task_correlation.columns) == ["SPY", "QQQ"]
+
+
+def test_describe_kernel_component_extracts_rank_for_positive_index_kernel() -> None:
+    kernel = _PositiveIndexKernelLike()
+
+    component = _describe_kernel_component(
+        kernel=kernel,
+        path="covar_module.kernels[1]",
+        all_feature_dims=list(range(58)),
+        task_feature_index=58,
+    )
+
+    assert component["kernel_type"] == "_PositiveIndexKernelLike"
+    assert component["num_tasks"] == 3
+    assert component["rank"] == 2
 
 
 def test_render_gp_interpretation_report_returns_tables_and_heatmap() -> None:
@@ -152,6 +177,7 @@ def test_render_gp_interpretation_report_returns_tables_and_heatmap() -> None:
     assert "GP Interpretation Summary" in rendered["summary_markdown"]
     assert hasattr(rendered["summary_display"], "_repr_markdown_") or isinstance(rendered["summary_display"], str)
     assert rendered["feature_summary"].shape[0] == 1
+    assert list(rendered["feature_summary"].columns) == ["feature", "kernel_type", "lengthscale_model_units"]
     assert rendered["task_summary"] is not None
     assert rendered["task_covariance"] is not None
     assert rendered["task_correlation_figure"] is not None
