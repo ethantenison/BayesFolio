@@ -46,7 +46,7 @@ class LengthscalePolicy(StrEnum):
     """Policy for lengthscale priors and constraints."""
 
     BOTORCH_STANDARD = "botorch_standard"
-    LEGACY_ADAPTIVE = "legacy_adaptive"
+    ADAPTIVE = "adaptive"
     MANUAL_LOGNORMAL = "manual_lognormal"
 
 
@@ -220,7 +220,7 @@ def _resolve_lengthscale_prior_and_constraint(
         prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
         minimum = 2.5e-2
         initial = prior.mode
-    elif policy.policy == LengthscalePolicy.LEGACY_ADAPTIVE:
+    elif policy.policy == LengthscalePolicy.ADAPTIVE:
         prior = LogNormalPrior(loc=SQRT2 + log(ard_num_dims) * 0.5, scale=SQRT3)
         minimum = 2.5e-2 * sqrt(ard_num_dims)
         initial = prior.mode

@@ -35,7 +35,7 @@ def test_build_covar_module_legacy_policy_scales_min_constraint() -> None:
                     KernelComponentConfig(
                         kind=KernelKind.MATERN,
                         dims=[0, 1, 2, 3],
-                        lengthscale_policy=LengthscalePolicyConfig(policy=LengthscalePolicy.LEGACY_ADAPTIVE),
+                        lengthscale_policy=LengthscalePolicyConfig(policy=LengthscalePolicy.ADAPTIVE),
                     )
                 ]
             )

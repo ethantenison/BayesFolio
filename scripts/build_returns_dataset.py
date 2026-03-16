@@ -20,6 +20,10 @@ from __future__ import annotations
 from datetime import date
 
 import pandas as pd
+import torch
+from botorch.fit import fit_gpytorch_mll
+from botorch.models.transforms.outcome import StratifiedStandardize
+from gpytorch.mlls import ExactMarginalLogLikelihood
 
 from bayesfolio.contracts.commands.features import BuildFeaturesDatasetCommand
 from bayesfolio.core.settings import Horizon, Interval
@@ -28,6 +32,23 @@ from bayesfolio.engine.features import (
     build_features_dataset,
     build_long_panel,
     make_default_feature_providers,
+    prepare_multitask_gp_data_with_task_feature,
+)
+from bayesfolio.engine.forecast import (
+    build_gp_interpretation_report,
+    display_gp_interpretation_report,
+    render_gp_interpretation_report,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    CovarModuleConfig,
+    KernelComponentConfig,
+    KernelKind,
+    KernelTermConfig,
+    LengthscalePolicy,
+    LengthscalePolicyConfig,
+    MeanKind,
+    MeanModuleConfig,
+    build_multitask_gp,
 )
 from bayesfolio.io import (
     ParquetArtifactStore,
@@ -238,23 +259,19 @@ print(features_df.tail())
 
 # --- GP section placeholder ---
 # TODO: Add GP data preparation and model training below.
-#
-import torch
-from botorch.fit import fit_gpytorch_mll
-from botorch.models.multitask import MultiTaskGP
-from botorch.models.transforms.outcome import StratifiedStandardize
-from gpytorch.mlls import ExactMarginalLogLikelihood
 
-from bayesfolio.engine.features import prepare_multitask_gp_data_with_task_feature
+# ---------------------------------------------------------------------------
+# GP configuration
+# ---------------------------------------------------------------------------
 
-#
-# X, I, y, task_map = prepare_multitask_gp_data(
-#     features_df,
-#     target_col="y_excess_lead",
-#     asset_col="asset_id",
-#     drop_cols=["date", "asset_id"],
-#     dtype=torch.float32,
-# )
+# Quick switch for the default lengthscale policy used in the base Matern block.
+# Use BOTORCH_STANDARD for BoTorch's fixed lower bound or ADAPTIVE for the
+# dimension-scaled lower bound used in the older research code.
+GP_LENGTHSCALE_POLICY = LengthscalePolicy.ADAPTIVE
+
+# Default kernel layout for the current script: one Matern block across all
+# non-task features.
+USE_SPLIT_KERNEL_BLOCKS_EXAMPLE = False
 
 X, y, task_map = prepare_multitask_gp_data_with_task_feature(
     features_df,
@@ -284,12 +301,87 @@ outcome_transform = StratifiedStandardize(
     batch_shape=y.shape[:-2],  # usually torch.Size([])
 )
 
-model = MultiTaskGP(
+# Default single-block covariance over all non-task features.
+covar_config = CovarModuleConfig(
+    terms=[
+        KernelTermConfig(
+            components=[
+                KernelComponentConfig(
+                    kind=KernelKind.MATERN,
+                    dims=non_task_indices,
+                    ard=True,
+                    matern_nu=2.5,
+                    use_outputscale=True,
+                    lengthscale_policy=LengthscalePolicyConfig(
+                        policy=GP_LENGTHSCALE_POLICY,
+                    ),
+                )
+            ]
+        )
+    ]
+)
+
+# Example split-block layout for future use.
+# Replace these placeholder index lists with the actual normalized feature
+# indices for your time, ETF, and macro feature groups.
+if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
+    time_feature_indices: list[int] = []
+    etf_feature_indices: list[int] = []
+    macro_feature_indices: list[int] = []
+
+    covar_config = CovarModuleConfig(
+        terms=[
+            KernelTermConfig(
+                components=[
+                    KernelComponentConfig(
+                        kind=KernelKind.PERIODIC,
+                        dims=time_feature_indices,
+                        ard=False,
+                        use_outputscale=True,
+                    )
+                ]
+            ),
+            KernelTermConfig(
+                components=[
+                    KernelComponentConfig(
+                        kind=KernelKind.MATERN,
+                        dims=etf_feature_indices,
+                        ard=True,
+                        matern_nu=2.5,
+                        use_outputscale=True,
+                        lengthscale_policy=LengthscalePolicyConfig(
+                            policy=GP_LENGTHSCALE_POLICY,
+                        ),
+                    )
+                ]
+            ),
+            KernelTermConfig(
+                components=[
+                    KernelComponentConfig(
+                        kind=KernelKind.MATERN,
+                        dims=macro_feature_indices,
+                        ard=True,
+                        matern_nu=2.5,
+                        use_outputscale=True,
+                        lengthscale_policy=LengthscalePolicyConfig(
+                            policy=GP_LENGTHSCALE_POLICY,
+                        ),
+                    )
+                ]
+            ),
+        ]
+    )
+
+mean_config = MeanModuleConfig(kind=MeanKind.MULTITASK_CONSTANT)
+
+model = build_multitask_gp(
     train_X=Xn,
     train_Y=y,
     task_feature=-1,
-    input_transform=None,
+    covar_config=covar_config,
+    mean_config=mean_config,
     outcome_transform=outcome_transform,
+    input_transform=None,
     rank=1,
 )
 
@@ -309,12 +401,6 @@ with torch.no_grad():
     pred = likelihood(f_dist, Xn)
 
 from IPython.display import display
-
-from bayesfolio.engine.forecast import (
-    build_gp_interpretation_report,
-    display_gp_interpretation_report,
-    render_gp_interpretation_report,
-)
 
 report = build_gp_interpretation_report(
     df=features_df,
