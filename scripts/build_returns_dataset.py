@@ -48,11 +48,11 @@ ETF_TICKERS: list[str] = [
     # "IWM",  # US small cap (Russell)
     # "VNQ",  # US REIT
     # "VNQI",  # international REIT
-    "VEA",  # developed international equity
-    "VWO",  # emerging market equity
+    # $"VEA",  # developed international equity
+    # "VWO",  # emerging market equity
     # "VSS",  # foreign small/mid cap
     # "BND",  # total US bond market
-    "IEF",  # 7-10 yr treasury
+    # "IEF",  # 7-10 yr treasury
     # "BNDX",  # total international bond (USD hedged)
     # "LQD",  # investment grade corporate bonds
     # "HYG",  # high yield bonds
@@ -302,7 +302,7 @@ if __name__ == "__main__":
         task_feature=-1,
         input_transform=None,
         outcome_transform=outcome_transform,
-        rank=2,
+        rank=1,
     )
 
     model.train()
@@ -319,3 +319,26 @@ if __name__ == "__main__":
     with torch.no_grad():
         f_dist = model(Xn)
         pred = likelihood(f_dist, Xn)
+
+    from IPython.display import display
+
+    from bayesfolio.engine.forecast import (
+        build_gp_interpretation_report,
+        display_gp_interpretation_report,
+        render_gp_interpretation_report,
+    )
+
+    report = build_gp_interpretation_report(
+        df=features_df,
+        model=model,
+        target_column="y_excess_lead",
+        task_column="asset_id",
+    )
+
+    rendered_report = render_gp_interpretation_report(report)
+
+    display(rendered_report["summary_display"])
+    display(rendered_report["notes_display"])
+    display(rendered_report["feature_summary"])
+    display(rendered_report["task_correlation_figure"])
+    display_gp_interpretation_report(rendered_report)

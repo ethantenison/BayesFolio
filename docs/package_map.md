@@ -47,6 +47,7 @@ should be translated at adapters/orchestrators, not leaked into contracts.
 - Pipeline orchestration: `engine.run_schema_first_pipeline`
 - Historical chat orchestration: `engine.run_historical_mvp_chat_turn`
 - Feature workflow: `engine.features.build_features_dataset`
+- GP interpretation helpers: `engine.forecast.build_gp_interpretation_report`, `engine.forecast.render_gp_interpretation_report`
 - IO dataset persistence: `io.ParquetArtifactStore`
 - IO providers: `io.EtfFeaturesProvider`, `io.MacroProvider`, `io.ReturnsProvider`
 - IO fingerprint helpers: `io.sha256_digest`, `io.sha256_fingerprint`
