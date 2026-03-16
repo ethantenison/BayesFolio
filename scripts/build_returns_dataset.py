@@ -1,3 +1,4 @@
+# ruff: noqa
 """Build ETF returns and features dataset using the current BayesFolio API.
 
 This script fetches ETF excess return data and a full merged feature panel
@@ -26,12 +27,9 @@ from bayesfolio.engine.features import (
     FeatureProviders,
     build_features_dataset,
     build_long_panel,
-    fetch_etf_features,
-    fetch_macro_features,
+    make_default_feature_providers,
 )
 from bayesfolio.io import (
-    EtfFeaturesProvider,
-    MacroProvider,
     ParquetArtifactStore,
     ReturnsProvider,
 )
@@ -82,6 +80,10 @@ DROP_MACRO_COLS: list[str] = [
     "yc_pc2",
     "yc_pc3",
     "y10_nominal",
+    "de10y",
+    "jp10y",
+    "uk10y",
+    "cn10y",
 ]
 
 # ETF feature columns to drop
@@ -119,22 +121,7 @@ def make_providers() -> FeatureProviders:
         FeatureProviders: Container holding returns, ETF features, and macro
             feature providers, each pointing to the shared artifact cache.
     """
-    return FeatureProviders(
-        returns_provider=ReturnsProvider(
-            fetcher=build_long_panel,
-            cache_dir="artifacts/cache/returns",
-        ),
-        etf_features_provider=EtfFeaturesProvider(
-            fetcher=fetch_etf_features,
-            cache_dir="artifacts/cache/etf_features",
-        ),
-        macro_provider=MacroProvider(
-            fetcher=fetch_macro_features,
-            max_retries=2,
-            retry_backoff_seconds=1.0,
-            cache_dir="artifacts/cache/macro",
-        ),
-    )
+    return make_default_feature_providers()
 
 
 def build_returns_wide(
@@ -231,114 +218,115 @@ def build_full_feature_panel() -> pd.DataFrame:
 # Script entrypoint
 # ---------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    # --- Quick returns-only path (wide format; good for riskfolio / benchmarks) ---
-    # print("Fetching returns (wide format)...")
-    # returns_wide = build_returns_wide(
-    #     tickers=ETF_TICKERS,
-    #     start=LOOKBACK_DATE,
-    #     end=END_DATE,
-    # )
-    # print(f"returns_wide shape: {returns_wide.shape}")
-    # print(returns_wide.tail())
+# if __name__ == "__main__":
+# --- Quick returns-only path (wide format; good for riskfolio / benchmarks) ---
+# print("Fetching returns (wide format)...")
+# returns_wide = build_returns_wide(
+#     tickers=ETF_TICKERS,
+#     start=LOOKBACK_DATE,
+#     end=END_DATE,
+# )
+# print(f"returns_wide shape: {returns_wide.shape}")
+# print(returns_wide.tail())
 
-    # --- Full feature panel (needed for GP modelling) ---
-    print("\nBuilding full feature panel...")
-    features_df = build_full_feature_panel()
-    print(f"features_df shape: {features_df.shape}")
-    print(features_df.dtypes)
-    print(features_df.tail())
+# --- Full feature panel (needed for GP modelling) ---
+print("\nBuilding full feature panel...")
+features_df = build_full_feature_panel()
+print(f"features_df shape: {features_df.shape}")
+print(features_df.dtypes)
+print(features_df.tail())
 
-    # --- GP section placeholder ---
-    # TODO: Add GP data preparation and model training below.
-    #
-    import torch
-    from botorch.fit import fit_gpytorch_mll
-    from botorch.models.multitask import MultiTaskGP
-    from botorch.models.transforms.outcome import StratifiedStandardize
-    from gpytorch.mlls import ExactMarginalLogLikelihood
+# --- GP section placeholder ---
+# TODO: Add GP data preparation and model training below.
+#
+import torch
+from botorch.fit import fit_gpytorch_mll
+from botorch.models.multitask import MultiTaskGP
+from botorch.models.transforms.outcome import StratifiedStandardize
+from gpytorch.mlls import ExactMarginalLogLikelihood
 
-    from bayesfolio.engine.features import prepare_multitask_gp_data_with_task_feature
-    #
-    # X, I, y, task_map = prepare_multitask_gp_data(
-    #     features_df,
-    #     target_col="y_excess_lead",
-    #     asset_col="asset_id",
-    #     drop_cols=["date", "asset_id"],
-    #     dtype=torch.float32,
-    # )
+from bayesfolio.engine.features import prepare_multitask_gp_data_with_task_feature
 
-    X, y, task_map = prepare_multitask_gp_data_with_task_feature(
-        features_df,
-        target_col="y_excess_lead",
-        asset_col="asset_id",
-        drop_cols=["date"],
-        dtype=torch.float64,
-    )
+#
+# X, I, y, task_map = prepare_multitask_gp_data(
+#     features_df,
+#     target_col="y_excess_lead",
+#     asset_col="asset_id",
+#     drop_cols=["date", "asset_id"],
+#     dtype=torch.float32,
+# )
 
-    task_feature = -1  # or the actual column index holding the task id
-    all_task_values = X[:, task_feature].to(torch.long).unique(sorted=True)
-    task_idx = X.shape[-1] - 1
-    non_task_indices = [i for i in range(X.shape[-1]) if i != task_idx]
+X, y, task_map = prepare_multitask_gp_data_with_task_feature(
+    features_df,
+    target_col="y_excess_lead",
+    asset_col="asset_id",
+    drop_cols=["date"],
+    dtype=torch.float64,
+)
 
-    Xn = X.clone()
+task_feature = -1  # or the actual column index holding the task id
+all_task_values = X[:, task_feature].to(torch.long).unique(sorted=True)
+task_idx = X.shape[-1] - 1
+non_task_indices = [i for i in range(X.shape[-1]) if i != task_idx]
 
-    mins = X[:, non_task_indices].amin(dim=0)
-    maxs = X[:, non_task_indices].amax(dim=0)
-    ranges = (maxs - mins).clamp_min(1e-12)
+Xn = X.clone()
 
-    Xn[:, non_task_indices] = (X[:, non_task_indices] - mins) / ranges
+mins = X[:, non_task_indices].amin(dim=0)
+maxs = X[:, non_task_indices].amax(dim=0)
+ranges = (maxs - mins).clamp_min(1e-12)
 
-    outcome_transform = StratifiedStandardize(
-        stratification_idx=task_feature,
-        all_task_values=all_task_values,
-        observed_task_values=X[:, task_feature].to(torch.long),
-        batch_shape=y.shape[:-2],  # usually torch.Size([])
-    )
+Xn[:, non_task_indices] = (X[:, non_task_indices] - mins) / ranges
 
-    model = MultiTaskGP(
-        train_X=Xn,
-        train_Y=y,
-        task_feature=-1,
-        input_transform=None,
-        outcome_transform=outcome_transform,
-        rank=1,
-    )
+outcome_transform = StratifiedStandardize(
+    stratification_idx=task_feature,
+    all_task_values=all_task_values,
+    observed_task_values=X[:, task_feature].to(torch.long),
+    batch_shape=y.shape[:-2],  # usually torch.Size([])
+)
 
-    model.train()
-    likelihood = model.likelihood  # MultiTaskGP has a likelihood attribute
-    mll = ExactMarginalLogLikelihood(likelihood, model)
+model = MultiTaskGP(
+    train_X=Xn,
+    train_Y=y,
+    task_feature=-1,
+    input_transform=None,
+    outcome_transform=outcome_transform,
+    rank=1,
+)
 
-    fit_gpytorch_mll(mll)  # fits model hyperparameters
+model.train()
+likelihood = model.likelihood  # MultiTaskGP has a likelihood attribute
+mll = ExactMarginalLogLikelihood(likelihood, model)
 
-    # Removing features led to great speed up.
+fit_gpytorch_mll(mll)  # fits model hyperparameters
 
-    # ---- Predict ----
-    model.eval()
-    likelihood.eval()
-    with torch.no_grad():
-        f_dist = model(Xn)
-        pred = likelihood(f_dist, Xn)
+# Removing features led to great speed up.
 
-    from IPython.display import display
+# ---- Predict ----
+model.eval()
+likelihood.eval()
+with torch.no_grad():
+    f_dist = model(Xn)
+    pred = likelihood(f_dist, Xn)
 
-    from bayesfolio.engine.forecast import (
-        build_gp_interpretation_report,
-        display_gp_interpretation_report,
-        render_gp_interpretation_report,
-    )
+from IPython.display import display
 
-    report = build_gp_interpretation_report(
-        df=features_df,
-        model=model,
-        target_column="y_excess_lead",
-        task_column="asset_id",
-    )
+from bayesfolio.engine.forecast import (
+    build_gp_interpretation_report,
+    display_gp_interpretation_report,
+    render_gp_interpretation_report,
+)
 
-    rendered_report = render_gp_interpretation_report(report)
+report = build_gp_interpretation_report(
+    df=features_df,
+    model=model,
+    target_column="y_excess_lead",
+    task_column="asset_id",
+)
 
-    display(rendered_report["summary_display"])
-    display(rendered_report["notes_display"])
-    display(rendered_report["feature_summary"])
-    display(rendered_report["task_correlation_figure"])
-    display_gp_interpretation_report(rendered_report)
+rendered_report = render_gp_interpretation_report(report)
+
+display(rendered_report["summary_display"])
+display(rendered_report["notes_display"])
+display(rendered_report["feature_summary"])
+display(rendered_report["task_correlation_figure"])
+display_gp_interpretation_report(rendered_report)

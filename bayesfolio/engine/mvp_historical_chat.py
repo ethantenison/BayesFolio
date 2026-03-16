@@ -56,14 +56,10 @@ from bayesfolio.engine.backtest import run_weighted_backtest
 from bayesfolio.engine.features import (
     build_features_dataset,
     build_long_panel,
-    fetch_etf_features,
-    fetch_macro_features,
+    make_default_feature_providers,
 )
-from bayesfolio.engine.features.dataset_builder import FeatureProviders
 from bayesfolio.engine.features.universe_loader import build_universe_snapshot
 from bayesfolio.io import (
-    EtfFeaturesProvider,
-    MacroProvider,
     ParquetArtifactStore,
     RegistryToolExecutor,
     ReturnsProvider,
@@ -756,21 +752,10 @@ def _run_feature_agent(request: HistoricalMvpRequest) -> FeaturesDatasetResult:
         horizon=Horizon.MONTHLY,
         artifact_name=(f"mvp_features_{request.start_date.isoformat()}_{request.end_date.isoformat()}"),
     )
-    providers = FeatureProviders(
-        returns_provider=ReturnsProvider(
-            fetcher=build_long_panel,
-            cache_dir=_cache_dir_for(request=request, dataset="returns"),
-        ),
-        macro_provider=MacroProvider(
-            fetcher=fetch_macro_features,
-            max_retries=1,
-            retry_backoff_seconds=0.0,
-            cache_dir=_cache_dir_for(request=request, dataset="macro"),
-        ),
-        etf_features_provider=EtfFeaturesProvider(
-            fetcher=fetch_etf_features,
-            cache_dir=_cache_dir_for(request=request, dataset="etf_features"),
-        ),
+    providers = make_default_feature_providers(
+        cache_root=request.cache_dir if request.use_local_cache else None,
+        macro_max_retries=1,
+        macro_retry_backoff_seconds=0.0,
     )
     artifact_store = ParquetArtifactStore(base_dir="artifacts/features")
     return build_features_dataset(feature_command, providers=providers, artifact_store=artifact_store)

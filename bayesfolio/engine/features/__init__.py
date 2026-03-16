@@ -1,4 +1,8 @@
-"""Data ingestion and feature preparation APIs."""
+"""Data ingestion and feature preparation APIs.
+
+This package owns feature fetch/engineering helpers, dataset assembly, and the
+canonical provider wiring used by BayesFolio feature-building workflows.
+"""
 
 from bayesfolio.engine.features.asset_prices import (
     add_cross_sectional_momentum_rank,
@@ -16,6 +20,7 @@ from bayesfolio.engine.features.market_fundamentals import (
     fetch_enhanced_macro_features,
     fetch_macro_features,
 )
+from bayesfolio.engine.features.providers import make_default_feature_providers
 from bayesfolio.engine.features.universe_loader import build_universe_snapshot
 
 __all__ = [
@@ -31,4 +36,5 @@ __all__ = [
     "fetch_core_global_macro",
     "fetch_enhanced_macro_features",
     "fetch_macro_features",
+    "make_default_feature_providers",
 ]

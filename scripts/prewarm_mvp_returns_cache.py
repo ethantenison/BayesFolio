@@ -11,10 +11,7 @@ MVP providers.
 from __future__ import annotations
 
 from bayesfolio.core.settings import Horizon
-from bayesfolio.engine.features import build_long_panel, fetch_etf_features, fetch_macro_features
-from bayesfolio.io.providers.etf_features_provider import EtfFeaturesProvider
-from bayesfolio.io.providers.macro_provider import MacroProvider
-from bayesfolio.io.providers.returns_provider import ReturnsProvider
+from bayesfolio.engine.features import make_default_feature_providers
 
 ETF_TICKERS: list[str] = [
     "SPY",
@@ -38,30 +35,29 @@ START_DATE = "2020-01-01"
 END_DATE = "2025-12-31"
 RETURNS_CACHE_DIR = "artifacts/cache/returns"
 ETF_FEATURES_CACHE_DIR = "artifacts/cache/etf_features"
-MACRO_CACHE_DIR = "artifacts/cache/macro"
+MACRO_CACHE_DIR = "artifacts/cache/macro_enhanced"
 
 
 def main() -> None:
     """Fetch monthly market data and persist it to local caches."""
 
-    returns_provider = ReturnsProvider(fetcher=build_long_panel, cache_dir=RETURNS_CACHE_DIR)
-    returns_frame = returns_provider.get_y_excess_lead_long(
+    providers = make_default_feature_providers()
+
+    returns_frame = providers.returns_provider.get_y_excess_lead_long(
         tickers=ETF_TICKERS,
         start=START_DATE,
         end=END_DATE,
         horizon=Horizon.MONTHLY,
     )
 
-    etf_provider = EtfFeaturesProvider(fetcher=fetch_etf_features, cache_dir=ETF_FEATURES_CACHE_DIR)
-    etf_frame = etf_provider.get_etf_features_long(
+    etf_frame = providers.etf_features_provider.get_etf_features_long(
         tickers=ETF_TICKERS,
         start=START_DATE,
         end=END_DATE,
         horizon=Horizon.MONTHLY,
     )
 
-    macro_provider = MacroProvider(fetcher=fetch_macro_features, cache_dir=MACRO_CACHE_DIR)
-    macro_frame = macro_provider.get_macro_features(
+    macro_frame = providers.macro_provider.get_macro_features(
         start=START_DATE,
         end=END_DATE,
         horizon=Horizon.MONTHLY,

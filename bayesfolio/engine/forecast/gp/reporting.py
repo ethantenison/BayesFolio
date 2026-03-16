@@ -40,6 +40,7 @@ class GPInterpretationReport(TypedDict):
     feature_summary: pd.DataFrame
     kernel_summary: pd.DataFrame
     task_summary: pd.DataFrame | None
+    task_covariance: pd.DataFrame | None
     task_correlation: pd.DataFrame | None
     noise_summary: pd.DataFrame
     interpretation_notes: list[str]
@@ -55,6 +56,7 @@ class RenderedGPInterpretationReport(TypedDict):
     feature_summary: pd.DataFrame
     kernel_summary: pd.DataFrame
     task_summary: pd.DataFrame | None
+    task_covariance: pd.DataFrame | None
     noise_summary: pd.DataFrame
     task_correlation: pd.DataFrame | None
     task_correlation_figure: go.Figure | None
@@ -156,7 +158,14 @@ def build_gp_interpretation_report(
 
     task_kernel = _resolve_task_kernel(model)
     task_label_map = _build_task_label_map(df, train_x, task_column, task_feature_index)
-    task_summary, task_correlation = _build_task_report(model, task_kernel, task_label_map, target_column)
+    task_summary, task_covariance, task_correlation = _build_task_report(
+        model,
+        task_kernel,
+        task_label_map,
+        target_column,
+        train_x.shape[-1],
+        task_feature_index,
+    )
     noise_summary = _build_noise_summary(model, task_label_map, target_column)
 
     model_summary = {
@@ -181,6 +190,7 @@ def build_gp_interpretation_report(
         "feature_summary": feature_summary,
         "kernel_summary": kernel_summary,
         "task_summary": task_summary,
+        "task_covariance": task_covariance,
         "task_correlation": task_correlation,
         "noise_summary": noise_summary,
         "interpretation_notes": _build_interpretation_notes(feature_summary, task_summary),
@@ -209,6 +219,7 @@ def render_gp_interpretation_report(
     feature_summary = _ensure_dataframe(report.get("feature_summary"))
     kernel_summary = _ensure_dataframe(report.get("kernel_summary"))
     task_summary = _ensure_optional_dataframe(report.get("task_summary"))
+    task_covariance = _ensure_optional_dataframe(report.get("task_covariance"))
     noise_summary = _ensure_dataframe(report.get("noise_summary"))
     task_correlation = _ensure_optional_dataframe(report.get("task_correlation"))
     model_summary = cast(dict[str, object], report.get("model_summary", {}))
@@ -233,6 +244,7 @@ def render_gp_interpretation_report(
         "feature_summary": rendered_feature_summary,
         "kernel_summary": rendered_kernel_summary,
         "task_summary": rendered_task_summary,
+        "task_covariance": task_covariance,
         "noise_summary": rendered_noise_summary,
         "task_correlation": task_correlation,
         "task_correlation_figure": task_correlation_figure,
@@ -263,6 +275,14 @@ def display_gp_interpretation_report(rendered_report: RenderedGPInterpretationRe
     task_summary = rendered_report["task_summary"]
     if task_summary is not None and not task_summary.empty:
         display(task_summary)
+
+    task_covariance = rendered_report["task_covariance"]
+    if task_covariance is not None and not task_covariance.empty:
+        display(task_covariance)
+
+    task_correlation = rendered_report["task_correlation"]
+    if task_correlation is not None and not task_correlation.empty:
+        display(task_correlation)
 
     display(rendered_report["noise_summary"])
 
@@ -674,13 +694,15 @@ def _build_task_report(
     task_kernel: object | None,
     task_label_map: dict[int, object],
     target_column: str,
-) -> tuple[pd.DataFrame | None, pd.DataFrame | None]:
+    input_dim: int,
+    task_feature_index: int | None,
+) -> tuple[pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None]:
     if task_kernel is None:
-        return None, None
+        return None, None, None
 
-    covariance = _linear_operator_to_numpy(getattr(task_kernel, "covar_matrix", None))
+    covariance = _evaluate_task_covariance(task_kernel, input_dim=input_dim, task_feature_index=task_feature_index)
     if covariance is None:
-        return None, None
+        return None, None, None
 
     task_indices = list(range(covariance.shape[0]))
     task_labels = [task_label_map.get(index, index) for index in task_indices]
@@ -701,8 +723,47 @@ def _build_task_report(
         )
 
     correlation = _covariance_to_correlation(covariance)
+    covariance_df = pd.DataFrame(covariance, index=task_labels, columns=task_labels)
     correlation_df = pd.DataFrame(correlation, index=task_labels, columns=task_labels)
-    return pd.DataFrame(rows), correlation_df
+    return pd.DataFrame(rows), covariance_df, correlation_df
+
+
+def _evaluate_task_covariance(
+    task_kernel: object,
+    input_dim: int,
+    task_feature_index: int | None,
+) -> np.ndarray | None:
+    num_tasks = getattr(task_kernel, "num_tasks", None)
+    if isinstance(num_tasks, int):
+        task_ids = torch.arange(num_tasks, dtype=torch.long)
+        active_dims = _normalize_dims(getattr(task_kernel, "active_dims", None))
+
+        evaluation_pairs: list[tuple[torch.Tensor, torch.Tensor]] = []
+        if active_dims:
+            dummy_inputs = torch.zeros((num_tasks, input_dim), dtype=torch.long)
+            active_task_dim = active_dims[0]
+            dummy_inputs[:, active_task_dim] = task_ids
+            evaluation_pairs.append((dummy_inputs, dummy_inputs))
+
+        evaluation_pairs.extend(
+            [
+                (task_ids, task_ids),
+                (task_ids.unsqueeze(-1), task_ids.unsqueeze(-1)),
+            ]
+        )
+
+        for left, right in evaluation_pairs:
+            try:
+                covariance = _linear_operator_to_numpy(cast(Any, task_kernel)(left, right))
+            except Exception:
+                covariance = None
+            if covariance is not None and covariance.shape[-2:] == (num_tasks, num_tasks):
+                return covariance
+
+    covariance = _linear_operator_to_numpy(getattr(task_kernel, "covar_matrix", None))
+    if covariance is not None and isinstance(num_tasks, int) and covariance.shape[-2:] != (num_tasks, num_tasks):
+        return None
+    return covariance
 
 
 def _extract_task_mean_constants(mean_module: object, expected_count: int) -> list[float] | None:

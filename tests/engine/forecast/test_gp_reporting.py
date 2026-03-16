@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+import numpy as np
 import pandas as pd
 import pytest
 import torch
@@ -95,12 +96,23 @@ def test_build_gp_interpretation_report_maps_multitask_outputs() -> None:
 
     feature_summary = report["feature_summary"]
     task_summary = report["task_summary"]
+    task_covariance = report["task_covariance"]
     task_correlation = report["task_correlation"]
+
+    task_ids = torch.arange(int(cast(Any, task_kernel).num_tasks), dtype=torch.long)
+    task_inputs = torch.zeros((len(task_ids), train_x.shape[-1]), dtype=torch.long)
+    task_inputs[:, int(cast(Any, model)._task_feature)] = task_ids
+    expected_covariance = task_kernel(task_inputs, task_inputs).to_dense().detach().cpu().numpy()
+    expected_scale = expected_covariance.diagonal().clip(min=1e-12) ** 0.5
+    expected_correlation = expected_covariance / np.outer(expected_scale, expected_scale)
 
     assert feature_summary.loc[0, "lengthscale_raw_units"] == pytest.approx(4.0)
     assert task_summary is not None
+    assert task_covariance is not None
     assert list(task_summary["task_label"]) == ["SPY", "QQQ"]
     assert task_correlation is not None
+    np.testing.assert_allclose(task_covariance.to_numpy(), expected_covariance)
+    np.testing.assert_allclose(task_correlation.to_numpy(), expected_correlation)
     assert list(task_correlation.index) == ["SPY", "QQQ"]
     assert list(task_correlation.columns) == ["SPY", "QQQ"]
 
@@ -141,6 +153,7 @@ def test_render_gp_interpretation_report_returns_tables_and_heatmap() -> None:
     assert hasattr(rendered["summary_display"], "_repr_markdown_") or isinstance(rendered["summary_display"], str)
     assert rendered["feature_summary"].shape[0] == 1
     assert rendered["task_summary"] is not None
+    assert rendered["task_covariance"] is not None
     assert rendered["task_correlation_figure"] is not None
     figure = cast(Any, rendered["task_correlation_figure"])
     assert figure.layout.to_plotly_json()["title"]["text"] == "Task Correlation"
@@ -157,6 +170,7 @@ def test_display_gp_interpretation_report_calls_ipython_display(monkeypatch: pyt
         "feature_summary": pd.DataFrame({"feature": ["x1"]}),
         "kernel_summary": pd.DataFrame({"kernel_type": ["RBFKernel"]}),
         "task_summary": pd.DataFrame({"task_label": ["SPY"]}),
+        "task_covariance": pd.DataFrame([[1.0]], index=["SPY"], columns=["SPY"]),
         "noise_summary": pd.DataFrame({"noise_variance": [0.1]}),
         "task_correlation": pd.DataFrame([[1.0]], index=["SPY"], columns=["SPY"]),
         "task_correlation_figure": None,
@@ -179,3 +193,4 @@ def test_display_gp_interpretation_report_calls_ipython_display(monkeypatch: pyt
     assert displayed[0] == "summary-object"
     assert displayed[1] == "notes-object"
     assert isinstance(displayed[2], pd.DataFrame)
+    assert isinstance(displayed[4], pd.DataFrame)
