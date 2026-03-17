@@ -5,12 +5,18 @@ from typing import Any, cast
 
 import pytest
 import torch
-from gpytorch.kernels import MaternKernel, PeriodicKernel, ScaleKernel
+from gpytorch.kernels import AdditiveKernel, MaternKernel, PeriodicKernel, ProductKernel, ScaleKernel
 from gpytorch.means import MultitaskMean
 from pydantic import ValidationError
 
 from bayesfolio.engine.forecast.gp.multitask_builder import (
+    BlockStructure,
     CovarModuleConfig,
+    GlobalStructure,
+    InteractionPolicy,
+    KernelBlockConfig,
+    KernelBlockRole,
+    KernelInteractionConfig,
     KernelTermConfig,
     LengthscalePolicy,
     LengthscalePolicyConfig,
@@ -87,7 +93,7 @@ def test_build_covar_module_manual_policy_uses_custom_prior() -> None:
 
 def test_rbf_component_rejects_matern_nu_field() -> None:
     with pytest.raises(ValidationError):
-        RBFKernelComponentConfig(dims=[0, 1], matern_nu=2.5)
+        RBFKernelComponentConfig.model_validate({"dims": [0, 1], "matern_nu": 2.5})
 
 
 def test_build_multitask_gp_builds_modules_from_configs() -> None:
@@ -149,7 +155,7 @@ def test_build_covar_module_periodic_component_uses_configured_period_length() -
     assert isinstance(kernel.base_kernel, PeriodicKernel)
     period_prior = kernel.base_kernel.period_length_prior
     assert period_prior is not None
-    prior_loc = float(period_prior.loc.detach().view(-1)[0])
+    prior_loc = float(cast(Any, period_prior).loc.detach().view(-1)[0])
     assert prior_loc == pytest.approx(log(0.33), rel=1e-6)
 
 
@@ -174,3 +180,130 @@ def test_build_multitask_gp_applies_custom_noise_floor() -> None:
 
     lower_bound = float(cast(Any, model.likelihood.noise_covar).raw_noise_constraint.lower_bound)
     assert lower_bound == pytest.approx(5e-3)
+
+
+def test_build_covar_module_hierarchical_blocks_adds_temporal_interactions() -> None:
+    config = CovarModuleConfig(
+        blocks=[
+            KernelBlockConfig(
+                name="time",
+                variable_type=KernelBlockRole.TIME,
+                components=[
+                    PeriodicKernelComponentConfig(
+                        dims=[0],
+                        ard=False,
+                        use_outputscale=False,
+                    )
+                ],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=True,
+            ),
+            KernelBlockConfig(
+                name="etf",
+                variable_type=KernelBlockRole.ETF,
+                components=[MaternKernelComponentConfig(dims=[1], use_outputscale=False)],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=True,
+            ),
+            KernelBlockConfig(
+                name="macro",
+                variable_type=KernelBlockRole.MACRO,
+                components=[
+                    MaternKernelComponentConfig(dims=[2], matern_nu=0.5, use_outputscale=False),
+                    LinearKernelComponentConfig(dims=[2], use_outputscale=False),
+                ],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=True,
+            ),
+        ],
+        global_structure=GlobalStructure.HIERARCHICAL,
+        interaction_policy=InteractionPolicy.TEMPORAL_ONLY,
+    )
+
+    kernel = build_covar_module(config)
+
+    assert isinstance(kernel, AdditiveKernel)
+    assert len(kernel.kernels) == 5
+    product_terms = [subkernel for subkernel in kernel.kernels if isinstance(subkernel, ScaleKernel)]
+    assert len(product_terms) >= 2
+    assert any(isinstance(subkernel.base_kernel, ProductKernel) for subkernel in product_terms)
+
+
+def test_product_terms_do_not_contain_inner_scale_kernels() -> None:
+    config = CovarModuleConfig(
+        blocks=[
+            KernelBlockConfig(
+                name="time",
+                variable_type=KernelBlockRole.TIME,
+                components=[
+                    PeriodicKernelComponentConfig(
+                        dims=[0],
+                        ard=False,
+                        use_outputscale=True,
+                    )
+                ],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=True,
+            ),
+            KernelBlockConfig(
+                name="macro",
+                variable_type=KernelBlockRole.MACRO,
+                components=[
+                    MaternKernelComponentConfig(dims=[1, 2], use_outputscale=True),
+                    LinearKernelComponentConfig(dims=[1, 2], use_outputscale=True),
+                ],
+                block_structure=BlockStructure.PRODUCT,
+                use_outputscale=True,
+            ),
+        ],
+        global_structure=GlobalStructure.HIERARCHICAL,
+        interaction_policy=InteractionPolicy.TEMPORAL_ONLY,
+    )
+
+    kernel = build_covar_module(config)
+    assert isinstance(kernel, AdditiveKernel)
+
+    interaction_products = [
+        subkernel.base_kernel
+        for subkernel in kernel.kernels
+        if isinstance(subkernel, ScaleKernel) and isinstance(subkernel.base_kernel, ProductKernel)
+    ]
+    assert interaction_products
+    for product in interaction_products:
+        assert all(not isinstance(child, ScaleKernel) for child in product.kernels)
+
+
+def test_custom_interactions_allow_explicit_block_products() -> None:
+    config = CovarModuleConfig(
+        blocks=[
+            KernelBlockConfig(
+                name="etf",
+                variable_type=KernelBlockRole.ETF,
+                components=[MaternKernelComponentConfig(dims=[0], use_outputscale=False)],
+                use_outputscale=True,
+            ),
+            KernelBlockConfig(
+                name="macro",
+                variable_type=KernelBlockRole.MACRO,
+                components=[LinearKernelComponentConfig(dims=[1], use_outputscale=False)],
+                use_outputscale=True,
+            ),
+            KernelBlockConfig(
+                name="time",
+                variable_type=KernelBlockRole.TIME,
+                components=[PeriodicKernelComponentConfig(dims=[2], ard=False, use_outputscale=False)],
+                use_outputscale=True,
+            ),
+        ],
+        global_structure=GlobalStructure.HIERARCHICAL,
+        interaction_policy=InteractionPolicy.CUSTOM,
+        custom_interactions=[
+            KernelInteractionConfig(blocks=["etf", "time"]),
+            KernelInteractionConfig(blocks=["macro", "time"]),
+        ],
+    )
+
+    kernel = build_covar_module(config)
+
+    assert isinstance(kernel, AdditiveKernel)
+    assert len(kernel.kernels) == 5

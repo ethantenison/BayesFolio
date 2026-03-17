@@ -14,23 +14,26 @@ class _HasValue(Protocol):
 
 
 class _KernelConfigLike(Protocol):
-    kernel_type: _HasValue
-    ard: bool
+    kind: _HasValue | None
+    kernel_type: _HasValue | None
+    ard: bool | None
 
     def model_dump(self) -> dict[str, object]: ...
 
 
 class _KernelBlockLike(Protocol):
+    name: str
     variable_type: _HasValue
     block_structure: _HasValue
-    dims: Sequence[int]
-    base_kernel: _KernelConfigLike
+    use_outputscale: bool
+    components: Sequence[_KernelConfigLike]
 
 
 class _KernelArchitectureConfigLike(Protocol):
     global_structure: _HasValue
     interaction_policy: _HasValue
     blocks: Sequence[_KernelBlockLike]
+    custom_interactions: Sequence[object]
 
     def model_dump(self) -> dict[str, object]: ...
 
@@ -46,28 +49,35 @@ def log_kernel_architecture_detailed(kernel_arch: KernelArchitectureConfig, pref
     mlflow.log_param(f"{prefix}.global_structure", kernel_arch.global_structure.value)
     mlflow.log_param(f"{prefix}.interaction_policy", kernel_arch.interaction_policy.value)
     mlflow.log_param(f"{prefix}.num_blocks", len(kernel_arch.blocks))
+    mlflow.log_param(f"{prefix}.num_custom_interactions", len(kernel_arch.custom_interactions))
 
     # Log each block separately
     for i, block in enumerate(kernel_arch.blocks):
         block_prefix = f"{prefix}.block_{i}"
+        mlflow.log_param(f"{block_prefix}.name", block.name)
         mlflow.log_param(f"{block_prefix}.variable_type", block.variable_type.value)
         mlflow.log_param(f"{block_prefix}.block_structure", block.block_structure.value)
-        mlflow.log_param(f"{block_prefix}.dims", str(block.dims))
-        mlflow.log_param(f"{block_prefix}.num_dims", len(block.dims))
+        mlflow.log_param(f"{block_prefix}.use_outputscale", block.use_outputscale)
+        mlflow.log_param(f"{block_prefix}.num_components", len(block.components))
 
-        # Log base kernel config
-        base_kernel = block.base_kernel
-        mlflow.log_param(f"{block_prefix}.base_kernel.type", base_kernel.kernel_type.value)
-        mlflow.log_param(f"{block_prefix}.base_kernel.ard", base_kernel.ard)
-
-        # Log kernel-specific parameters
-        nu = getattr(base_kernel, "nu", None)
-        if nu is not None:
-            mlflow.log_param(f"{block_prefix}.base_kernel.nu", nu)
-
-        depth = getattr(base_kernel, "depth", None)
-        if depth is not None:
-            mlflow.log_param(f"{block_prefix}.base_kernel.depth", depth)
+        for component_index, component in enumerate(block.components):
+            component_prefix = f"{block_prefix}.component_{component_index}"
+            component_kind = getattr(component, "kind", None) or getattr(component, "kernel_type", None)
+            if component_kind is not None:
+                mlflow.log_param(f"{component_prefix}.kind", component_kind.value)
+            dims = getattr(component, "dims", None)
+            if dims is not None:
+                mlflow.log_param(f"{component_prefix}.dims", str(dims))
+                mlflow.log_param(f"{component_prefix}.num_dims", len(dims))
+            ard = getattr(component, "ard", None)
+            if ard is not None:
+                mlflow.log_param(f"{component_prefix}.ard", ard)
+            use_outputscale = getattr(component, "use_outputscale", None)
+            if use_outputscale is not None:
+                mlflow.log_param(f"{component_prefix}.use_outputscale", use_outputscale)
+            nu = getattr(component, "matern_nu", None)
+            if nu is not None:
+                mlflow.log_param(f"{component_prefix}.matern_nu", nu)
 
     # Also save full config as JSON for complete record
     mlflow.log_dict(kernel_arch.model_dump(), f"{prefix}_architecture.json")

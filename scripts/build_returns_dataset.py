@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import date
+from typing import cast
 from uuid import uuid4
 
 import pandas as pd
@@ -44,10 +45,15 @@ from bayesfolio.engine.forecast import (
     render_gp_interpretation_report,
 )
 from bayesfolio.engine.forecast.gp.multitask_builder import (
+    BlockStructure,
     CovarModuleConfig,
-    KernelTermConfig,
+    GlobalStructure,
+    InteractionPolicy,
+    KernelBlockConfig,
+    KernelBlockRole,
     LengthscalePolicy,
     LengthscalePolicyConfig,
+    LinearKernelComponentConfig,
     MaternKernelComponentConfig,
     MeanKind,
     MeanModuleConfig,
@@ -237,19 +243,22 @@ def build_full_feature_panel() -> pd.DataFrame:
             feature columns, and ``y_excess_lead`` (decimal). Returns are in
             **decimal units** (0.02 = 2%).
     """
-    command = BuildFeaturesDatasetCommand(
-        tickers=ETF_TICKERS,
-        drop_assets=DROP_ASSETS,
-        lookback_date=LOOKBACK_DATE,
-        start_date=START_DATE,
-        end_date=END_DATE,
-        interval=Interval.DAILY,
-        horizon=Horizon.MONTHLY,
-        drop_macro_cols=[],
-        drop_etf_cols=[],
-        clip_quantile=0.99,
-        seed=27,
-        artifact_name="march_2026_features.parquet",
+    command = BuildFeaturesDatasetCommand.model_validate(
+        {
+            "schema": "bayesfolio.features.dataset.command",
+            "tickers": ETF_TICKERS,
+            "drop_assets": DROP_ASSETS,
+            "lookback_date": LOOKBACK_DATE,
+            "start_date": START_DATE,
+            "end_date": END_DATE,
+            "interval": Interval.DAILY,
+            "horizon": Horizon.MONTHLY,
+            "drop_macro_cols": [],
+            "drop_etf_cols": [],
+            "clip_quantile": 0.99,
+            "seed": 27,
+            "artifact_name": "march_2026_features.parquet",
+        }
     )
 
     providers = make_providers()
@@ -407,11 +416,11 @@ def build_kernel_expression(
             return visit(node.base_kernel)
 
         if isinstance(node, AdditiveKernel):
-            children = [visit(c) for c in node.kernels]
+            children = [visit(cast(Kernel, c)) for c in node.kernels]
             return " + ".join(part for part, _ in children), True
 
         if isinstance(node, ProductKernel):
-            children = [visit(c) for c in node.kernels]
+            children = [visit(cast(Kernel, c)) for c in node.kernels]
             rendered: list[str] = []
             for text, is_additive in children:
                 rendered.append(f"({text})" if is_additive else text)
@@ -468,7 +477,7 @@ def build_kernel_mermaid(
             if parent_id is not None:
                 lines.append(f"{parent_id} --> {node_id}")
             for child in node.kernels:
-                add_node(child, node_id)
+                add_node(cast(Kernel, child), node_id)
             return node_id
 
         if isinstance(node, ProductKernel):
@@ -476,7 +485,7 @@ def build_kernel_mermaid(
             if parent_id is not None:
                 lines.append(f"{parent_id} --> {node_id}")
             for child in node.kernels:
-                add_node(child, node_id)
+                add_node(cast(Kernel, child), node_id)
             return node_id
 
         base = _unwrap_scale(node)
@@ -614,8 +623,10 @@ outcome_transform = StratifiedStandardize(
 
 # Default single-block covariance over all non-task features.
 covar_config = CovarModuleConfig(
-    terms=[
-        KernelTermConfig(
+    blocks=[
+        KernelBlockConfig(
+            name="features",
+            variable_type=KernelBlockRole.GENERIC,
             components=[
                 MaternKernelComponentConfig(
                     dims=non_task_indices,
@@ -626,9 +637,12 @@ covar_config = CovarModuleConfig(
                         policy=GP_LENGTHSCALE_POLICY,
                     ),
                 )
-            ]
+            ],
+            block_structure=BlockStructure.ADDITIVE,
+            use_outputscale=False,
         )
-    ]
+    ],
+    global_structure=GlobalStructure.ADDITIVE,
 )
 
 # Example split-block layout for future use.
@@ -651,43 +665,61 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
     )
 
     covar_config = CovarModuleConfig(
-        terms=[
-            KernelTermConfig(
+        blocks=[
+            KernelBlockConfig(
+                name="time",
+                variable_type=KernelBlockRole.TIME,
                 components=[
                     PeriodicKernelComponentConfig(
                         dims=time_feature_indices,
                         ard=False,
-                        use_outputscale=True,
+                        use_outputscale=False,
                     )
-                ]
+                ],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=True,
             ),
-            KernelTermConfig(
+            KernelBlockConfig(
+                name="etf",
+                variable_type=KernelBlockRole.ETF,
                 components=[
                     MaternKernelComponentConfig(
                         dims=etf_feature_indices,
                         ard=True,
                         matern_nu=0.5,
-                        use_outputscale=True,
+                        use_outputscale=False,
                         lengthscale_policy=LengthscalePolicyConfig(
                             policy=GP_LENGTHSCALE_POLICY,
                         ),
                     )
-                ]
+                ],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=True,
             ),
-            KernelTermConfig(
+            KernelBlockConfig(
+                name="macro",
+                variable_type=KernelBlockRole.MACRO,
                 components=[
                     MaternKernelComponentConfig(
                         dims=macro_feature_indices,
                         ard=True,
                         matern_nu=2.5,
-                        use_outputscale=True,
+                        use_outputscale=False,
                         lengthscale_policy=LengthscalePolicyConfig(
                             policy=GP_LENGTHSCALE_POLICY,
                         ),
-                    )
-                ]
+                    ),
+                    LinearKernelComponentConfig(
+                        dims=macro_feature_indices,
+                        use_outputscale=False,
+                    ),
+                ],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=True,
             ),
-        ]
+        ],
+        global_structure=GlobalStructure.HIERARCHICAL,
+        interaction_policy=InteractionPolicy.TEMPORAL_ONLY,
     )
 
 kernel_block_indices = build_feature_index_groups_from_blocks(
