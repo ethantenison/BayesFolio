@@ -23,6 +23,7 @@ from typing import cast
 from uuid import uuid4
 
 import pandas as pd
+from regex import R
 import torch
 from botorch.fit import fit_gpytorch_mll
 from botorch.models.transforms.outcome import StratifiedStandardize
@@ -59,6 +60,7 @@ from bayesfolio.engine.forecast.gp.multitask_builder import (
     MeanModuleConfig,
     PeriodicKernelComponentConfig,
     build_multitask_gp,
+    RQKernelComponentConfig,
 )
 from bayesfolio.io import (
     ParquetArtifactStore,
@@ -245,7 +247,7 @@ def build_full_feature_panel() -> pd.DataFrame:
     """
     command = BuildFeaturesDatasetCommand.model_validate(
         {
-            "schema": "bayesfolio.features.dataset.command",
+            "schema": "bayesfolio.features_dataset.command",
             "tickers": ETF_TICKERS,
             "drop_assets": DROP_ASSETS,
             "lookback_date": LOOKBACK_DATE,
@@ -670,10 +672,14 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
                 name="time",
                 variable_type=KernelBlockRole.TIME,
                 components=[
-                    PeriodicKernelComponentConfig(
+                    MaternKernelComponentConfig(
                         dims=time_feature_indices,
                         ard=False,
+                        matern_nu=0.5,
                         use_outputscale=False,
+                        lengthscale_policy=LengthscalePolicyConfig(
+                            policy=GP_LENGTHSCALE_POLICY,
+                        ),
                     )
                 ],
                 block_structure=BlockStructure.ADDITIVE,
@@ -703,7 +709,7 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
                     MaternKernelComponentConfig(
                         dims=macro_feature_indices,
                         ard=True,
-                        matern_nu=2.5,
+                        matern_nu=0.5,
                         use_outputscale=False,
                         lengthscale_policy=LengthscalePolicyConfig(
                             policy=GP_LENGTHSCALE_POLICY,
@@ -713,13 +719,21 @@ if USE_SPLIT_KERNEL_BLOCKS_EXAMPLE:
                         dims=macro_feature_indices,
                         use_outputscale=False,
                     ),
+                    RQKernelComponentConfig(
+                        dims=macro_feature_indices,
+                        ard=True,
+                        use_outputscale=False,
+                        lengthscale_policy=LengthscalePolicyConfig(
+                            policy=GP_LENGTHSCALE_POLICY,
+                        ),
+                    ),
                 ],
                 block_structure=BlockStructure.ADDITIVE,
                 use_outputscale=True,
             ),
         ],
         global_structure=GlobalStructure.HIERARCHICAL,
-        interaction_policy=InteractionPolicy.TEMPORAL_ONLY,
+        interaction_policy=InteractionPolicy.SPARSE,
     )
 
 kernel_block_indices = build_feature_index_groups_from_blocks(
