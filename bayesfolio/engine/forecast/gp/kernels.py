@@ -1,13 +1,18 @@
-"""Gaussian Process Kernels"""
+"""Legacy Gaussian Process kernel compatibility helpers.
+
+This module preserves the older block-oriented kernel configuration models for
+research compatibility, but routes supported compositions through the active
+multitask covariance builder in ``multitask_builder.py``.
+"""
 
 # ============================================================================
 # Imports & Global Constants
 # ============================================================================
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from enum import StrEnum
 from math import exp, log, sqrt
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, cast
 
 import torch
 from botorch.models.kernels import (
@@ -30,6 +35,48 @@ from gpytorch.kernels import (
 )
 from gpytorch.priors import LogNormalPrior
 from pydantic import BaseModel, Field
+
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    BlockStructure as ActiveBlockStructure,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    CovarModuleConfig as ActiveCovarModuleConfig,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    GlobalStructure as ActiveGlobalStructure,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    InteractionPolicy as ActiveInteractionPolicy,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    KernelBlockConfig as ActiveKernelBlockConfig,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    KernelBlockRole,
+    KernelInteractionConfig,
+    LengthscalePolicy,
+    LengthscalePolicyConfig,
+    PeriodLengthPriorConfig,
+    make_period_length_prior,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    LinearKernelComponentConfig as ActiveLinearKernelComponentConfig,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    MaternKernelComponentConfig as ActiveMaternKernelComponentConfig,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    PeriodicKernelComponentConfig as ActivePeriodicKernelComponentConfig,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    RBFKernelComponentConfig as ActiveRBFKernelComponentConfig,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    RQKernelComponentConfig as ActiveRQKernelComponentConfig,
+)
+from bayesfolio.engine.forecast.gp.multitask_builder import (
+    build_covar_module as build_active_covar_module,
+)
 
 torch.set_default_dtype(torch.float32)
 SQRT2 = sqrt(2)
@@ -125,22 +172,9 @@ MODIFIER_KERNELS_BY_TYPE = {
 # ============================================================================
 
 
-def make_period_length_prior(p0: float, cv: float = 0.5) -> LogNormalPrior:
-    """Create a log-normal prior for periodic kernel period length."""
-    sigma = sqrt(log(1 + cv**2))
-    mu = log(p0)
-    return LogNormalPrior(loc=mu, scale=sigma)
-
-
 def default_period_prior(cv: float = 1.5) -> LogNormalPrior:
     """Default weak prior encouraging ~3–4 cycles on [0, 1]."""
     return make_period_length_prior(p0=0.25, cv=cv)
-
-
-def make_period_length_prior2(p0: float, cv: float = 0.5) -> LogNormalPrior:
-    sigma = sqrt(log(1 + cv**2))
-    mu = log(p0)
-    return LogNormalPrior(loc=mu, scale=sigma)
 
 
 def make_dim_scaled_lengthscale_prior_and_constraint(
@@ -154,7 +188,6 @@ def make_dim_scaled_lengthscale_prior_and_constraint(
     )
     lengthscale_constraint = GreaterThan(
         ls_min,
-        transform=None,
         initial_value=lengthscale_prior.mode,
     )
     return lengthscale_prior, lengthscale_constraint
@@ -175,7 +208,7 @@ class BaseKernelConfig(BaseModel):
 class MaternKernelConfig(BaseKernelConfig):
     kernel_type: Literal[KernelType.MATERN]
     ard: bool = True
-    nu: Literal[0.5, 1.5, 2.5] = 2.5
+    nu: float = 2.5
 
 
 class RQKernelConfig(BaseKernelConfig):
@@ -419,6 +452,161 @@ class KernelArchitectureConfig(BaseModel):
     interaction_policy: InteractionPolicy = InteractionPolicy.SPARSE
 
 
+_ACTIVE_SUPPORTED_KERNELS = {
+    KernelType.MATERN,
+    KernelType.RBF,
+    KernelType.RQ,
+    KernelType.PERIODIC,
+    KernelType.LINEAR,
+}
+
+
+def _supports_active_builder(cfg: KernelArchitectureConfig) -> bool:
+    return all(block.base_kernel.kernel_type in _ACTIVE_SUPPORTED_KERNELS for block in cfg.blocks)
+
+
+def _to_active_role(variable_type: KernelVariableType) -> KernelBlockRole:
+    if variable_type is KernelVariableType.TEMPORAL:
+        return KernelBlockRole.TIME
+    if variable_type is KernelVariableType.CATEGORICAL:
+        return KernelBlockRole.CATEGORICAL
+    return KernelBlockRole.GENERIC
+
+
+def _to_active_interaction_policy(policy: InteractionPolicy) -> ActiveInteractionPolicy:
+    if policy is InteractionPolicy.NONE:
+        return ActiveInteractionPolicy.NONE
+    if policy is InteractionPolicy.SPARSE:
+        return ActiveInteractionPolicy.SPARSE
+    if policy is InteractionPolicy.TEMPORAL_ONLY:
+        return ActiveInteractionPolicy.TEMPORAL_ONLY
+    if policy is InteractionPolicy.FULL:
+        return ActiveInteractionPolicy.FULL
+    raise ValueError(f"Unknown interaction policy: {policy}")
+
+
+def _to_active_global_structure(global_structure: GlobalStructure) -> ActiveGlobalStructure:
+    if global_structure is GlobalStructure.ADDITIVE:
+        return ActiveGlobalStructure.ADDITIVE
+    if global_structure is GlobalStructure.HIERARCHICAL:
+        return ActiveGlobalStructure.HIERARCHICAL
+    if global_structure is GlobalStructure.NON_COMPOSITIONAL:
+        return ActiveGlobalStructure.NON_COMPOSITIONAL
+    raise ValueError(f"Unknown global structure: {global_structure}")
+
+
+def _to_active_component(dims: list[int], cfg: BaseKernelConfig):
+    adaptive = LengthscalePolicyConfig(policy=LengthscalePolicy.ADAPTIVE)
+    if isinstance(cfg, MaternKernelConfig):
+        return ActiveMaternKernelComponentConfig(
+            dims=dims,
+            ard=cfg.ard,
+            matern_nu=cfg.nu,
+            use_outputscale=True,
+            lengthscale_policy=adaptive,
+        )
+    if isinstance(cfg, RBFKernelConfig):
+        return ActiveRBFKernelComponentConfig(
+            dims=dims,
+            ard=cfg.ard,
+            use_outputscale=True,
+            lengthscale_policy=adaptive,
+        )
+    if isinstance(cfg, RQKernelConfig):
+        return ActiveRQKernelComponentConfig(
+            dims=dims,
+            ard=cfg.ard,
+            use_outputscale=True,
+            lengthscale_policy=adaptive,
+        )
+    if isinstance(cfg, PeriodicKernelConfig):
+        return ActivePeriodicKernelComponentConfig(
+            dims=dims,
+            ard=cfg.ard,
+            use_outputscale=True,
+            lengthscale_policy=adaptive,
+            period_prior=PeriodLengthPriorConfig(p0=cfg.period_median, cv=cfg.period_prior_cv),
+        )
+    if isinstance(cfg, LinearKernelConfig):
+        return ActiveLinearKernelComponentConfig(
+            dims=dims,
+            use_outputscale=True,
+        )
+    raise ValueError(f"Kernel type {cfg.kernel_type} is not supported by the active builder")
+
+
+def _to_active_blocks(blocks: list[KernelBlockConfig]) -> list[ActiveKernelBlockConfig]:
+    active_blocks: list[ActiveKernelBlockConfig] = []
+    for index, block in enumerate(blocks):
+        block_name = f"block_{index}"
+        if block.block_structure is BlockStructure.JOINT:
+            components = [_to_active_component(block.dims, block.base_kernel)]
+        else:
+            components = [_to_active_component([dim], block.base_kernel) for dim in block.dims]
+        active_blocks.append(
+            ActiveKernelBlockConfig(
+                name=block_name,
+                variable_type=_to_active_role(block.variable_type),
+                components=components,
+                block_structure=ActiveBlockStructure.ADDITIVE,
+                use_outputscale=False,
+            )
+        )
+    return active_blocks
+
+
+def _to_active_custom_interactions(blocks: list[KernelBlockConfig]) -> list[KernelInteractionConfig]:
+    if len(blocks) != 1 or blocks[0].block_structure is not BlockStructure.ADDITIVE:
+        return []
+
+    block = blocks[0]
+    if len(block.dims) < 2:
+        return []
+
+    interactions: list[KernelInteractionConfig] = []
+    for left in range(len(block.dims)):
+        for right in range(left + 1, len(block.dims)):
+            interactions.append(
+                KernelInteractionConfig(
+                    blocks=[f"block_0_dim_{left}", f"block_0_dim_{right}"],
+                )
+            )
+    return interactions
+
+
+def _to_active_config(cfg: KernelArchitectureConfig) -> ActiveCovarModuleConfig:
+    if len(cfg.blocks) == 1 and cfg.blocks[0].block_structure is BlockStructure.ADDITIVE:
+        block = cfg.blocks[0]
+        split_blocks = [
+            ActiveKernelBlockConfig(
+                name=f"block_0_dim_{index}",
+                variable_type=_to_active_role(block.variable_type),
+                components=[_to_active_component([dim], block.base_kernel)],
+                block_structure=ActiveBlockStructure.ADDITIVE,
+                use_outputscale=False,
+            )
+            for index, dim in enumerate(block.dims)
+        ]
+        custom_interactions = _to_active_custom_interactions(cfg.blocks)
+        interaction_policy = (
+            ActiveInteractionPolicy.CUSTOM
+            if custom_interactions
+            else _to_active_interaction_policy(cfg.interaction_policy)
+        )
+        return ActiveCovarModuleConfig(
+            blocks=split_blocks,
+            global_structure=_to_active_global_structure(cfg.global_structure),
+            interaction_policy=interaction_policy,
+            custom_interactions=custom_interactions,
+        )
+
+    return ActiveCovarModuleConfig(
+        blocks=_to_active_blocks(cfg.blocks),
+        global_structure=_to_active_global_structure(cfg.global_structure),
+        interaction_policy=_to_active_interaction_policy(cfg.interaction_policy),
+    )
+
+
 # ============================================================================
 # Kernel Composition Utilities
 # ============================================================================
@@ -431,7 +619,7 @@ def _get_base_kernel_builder(kernel_type: KernelType):
         raise ValueError(f"No kernel builder registered for {kernel_type}") from exc
 
 
-def _sum_kernels(kernels: list[Kernel]) -> Kernel:
+def _sum_kernels(kernels: Sequence[Kernel]) -> Kernel:
     if not kernels:
         raise ValueError("Cannot sum an empty kernel list.")
     out = kernels[0]
@@ -584,6 +772,9 @@ def build_block_interactions(
 
 
 def build_kernel(cfg: KernelArchitectureConfig, *, batch_shape: torch.Size) -> Kernel:
+    if _supports_active_builder(cfg):
+        return build_active_covar_module(_to_active_config(cfg), batch_shape=batch_shape)
+
     block_kernels = [build_block_kernel(b, batch_shape=batch_shape) for b in cfg.blocks]
 
     if cfg.global_structure is GlobalStructure.ADDITIVE:
@@ -651,21 +842,6 @@ def make_default_kernel_architecture(
     )
 
 
-# ============================================================================
-# Kernel Composition Utilities
-# ============================================================================
-def _unwrap_scale(k: Kernel) -> Kernel:
-    """Return the bare base kernel if `k` is a ScaleKernel; else the kernel itself."""
-    return k.base_kernel if isinstance(k, ScaleKernel) else k
-
-
-def _scaled_product(k1: Kernel, k2: Kernel, *, batch_shape: torch.Size) -> Kernel:
-    """Form product terms as Scale(base1 * base2), stripping any inner scales."""
-    b1 = _unwrap_scale(k1)
-    b2 = _unwrap_scale(k2)
-    return ScaleKernel(b1 * b2, batch_shape=batch_shape)
-
-
 def _assert_unscaled_base(k: Kernel, *, ctx: str) -> None:
     """Dev-only guardrail: builders used for interaction terms must return unscaled bases."""
     if isinstance(k, ScaleKernel):
@@ -688,7 +864,7 @@ def _assert_no_inner_scales_in_products(k: Kernel, *, ctx: str = "sanity") -> No
         # Recurse into common composites
         # AdditiveKernel / ProductKernel expose `.kernels`; ScaleKernel exposes `.base_kernel`
         if hasattr(node, "kernels"):  # AdditiveKernel / ProductKernel
-            for idx, child in enumerate(node.kernels):
+            for idx, child in enumerate(cast(Any, node.kernels)):
                 _walk(child, f"{path}/kernels[{idx}]")
         elif isinstance(node, ScaleKernel):
             _walk(node.base_kernel, f"{path}/base_kernel")

@@ -1,10 +1,11 @@
 """Configuration-driven builders for BoTorch MultiTaskGP modules.
 
-This module provides a small configuration layer for constructing ``MultiTaskGP``
-mean and covariance modules with explicit prior and constraint controls.
+This module provides a configuration layer for constructing ``MultiTaskGP``
+mean and covariance modules with explicit prior, composition, and interaction
+controls.
 
 Boundary responsibility:
-- Builds ``gpytorch`` mean / kernel modules and optionally instantiates a
+- Builds ``gpytorch`` mean and kernel modules and optionally instantiates a
   ``botorch.models.multitask.MultiTaskGP``.
 - Does not perform I/O or business orchestration.
 
@@ -37,7 +38,7 @@ from gpytorch.kernels import (
 from gpytorch.likelihoods import HadamardGaussianLikelihood
 from gpytorch.means import ConstantMean, LinearMean, Mean, MultitaskMean, ZeroMean
 from gpytorch.priors import LogNormalPrior
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -72,8 +73,70 @@ class MeanKind(StrEnum):
     LINEAR = "linear"
 
 
+class KernelBlockRole(StrEnum):
+    """Semantic role of a covariance block.
+
+    Attributes:
+        GENERIC: Generic feature block with no special interaction semantics.
+        TIME: Temporal block used by policies such as ``TEMPORAL_ONLY``.
+        ETF: Asset-level feature block.
+        MACRO: Macro feature block.
+        CATEGORICAL: Categorical feature block.
+    """
+
+    GENERIC = "generic"
+    TIME = "time"
+    ETF = "etf"
+    MACRO = "macro"
+    CATEGORICAL = "categorical"
+
+
+class BlockStructure(StrEnum):
+    """How kernels inside a block are composed.
+
+    Attributes:
+        ADDITIVE: Sum component kernels inside the block.
+        PRODUCT: Multiply component kernels inside the block.
+    """
+
+    ADDITIVE = "additive"
+    PRODUCT = "product"
+
+
+class GlobalStructure(StrEnum):
+    """How blocks are combined at the top level.
+
+    Attributes:
+        ADDITIVE: Sum block kernels only.
+        HIERARCHICAL: Sum block kernels and interaction kernels.
+        NON_COMPOSITIONAL: Use a single block only.
+    """
+
+    ADDITIVE = "additive"
+    HIERARCHICAL = "hierarchical"
+    NON_COMPOSITIONAL = "non_compositional"
+
+
+class InteractionPolicy(StrEnum):
+    """Policy for auto-generated block interaction kernels.
+
+    Attributes:
+        NONE: No policy-generated interactions.
+        SPARSE: Heuristic interactions based on block roles.
+        TEMPORAL_ONLY: Interact temporal blocks with every other block.
+        FULL: All pairwise block interactions.
+        CUSTOM: Use only explicitly supplied custom interactions.
+    """
+
+    NONE = "none"
+    SPARSE = "sparse"
+    TEMPORAL_ONLY = "temporal_only"
+    FULL = "full"
+    CUSTOM = "custom"
+
+
 class LengthscalePriorConfig(BaseModel):
-    """Manual LogNormal prior / lower-bound configuration for lengthscale.
+    """Manual LogNormal prior and lower-bound configuration for lengthscale.
 
     Attributes:
         loc: LogNormal location parameter.
@@ -126,7 +189,10 @@ class BaseKernelComponentConfig(BaseModel):
     Attributes:
         kind: Base kernel type.
         dims: Active feature indices for this component, excluding task column.
-        use_outputscale: If True, wraps this component in ``ScaleKernel``.
+        use_outputscale: If True, wraps this component in ``ScaleKernel`` when
+            the component is used directly in an additive position. Product
+            compositions ignore this flag and apply scaling only once at the
+            outer product-term level.
     """
 
     kind: KernelKind
@@ -137,7 +203,17 @@ class BaseKernelComponentConfig(BaseModel):
 
 
 class MaternKernelComponentConfig(BaseKernelComponentConfig):
-    """Kernel component configuration for ``MaternKernel``."""
+    """Kernel component configuration for ``MaternKernel``.
+
+    Attributes:
+        kind: Discriminator for a Matérn kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+        ard: Whether to use ARD lengthscales.
+        matern_nu: Smoothness parameter for the Matérn kernel.
+        lengthscale_policy: Lengthscale prior and lower-bound policy.
+    """
 
     kind: Literal[KernelKind.MATERN] = KernelKind.MATERN
     ard: bool = True
@@ -146,7 +222,16 @@ class MaternKernelComponentConfig(BaseKernelComponentConfig):
 
 
 class RBFKernelComponentConfig(BaseKernelComponentConfig):
-    """Kernel component configuration for ``RBFKernel``."""
+    """Kernel component configuration for ``RBFKernel``.
+
+    Attributes:
+        kind: Discriminator for an RBF kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+        ard: Whether to use ARD lengthscales.
+        lengthscale_policy: Lengthscale prior and lower-bound policy.
+    """
 
     kind: Literal[KernelKind.RBF] = KernelKind.RBF
     ard: bool = True
@@ -154,7 +239,16 @@ class RBFKernelComponentConfig(BaseKernelComponentConfig):
 
 
 class RQKernelComponentConfig(BaseKernelComponentConfig):
-    """Kernel component configuration for ``RQKernel``."""
+    """Kernel component configuration for ``RQKernel``.
+
+    Attributes:
+        kind: Discriminator for an RQ kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+        ard: Whether to use ARD lengthscales.
+        lengthscale_policy: Lengthscale prior and lower-bound policy.
+    """
 
     kind: Literal[KernelKind.RQ] = KernelKind.RQ
     ard: bool = True
@@ -162,7 +256,17 @@ class RQKernelComponentConfig(BaseKernelComponentConfig):
 
 
 class PeriodicKernelComponentConfig(BaseKernelComponentConfig):
-    """Kernel component configuration for ``PeriodicKernel``."""
+    """Kernel component configuration for ``PeriodicKernel``.
+
+    Attributes:
+        kind: Discriminator for a periodic kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+        ard: Whether to use ARD lengthscales.
+        lengthscale_policy: Lengthscale prior and lower-bound policy.
+        period_prior: Optional prior for period length in normalized units.
+    """
 
     kind: Literal[KernelKind.PERIODIC] = KernelKind.PERIODIC
     ard: bool = True
@@ -171,7 +275,14 @@ class PeriodicKernelComponentConfig(BaseKernelComponentConfig):
 
 
 class LinearKernelComponentConfig(BaseKernelComponentConfig):
-    """Kernel component configuration for ``LinearKernel``."""
+    """Kernel component configuration for ``LinearKernel``.
+
+    Attributes:
+        kind: Discriminator for a linear kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+    """
 
     kind: Literal[KernelKind.LINEAR] = KernelKind.LINEAR
 
@@ -187,11 +298,13 @@ KernelComponentConfig = Annotated[
 
 
 class KernelTermConfig(BaseModel):
-    """A product term made from one or more kernel components.
+    """Legacy product term made from one or more kernel components.
 
     Attributes:
         components: Components multiplied together in order.
-        use_outputscale: If True, wrap final product in ``ScaleKernel``.
+        use_outputscale: If True, wrap the final product in ``ScaleKernel``.
+            When ``components`` contains multiple items, component-level
+            outputscales are ignored and the product is wrapped once here.
     """
 
     components: list[KernelComponentConfig]
@@ -200,17 +313,98 @@ class KernelTermConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class CovarModuleConfig(BaseModel):
-    """Covariance architecture as an additive sum of product terms.
+class KernelBlockConfig(BaseModel):
+    """A named covariance block used by the architecture-first builder.
 
     Attributes:
-        terms: Additive kernel terms. A term with one component is a plain
-            component; a term with multiple components builds a product kernel.
+        name: Unique block identifier used by interaction definitions.
+        variable_type: Semantic role used by interaction policies.
+        components: Kernel components combined inside this block.
+        block_structure: Whether components are added or multiplied.
+        use_outputscale: If True, wrap the whole block kernel in
+            ``ScaleKernel`` when used as a top-level additive term. When the
+            block participates in an interaction product, its unscaled base
+            kernel is used instead.
     """
 
-    terms: list[KernelTermConfig]
+    name: str
+    variable_type: KernelBlockRole = KernelBlockRole.GENERIC
+    components: list[KernelComponentConfig]
+    block_structure: BlockStructure = BlockStructure.ADDITIVE
+    use_outputscale: bool = False
 
     model_config = ConfigDict(extra="forbid")
+
+
+class KernelInteractionConfig(BaseModel):
+    """Explicit interaction term assembled from named blocks.
+
+    Attributes:
+        blocks: Ordered block names multiplied together in this interaction.
+        name: Optional human-readable interaction label.
+        use_outputscale: If True, wrap the final product interaction once in
+            ``ScaleKernel``.
+    """
+
+    blocks: list[str]
+    name: str | None = None
+    use_outputscale: bool = True
+
+    model_config = ConfigDict(extra="forbid")
+
+    @model_validator(mode="after")
+    def _validate_blocks(self) -> KernelInteractionConfig:
+        if len(self.blocks) < 2:
+            raise ValueError("interaction blocks must contain at least two block names")
+        return self
+
+
+class CovarModuleConfig(BaseModel):
+    """Covariance architecture for non-task features in ``MultiTaskGP``.
+
+    Attributes:
+        blocks: Architecture-first block definitions. Each block describes a
+            named kernel expression over one or more feature subsets.
+        global_structure: Top-level combination strategy for block kernels.
+        interaction_policy: Policy used to auto-generate block interactions
+            when ``global_structure=HIERARCHICAL``.
+        custom_interactions: Explicit interaction products between named blocks.
+            These are added in addition to policy-generated interactions unless
+            ``interaction_policy=CUSTOM``.
+        terms: Legacy additive-product terms kept temporarily for compatibility.
+            New code should prefer ``blocks``.
+    """
+
+    blocks: list[KernelBlockConfig] = Field(default_factory=list)
+    global_structure: GlobalStructure = GlobalStructure.ADDITIVE
+    interaction_policy: InteractionPolicy = InteractionPolicy.NONE
+    custom_interactions: list[KernelInteractionConfig] = Field(default_factory=list)
+    terms: list[KernelTermConfig] | None = None
+
+    model_config = ConfigDict(extra="forbid")
+
+    @model_validator(mode="after")
+    def _validate_config_shape(self) -> CovarModuleConfig:
+        has_terms = bool(self.terms)
+        has_blocks = bool(self.blocks)
+        if has_terms == has_blocks:
+            raise ValueError("Exactly one of terms or blocks must be provided")
+        if has_terms and self.custom_interactions:
+            raise ValueError("custom_interactions are only supported with blocks")
+        if has_terms and self.global_structure is not GlobalStructure.ADDITIVE:
+            raise ValueError("legacy terms only support ADDITIVE global_structure")
+        if has_terms and self.interaction_policy is not InteractionPolicy.NONE:
+            raise ValueError("legacy terms do not support interaction policies")
+        if has_blocks:
+            block_names = [block.name for block in self.blocks]
+            if len(block_names) != len(set(block_names)):
+                raise ValueError("block names must be unique")
+            known_blocks = set(block_names)
+            for interaction in self.custom_interactions:
+                missing = [name for name in interaction.blocks if name not in known_blocks]
+                if missing:
+                    raise ValueError(f"Unknown block names in interaction {interaction.blocks}: {missing}")
+        return self
 
 
 class MeanModuleConfig(BaseModel):
@@ -276,10 +470,65 @@ def _resolve_lengthscale_prior_and_constraint(
     return prior, constraint
 
 
-def _build_kernel_component(component: KernelComponentConfig, batch_shape: torch.Size = torch.Size()) -> Kernel:
+def _sum_kernels(kernels: list[Kernel]) -> Kernel:
+    if not kernels:
+        raise ValueError("Cannot sum an empty kernel list")
+    kernel_sum = kernels[0]
+    for next_kernel in kernels[1:]:
+        kernel_sum = kernel_sum + next_kernel
+    return kernel_sum
+
+
+def _unwrap_scale(kernel: Kernel) -> Kernel:
+    current = kernel
+    while isinstance(current, ScaleKernel):
+        current = current.base_kernel
+    return current
+
+
+def _assert_no_inner_scales_in_products(kernel: Kernel, *, ctx: str = "sanity") -> None:
+    """Assert that product-kernel children are not directly wrapped in ``ScaleKernel``."""
+
+    def _walk(node: Kernel, path: str) -> None:
+        if isinstance(node, ProductKernel):
+            for child in node.kernels:
+                if isinstance(child, ScaleKernel):
+                    raise RuntimeError(
+                        f"[{ctx}] Found ScaleKernel directly under ProductKernel at: {path} -> ProductKernel"
+                    )
+        kernels = getattr(node, "kernels", None)
+        if kernels is not None:
+            for index, child in enumerate(kernels):
+                _walk(child, f"{path}/kernels[{index}]")
+        elif isinstance(node, ScaleKernel):
+            _walk(node.base_kernel, f"{path}/base_kernel")
+
+    _walk(kernel, "kernel")
+
+
+def _build_product_kernel(kernels: list[Kernel], *, batch_shape: torch.Size, use_outputscale: bool) -> Kernel:
+    if not kernels:
+        raise ValueError("Cannot multiply an empty kernel list")
+
+    product = _unwrap_scale(kernels[0])
+    for next_kernel in kernels[1:]:
+        product = ProductKernel(product, _unwrap_scale(next_kernel))
+    if use_outputscale:
+        product = ScaleKernel(product, batch_shape=batch_shape)
+    _assert_no_inner_scales_in_products(product, ctx="product")
+    return product
+
+
+def _build_kernel_component(
+    component: KernelComponentConfig,
+    *,
+    batch_shape: torch.Size = torch.Size(),
+    apply_outputscale: bool | None = None,
+) -> Kernel:
     if isinstance(component, LinearKernelComponentConfig):
         kernel: Kernel = LinearKernel(active_dims=tuple(component.dims), ard_num_dims=None, batch_shape=batch_shape)
-        return ScaleKernel(kernel, batch_shape=batch_shape) if component.use_outputscale else kernel
+        should_scale = component.use_outputscale if apply_outputscale is None else apply_outputscale
+        return ScaleKernel(kernel, batch_shape=batch_shape) if should_scale else kernel
 
     ard_num_dims = len(component.dims) if component.ard else 1
     prior, constraint = _resolve_lengthscale_prior_and_constraint(
@@ -328,11 +577,152 @@ def _build_kernel_component(component: KernelComponentConfig, batch_shape: torch
     else:
         raise ValueError(f"Unsupported kernel kind: {component.kind}")
 
-    return ScaleKernel(kernel, batch_shape=batch_shape) if component.use_outputscale else kernel
+    should_scale = component.use_outputscale if apply_outputscale is None else apply_outputscale
+    return ScaleKernel(kernel, batch_shape=batch_shape) if should_scale else kernel
+
+
+def _build_legacy_covar_module(terms: list[KernelTermConfig], *, batch_shape: torch.Size) -> Kernel:
+    if not terms:
+        raise ValueError("config.terms cannot be empty")
+
+    additive_terms: list[Kernel] = []
+    for term in terms:
+        if not term.components:
+            raise ValueError("each term must have at least one component")
+        if len(term.components) == 1:
+            additive_terms.append(_build_kernel_component(term.components[0], batch_shape=batch_shape))
+            continue
+
+        built_components = [
+            _build_kernel_component(component, batch_shape=batch_shape, apply_outputscale=False)
+            for component in term.components
+        ]
+        additive_terms.append(
+            _build_product_kernel(
+                built_components,
+                batch_shape=batch_shape,
+                use_outputscale=term.use_outputscale,
+            )
+        )
+
+    return _sum_kernels(additive_terms)
+
+
+def _build_block_kernel(block: KernelBlockConfig, *, batch_shape: torch.Size, scaled: bool) -> Kernel:
+    if not block.components:
+        raise ValueError(f"block {block.name} must have at least one component")
+
+    component_kernels: list[Kernel] = []
+    for component in block.components:
+        should_scale_component = (
+            scaled and block.block_structure is BlockStructure.ADDITIVE and component.use_outputscale
+        )
+        component_kernels.append(
+            _build_kernel_component(
+                component,
+                batch_shape=batch_shape,
+                apply_outputscale=should_scale_component,
+            )
+        )
+
+    if block.block_structure is BlockStructure.PRODUCT:
+        return _build_product_kernel(
+            component_kernels,
+            batch_shape=batch_shape,
+            use_outputscale=scaled and block.use_outputscale,
+        )
+
+    block_kernel = _sum_kernels(component_kernels)
+    if scaled and block.use_outputscale:
+        block_kernel = ScaleKernel(block_kernel, batch_shape=batch_shape)
+    return block_kernel
+
+
+def _dedupe_interactions(interactions: list[KernelInteractionConfig]) -> list[KernelInteractionConfig]:
+    unique: list[KernelInteractionConfig] = []
+    seen: set[tuple[str, ...]] = set()
+    for interaction in interactions:
+        key = tuple(sorted(dict.fromkeys(interaction.blocks)))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(interaction)
+    return unique
+
+
+def _build_sparse_interactions(blocks: list[KernelBlockConfig]) -> list[KernelInteractionConfig]:
+    interactions: list[KernelInteractionConfig] = []
+    time_blocks = [block.name for block in blocks if block.variable_type is KernelBlockRole.TIME]
+    continuous_like = {
+        KernelBlockRole.GENERIC,
+        KernelBlockRole.ETF,
+        KernelBlockRole.MACRO,
+    }
+    categorical_blocks = [block.name for block in blocks if block.variable_type is KernelBlockRole.CATEGORICAL]
+
+    for time_block in time_blocks:
+        for block in blocks:
+            if block.name != time_block:
+                interactions.append(KernelInteractionConfig(blocks=[time_block, block.name]))
+
+    for categorical_block in categorical_blocks:
+        for block in blocks:
+            if block.name == categorical_block:
+                continue
+            if block.variable_type in continuous_like:
+                interactions.append(KernelInteractionConfig(blocks=[categorical_block, block.name]))
+
+    return _dedupe_interactions(interactions)
+
+
+def _build_policy_interactions(
+    blocks: list[KernelBlockConfig],
+    *,
+    policy: InteractionPolicy,
+) -> list[KernelInteractionConfig]:
+    if policy in {InteractionPolicy.NONE, InteractionPolicy.CUSTOM}:
+        return []
+
+    if policy is InteractionPolicy.FULL:
+        return [
+            KernelInteractionConfig(blocks=[blocks[left].name, blocks[right].name])
+            for left in range(len(blocks))
+            for right in range(left + 1, len(blocks))
+        ]
+
+    if policy is InteractionPolicy.TEMPORAL_ONLY:
+        time_blocks = [block.name for block in blocks if block.variable_type is KernelBlockRole.TIME]
+        interactions: list[KernelInteractionConfig] = []
+        for time_block in time_blocks:
+            for block in blocks:
+                if block.name != time_block:
+                    interactions.append(KernelInteractionConfig(blocks=[time_block, block.name]))
+        return _dedupe_interactions(interactions)
+
+    if policy is InteractionPolicy.SPARSE:
+        return _build_sparse_interactions(blocks)
+
+    raise ValueError(f"Unsupported interaction policy: {policy}")
+
+
+def _build_interaction_kernel(
+    interaction: KernelInteractionConfig,
+    *,
+    block_lookup: dict[str, KernelBlockConfig],
+    batch_shape: torch.Size,
+) -> Kernel:
+    block_kernels = [
+        _build_block_kernel(block_lookup[name], batch_shape=batch_shape, scaled=False) for name in interaction.blocks
+    ]
+    return _build_product_kernel(
+        block_kernels,
+        batch_shape=batch_shape,
+        use_outputscale=interaction.use_outputscale,
+    )
 
 
 def build_covar_module(config: CovarModuleConfig, batch_shape: torch.Size = torch.Size()) -> Kernel:
-    """Build a covariance module from additive-product kernel terms.
+    """Build a covariance module from an architecture or legacy term config.
 
     Args:
         config: Covariance configuration.
@@ -343,26 +733,30 @@ def build_covar_module(config: CovarModuleConfig, batch_shape: torch.Size = torc
         ``MultiTaskGP``.
     """
 
-    if not config.terms:
-        raise ValueError("config.terms cannot be empty")
+    if config.terms is not None:
+        return _build_legacy_covar_module(config.terms, batch_shape=batch_shape)
 
-    additive_terms: list[Kernel] = []
-    for term in config.terms:
-        if not term.components:
-            raise ValueError("each term must have at least one component")
+    if not config.blocks:
+        raise ValueError("config.blocks cannot be empty")
 
-        built_components = [_build_kernel_component(c, batch_shape=batch_shape) for c in term.components]
-        product: Kernel = built_components[0]
-        for next_kernel in built_components[1:]:
-            product = ProductKernel(product, next_kernel)
-        if term.use_outputscale:
-            product = ScaleKernel(product, batch_shape=batch_shape)
-        additive_terms.append(product)
+    block_lookup = {block.name: block for block in config.blocks}
+    block_kernels = [_build_block_kernel(block, batch_shape=batch_shape, scaled=True) for block in config.blocks]
 
-    kernel_sum = additive_terms[0]
-    for next_term in additive_terms[1:]:
-        kernel_sum = kernel_sum + next_term
-    return kernel_sum
+    if config.global_structure is GlobalStructure.NON_COMPOSITIONAL:
+        if len(block_kernels) != 1:
+            raise ValueError("NON_COMPOSITIONAL structure requires exactly one block")
+        return block_kernels[0]
+
+    if config.global_structure is GlobalStructure.ADDITIVE:
+        return _sum_kernels(block_kernels)
+
+    interactions = _build_policy_interactions(config.blocks, policy=config.interaction_policy)
+    interactions.extend(config.custom_interactions)
+    interaction_kernels = [
+        _build_interaction_kernel(interaction, block_lookup=block_lookup, batch_shape=batch_shape)
+        for interaction in _dedupe_interactions(interactions)
+    ]
+    return _sum_kernels(block_kernels + interaction_kernels)
 
 
 def build_mean_module(config: MeanModuleConfig) -> Mean:
@@ -409,19 +803,21 @@ def default_covar_config_for_non_task_dims(
     *,
     policy: LengthscalePolicy = LengthscalePolicy.BOTORCH_STANDARD,
 ) -> CovarModuleConfig:
-    """Create a default one-term Matern covariance over non-task dimensions.
+    """Create a default one-block Matérn covariance over non-task dimensions.
 
     Args:
         non_task_dims: Non-task feature indices.
-        policy: Lengthscale prior/constraint policy.
+        policy: Lengthscale prior and constraint policy.
 
     Returns:
-        CovarModuleConfig with one Matern component.
+        CovarModuleConfig with one generic block.
     """
 
     return CovarModuleConfig(
-        terms=[
-            KernelTermConfig(
+        blocks=[
+            KernelBlockConfig(
+                name="features",
+                variable_type=KernelBlockRole.GENERIC,
                 components=[
                     MaternKernelComponentConfig(
                         dims=list(non_task_dims),
@@ -430,7 +826,9 @@ def default_covar_config_for_non_task_dims(
                         use_outputscale=True,
                         lengthscale_policy=LengthscalePolicyConfig(policy=policy),
                     )
-                ]
+                ],
+                block_structure=BlockStructure.ADDITIVE,
+                use_outputscale=False,
             )
         ]
     )
@@ -453,15 +851,16 @@ def build_multitask_gp(
 
     Args:
         train_X: Training design matrix including task feature column.
-        train_Y: Training targets, shape ``n x 1`` (or batch equivalent).
+        train_Y: Training targets, shape ``n x 1`` or batch equivalent.
         task_feature: Index of task feature column in ``train_X``.
         covar_config: Optional covariance configuration. If ``None``, uses one
-            Matern term over non-task dimensions with BoTorch-standard priors.
+            generic Matérn block over non-task dimensions with BoTorch-standard
+            priors.
         mean_config: Optional mean configuration. If ``None``, uses
             ``MULTITASK_CONSTANT``.
         rank: Task covariance rank.
-        min_inferred_noise_level: Optional minimum inferred noise floor for
-            the multitask likelihood. If ``None``, uses BoTorch defaults.
+        min_inferred_noise_level: Optional minimum inferred noise floor for the
+            multitask likelihood. If ``None``, uses BoTorch defaults.
         outcome_transform: Optional BoTorch outcome transform.
         input_transform: Optional BoTorch input transform.
         validate_task_values: Whether ``MultiTaskGP`` validates task values.
@@ -514,19 +913,25 @@ def build_multitask_gp(
 
 
 __all__ = [
+    "BlockStructure",
     "CovarModuleConfig",
-    "LinearKernelComponentConfig",
+    "GlobalStructure",
+    "InteractionPolicy",
+    "KernelBlockConfig",
+    "KernelBlockRole",
     "KernelComponentConfig",
+    "KernelInteractionConfig",
     "KernelKind",
     "KernelTermConfig",
     "LengthscalePolicy",
     "LengthscalePolicyConfig",
     "LengthscalePriorConfig",
+    "LinearKernelComponentConfig",
+    "MaternKernelComponentConfig",
     "MeanKind",
     "MeanModuleConfig",
-    "MaternKernelComponentConfig",
-    "PeriodLengthPriorConfig",
     "PeriodicKernelComponentConfig",
+    "PeriodLengthPriorConfig",
     "RBFKernelComponentConfig",
     "RQKernelComponentConfig",
     "build_covar_module",
