@@ -19,6 +19,8 @@ or public entry points change.
 - `contracts/results/`: execution outputs (result contracts)
 - `contracts/ui/`: UI-facing data shapes
 - `contracts/chat/`: chat intent and tool protocol schemas (`ChatMessage*`, `ChatTool*`, `ChatTurn`)
+- `contracts/commands/gp_planner.py`: planner request contract for structured multitask GP design selection
+- `contracts/results/gp_workflow.py`: planner response and planner-driven GP workflow execution results
 
 ### Agent Boundary (Phase 1)
 
@@ -49,6 +51,7 @@ should be translated at adapters/orchestrators, not leaked into contracts.
 - Feature workflow: `engine.features.build_features_dataset`
 - Feature provider factory: `engine.features.make_default_feature_providers`
 - GP interpretation helpers: `engine.forecast.build_gp_interpretation_report`, `engine.forecast.render_gp_interpretation_report`
+- Planner-driven GP workflow: `engine.forecast.run_planned_multitask_gp_workflow`
 - IO dataset persistence: `io.ParquetArtifactStore`
 - IO providers: `io.EtfFeaturesProvider`, `io.MacroProvider`, `io.ReturnsProvider`
 - IO fingerprint helpers: `io.sha256_digest`, `io.sha256_fingerprint`

@@ -64,6 +64,9 @@ class SchemaName(str, enum.Enum):
     SCENARIO_COMMAND = "bayesfolio.scenario.command"
     FEATURES_DATASET_COMMAND = "bayesfolio.features_dataset.command"
     FEATURES_DATASET_RESULT = "bayesfolio.features_dataset.result"
+    GP_PLANNER_COMMAND = "bayesfolio.gp_planner.command"
+    GP_PLANNER_RESULT = "bayesfolio.gp_planner.result"
+    GP_WORKFLOW_RESULT = "bayesfolio.gp_workflow.result"
 
 
 class ContractModel(BaseModel):
