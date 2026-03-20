@@ -51,6 +51,8 @@ class PlannedGPWorkflowOptions:
     Attributes:
         planner_prompt: System prompt supplied to the planner client.
         planner_timeout_seconds: HTTP timeout for the planner call.
+        require_live_planner: If True, fail fast unless planner status is
+            ``ok`` from a live endpoint response.
         dtype: Torch dtype for tensor creation.
         rank: Multitask rank passed to ``build_multitask_gp``.
         min_inferred_noise_level: Initial minimum inferred noise floor.
@@ -60,11 +62,64 @@ class PlannedGPWorkflowOptions:
 
     planner_prompt: str = DEFAULT_GP_PLANNER_PROMPT
     planner_timeout_seconds: float = 20.0
+    require_live_planner: bool = False
     dtype: torch.dtype = torch.float64
     rank: int | None = 1
     min_inferred_noise_level: float = 5e-3
     max_repair_steps: int = 8
     seed: int | None = None
+
+
+def run_planned_multitask_gp_from_dataframe(
+    *,
+    df: pd.DataFrame,
+    input_columns: list[str],
+    output_columns: list[str],
+    instruction_text: str,
+    feature_groups: dict[str, list[str]] | None = None,
+    options: PlannedGPWorkflowOptions | None = None,
+) -> PlannedMultitaskGPArtifacts:
+    """Run planner-driven multitask GP directly from input/output column lists.
+
+    Args:
+        df: Input dataframe with all modeling columns.
+        input_columns: Ordered usable non-task feature columns.
+        output_columns: Two-column list in order ``[target_column,
+            task_column]``.
+        instruction_text: Free-form GP instruction text and prior beliefs.
+        feature_groups: Optional semantic feature-group mapping. When omitted,
+            a single ``inputs`` group is built from ``input_columns``.
+        options: Optional workflow runtime options.
+
+    Returns:
+        Engine-facing planner-driven GP artifacts.
+
+    Raises:
+        ValueError: If required columns are missing or output columns do not
+            contain exactly ``[target_column, task_column]``.
+    """
+
+    if len(output_columns) != 2:
+        raise ValueError("output_columns must contain exactly [target_column, task_column]")
+
+    target_column, task_column = output_columns
+    required_columns = [*input_columns, target_column, task_column]
+    missing = [name for name in required_columns if name not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required dataframe columns: {missing}")
+
+    deduped_inputs = list(dict.fromkeys(input_columns))
+    resolved_groups = feature_groups if feature_groups is not None else {"inputs": deduped_inputs}
+
+    return run_planned_multitask_gp_workflow(
+        df=df,
+        target_column=target_column,
+        task_column=task_column,
+        feature_groups=resolved_groups,
+        allowed_feature_columns=deduped_inputs,
+        instruction_text=instruction_text,
+        options=options,
+    )
 
 
 @dataclass(frozen=True)
@@ -154,6 +209,8 @@ def run_planned_multitask_gp_workflow(
         request=planner_request,
         timeout_seconds=runtime_options.planner_timeout_seconds,
     )
+    if runtime_options.require_live_planner and planner_client_status != "ok":
+        raise RuntimeError(f"Live planner was required but unavailable. Planner status: {planner_client_status}.")
 
     compiled = compile_planner_response(
         planner_response,

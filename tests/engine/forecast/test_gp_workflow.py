@@ -6,7 +6,11 @@ import pandas as pd
 import pytest
 import torch
 
-from bayesfolio.engine.forecast.gp.workflow import run_planned_multitask_gp_workflow
+from bayesfolio.engine.forecast.gp.workflow import (
+    PlannedGPWorkflowOptions,
+    run_planned_multitask_gp_from_dataframe,
+    run_planned_multitask_gp_workflow,
+)
 
 
 def _make_workflow_df() -> pd.DataFrame:
@@ -100,4 +104,32 @@ def test_run_planned_multitask_gp_workflow_rejects_null_task_values() -> None:
             task_column="asset_id",
             feature_groups={"macro": ["macro_1", "macro_2"], "etf": ["etf_1"]},
             instruction_text="Use a matern kernel with ard for all input variables",
+        )
+
+
+def test_run_planned_multitask_gp_from_dataframe_smoke(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    artifacts = run_planned_multitask_gp_from_dataframe(
+        df=_make_workflow_df(),
+        input_columns=["macro_1", "macro_2", "etf_1"],
+        output_columns=["y_excess_lead", "asset_id"],
+        instruction_text="Use a matern kernel with ard for all input variables",
+    )
+
+    assert artifacts.result.final_status == "ok"
+    assert artifacts.result.fit_validation.fit_success is True
+
+
+def test_run_planned_multitask_gp_workflow_requires_live_planner(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    with pytest.raises(RuntimeError, match="Live planner was required"):
+        run_planned_multitask_gp_workflow(
+            df=_make_workflow_df(),
+            target_column="y_excess_lead",
+            task_column="asset_id",
+            feature_groups={"macro": ["macro_1", "macro_2"], "etf": ["etf_1"]},
+            instruction_text="Use a matern kernel with ard for all input variables",
+            options=PlannedGPWorkflowOptions(require_live_planner=True),
         )

@@ -51,7 +51,7 @@ should be translated at adapters/orchestrators, not leaked into contracts.
 - Feature workflow: `engine.features.build_features_dataset`
 - Feature provider factory: `engine.features.make_default_feature_providers`
 - GP interpretation helpers: `engine.forecast.build_gp_interpretation_report`, `engine.forecast.render_gp_interpretation_report`
-- Planner-driven GP workflow: `engine.forecast.run_planned_multitask_gp_workflow`
+- Planner-driven GP workflow: `engine.forecast.run_planned_multitask_gp_workflow`, `engine.forecast.run_planned_multitask_gp_from_dataframe`
 - IO dataset persistence: `io.ParquetArtifactStore`
 - IO providers: `io.EtfFeaturesProvider`, `io.MacroProvider`, `io.ReturnsProvider`
 - IO fingerprint helpers: `io.sha256_digest`, `io.sha256_fingerprint`
