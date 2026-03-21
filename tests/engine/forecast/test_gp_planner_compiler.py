@@ -91,6 +91,18 @@ def test_compile_planner_response_enforces_block_specific_matern_nu() -> None:
     assert blocks["etf"].components[0].matern_nu == 0.5
 
 
+def test_compile_planner_response_enforces_matern_three_halves_token() -> None:
+    compiled = compile_planner_response(
+        _make_response(),
+        feature_columns=["macro_1", "etf_1"],
+        feature_groups={"macro": ["macro_1"], "etf": ["etf_1"]},
+        instruction_text="Use matern 1.5 on macro",
+    )
+
+    blocks = {block.name: block for block in compiled.covar_config.blocks}
+    assert blocks["macro"].components[0].matern_nu == 1.5
+
+
 def test_compile_planner_response_enforces_linear_plus_matern_on_macro() -> None:
     compiled = compile_planner_response(
         _make_response(),

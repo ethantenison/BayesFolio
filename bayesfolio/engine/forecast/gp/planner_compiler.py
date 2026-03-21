@@ -191,7 +191,7 @@ def parse_explicit_instructions(instruction_text: str) -> ExplicitInstructionCon
         trace.append("Explicit interaction constraint recognized: no interactions.")
 
     all_inputs_match = re.search(
-        r"use (?:a |an )?matern(?: kernel)?(?:\s+(5/2|1/2|2\.5|0\.5))?(?: with ard)? for all input variables",
+        r"use (?:a |an )?matern(?: kernel)?(?:\s+(5/2|3/2|1/2|2\.5|1\.5|0\.5))?(?: with ard)? for all input variables",
         lowered,
     )
     if all_inputs_match:
@@ -247,7 +247,10 @@ def parse_explicit_instructions(instruction_text: str) -> ExplicitInstructionCon
         )
         trace.append(f"Explicit block kernel combo recognized on {block_name}.")
 
-    for nu_text, block_name in re.findall(r"matern(?: kernel)?\s*(5/2|1/2|2\.5|0\.5)? on (macro|etf|time)", lowered):
+    for nu_text, block_name in re.findall(
+        r"matern(?: kernel)?\s*(5/2|3/2|1/2|2\.5|1\.5|0\.5)? on (macro|etf|time)",
+        lowered,
+    ):
         existing_override = block_overrides.get(block_name)
         if existing_override is not None and len(existing_override.components) > 1:
             continue
@@ -493,6 +496,8 @@ def _parse_matern_nu(raw_value: str | None) -> float:
 
     if raw_value in {None, "", "5/2", "2.5"}:
         return 2.5
+    if raw_value in {"3/2", "1.5"}:
+        return 1.5
     if raw_value in {"1/2", "0.5"}:
         return 0.5
     return float(raw_value)
