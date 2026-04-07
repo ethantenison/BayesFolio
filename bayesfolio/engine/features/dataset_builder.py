@@ -41,6 +41,7 @@ class ReturnsProviderProtocol(Protocol):
         start: str,
         end: str,
         horizon: Horizon,
+        include_unlabeled_tail: bool = False,
     ) -> pd.DataFrame: ...
 
 
@@ -117,6 +118,7 @@ def build_features_dataset(
         start=command.lookback_date.isoformat(),
         end=command.end_date.isoformat(),
         horizon=command.horizon,
+        include_unlabeled_tail=command.include_unlabeled_tail,
     )
     macro_frame = providers.macro_provider.get_macro_features(
         start=command.lookback_date.isoformat(),
@@ -164,7 +166,10 @@ def build_features_dataset(
     target_missing_rate_before_drop = (
         float(merged_window["y_excess_lead"].isna().mean()) if not merged_window.empty else 0.0
     )
-    merged = merged_window.dropna(subset=["y_excess_lead"]).reset_index(drop=True)
+    if not command.include_unlabeled_tail:
+        merged = merged_window.dropna(subset=["y_excess_lead"]).reset_index(drop=True)
+    else:
+        merged = merged_window.reset_index(drop=True)
 
     lag_cols = ["lag_y_excess_lead", "lag2_y_excess_lead"]
     output_cols = [

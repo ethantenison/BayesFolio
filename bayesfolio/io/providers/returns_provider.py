@@ -55,6 +55,7 @@ class ReturnsProvider:
         start: str,
         end: str,
         horizon: Horizon,
+        include_unlabeled_tail: bool = False,
     ) -> pd.DataFrame:
         """Fetch long-format target labels in decimal units.
 
@@ -63,6 +64,9 @@ class ReturnsProvider:
             start: Inclusive start date in ISO format.
             end: Inclusive end date in ISO format.
             horizon: Frequency code (for example ``BME``).
+            include_unlabeled_tail: If True, preserve the final period with NaN
+                returns for forecasting workflows. Defaults to False (drops
+                unlabeled tail for training).
 
         Returns:
             DataFrame with columns ``date``, ``asset_id``, ``y_excess_lead``
@@ -79,7 +83,13 @@ class ReturnsProvider:
         normalized_tickers = [str(ticker).upper() for ticker in tickers]
         if self._cache_dir is None:
             logger.info("Fetching return labels for %d tickers from %s to %s.", len(tickers), start, end)
-            return self._call_fetcher(tickers=normalized_tickers, start=start, end=end, horizon=horizon)
+            return self._call_fetcher(
+                tickers=normalized_tickers,
+                start=start,
+                end=end,
+                horizon=horizon,
+                include_unlabeled_tail=include_unlabeled_tail,
+            )
 
         cache_frame = self._read_cache_frame(horizon)
         requested_cached = slice_requested(
@@ -110,7 +120,13 @@ class ReturnsProvider:
             len(normalized_tickers),
             len(missing_ticker_values),
         )
-        fetched = self._call_fetcher(tickers=missing_ticker_values, start=start, end=end, horizon=horizon)
+        fetched = self._call_fetcher(
+            tickers=missing_ticker_values,
+            start=start,
+            end=end,
+            horizon=horizon,
+            include_unlabeled_tail=include_unlabeled_tail,
+        )
         merged_request = concat_frames(requested_cached, fetched)
         merged_request = dedupe_rows(merged_request, subset=["date", "asset_id"], sort_by=["date", "asset_id"])
         merged_request = slice_requested(
@@ -135,11 +151,21 @@ class ReturnsProvider:
         start: str,
         end: str,
         horizon: Horizon,
+        include_unlabeled_tail: bool = False,
     ) -> pd.DataFrame:
         try:
-            frame = self._fetcher(tickers=tickers, start=start, end=end, horizon=horizon)
+            frame = self._fetcher(
+                tickers=tickers,
+                start=start,
+                end=end,
+                horizon=horizon,
+                include_unlabeled_tail=include_unlabeled_tail,
+            )
         except TypeError:
-            frame = self._fetcher(tickers, start, end, horizon)
+            try:
+                frame = self._fetcher(tickers, start, end, horizon, include_unlabeled_tail)
+            except TypeError:
+                frame = self._fetcher(tickers, start, end, horizon)
 
         required = {"date", "asset_id", "y_excess_lead"}
         missing = required - set(frame.columns)

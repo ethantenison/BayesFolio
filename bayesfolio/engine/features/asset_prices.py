@@ -212,12 +212,22 @@ def fetch_rf_daily(start, end=None, interval: Interval = Interval.DAILY):
 
 
 def compute_excess_future_return_calendar(
-    adj_close: pd.Series, rf_daily_cont: pd.Series, horizon: Horizon = Horizon.MONTHLY
+    adj_close: pd.Series,
+    rf_daily_cont: pd.Series,
+    horizon: Horizon = Horizon.MONTHLY,
+    include_unlabeled_tail: bool = False,
 ):
     """
     Calendar-aligned future excess return for one asset.
     y_excess = exp( log(P_{t1}) - log(P_t) - ∑_{(t,t1]} rf_daily_cont ) - 1
     Returns a Series indexed by the start-of-period date t.
+
+    Args:
+        adj_close: Series of adjusted closing prices.
+        rf_daily_cont: Series of risk-free daily continuous rates.
+        horizon: Calendar frequency (e.g., MONTHLY).
+        include_unlabeled_tail: If True, preserve the final period with NaN
+            returns when forward price is unavailable. Defaults to False.
     """
     # Resample to period-end closes
     px_period = adj_close.resample(horizon).last().dropna()
@@ -228,13 +238,23 @@ def compute_excess_future_return_calendar(
     log_r_price = pd.Series(
         np.log(px_fwd.to_numpy(dtype=float)) - np.log(px_period.to_numpy(dtype=float)),
         index=px_period.index,
-    ).iloc[:-1]
+    )
+
+    # If not including unlabeled tail, drop the final period (which has NaN forward price)
+    if not include_unlabeled_tail:
+        log_r_price = log_r_price.iloc[:-1]
 
     # Integrate RF over (t, t1] by summing continuous daily rates
+    # Only compute RF for periods that have valid t+1, i.e., exclude the last period
     rf_log = []
     for t, t1 in zip(period_end[:-1], period_end[1:]):
         days = rf_daily_cont.loc[(rf_daily_cont.index > t) & (rf_daily_cont.index <= t1)]
         rf_log.append(days.sum() if not days.empty else 0.0)
+
+    # If including unlabeled tail, append NaN for final period (no forward RF)
+    if include_unlabeled_tail:
+        rf_log.append(np.nan)
+
     rf_log = pd.Series(rf_log, index=log_r_price.index)
 
     # Use numpy arrays to avoid dtype gotchas, then rebuild Series
@@ -244,7 +264,13 @@ def compute_excess_future_return_calendar(
     return y_excess
 
 
-def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHLY):
+def build_long_panel(
+    tickers,
+    start,
+    end=None,
+    horizon: Horizon = Horizon.MONTHLY,
+    include_unlabeled_tail: bool = False,
+):
     """Build long-format excess-return labels for a ticker universe.
 
     Args:
@@ -252,11 +278,15 @@ def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHL
         start: Inclusive start date in ISO format.
         end: Optional inclusive end date in ISO format.
         horizon: Forecast horizon/calendar frequency (for example ``BME``).
+        include_unlabeled_tail: If True, preserve the final period with NaN
+            returns for forecasting workflows. Defaults to False (drops
+            unlabeled tail for training).
 
     Returns:
         Long-format dataframe with columns ``date``, ``asset_id``, and
         ``y_excess_lead`` where return values are decimal units
-        (``0.02`` means ``2%``).
+        (``0.02`` means ``2%``). When include_unlabeled_tail is True,
+        the final period will have NaN y_excess_lead.
     """
 
     prices = fetch_prices(tickers, start, end)
@@ -264,7 +294,9 @@ def build_long_panel(tickers, start, end=None, horizon: Horizon = Horizon.MONTHL
 
     # Choose calendar frequency
     def compute_fn(s):
-        return compute_excess_future_return_calendar(s, rf_daily_cont, horizon=horizon)
+        return compute_excess_future_return_calendar(
+            s, rf_daily_cont, horizon=horizon, include_unlabeled_tail=include_unlabeled_tail
+        )
 
     rows = []
     for tk in prices.columns:
