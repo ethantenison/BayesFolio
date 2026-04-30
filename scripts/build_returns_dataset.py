@@ -73,23 +73,23 @@ from bayesfolio.io import (
 
 ETF_TICKERS: list[str] = [
     "SPY",  # total US market large cap
-    # "MGK",  # US growth
+    "MGK",  # US growth
     "VTV",  # US value
     "IJR",  # US small cap (S&P 600)
-    # "IWM",  # US small cap (Russell)
-    # "VNQ",  # US REIT
-    # "VNQI",  # international REIT
-    # $"VEA",  # developed international equity
-    # "VWO",  # emerging market equity
-    # "VSS",  # foreign small/mid cap
-    # "BND",  # total US bond market
-    # "IEF",  # 7-10 yr treasury
-    # "BNDX",  # total international bond (USD hedged)
-    # "LQD",  # investment grade corporate bonds
-    # "HYG",  # high yield bonds
-    # "EWX",  # emerging market small cap
-    # "VWOB",  # emerging market government bonds
-    # "HYEM",  # emerging market high yield corporate bonds
+    "IWM",  # US small cap (Russell)
+    "VNQ",  # US REIT
+    "VNQI",  # international REIT
+    "VEA",  # developed international equity
+    "VWO",  # emerging market equity
+    "VSS",  # foreign small/mid cap
+    "BND",  # total US bond market
+    "IEF",  # 7-10 yr treasury
+    "BNDX",  # total international bond (USD hedged)
+    "LQD",  # investment grade corporate bonds
+    "HYG",  # high yield bonds
+    "EWX",  # emerging market small cap
+    "VWOB",  # emerging market government bonds
+    "HYEM",  # emerging market high yield corporate bonds
 ]
 
 # Assets to exclude from the portfolio universe.
@@ -97,9 +97,9 @@ ETF_TICKERS: list[str] = [
 DROP_ASSETS: list[str] = []
 
 # Date range
-LOOKBACK_DATE = date(2019, 7, 1)  # Earliest history for feature engineering
-START_DATE = date(2021, 11, 29)  # First row in the output panel
-END_DATE = date(2026, 2, 28)  # Last row in the output panel
+LOOKBACK_DATE = date(2019, 10, 1)  # Earliest history for feature engineering
+START_DATE = date(2021, 3, 1)  # First row in the output panel
+END_DATE = date(2026, 4, 30)  # Last row in the output panel
 
 # ---------------------------------------------------------------------------
 # Column selection
@@ -548,14 +548,14 @@ def render_mermaid_in_notebook(mermaid_markup: str) -> None:
 
 # if __name__ == "__main__":
 # --- Quick returns-only path (wide format; good for riskfolio / benchmarks) ---
-# print("Fetching returns (wide format)...")
-# returns_wide = build_returns_wide(
-#     tickers=ETF_TICKERS,
-#     start=LOOKBACK_DATE,
-#     end=END_DATE,
-# )
-# print(f"returns_wide shape: {returns_wide.shape}")
-# print(returns_wide.tail())
+print("Fetching returns (wide format)...")
+returns_wide = build_returns_wide(
+    tickers=ETF_TICKERS,
+    start=LOOKBACK_DATE,
+    end=END_DATE,
+)
+print(f"returns_wide shape: {returns_wide.shape}")
+print(returns_wide.tail())
 
 # --- Full feature panel (needed for GP modelling) ---
 print("\nBuilding full feature panel...")
@@ -593,7 +593,7 @@ X, y, task_map = prepare_multitask_gp_data_with_task_feature(
     target_col="y_excess_lead",
     asset_col="asset_id",
     drop_cols=["date"],
-    dtype=torch.float64,
+    dtype=torch.float32,
 )
 
 feature_columns = get_gp_feature_columns(
@@ -753,7 +753,7 @@ model = build_multitask_gp(
     min_inferred_noise_level=GP_MIN_INFERRED_NOISE_LEVEL,
     outcome_transform=outcome_transform,
     input_transform=None,
-    rank=1,
+    rank=3,
 )
 
 kernel_expression = build_kernel_expression(
