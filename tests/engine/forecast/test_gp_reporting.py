@@ -18,6 +18,7 @@ from bayesfolio.engine.forecast import (
 from bayesfolio.engine.forecast.gp.reporting import (
     GPInterpretationReport,
     RenderedGPInterpretationReport,
+    _build_feature_summary,
     _describe_kernel_component,
 )
 
@@ -63,6 +64,7 @@ def test_build_gp_interpretation_report_reports_single_task_lengthscales_in_mode
 
     assert by_feature.loc["feature_a", "lengthscale_model_units"] == pytest.approx(0.25)
     assert by_feature.loc["feature_b", "lengthscale_model_units"] == pytest.approx(0.50)
+    assert by_feature.loc["feature_a", "kernel_scope"] == "feature_a, feature_b"
     assert "scaling_note" not in feature_summary.columns
 
 
@@ -177,12 +179,227 @@ def test_render_gp_interpretation_report_returns_tables_and_heatmap() -> None:
     assert "GP Interpretation Summary" in rendered["summary_markdown"]
     assert hasattr(rendered["summary_display"], "_repr_markdown_") or isinstance(rendered["summary_display"], str)
     assert rendered["feature_summary"].shape[0] == 1
-    assert list(rendered["feature_summary"].columns) == ["feature", "kernel_type", "lengthscale_model_units"]
+    assert list(rendered["feature_summary"].columns) == [
+        "feature",
+        "kernel_scope",
+        "kernel_type",
+        "lengthscale_model_units",
+    ]
+    assert rendered["feature_summary"].loc[0, "kernel_scope"] == "feature_a"
     assert rendered["task_summary"] is not None
     assert rendered["task_covariance"] is not None
     assert rendered["task_correlation_figure"] is not None
     figure = cast(Any, rendered["task_correlation_figure"])
     assert figure.layout.to_plotly_json()["title"]["text"] == "Task Correlation"
+
+
+def test_build_feature_summary_uses_product_scope_labels_from_feature_blocks() -> None:
+    kernel_components: list[dict[str, object]] = [
+        {
+            "kernel_path": "covar_module.kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [0],
+            "lengthscale_model_units": [0.2],
+        },
+        {
+            "kernel_path": "covar_module.kernels[1]",
+            "kernel_type": "ProductKernel",
+            "feature_dims": [0, 1],
+            "lengthscale_model_units": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[1].kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [0],
+            "lengthscale_model_units": [0.3],
+        },
+        {
+            "kernel_path": "covar_module.kernels[1].kernels[1]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [1],
+            "lengthscale_model_units": [0.4],
+        },
+        {
+            "kernel_path": "covar_module.kernels[2]",
+            "kernel_type": "ProductKernel",
+            "feature_dims": [0, 2],
+            "lengthscale_model_units": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[2].kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [0],
+            "lengthscale_model_units": [0.5],
+        },
+        {
+            "kernel_path": "covar_module.kernels[2].kernels[1]",
+            "kernel_type": "RQKernel",
+            "feature_dims": [2],
+            "lengthscale_model_units": [0.6],
+        },
+    ]
+
+    feature_summary = _build_feature_summary(
+        kernel_components=kernel_components,
+        feature_name_by_dim={0: "t_index", 1: "lag_y_excess_lead", 2: "vix"},
+        feature_blocks={
+            "time": ["t_index"],
+            "etf": ["lag_y_excess_lead"],
+            "macro": ["vix"],
+        },
+    )
+
+    scope_by_path = feature_summary.set_index("kernel_path")["kernel_scope"]
+
+    assert scope_by_path.loc["covar_module.kernels[0]"] == "time"
+    assert scope_by_path.loc["covar_module.kernels[1].kernels[0]"] == "product of time and etf"
+    assert scope_by_path.loc["covar_module.kernels[1].kernels[1]"] == "product of time and etf"
+    assert scope_by_path.loc["covar_module.kernels[2].kernels[0]"] == "product of time and macro"
+    assert scope_by_path.loc["covar_module.kernels[2].kernels[1]"] == "product of time and macro"
+
+
+def test_build_feature_summary_uses_outermost_product_scope_for_nested_products() -> None:
+    kernel_components: list[dict[str, object]] = [
+        {
+            "kernel_path": "covar_module.kernels[0]",
+            "kernel_type": "ProductKernel",
+            "feature_dims": [0, 1, 2],
+            "lengthscale_model_units": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [0],
+            "lengthscale_model_units": [0.2],
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[1]",
+            "kernel_type": "ProductKernel",
+            "feature_dims": [1, 2],
+            "lengthscale_model_units": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[1].kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [1],
+            "lengthscale_model_units": [0.3],
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[1].kernels[1]",
+            "kernel_type": "RQKernel",
+            "feature_dims": [2],
+            "lengthscale_model_units": [0.4],
+        },
+    ]
+
+    feature_summary = _build_feature_summary(
+        kernel_components=kernel_components,
+        feature_name_by_dim={0: "t_index", 1: "lag_y_excess_lead", 2: "y10_real_proxy"},
+        feature_blocks={
+            "time": ["t_index"],
+            "etf": ["lag_y_excess_lead"],
+            "macro": ["y10_real_proxy"],
+        },
+    )
+
+    scope_by_path = feature_summary.set_index("kernel_path")["kernel_scope"]
+
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[0]"] == "product of time and etf and macro"
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[1].kernels[0]"] == "product of time and etf and macro"
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[1].kernels[1]"] == "product of time and etf and macro"
+
+
+def test_build_feature_summary_ignores_top_level_data_task_product_scope() -> None:
+    kernel_components: list[dict[str, object]] = [
+        {
+            "kernel_path": "covar_module",
+            "kernel_type": "ProductKernel",
+            "feature_dims": [0, 1, 2],
+            "lengthscale_model_units": None,
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0]",
+            "kernel_type": "AdditiveKernel",
+            "feature_dims": [0, 1, 2],
+            "lengthscale_model_units": None,
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [0],
+            "lengthscale_model_units": [0.2],
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[1]",
+            "kernel_type": "ProductKernel",
+            "feature_dims": [0, 1],
+            "lengthscale_model_units": None,
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[1].kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [0],
+            "lengthscale_model_units": [0.3],
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[1].kernels[1]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [1],
+            "lengthscale_model_units": [0.4],
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[2]",
+            "kernel_type": "ProductKernel",
+            "feature_dims": [0, 2],
+            "lengthscale_model_units": None,
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[2].kernels[0]",
+            "kernel_type": "MaternKernel",
+            "feature_dims": [0],
+            "lengthscale_model_units": [0.5],
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[0].kernels[2].kernels[1]",
+            "kernel_type": "RQKernel",
+            "feature_dims": [2],
+            "lengthscale_model_units": [0.6],
+            "num_tasks": None,
+        },
+        {
+            "kernel_path": "covar_module.kernels[1]",
+            "kernel_type": "IndexKernel",
+            "feature_dims": [],
+            "lengthscale_model_units": None,
+            "num_tasks": 3,
+        },
+    ]
+
+    feature_summary = _build_feature_summary(
+        kernel_components=kernel_components,
+        feature_name_by_dim={0: "t_index", 1: "lag_y_excess_lead", 2: "y10_real_proxy"},
+        feature_blocks={
+            "time": ["t_index"],
+            "etf": ["lag_y_excess_lead"],
+            "macro": ["y10_real_proxy"],
+        },
+    )
+
+    scope_by_path = feature_summary.set_index("kernel_path")["kernel_scope"]
+
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[0]"] == "time"
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[1].kernels[0]"] == "product of time and etf"
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[1].kernels[1]"] == "product of time and etf"
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[2].kernels[0]"] == "product of time and macro"
+    assert scope_by_path.loc["covar_module.kernels[0].kernels[2].kernels[1]"] == "product of time and macro"
 
 
 def test_display_gp_interpretation_report_calls_ipython_display(monkeypatch: pytest.MonkeyPatch) -> None:

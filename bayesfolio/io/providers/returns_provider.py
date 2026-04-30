@@ -7,6 +7,7 @@ Returns are expressed in decimal units (0.02 means 2%).
 
 from __future__ import annotations
 
+import inspect
 import logging
 from collections.abc import Callable
 from pathlib import Path
@@ -55,6 +56,7 @@ class ReturnsProvider:
         start: str,
         end: str,
         horizon: Horizon,
+        include_unlabeled_tail: bool = False,
     ) -> pd.DataFrame:
         """Fetch long-format target labels in decimal units.
 
@@ -63,6 +65,9 @@ class ReturnsProvider:
             start: Inclusive start date in ISO format.
             end: Inclusive end date in ISO format.
             horizon: Frequency code (for example ``BME``).
+            include_unlabeled_tail: If True, preserve the final period with NaN
+                returns for forecasting workflows. Defaults to False (drops
+                unlabeled tail for training).
 
         Returns:
             DataFrame with columns ``date``, ``asset_id``, ``y_excess_lead``
@@ -79,7 +84,13 @@ class ReturnsProvider:
         normalized_tickers = [str(ticker).upper() for ticker in tickers]
         if self._cache_dir is None:
             logger.info("Fetching return labels for %d tickers from %s to %s.", len(tickers), start, end)
-            return self._call_fetcher(tickers=normalized_tickers, start=start, end=end, horizon=horizon)
+            return self._call_fetcher(
+                tickers=normalized_tickers,
+                start=start,
+                end=end,
+                horizon=horizon,
+                include_unlabeled_tail=include_unlabeled_tail,
+            )
 
         cache_frame = self._read_cache_frame(horizon)
         requested_cached = slice_requested(
@@ -110,7 +121,13 @@ class ReturnsProvider:
             len(normalized_tickers),
             len(missing_ticker_values),
         )
-        fetched = self._call_fetcher(tickers=missing_ticker_values, start=start, end=end, horizon=horizon)
+        fetched = self._call_fetcher(
+            tickers=missing_ticker_values,
+            start=start,
+            end=end,
+            horizon=horizon,
+            include_unlabeled_tail=include_unlabeled_tail,
+        )
         merged_request = concat_frames(requested_cached, fetched)
         merged_request = dedupe_rows(merged_request, subset=["date", "asset_id"], sort_by=["date", "asset_id"])
         merged_request = slice_requested(
@@ -135,11 +152,13 @@ class ReturnsProvider:
         start: str,
         end: str,
         horizon: Horizon,
+        include_unlabeled_tail: bool = False,
     ) -> pd.DataFrame:
-        try:
-            frame = self._fetcher(tickers=tickers, start=start, end=end, horizon=horizon)
-        except TypeError:
-            frame = self._fetcher(tickers, start, end, horizon)
+        keyword_call = {"tickers": tickers, "start": start, "end": end, "horizon": horizon}
+        if _supports_argument(self._fetcher, "include_unlabeled_tail"):
+            frame = self._fetcher(**keyword_call, include_unlabeled_tail=include_unlabeled_tail)
+        else:
+            frame = self._fetcher(**keyword_call)
 
         required = {"date", "asset_id", "y_excess_lead"}
         missing = required - set(frame.columns)
@@ -147,6 +166,41 @@ class ReturnsProvider:
             msg = f"Returns fetcher missing required columns: {sorted(missing)}"
             raise ValueError(msg)
         return frame
+
+    def _cache_file_path(self, horizon: Horizon) -> Path:
+        assert self._cache_dir is not None
+        safe_horizon = str(horizon.value).replace("-", "_").lower()
+        return self._cache_dir / f"returns_{safe_horizon}.parquet"
+
+    def _read_cache_frame(self, horizon: Horizon) -> pd.DataFrame:
+        cache_path = self._cache_file_path(horizon)
+        if not cache_path.exists():
+            return pd.DataFrame(columns=["date", "asset_id", "y_excess_lead"])
+
+        frame = pd.read_parquet(cache_path)
+        return normalize_asset_id_column(normalize_date_column(frame))
+
+    def _write_cache_frame(self, frame: pd.DataFrame, horizon: Horizon) -> None:
+        if self._cache_dir is None:
+            return
+
+        self._cache_dir.mkdir(parents=True, exist_ok=True)
+        cache_path = self._cache_file_path(horizon)
+        frame.to_parquet(cache_path, index=False)
+
+
+def _supports_argument(callable_obj: Callable[..., object], argument_name: str) -> bool:
+    try:
+        signature = inspect.signature(callable_obj)
+    except (TypeError, ValueError):
+        return True
+
+    for parameter in signature.parameters.values():
+        if parameter.kind is inspect.Parameter.VAR_KEYWORD:
+            return True
+        if parameter.name == argument_name:
+            return True
+    return False
 
     def _cache_file_path(self, horizon: Horizon) -> Path:
         assert self._cache_dir is not None

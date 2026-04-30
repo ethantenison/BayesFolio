@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import inspect
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Callable, Protocol
 
 import numpy as np
 import pandas as pd
@@ -41,6 +42,7 @@ class ReturnsProviderProtocol(Protocol):
         start: str,
         end: str,
         horizon: Horizon,
+        include_unlabeled_tail: bool = False,
     ) -> pd.DataFrame: ...
 
 
@@ -112,11 +114,13 @@ def build_features_dataset(
     _validate_command(command)
 
     diagnostics: list[str] = []
-    returns_frame = providers.returns_provider.get_y_excess_lead_long(
+    returns_frame = _get_returns_frame(
+        returns_provider=providers.returns_provider,
         tickers=command.tickers,
         start=command.lookback_date.isoformat(),
         end=command.end_date.isoformat(),
         horizon=command.horizon,
+        include_unlabeled_tail=command.include_unlabeled_tail,
     )
     macro_frame = providers.macro_provider.get_macro_features(
         start=command.lookback_date.isoformat(),
@@ -164,7 +168,10 @@ def build_features_dataset(
     target_missing_rate_before_drop = (
         float(merged_window["y_excess_lead"].isna().mean()) if not merged_window.empty else 0.0
     )
-    merged = merged_window.dropna(subset=["y_excess_lead"]).reset_index(drop=True)
+    if not command.include_unlabeled_tail:
+        merged = merged_window.dropna(subset=["y_excess_lead"]).reset_index(drop=True)
+    else:
+        merged = merged_window.reset_index(drop=True)
 
     lag_cols = ["lag_y_excess_lead", "lag2_y_excess_lead"]
     output_cols = [
@@ -218,6 +225,36 @@ def build_features_dataset(
         market_structure=market_structure,
         diagnostics=diagnostics,
     )
+
+
+def _get_returns_frame(
+    returns_provider: ReturnsProviderProtocol,
+    tickers: list[str],
+    start: str,
+    end: str,
+    horizon: Horizon,
+    include_unlabeled_tail: bool,
+) -> pd.DataFrame:
+    method = returns_provider.get_y_excess_lead_long
+    if _supports_argument(method, "include_unlabeled_tail"):
+        return method(
+            tickers=tickers, start=start, end=end, horizon=horizon, include_unlabeled_tail=include_unlabeled_tail
+        )
+    return method(tickers=tickers, start=start, end=end, horizon=horizon)
+
+
+def _supports_argument(method: Callable[..., object], argument_name: str) -> bool:
+    try:
+        signature = inspect.signature(method)
+    except (TypeError, ValueError):
+        return True
+
+    for parameter in signature.parameters.values():
+        if parameter.kind is inspect.Parameter.VAR_KEYWORD:
+            return True
+        if parameter.name == argument_name:
+            return True
+    return False
 
 
 def _validate_command(command: BuildFeaturesDatasetCommand) -> None:
