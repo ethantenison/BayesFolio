@@ -864,7 +864,7 @@ def _build_task_correlation_figure(task_correlation: pd.DataFrame | None) -> go.
             z=z_values,
             x=labels,
             y=labels,
-            zmin=-1.0,
+            zmin=0,
             zmax=1.0,
             colorscale="RdBu",
             reversescale=True,
