@@ -18,7 +18,7 @@ Outputs:
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any, TypedDict, cast
 
 import numpy as np
@@ -64,6 +64,7 @@ def build_gp_interpretation_report(
     target_column: str,
     task_column: str | None = None,
     feature_columns: Sequence[str] | None = None,
+    feature_blocks: Mapping[str, Sequence[str]] | None = None,
 ) -> GPInterpretationReport:
     """Build a notebook-friendly interpretation report for a fitted GP model.
 
@@ -85,6 +86,12 @@ def build_gp_interpretation_report(
         feature_columns: Optional ordered feature columns. When omitted, the
             function uses all numeric columns except ``target_column`` and
             ``task_column``.
+        feature_blocks: Optional mapping from human-readable block names to the
+            feature columns belonging to each block, for example ``{"time":
+            ["t_index"], "etf": [...], "macro": [...]}``. When provided,
+            rendered kernel scopes can describe additive terms and interaction
+            products in block-level terms such as ``time`` or ``product of
+            time and macro``.
 
     Returns:
         dict[str, object]: Dictionary with notebook-friendly report sections:
@@ -140,6 +147,7 @@ def build_gp_interpretation_report(
     feature_summary = _build_feature_summary(
         kernel_components=kernel_components,
         feature_name_by_dim=feature_name_by_dim,
+        feature_blocks=feature_blocks,
     )
 
     task_kernel = _resolve_task_kernel(model)
@@ -474,8 +482,14 @@ def _normalize_dims(value: object) -> list[int] | None:
 def _build_feature_summary(
     kernel_components: Sequence[dict[str, object]],
     feature_name_by_dim: dict[int, str],
+    feature_blocks: Mapping[str, Sequence[str]] | None = None,
 ) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
+    scope_by_path = _build_kernel_scope_by_path(
+        kernel_components=kernel_components,
+        feature_name_by_dim=feature_name_by_dim,
+        feature_blocks=feature_blocks,
+    )
 
     for component in kernel_components:
         lengthscale_values = cast(list[float] | None, component["lengthscale_model_units"])
@@ -483,6 +497,10 @@ def _build_feature_summary(
             continue
 
         feature_dims = cast(list[int], component["feature_dims"])
+        kernel_scope = scope_by_path.get(
+            cast(str, component["kernel_path"]),
+            _describe_kernel_scope(feature_dims, feature_name_by_dim),
+        )
         mapped_values = _expand_lengthscales(lengthscale_values, feature_dims)
         for feature_dim, model_lengthscale in mapped_values:
             if feature_dim not in feature_name_by_dim:
@@ -493,6 +511,7 @@ def _build_feature_summary(
                     "feature": feature_name_by_dim[feature_dim],
                     "model_input_dim": feature_dim,
                     "kernel_path": component["kernel_path"],
+                    "kernel_scope": kernel_scope,
                     "kernel_type": component["kernel_type"],
                     "lengthscale_model_units": float(model_lengthscale),
                     "interpretation": (
@@ -507,6 +526,7 @@ def _build_feature_summary(
                 "feature",
                 "model_input_dim",
                 "kernel_path",
+                "kernel_scope",
                 "kernel_type",
                 "lengthscale_model_units",
                 "interpretation",
@@ -530,6 +550,168 @@ def _expand_lengthscales(lengthscale_values: Sequence[float], feature_dims: Sequ
             (feature_dim, float(value)) for feature_dim, value in zip(feature_dims, lengthscale_values, strict=True)
         ]
     return []
+
+
+def _describe_kernel_scope(
+    feature_dims: Sequence[int],
+    feature_name_by_dim: dict[int, str],
+    *,
+    preview_count: int = 3,
+) -> str:
+    feature_names = [
+        feature_name_by_dim[feature_dim] for feature_dim in feature_dims if feature_dim in feature_name_by_dim
+    ]
+    if not feature_names:
+        return "all features"
+    if len(feature_names) == 1:
+        return feature_names[0]
+    if len(feature_names) <= preview_count:
+        return ", ".join(feature_names)
+    preview = ", ".join(feature_names[:preview_count])
+    return f"{len(feature_names)} features incl. {preview}"
+
+
+def _build_kernel_scope_by_path(
+    kernel_components: Sequence[dict[str, object]],
+    feature_name_by_dim: dict[int, str],
+    feature_blocks: Mapping[str, Sequence[str]] | None,
+) -> dict[str, str]:
+    component_by_path = {cast(str, component["kernel_path"]): component for component in kernel_components}
+    scope_by_path: dict[str, str] = {}
+    normalized_feature_blocks = _normalize_feature_blocks(feature_name_by_dim, feature_blocks)
+
+    for component in kernel_components:
+        component_path = cast(str, component["kernel_path"])
+        feature_dims = cast(list[int], component["feature_dims"])
+        base_scope = _resolve_block_label(
+            feature_dims=feature_dims,
+            feature_name_by_dim=feature_name_by_dim,
+            feature_blocks=normalized_feature_blocks,
+        ) or _describe_kernel_scope(feature_dims, feature_name_by_dim)
+
+        product_path = _find_nearest_kernel_ancestor(component_path, component_by_path, kernel_type="ProductKernel")
+        if product_path is None:
+            scope_by_path[component_path] = base_scope
+            continue
+
+        product_parts = _collect_product_scope_parts(
+            kernel_components=kernel_components,
+            product_path=product_path,
+            feature_name_by_dim=feature_name_by_dim,
+            feature_blocks=normalized_feature_blocks,
+        )
+        if len(product_parts) >= 2:
+            scope_by_path[component_path] = f"product of {' and '.join(product_parts)}"
+            continue
+
+        scope_by_path[component_path] = base_scope
+
+    return scope_by_path
+
+
+def _normalize_feature_blocks(
+    feature_name_by_dim: dict[int, str],
+    feature_blocks: Mapping[str, Sequence[str]] | None,
+) -> dict[str, set[str]]:
+    if feature_blocks is None:
+        return {}
+
+    feature_names_in_model = set(feature_name_by_dim.values())
+    normalized_blocks: dict[str, set[str]] = {}
+    for block_name, block_columns in feature_blocks.items():
+        block_feature_names = {column for column in block_columns if column in feature_names_in_model}
+        if block_feature_names:
+            normalized_blocks[block_name] = block_feature_names
+    return normalized_blocks
+
+
+def _resolve_block_label(
+    feature_dims: Sequence[int],
+    feature_name_by_dim: dict[int, str],
+    feature_blocks: Mapping[str, set[str]],
+) -> str | None:
+    if not feature_blocks:
+        return None
+
+    feature_names = {
+        feature_name_by_dim[feature_dim] for feature_dim in feature_dims if feature_dim in feature_name_by_dim
+    }
+    if not feature_names:
+        return None
+
+    for block_name, block_feature_names in feature_blocks.items():
+        if feature_names == block_feature_names:
+            return block_name
+    return None
+
+
+def _find_nearest_kernel_ancestor(
+    component_path: str,
+    component_by_path: Mapping[str, dict[str, object]],
+    *,
+    kernel_type: str,
+) -> str | None:
+    matching_ancestor: str | None = None
+    for ancestor_path in _iter_ancestor_paths(component_path):
+        ancestor = component_by_path.get(ancestor_path)
+        if ancestor is None:
+            continue
+        if ancestor.get("kernel_type") == kernel_type:
+            if _subtree_contains_task_kernel(ancestor_path, component_by_path):
+                continue
+            matching_ancestor = ancestor_path
+    return matching_ancestor
+
+
+def _iter_ancestor_paths(component_path: str) -> Sequence[str]:
+    ancestors: list[str] = []
+    current_path = component_path
+    while "." in current_path:
+        current_path = current_path.rsplit(".", 1)[0]
+        ancestors.append(current_path)
+    return ancestors
+
+
+def _subtree_contains_task_kernel(
+    subtree_path: str,
+    component_by_path: Mapping[str, dict[str, object]],
+) -> bool:
+    subtree_prefix = f"{subtree_path}."
+    for component_path, component in component_by_path.items():
+        if component_path != subtree_path and not component_path.startswith(subtree_prefix):
+            continue
+        if component.get("num_tasks") is not None:
+            return True
+    return False
+
+
+def _collect_product_scope_parts(
+    kernel_components: Sequence[dict[str, object]],
+    product_path: str,
+    feature_name_by_dim: dict[int, str],
+    feature_blocks: Mapping[str, set[str]],
+) -> list[str]:
+    product_parts: list[str] = []
+
+    for component in kernel_components:
+        component_path = cast(str, component["kernel_path"])
+        if not component_path.startswith(f"{product_path}."):
+            continue
+
+        lengthscale_values = cast(list[float] | None, component["lengthscale_model_units"])
+        if lengthscale_values is None:
+            continue
+
+        feature_dims = cast(list[int], component["feature_dims"])
+        part_label = _resolve_block_label(
+            feature_dims=feature_dims,
+            feature_name_by_dim=feature_name_by_dim,
+            feature_blocks=feature_blocks,
+        ) or _describe_kernel_scope(feature_dims, feature_name_by_dim)
+        if part_label not in product_parts:
+            product_parts.append(part_label)
+
+    return product_parts
 
 
 def _resolve_task_kernel(model: object) -> object | None:
@@ -781,6 +963,7 @@ def _prepare_feature_display_table(feature_summary: pd.DataFrame, max_feature_ro
 
     columns = [
         "feature",
+        "kernel_scope",
         "kernel_type",
         "lengthscale_model_units",
     ]

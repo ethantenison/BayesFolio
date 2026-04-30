@@ -791,6 +791,7 @@ report = build_gp_interpretation_report(
     model=model,
     target_column="y_excess_lead",
     task_column="asset_id",
+    feature_blocks=FEATURE_BLOCK_COLUMNS,
 )
 
 rendered_report = render_gp_interpretation_report(report)
