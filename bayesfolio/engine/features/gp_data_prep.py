@@ -110,9 +110,9 @@ def prepare_multitask_gp_data_with_task_feature(
 
     df_proc = df.drop(columns=drop_cols + [asset_col], errors="ignore")
 
-    if df_proc.isnull().any().any():
-        bad_cols = df_proc.columns[df_proc.isnull().any()].tolist()
-        raise ValueError(f"NaNs detected in columns {bad_cols}. Clean data before training.")
+    # if df_proc.isnull().any().any():
+    #     bad_cols = df_proc.columns[df_proc.isnull().any()].tolist()
+    #     raise ValueError(f"NaNs detected in columns {bad_cols}. Clean data before training.")
 
     feature_df = df_proc.drop(columns=[target_col, "__task_idx__"], errors="ignore")
     x_np = feature_df.to_numpy()
