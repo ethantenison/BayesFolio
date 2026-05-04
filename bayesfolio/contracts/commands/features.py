@@ -37,6 +37,9 @@ class BuildFeaturesDatasetCommand(VersionedContract):
         clip_quantile: Upper quantile used for log-liquidity clipping.
         seed: Optional deterministic seed used by downstream components.
         artifact_name: Optional base artifact name for persisted parquet output.
+        include_unlabeled_tail: When True, includes the final period with NaN
+            return labels for forecasting. When False (default), drops rows
+            with missing y_excess_lead (training-only behavior).
     """
 
     schema: Literal[SchemaName.FEATURES_DATASET_COMMAND] = SchemaName.FEATURES_DATASET_COMMAND
@@ -55,3 +58,7 @@ class BuildFeaturesDatasetCommand(VersionedContract):
     clip_quantile: float = Field(default=0.99, gt=0.0, le=1.0)
     seed: int | None = None
     artifact_name: str | None = None
+    include_unlabeled_tail: bool = Field(
+        default=False,
+        description="Include final period with NaN returns for forecasting.",
+    )
