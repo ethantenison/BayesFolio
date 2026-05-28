@@ -67,6 +67,8 @@ class SchemaName(str, enum.Enum):
     GP_PLANNER_COMMAND = "bayesfolio.gp_planner.command"
     GP_PLANNER_RESULT = "bayesfolio.gp_planner.result"
     GP_WORKFLOW_RESULT = "bayesfolio.gp_workflow.result"
+    MONTHLY_PORTFOLIO_COMMAND = "bayesfolio.monthly_portfolio.command"
+    MONTHLY_PORTFOLIO_RESULT = "bayesfolio.monthly_portfolio.result"
 
 
 class ContractModel(BaseModel):
