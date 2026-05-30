@@ -13,7 +13,6 @@ import pandas as pd
 import pandas_datareader.data as pdr
 import yfinance as yf
 from pandas_datareader.fred import FredReader
-from sklearn.decomposition import PCA
 
 from bayesfolio.core.settings import Horizon, Interval
 
@@ -661,64 +660,6 @@ def fetch_dxy(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     raise ValueError("No DXY data available (DX-Y.NYB, DX=F, UUP all failed).")
 
 
-def fetch_yield_curve_pcs(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY, n_components=3):
-    """
-    Fetch Treasury yields across maturities, extract PCA components.
-    Uses FRED if Yahoo fails.
-    """
-    tickers_yahoo = {"^IRX": "3m", "^FVX": "5y", "^TNX": "10y", "^TYX": "30y"}
-    tickers_fred = {"DTB3": "3m", "DGS5": "5y", "DGS10": "10y", "DGS30": "30y"}
-
-    # Try Yahoo first
-    px = _download_frame(list(tickers_yahoo.keys()), start=start, end=end, interval=Interval.DAILY, progress=False)
-    cols = []
-
-    for tk, label in tickers_yahoo.items():
-        try:
-            if isinstance(px.columns, pd.MultiIndex):
-                s = px[(tk, "Adj Close")] if (tk, "Adj Close") in px.columns else px[(tk, "Close")]
-            else:
-                s = px["Adj Close"] if "Adj Close" in px.columns else px["Close"]
-            cols.append(s.rename(label) / 100.0)
-        except Exception:
-            continue
-
-    if cols:
-        df = pd.concat(cols, axis=1)
-    else:
-        # Fallback: fetch from FRED symbol-by-symbol so one timeout does not
-        # fail the entire yield-curve feature block.
-        fred_cols: list[pd.Series] = []
-        for tk, label in tickers_fred.items():
-            try:
-                series_df = _read_fred(tk, start=start, end=end)
-                if tk not in series_df.columns:
-                    continue
-                series = series_df[tk].rename(label)
-                fred_cols.append(series)
-            except Exception:
-                continue
-
-        if not fred_cols:
-            msg = "No yield-curve series available from Yahoo or FRED."
-            raise RuntimeError(msg)
-
-        df = pd.concat(fred_cols, axis=1)
-
-    df = df.dropna().resample(horizon).last()
-
-    if df.empty or df.shape[1] == 0:
-        msg = "Yield-curve series are unavailable after alignment/resampling."
-        raise RuntimeError(msg)
-
-    # PCA
-    pca = PCA(n_components=min(n_components, df.shape[1]))
-    pcs = pca.fit_transform(df.values)
-    pcs_df = pd.DataFrame(pcs, index=df.index, columns=[f"yc_pc{i + 1}" for i in range(pcs.shape[1])])
-
-    return pcs_df.reset_index().rename(columns={"index": "date", "DATE": "date"})
-
-
 def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
     """
     Fetch global high-yield credit spreads from FRED as a proxy for EM sovereign risk.
@@ -837,13 +778,9 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     cred_df = fetch_credit_spread(start=start, end=end, horizon=horizon)
     # tbill_df = fetch_tbill_rate(start=start, end=end, horizon=horizon)
     dxy_df = fetch_dxy(start=start, end=end, horizon=horizon)
-    try:
-        yc_df = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
-    except Exception:
-        yc_df = pd.DataFrame(columns=["date", "yc_pc1", "yc_pc2", "yc_pc3"])
 
     # Merge on date
-    dfs = [vix_df, term_df, cred_df, dxy_df, yc_df]  # tbill_df,
+    dfs = [vix_df, term_df, cred_df, dxy_df]  # tbill_df,
 
     # Ensure all have lowercase column names and 'date'
     for i, df in enumerate(dfs):
@@ -997,7 +934,6 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
     term_df = fetch_term_spread(start=start, end=end, horizon=horizon)
     cred_df = fetch_credit_spread(start=start, end=end, horizon=horizon)
     dxy_df = fetch_dxy(start=start, end=end, horizon=horizon)
-    yc_df = fetch_yield_curve_pcs(start=start, end=end, horizon=horizon, n_components=3)
     high_y_spread = fetch_high_yield_spread(start=start, end=end, horizon=horizon)
     global_macro = fetch_core_global_macro(start=start, end=end, horizon=horizon)
     cpi_df = fetch_cpi_inflation(start=start, end=end, horizon=horizon)
@@ -1111,7 +1047,6 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
         term_df,
         cred_df,
         dxy_df,
-        yc_df,  # existing macro
         spy_df2,
         erp_df,  # ERP block
         skew_df,
