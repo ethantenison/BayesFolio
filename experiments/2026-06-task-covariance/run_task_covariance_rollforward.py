@@ -131,6 +131,7 @@ INPUT_COLUMNS = [*TIME_COLS, *ETF_COLS, *MACRO_COLS]
 TARGET_COL = "y_excess_lead"
 TASK_FEATURE = -1
 RANK = 5
+TIME_DIMS = tuple(INPUT_COLUMNS.index(col) for col in TIME_COLS)
 
 
 @dataclass(frozen=True)
@@ -288,6 +289,9 @@ def build_covar_config() -> CovarModuleConfig:
 def prepare_window_tensors(
     train_df: pd.DataFrame,
     eval_df: pd.DataFrame,
+    *,
+    global_time_mins: torch.Tensor,
+    global_time_ranges: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, int], torch.Tensor, torch.Tensor]:
     task_map = {asset: idx for idx, asset in enumerate(ETF_TICKERS)}
     train_x_raw = _frame_to_x(train_df, task_map)
@@ -299,9 +303,20 @@ def prepare_window_tensors(
     mins = train_x[:, : len(INPUT_COLUMNS)].amin(dim=0)
     maxs = train_x[:, : len(INPUT_COLUMNS)].amax(dim=0)
     ranges = (maxs - mins).clamp_min(1e-12)
+    time_index = torch.tensor(TIME_DIMS, dtype=torch.long)
+    mins[time_index] = global_time_mins.to(dtype=mins.dtype, device=mins.device)
+    ranges[time_index] = global_time_ranges.to(dtype=ranges.dtype, device=ranges.device)
     train_x[:, : len(INPUT_COLUMNS)] = (train_x[:, : len(INPUT_COLUMNS)] - mins) / ranges
     eval_x[:, : len(INPUT_COLUMNS)] = (eval_x[:, : len(INPUT_COLUMNS)] - mins) / ranges
     return train_x, train_y, eval_x, task_map, mins, ranges
+
+
+def global_time_scaling(df: pd.DataFrame) -> tuple[torch.Tensor, torch.Tensor]:
+    time_values = torch.tensor(df.loc[:, TIME_COLS].to_numpy(dtype=float), dtype=torch.float64)
+    mins = time_values.amin(dim=0)
+    maxs = time_values.amax(dim=0)
+    ranges = (maxs - mins).clamp_min(1e-12)
+    return mins, ranges
 
 
 def _frame_to_x(df: pd.DataFrame, task_map: dict[str, int]) -> torch.Tensor:
@@ -509,6 +524,8 @@ def build_manifest(
     scored_dates: list[pd.Timestamp],
     live_date: pd.Timestamp | None,
     variants: list[Variant],
+    global_time_mins: torch.Tensor,
+    global_time_ranges: torch.Tensor,
 ) -> dict[str, Any]:
     train_sizes = []
     for window_date in scored_dates:
@@ -561,7 +578,16 @@ def build_manifest(
             "task_feature": TASK_FEATURE,
             "add_time_varying_lengthscale": True,
             "add_time_varying_outputscale": True,
-            "scaling": "train-window min-max on non-task input columns; apply same stats to eval rows",
+            "scaling": (
+                "global min-max for time input columns over the full feature frame; "
+                "train-window min-max for remaining non-task input columns; "
+                "apply same stats to eval rows"
+            ),
+            "time_scaling": {
+                "columns": TIME_COLS,
+                "mins": {col: float(value) for col, value in zip(TIME_COLS, global_time_mins, strict=True)},
+                "ranges": {col: float(value) for col, value in zip(TIME_COLS, global_time_ranges, strict=True)},
+            },
             "outcome_transform": "StratifiedStandardize by ETF task",
             "residualized_metrics": "subtract each ETF training-window historical mean from y_true and y_pred",
         },
@@ -584,6 +610,7 @@ def run(args: argparse.Namespace) -> None:
 
     variants = [VARIANTS[name] for name in args.variants]
     df = load_features(args.feature_path)
+    global_time_mins, global_time_ranges = global_time_scaling(df)
     scored_dates, live_date = scored_and_live_dates(df, args.max_windows)
     output_dir = resolve_output_dir(args)
     output_dir.mkdir(parents=True, exist_ok=False)
@@ -594,6 +621,8 @@ def run(args: argparse.Namespace) -> None:
         scored_dates=scored_dates,
         live_date=live_date,
         variants=variants,
+        global_time_mins=global_time_mins,
+        global_time_ranges=global_time_ranges,
     )
     (output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
@@ -613,7 +642,12 @@ def run(args: argparse.Namespace) -> None:
                 y_pred, y_std = historical_mean_predict(train_df, eval_df)
             else:
                 torch.manual_seed(stable_seed(args.seed, variant.name, window_index))
-                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
+                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(
+                    train_df,
+                    eval_df,
+                    global_time_mins=global_time_mins,
+                    global_time_ranges=global_time_ranges,
+                )
                 model = build_model(train_x, train_y, variant)
                 y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
                 corr = task_correlation(model)
@@ -657,7 +691,12 @@ def run(args: argparse.Namespace) -> None:
                 y_pred, y_std = historical_mean_predict(train_df, eval_df)
             else:
                 torch.manual_seed(stable_seed(args.seed, variant.name, len(scored_dates)))
-                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
+                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(
+                    train_df,
+                    eval_df,
+                    global_time_mins=global_time_mins,
+                    global_time_ranges=global_time_ranges,
+                )
                 model = build_model(train_x, train_y, variant)
                 y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
             train_means = training_asset_means(train_df, eval_df)

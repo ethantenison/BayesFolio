@@ -32,7 +32,8 @@ Fixed modeling choices:
 - No Riskfolio portfolio optimization. This experiment evaluates model quality
   and top/bottom 5 long-short signal only.
 - Multitask constant mean module.
-- Train-window min-max scaling on non-task input columns.
+- Global min-max scaling for time input columns over the full feature frame.
+- Train-window min-max scaling for the remaining non-task input columns.
 - Stable per-variant/per-window seeds so adding a new variant does not change
   existing variant initializations.
 - Residualized metrics that subtract each ETF's training-window historical mean
