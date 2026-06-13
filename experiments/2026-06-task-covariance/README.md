@@ -1,0 +1,50 @@
+# June 2026 Task Covariance Experiment
+
+Purpose: compare ETF multitask GP task-covariance assumptions before making the
+BayesFolio production model explicit.
+
+Data source:
+
+- `/Users/et/.bayesfolio/artifacts/features/portfolio_etf_macro_features_2026_06.parquet`
+- June 2026 ETF universe from `notebooks/20260601_portfolio.py`
+- 12 scored monthly roll-forward windows ending with the last month that has
+  realized labels, plus an unscored June live prediction row.
+
+Variants:
+
+1. `positive_no_prior`: BoTorch `PositiveIndexKernel`, `task_covar_prior=None`
+2. `positive_beta_prior`: BoTorch `PositiveIndexKernel`, BoTorch 0.18 default
+   `BetaPrior(2.5, 1.5)`
+3. `signed_lkj_eta_1`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=1.0)`
+4. `signed_lkj_eta_2`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=2.0)`
+
+Fixed modeling choices:
+
+- Rank 5 task covariance.
+- Stratified standardization by ETF task.
+- Time-varying lengthscale and outputscale wrappers from the GPArchitect
+  implementation already present in BayesFolio.
+- June monthly GP architecture: time, ETF, and macro blocks plus explicit
+  time-ETF, time-macro, and macro-ETF interactions.
+- No Riskfolio portfolio optimization. This experiment evaluates model quality
+  and top/bottom 5 long-short signal only.
+
+Outputs:
+
+- `outputs/window_predictions.csv`
+- `outputs/window_metrics.csv`
+- `outputs/variant_summary.csv`
+- `outputs/task_covariance_diagnostics.csv`
+- `outputs/live_june_predictions.csv`
+
+Run:
+
+```bash
+poetry run python experiments/2026-06-task-covariance/run_task_covariance_rollforward.py
+```
+
+For a fast smoke test:
+
+```bash
+poetry run python experiments/2026-06-task-covariance/run_task_covariance_rollforward.py --max-windows 1 --variants positive_no_prior
+```

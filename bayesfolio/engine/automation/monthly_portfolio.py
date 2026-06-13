@@ -198,7 +198,6 @@ def _run_fixed_monthly_gp(*, training_df: pd.DataFrame, command: MonthlyPortfoli
     outcome_transform = StratifiedStandardize(
         stratification_idx=task_feature_idx,
         all_task_values=all_task_values,
-        observed_task_values=train_x[:, task_feature_idx].to(torch.long),
         batch_shape=train_y.shape[:-2],
     )
 

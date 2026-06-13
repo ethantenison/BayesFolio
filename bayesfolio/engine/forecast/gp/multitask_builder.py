@@ -24,6 +24,7 @@ from typing import Annotated, Any, Literal, cast
 
 import torch
 from botorch.models.multitask import MultiTaskGP
+from botorch.utils.types import DEFAULT
 from gpytorch.constraints import GreaterThan
 from gpytorch.kernels import (
     Kernel,
@@ -40,7 +41,7 @@ from gpytorch.means import ConstantMean, LinearMean, Mean, MultitaskMean, ZeroMe
 from gpytorch.priors import LogNormalPrior
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-#from bayesfolio.engine.forecast.gp.time_varying_kernel import build_time_varying_kernel
+from bayesfolio.engine.forecast.gp.time_varying_kernel import build_time_varying_kernel
 
 SQRT2 = sqrt(2)
 SQRT3 = sqrt(3)
@@ -837,10 +838,10 @@ def default_covar_config_for_non_task_dims(
 
 
 #########Time varying add on from gparchitect
-# def add_time_varying_os_ls(covar_module: Kernel) -> Kernel:
-#     covar_module = build_time_varying_kernel(covar_module, time_feature_index=0, target="lengthscale")
-#     covar_module = build_time_varying_kernel(covar_module, time_feature_index=0, target="outputscale")
-#     return covar_module
+def add_time_varying_os_ls(covar_module: Kernel) -> Kernel:
+    covar_module = build_time_varying_kernel(covar_module, time_feature_index=0, target="lengthscale")
+    covar_module = build_time_varying_kernel(covar_module, time_feature_index=0, target="outputscale")
+    return covar_module
 
 
 def build_multitask_gp(
@@ -854,6 +855,7 @@ def build_multitask_gp(
     min_inferred_noise_level: float | None = None,
     outcome_transform: object | None = None,
     input_transform: object | None = None,
+    task_covar_prior: object | None = DEFAULT,
     validate_task_values: bool = True,
     add_tv_os_ls: bool = False,
 ) -> MultiTaskGP:
@@ -886,8 +888,8 @@ def build_multitask_gp(
         covar_config = default_covar_config_for_non_task_dims(non_task_dims)
     covar_module = build_covar_module(covar_config, batch_shape=train_X.shape[:-2])
 
-    # if add_tv_os_ls:
-    #     covar_module = add_time_varying_os_ls(covar_module)
+    if add_tv_os_ls:
+        covar_module = add_time_varying_os_ls(covar_module)
 
     num_tasks = int(train_X[..., task_feature_idx].to(torch.long).unique().numel())
     if mean_config is None:
@@ -919,6 +921,7 @@ def build_multitask_gp(
         mean_module=mean_module,
         likelihood=likelihood,
         rank=rank,
+        task_covar_prior=cast(Any, task_covar_prior),
         outcome_transform=outcome_t,
         input_transform=input_t,
         validate_task_values=validate_task_values,
