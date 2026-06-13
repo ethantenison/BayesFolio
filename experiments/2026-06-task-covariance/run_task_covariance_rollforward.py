@@ -137,6 +137,7 @@ class Variant:
 
 
 VARIANTS = {
+    "historical_mean": Variant("historical_mean", "baseline", None),
     "positive_no_prior": Variant("positive_no_prior", "positive", None),
     "positive_beta_prior": Variant(
         "positive_beta_prior",
@@ -276,6 +277,21 @@ def _frame_to_x(df: pd.DataFrame, task_map: dict[str, int]) -> torch.Tensor:
     features = df.loc[:, INPUT_COLUMNS].to_numpy(dtype=float)
     task_ids = df["asset_id"].astype(str).map(task_map).to_numpy(dtype=float).reshape(-1, 1)
     return torch.tensor(np.concatenate([features, task_ids], axis=1), dtype=torch.float64)
+
+
+def historical_mean_predict(train_df: pd.DataFrame, eval_df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    by_asset = train_df.groupby("asset_id", observed=True)[TARGET_COL]
+    means = by_asset.mean()
+    stds = by_asset.std(ddof=1)
+    global_mean = float(train_df[TARGET_COL].mean())
+    global_std = float(train_df[TARGET_COL].std(ddof=1))
+    if not np.isfinite(global_std) or global_std <= 0:
+        global_std = 1e-6
+    eval_assets = eval_df["asset_id"].astype(str)
+    y_pred = eval_assets.map(means).fillna(global_mean).to_numpy(dtype=float)
+    y_std = eval_assets.map(stds).fillna(global_std).to_numpy(dtype=float)
+    y_std = np.clip(y_std, 1e-6, None)
+    return y_pred, y_std
 
 
 def build_model(train_x: torch.Tensor, train_y: torch.Tensor, variant: Variant) -> Any:
@@ -427,11 +443,14 @@ def run(args: argparse.Namespace) -> None:
             print(f"  window {window_date.date()}", flush=True)
             train_df = df[(df["date"] < window_date) & df[TARGET_COL].notna()].copy()
             eval_df = df[df["date"] == window_date].copy()
-            train_x, train_y, eval_x, task_map, _, _ = prepare_window_tensors(train_df, eval_df)
-            model = build_model(train_x, train_y, variant)
-            y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
-            corr = task_correlation(model)
-            diag_rows.append(covariance_diagnostics(corr, variant=variant.name, window_date=window_date))
+            if variant.task_kernel == "baseline":
+                y_pred, y_std = historical_mean_predict(train_df, eval_df)
+            else:
+                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
+                model = build_model(train_x, train_y, variant)
+                y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
+                corr = task_correlation(model)
+                diag_rows.append(covariance_diagnostics(corr, variant=variant.name, window_date=window_date))
 
             y_true = eval_df[TARGET_COL].to_numpy(dtype=float)
             window_metric_rows.append(
@@ -457,9 +476,12 @@ def run(args: argparse.Namespace) -> None:
             print(f"  live {live_date.date()}", flush=True)
             train_df = df[(df["date"] < live_date) & df[TARGET_COL].notna()].copy()
             eval_df = df[df["date"] == live_date].copy()
-            train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
-            model = build_model(train_x, train_y, variant)
-            y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
+            if variant.task_kernel == "baseline":
+                y_pred, y_std = historical_mean_predict(train_df, eval_df)
+            else:
+                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
+                model = build_model(train_x, train_y, variant)
+                y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
             for row, mean, std in zip(eval_df.itertuples(index=False), y_pred, y_std, strict=True):
                 live_rows.append(
                     {

@@ -12,11 +12,13 @@ Data source:
 
 Variants:
 
-1. `positive_no_prior`: BoTorch `PositiveIndexKernel`, `task_covar_prior=None`
-2. `positive_beta_prior`: BoTorch `PositiveIndexKernel`, BoTorch 0.18 default
+1. `historical_mean`: no-model baseline using each ETF's training-window mean
+   realized excess return.
+2. `positive_no_prior`: BoTorch `PositiveIndexKernel`, `task_covar_prior=None`
+3. `positive_beta_prior`: BoTorch `PositiveIndexKernel`, BoTorch 0.18 default
    `BetaPrior(2.5, 1.5)`
-3. `signed_lkj_eta_1`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=1.0)`
-4. `signed_lkj_eta_2`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=2.0)`
+4. `signed_lkj_eta_1`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=1.0)`
+5. `signed_lkj_eta_2`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=2.0)`
 
 Fixed modeling choices:
 
