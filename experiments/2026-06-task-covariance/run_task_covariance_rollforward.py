@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import math
+import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import botorch
 import gpytorch
 import numpy as np
 import pandas as pd
@@ -46,7 +51,7 @@ from bayesfolio.engine.forecast.gp.multitask_builder import (  # noqa: E402
 
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 DEFAULT_FEATURE_PATH = Path("/Users/et/.bayesfolio/artifacts/features/portfolio_etf_macro_features_2026_06.parquet")
-OUTPUT_DIR = EXPERIMENT_DIR / "outputs"
+OUTPUT_ROOT = EXPERIMENT_DIR / "outputs"
 
 ETF_TICKERS = [
     "SPY",
@@ -153,7 +158,8 @@ VARIANTS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--feature-path", type=Path, default=DEFAULT_FEATURE_PATH)
-    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--output-dir", type=Path, default=None)
+    parser.add_argument("--run-id", type=str, default=None)
     parser.add_argument("--max-windows", type=int, default=None)
     parser.add_argument("--maxiter", type=int, default=75)
     parser.add_argument("--variants", nargs="+", default=list(VARIANTS))
@@ -170,6 +176,30 @@ def load_features(path: Path) -> pd.DataFrame:
     df["asset_id"] = pd.Categorical(df["asset_id"], categories=ETF_TICKERS, ordered=True)
     df = df[df["asset_id"].notna()].sort_values(["date", "asset_id"]).reset_index(drop=True)
     return df
+
+
+def resolve_output_dir(args: argparse.Namespace) -> Path:
+    if args.output_dir is not None:
+        return args.output_dir
+    run_id = args.run_id or f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}_{git_sha(short=True)}"
+    return OUTPUT_ROOT / "runs" / run_id
+
+
+def git_sha(*, short: bool = False) -> str:
+    cmd = ["git", "rev-parse", "--short" if short else "HEAD"]
+    return subprocess.check_output(cmd, cwd=REPO_ROOT, text=True).strip()
+
+
+def git_dirty_summary() -> str:
+    return subprocess.check_output(["git", "status", "--short"], cwd=REPO_ROOT, text=True).strip()
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def scored_and_live_dates(df: pd.DataFrame, max_windows: int | None) -> tuple[list[pd.Timestamp], pd.Timestamp | None]:
@@ -295,6 +325,12 @@ def historical_mean_predict(train_df: pd.DataFrame, eval_df: pd.DataFrame) -> tu
     return y_pred, y_std
 
 
+def training_asset_means(train_df: pd.DataFrame, eval_df: pd.DataFrame) -> np.ndarray:
+    means = train_df.groupby("asset_id", observed=True)[TARGET_COL].mean()
+    global_mean = float(train_df[TARGET_COL].mean())
+    return eval_df["asset_id"].astype(str).map(means).fillna(global_mean).to_numpy(dtype=float)
+
+
 def build_model(train_x: torch.Tensor, train_y: torch.Tensor, variant: Variant) -> Any:
     task_idx = train_x.shape[-1] - 1
     all_task_values = train_x[:, task_idx].to(torch.long).unique(sorted=True)
@@ -415,18 +451,130 @@ def summarize_variant(variant: str, pred_rows: list[dict[str, Any]]) -> dict[str
     y_true = panelize(pred_rows, "y_true")
     y_pred = panelize(pred_rows, "y_pred")
     y_std = panelize(pred_rows, "y_std")
+    y_true_resid = panelize(pred_rows, "y_true_resid")
+    y_pred_resid = panelize(pred_rows, "y_pred_resid")
     pricing_metrics = evaluate_asset_pricing(y_true, y_pred)
     ls_returns = long_short_returns_topk(y_true, y_pred, k=5, q=None, min_assets=10)
     ls_returns.index = y_true.index
     ls_stats = portfolio_stats(ls_returns, periods_per_year=12)
     scalars = window_scalar_metrics(y_true.to_numpy(), y_pred.to_numpy(), y_std.to_numpy())
+    residual_pricing_metrics = evaluate_asset_pricing(y_true_resid, y_pred_resid)
+    residual_signal_mask = y_pred_resid.apply(lambda row: row.dropna().nunique() > 1, axis=1)
+    if residual_signal_mask.any():
+        residual_ls_returns = long_short_returns_topk(
+            y_true_resid.loc[residual_signal_mask],
+            y_pred_resid.loc[residual_signal_mask],
+            k=5,
+            q=None,
+            min_assets=10,
+        )
+        residual_ls_returns.index = y_true_resid.loc[residual_signal_mask].index
+        residual_ls_stats = portfolio_stats(residual_ls_returns, periods_per_year=12)
+        residual_ls_mean = float(residual_ls_returns.mean())
+        residual_ls_hit_rate = float((residual_ls_returns > 0).mean())
+    else:
+        residual_ls_stats = {
+            "cum_return": math.nan,
+            "ann_return": math.nan,
+            "ann_vol": math.nan,
+            "sharpe": math.nan,
+            "max_drawdown": math.nan,
+        }
+        residual_ls_mean = math.nan
+        residual_ls_hit_rate = math.nan
+    residual_scalars = window_scalar_metrics(
+        y_true_resid.to_numpy(),
+        y_pred_resid.to_numpy(),
+        y_std.to_numpy(),
+    )
     result: dict[str, float | str] = {"variant": variant, "n_windows": float(len(y_true))}
     result.update(pricing_metrics)
     result.update(scalars)
     result.update({f"top_bottom_5_{k}": float(v) for k, v in ls_stats.items()})
     result["top_bottom_5_mean_monthly"] = float(ls_returns.mean())
     result["top_bottom_5_hit_rate"] = float((ls_returns > 0).mean())
+    result.update({f"resid_{key}": value for key, value in residual_pricing_metrics.items()})
+    result.update({f"resid_{key}": value for key, value in residual_scalars.items()})
+    result.update({f"resid_top_bottom_5_{key}": float(value) for key, value in residual_ls_stats.items()})
+    result["resid_top_bottom_5_mean_monthly"] = residual_ls_mean
+    result["resid_top_bottom_5_hit_rate"] = residual_ls_hit_rate
     return result
+
+
+def build_manifest(
+    *,
+    args: argparse.Namespace,
+    output_dir: Path,
+    df: pd.DataFrame,
+    scored_dates: list[pd.Timestamp],
+    live_date: pd.Timestamp | None,
+    variants: list[Variant],
+) -> dict[str, Any]:
+    train_sizes = []
+    for window_date in scored_dates:
+        train_df = df[(df["date"] < window_date) & df[TARGET_COL].notna()]
+        train_sizes.append(
+            {
+                "window_date": window_date.date().isoformat(),
+                "train_rows": int(len(train_df)),
+                "train_months": int(train_df["date"].nunique()),
+                "train_start": train_df["date"].min().date().isoformat(),
+                "train_end": train_df["date"].max().date().isoformat(),
+            }
+        )
+
+    live_train = None
+    if live_date is not None:
+        live_train_df = df[(df["date"] < live_date) & df[TARGET_COL].notna()]
+        live_train = {
+            "window_date": live_date.date().isoformat(),
+            "train_rows": int(len(live_train_df)),
+            "train_months": int(live_train_df["date"].nunique()),
+            "train_start": live_train_df["date"].min().date().isoformat(),
+            "train_end": live_train_df["date"].max().date().isoformat(),
+        }
+
+    return {
+        "schema": "bayesfolio.task_covariance_experiment.manifest.v1",
+        "created_at_utc": datetime.now(UTC).isoformat(),
+        "command": " ".join(sys.argv),
+        "git_sha": git_sha(short=False),
+        "git_dirty_summary_at_start": git_dirty_summary(),
+        "feature_path": str(args.feature_path),
+        "feature_sha256": sha256_file(args.feature_path),
+        "data": {
+            "rows": int(len(df)),
+            "date_min": df["date"].min().date().isoformat(),
+            "date_max": df["date"].max().date().isoformat(),
+            "asset_count": int(df["asset_id"].nunique()),
+            "target_col": TARGET_COL,
+            "input_columns": INPUT_COLUMNS,
+        },
+        "scored_dates": [date.date().isoformat() for date in scored_dates],
+        "live_date": live_date.date().isoformat() if live_date is not None else None,
+        "train_sizes": train_sizes,
+        "live_train_size": live_train,
+        "variants": [variant.name for variant in variants],
+        "modeling": {
+            "rank": RANK,
+            "mean_config": MeanKind.MULTITASK_CONSTANT.value,
+            "task_feature": TASK_FEATURE,
+            "add_time_varying_lengthscale": True,
+            "add_time_varying_outputscale": True,
+            "scaling": "train-window min-max on non-task input columns; apply same stats to eval rows",
+            "outcome_transform": "StratifiedStandardize by ETF task",
+            "residualized_metrics": "subtract each ETF training-window historical mean from y_true and y_pred",
+        },
+        "runtime": {
+            "seed": args.seed,
+            "seed_policy": "stable per variant/window from base seed + variant name offset + window index",
+            "maxiter": args.maxiter,
+            "botorch": botorch.__version__,
+            "gpytorch": gpytorch.__version__,
+            "torch": torch.__version__,
+        },
+        "output_dir": str(output_dir),
+    }
 
 
 def run(args: argparse.Namespace) -> None:
@@ -437,7 +585,17 @@ def run(args: argparse.Namespace) -> None:
     variants = [VARIANTS[name] for name in args.variants]
     df = load_features(args.feature_path)
     scored_dates, live_date = scored_and_live_dates(df, args.max_windows)
-    args.output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = resolve_output_dir(args)
+    output_dir.mkdir(parents=True, exist_ok=False)
+    manifest = build_manifest(
+        args=args,
+        output_dir=output_dir,
+        df=df,
+        scored_dates=scored_dates,
+        live_date=live_date,
+        variants=variants,
+    )
+    (output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
     pred_rows: list[dict[str, Any]] = []
     window_metric_rows: list[dict[str, Any]] = []
@@ -469,14 +627,24 @@ def run(args: argparse.Namespace) -> None:
                     **window_scalar_metrics(y_true, y_pred, y_std),
                 }
             )
-            for row, mean, std in zip(eval_df.itertuples(index=False), y_pred, y_std, strict=True):
+            train_means = training_asset_means(train_df, eval_df)
+            for row, mean, std, train_mean in zip(
+                eval_df.itertuples(index=False),
+                y_pred,
+                y_std,
+                train_means,
+                strict=True,
+            ):
                 record = {
                     "variant": variant.name,
                     "date": pd.Timestamp(row.date).date().isoformat(),
                     "asset_id": str(row.asset_id),
+                    "train_mean": float(train_mean),
                     "y_true": float(row.y_excess_lead),
                     "y_pred": float(mean),
                     "y_std": float(std),
+                    "y_true_resid": float(row.y_excess_lead - train_mean),
+                    "y_pred_resid": float(mean - train_mean),
                 }
                 pred_rows.append(record)
                 variant_pred_rows.append(record)
@@ -492,21 +660,31 @@ def run(args: argparse.Namespace) -> None:
                 train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
                 model = build_model(train_x, train_y, variant)
                 y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
-            for row, mean, std in zip(eval_df.itertuples(index=False), y_pred, y_std, strict=True):
+            train_means = training_asset_means(train_df, eval_df)
+            for row, mean, std, train_mean in zip(
+                eval_df.itertuples(index=False),
+                y_pred,
+                y_std,
+                train_means,
+                strict=True,
+            ):
                 live_rows.append(
                     {
                         "variant": variant.name,
                         "date": pd.Timestamp(row.date).date().isoformat(),
                         "asset_id": str(row.asset_id),
+                        "train_mean": float(train_mean),
                         "y_pred": float(mean),
                         "y_std": float(std),
                         "score": float(mean / max(float(std), 1e-12)),
+                        "y_pred_resid": float(mean - train_mean),
+                        "resid_score": float((mean - train_mean) / max(float(std), 1e-12)),
                     }
                 )
 
         summary_row = summarize_variant(variant.name, variant_pred_rows)
         pd.DataFrame([summary_row]).to_csv(
-            args.output_dir / f"summary_{variant.name}.csv",
+            output_dir / f"summary_{variant.name}.csv",
             index=False,
         )
 
@@ -515,15 +693,15 @@ def run(args: argparse.Namespace) -> None:
         for name in args.variants
     ]
     summary = pd.DataFrame(summary_rows)
-    pd.DataFrame(pred_rows).to_csv(args.output_dir / "window_predictions.csv", index=False)
-    pd.DataFrame(window_metric_rows).to_csv(args.output_dir / "window_metrics.csv", index=False)
-    summary.to_csv(args.output_dir / "variant_summary.csv", index=False)
-    pd.DataFrame(diag_rows).to_csv(args.output_dir / "task_covariance_diagnostics.csv", index=False)
+    pd.DataFrame(pred_rows).to_csv(output_dir / "window_predictions.csv", index=False)
+    pd.DataFrame(window_metric_rows).to_csv(output_dir / "window_metrics.csv", index=False)
+    summary.to_csv(output_dir / "variant_summary.csv", index=False)
+    pd.DataFrame(diag_rows).to_csv(output_dir / "task_covariance_diagnostics.csv", index=False)
     if live_rows:
-        pd.DataFrame(live_rows).to_csv(args.output_dir / "live_june_predictions.csv", index=False)
+        pd.DataFrame(live_rows).to_csv(output_dir / "live_june_predictions.csv", index=False)
 
     print(summary.to_string(index=False))
-    print(f"Wrote outputs to {args.output_dir}")
+    print(f"Wrote outputs to {output_dir}")
 
 
 if __name__ == "__main__":

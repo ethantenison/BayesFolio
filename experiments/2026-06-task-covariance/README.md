@@ -31,14 +31,22 @@ Fixed modeling choices:
   time-ETF, time-macro, and macro-ETF interactions.
 - No Riskfolio portfolio optimization. This experiment evaluates model quality
   and top/bottom 5 long-short signal only.
+- Multitask constant mean module.
+- Train-window min-max scaling on non-task input columns.
+- Stable per-variant/per-window seeds so adding a new variant does not change
+  existing variant initializations.
+- Residualized metrics that subtract each ETF's training-window historical mean
+  from both realized returns and model predictions.
 
 Outputs:
 
-- `outputs/window_predictions.csv`
-- `outputs/window_metrics.csv`
-- `outputs/variant_summary.csv`
-- `outputs/task_covariance_diagnostics.csv`
-- `outputs/live_june_predictions.csv`
+- Versioned runs are written under `outputs/runs/<run-id>/`.
+- Each run includes `manifest.json` with command, git SHA, dirty status, data
+  artifact hash, train sizes, variants, dependency versions, seed policy, and
+  output path.
+- Run files include `window_predictions.csv`, `window_metrics.csv`,
+  `variant_summary.csv`, `task_covariance_diagnostics.csv`, and
+  `live_june_predictions.csv`.
 
 Run:
 
