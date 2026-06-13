@@ -215,6 +215,7 @@ macro_cols = [
     "em_fx_ret",
 ]
 
+
 input_columns = [*time_cols, *etf_cols, *macro_cols]
 
 # 2) Train-only frame (no unlabeled tail rows)

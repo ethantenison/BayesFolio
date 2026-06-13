@@ -429,18 +429,18 @@ risk_config = RiskfolioConfig(
     obj=Objective.SHARPE,
     method_mu=MuEstimator.HIST,
     method_cov=CovEstimator.HIST,
-    nea=12,
+    nea=10,
     rf=0.0,
     ra=0.5,
     method_kurt=None,
     hist=True,
-    upperlng=0.35,
+    upperlng=0.2,
 )
 
-port_gp = rp.Portfolio(returns=final_scenarios)
+port_gp = rp.Portfolio(returns=final_scenarios, upperlng=0.2)
 port_gp.assets_stats(method_mu=risk_config.method_mu, method_cov=risk_config.method_cov)
 
-port_gp.alpha = 0.20
+port_gp.alpha = 0.5
 port_gp.nea = risk_config.nea
 port_gp.card = None
 
@@ -452,7 +452,7 @@ display(w_gp.T)
 ax = rp.plot_pie(
     w=w_gp,
     title=f"{risk_config.rm} {risk_config.obj} — GP Posterior Scenarios (1M) (excl. MGK/BND)",
-    others=0.05,
+    others=0.01,
     nrow=25,
     cmap="tab20",
     height=6,
