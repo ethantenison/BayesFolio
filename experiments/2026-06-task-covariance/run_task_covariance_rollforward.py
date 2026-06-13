@@ -144,6 +144,7 @@ VARIANTS = {
         "positive",
         BetaPrior(concentration1=2.5, concentration0=1.5),
     ),
+    "signed_no_prior": Variant("signed_no_prior", "signed", None),
     "signed_lkj_eta_1": Variant("signed_lkj_eta_1", "signed", None, lkj_eta=1.0),
     "signed_lkj_eta_2": Variant("signed_lkj_eta_2", "signed", None, lkj_eta=2.0),
 }
@@ -316,14 +317,16 @@ def build_model(train_x: torch.Tensor, train_y: torch.Tensor, variant: Variant) 
         add_tv_os_ls=True,
     )
     if variant.task_kernel == "signed":
-        replace_with_signed_index_kernel(model, eta=float(variant.lkj_eta))
+        replace_with_signed_index_kernel(model, eta=variant.lkj_eta)
     return model
 
 
-def replace_with_signed_index_kernel(model: Any, *, eta: float) -> None:
+def replace_with_signed_index_kernel(model: Any, *, eta: float | None) -> None:
     data_kernel = model.covar_module.kernels[0]
-    sd_prior = LogNormalPrior(loc=0.0, scale=0.5)
-    task_prior = LKJCovariancePrior(n=model.num_tasks, eta=eta, sd_prior=sd_prior)
+    task_prior = None
+    if eta is not None:
+        sd_prior = LogNormalPrior(loc=0.0, scale=0.5)
+        task_prior = LKJCovariancePrior(n=model.num_tasks, eta=eta, sd_prior=sd_prior)
     signed_task_kernel = IndexKernel(
         num_tasks=model.num_tasks,
         rank=RANK,
@@ -403,6 +406,11 @@ def window_scalar_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_std: np.ndar
     return {"rmse": rmse, "mae": mae, "nlpd": nlpd, "cover_1sd": cover_1sd, "cover_2sd": cover_2sd}
 
 
+def stable_seed(base_seed: int, variant_name: str, window_index: int) -> int:
+    variant_offset = sum((idx + 1) * ord(char) for idx, char in enumerate(variant_name))
+    return int(base_seed + variant_offset + window_index)
+
+
 def summarize_variant(variant: str, pred_rows: list[dict[str, Any]]) -> dict[str, float | str]:
     y_true = panelize(pred_rows, "y_true")
     y_pred = panelize(pred_rows, "y_pred")
@@ -439,13 +447,14 @@ def run(args: argparse.Namespace) -> None:
     for variant in variants:
         print(f"== {variant.name} ==", flush=True)
         variant_pred_rows: list[dict[str, Any]] = []
-        for window_date in scored_dates:
+        for window_index, window_date in enumerate(scored_dates):
             print(f"  window {window_date.date()}", flush=True)
             train_df = df[(df["date"] < window_date) & df[TARGET_COL].notna()].copy()
             eval_df = df[df["date"] == window_date].copy()
             if variant.task_kernel == "baseline":
                 y_pred, y_std = historical_mean_predict(train_df, eval_df)
             else:
+                torch.manual_seed(stable_seed(args.seed, variant.name, window_index))
                 train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
                 model = build_model(train_x, train_y, variant)
                 y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
@@ -479,6 +488,7 @@ def run(args: argparse.Namespace) -> None:
             if variant.task_kernel == "baseline":
                 y_pred, y_std = historical_mean_predict(train_df, eval_df)
             else:
+                torch.manual_seed(stable_seed(args.seed, variant.name, len(scored_dates)))
                 train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
                 model = build_model(train_x, train_y, variant)
                 y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)

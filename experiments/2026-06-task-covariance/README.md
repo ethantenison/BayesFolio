@@ -17,8 +17,9 @@ Variants:
 2. `positive_no_prior`: BoTorch `PositiveIndexKernel`, `task_covar_prior=None`
 3. `positive_beta_prior`: BoTorch `PositiveIndexKernel`, BoTorch 0.18 default
    `BetaPrior(2.5, 1.5)`
-4. `signed_lkj_eta_1`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=1.0)`
-5. `signed_lkj_eta_2`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=2.0)`
+4. `signed_no_prior`: GPyTorch `IndexKernel`, no task covariance prior
+5. `signed_lkj_eta_1`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=1.0)`
+6. `signed_lkj_eta_2`: GPyTorch `IndexKernel`, `LKJCovariancePrior(eta=2.0)`
 
 Fixed modeling choices:
 
