@@ -25,8 +25,20 @@ from bayesfolio.engine.forecast.gp.time_varying_kernel import build_time_varying
 
 RUN_ID = "20260613_time_modulation_ablation"
 RUN_ID_OUTPUTSCALE_PRIOR = "20260613_time_modulation_ablation_outputscale_prior"
+RUN_ID_COMPONENT_BUDGET_PRIOR = "20260613_time_modulation_ablation_component_budget_prior"
 BASE_VARIANT = exp.VARIANTS["positive_no_prior"]
 MODES = ["both", "outputscale_only", "lengthscale_only", "neither"]
+LOGNORMAL_SIGMA = 0.5
+SCALE_COMPONENT_BUDGETS = [
+    ("time", 0.10),
+    ("etf", 0.25),
+    ("macro_matern", 0.20),
+    ("macro_rq", 0.10),
+    ("macro_linear", 0.10),
+    ("time_x_etf", 0.07),
+    ("time_x_macro", 0.09),
+    ("macro_x_etf", 0.09),
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -36,10 +48,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-windows", type=int, default=None)
     parser.add_argument("--maxiter", type=int, default=50)
     parser.add_argument("--seed", type=int, default=27)
-    parser.add_argument("--outputscale-prior", choices=["none", "lognormal_unit"], default="none")
+    parser.add_argument(
+        "--outputscale-prior",
+        choices=["none", "lognormal_unit", "lognormal_component_budget"],
+        default="none",
+    )
     args = parser.parse_args()
     if args.output_dir is None:
-        run_id = RUN_ID_OUTPUTSCALE_PRIOR if args.outputscale_prior != "none" else RUN_ID
+        if args.outputscale_prior == "lognormal_component_budget":
+            run_id = RUN_ID_COMPONENT_BUDGET_PRIOR
+        elif args.outputscale_prior != "none":
+            run_id = RUN_ID_OUTPUTSCALE_PRIOR
+        else:
+            run_id = RUN_ID
         args.output_dir = exp.OUTPUT_ROOT / "runs" / run_id
     return args
 
@@ -60,20 +81,65 @@ def modulation_builder(mode: str) -> tuple[bool, Callable[[Kernel], Kernel]]:
 def apply_outputscale_prior(model: torch.nn.Module, prior_name: str) -> int:
     if prior_name == "none":
         return 0
-    if prior_name != "lognormal_unit":
+    if prior_name not in {"lognormal_unit", "lognormal_component_budget"}:
         raise ValueError(f"Unknown outputscale prior: {prior_name}")
 
     applied = 0
-    for module in model.modules():
-        if isinstance(module, ScaleKernel):
-            module.register_prior(
-                "unit_lognormal_outputscale_prior",
-                LogNormalPrior(loc=0.0, scale=0.5),
-                "outputscale",
-            )
-            module.initialize(outputscale=1.0)
-            applied += 1
+    scale_modules = [module for module in model.modules() if isinstance(module, ScaleKernel)]
+    if prior_name == "lognormal_component_budget" and len(scale_modules) != len(SCALE_COMPONENT_BUDGETS):
+        raise ValueError(
+            "Component-budget outputscale prior expected "
+            f"{len(SCALE_COMPONENT_BUDGETS)} ScaleKernels but found {len(scale_modules)}"
+        )
+    for index, module in enumerate(scale_modules):
+        if prior_name == "lognormal_unit":
+            component_name = "unit"
+            median = 1.0
+        else:
+            component_name, median = SCALE_COMPONENT_BUDGETS[index]
+        module.register_prior(
+            f"{component_name}_lognormal_outputscale_prior",
+            LogNormalPrior(loc=float(np.log(median)), scale=LOGNORMAL_SIGMA),
+            "outputscale",
+        )
+        module.initialize(outputscale=median)
+        applied += 1
     return applied
+
+
+def collect_outputscale_diagnostics(
+    *,
+    model: torch.nn.Module,
+    variant: str,
+    window_date: pd.Timestamp | None,
+    window_index: int,
+    outputscale_prior: str,
+) -> list[dict[str, Any]]:
+    diagnostics: list[dict[str, Any]] = []
+    scale_modules = [(name, module) for name, module in model.named_modules() if isinstance(module, ScaleKernel)]
+    for index, (path, module) in enumerate(scale_modules):
+        if index < len(SCALE_COMPONENT_BUDGETS):
+            component, budget_median = SCALE_COMPONENT_BUDGETS[index]
+        else:
+            component, budget_median = path, np.nan
+        outputscale = module.outputscale.detach().cpu().reshape(-1)
+        diagnostics.append(
+            {
+                "variant": variant,
+                "date": window_date.date().isoformat() if window_date is not None else "live",
+                "window_index": window_index,
+                "outputscale_prior": outputscale_prior,
+                "scale_index": index,
+                "component": component,
+                "kernel_path": path,
+                "kernel_type": module.base_kernel.__class__.__name__,
+                "prior_median": float(budget_median),
+                "learned_outputscale_mean": float(outputscale.mean()),
+                "learned_outputscale_min": float(outputscale.min()),
+                "learned_outputscale_max": float(outputscale.max()),
+            }
+        )
+    return diagnostics
 
 
 def fit_mode(
@@ -82,10 +148,11 @@ def fit_mode(
     train_df: pd.DataFrame,
     eval_df: pd.DataFrame,
     window_index: int,
+    window_date: pd.Timestamp | None,
     seed: int,
     maxiter: int,
     outputscale_prior: str,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, list[dict[str, Any]]]:
     add_tv_os_ls, builder = modulation_builder(mode)
     original = multitask_builder.add_time_varying_os_ls
     multitask_builder.add_time_varying_os_ls = builder
@@ -116,7 +183,15 @@ def fit_mode(
             add_tv_os_ls=add_tv_os_ls,
         )
         apply_outputscale_prior(model, outputscale_prior)
-        return exp.fit_and_predict(model, eval_x, maxiter=maxiter)
+        y_pred, y_std = exp.fit_and_predict(model, eval_x, maxiter=maxiter)
+        diagnostics = collect_outputscale_diagnostics(
+            model=model,
+            variant=f"{BASE_VARIANT.name}_{mode}",
+            window_date=window_date,
+            window_index=window_index,
+            outputscale_prior=outputscale_prior,
+        )
+        return y_pred, y_std, diagnostics
     finally:
         multitask_builder.add_time_varying_os_ls = original
 
@@ -230,6 +305,7 @@ def run(args: argparse.Namespace) -> None:
 
     pred_rows: list[dict[str, Any]] = []
     live_rows: list[dict[str, Any]] = []
+    outputscale_diag_rows: list[dict[str, Any]] = []
     variants = ["historical_mean", *[f"{BASE_VARIANT.name}_{mode}" for mode in MODES]]
 
     for window_index, window_date in enumerate(scored_dates):
@@ -249,15 +325,17 @@ def run(args: argparse.Namespace) -> None:
         for mode in MODES:
             variant_name = f"{BASE_VARIANT.name}_{mode}"
             print(f"  {variant_name}", flush=True)
-            y_pred, y_std = fit_mode(
+            y_pred, y_std, diagnostics = fit_mode(
                 mode=mode,
                 train_df=train_df,
                 eval_df=eval_df,
                 window_index=window_index,
+                window_date=window_date,
                 seed=args.seed,
                 maxiter=args.maxiter,
                 outputscale_prior=args.outputscale_prior,
             )
+            outputscale_diag_rows.extend(diagnostics)
             pred_rows.extend(
                 prediction_records(
                     variant=variant_name,
@@ -273,15 +351,17 @@ def run(args: argparse.Namespace) -> None:
         eval_df = df[df["date"] == live_date].copy()
         for mode in MODES:
             variant_name = f"{BASE_VARIANT.name}_{mode}"
-            y_pred, y_std = fit_mode(
+            y_pred, y_std, diagnostics = fit_mode(
                 mode=mode,
                 train_df=train_df,
                 eval_df=eval_df,
                 window_index=len(scored_dates),
+                window_date=None,
                 seed=args.seed,
                 maxiter=args.maxiter,
                 outputscale_prior=args.outputscale_prior,
             )
+            outputscale_diag_rows.extend(diagnostics)
             live_rows.extend(
                 prediction_records(
                     variant=variant_name,
@@ -298,6 +378,7 @@ def run(args: argparse.Namespace) -> None:
     summary = pd.DataFrame(summary_rows)
     pd.DataFrame(pred_rows).to_csv(args.output_dir / "window_predictions.csv", index=False)
     pd.DataFrame(live_rows).to_csv(args.output_dir / "live_predictions.csv", index=False)
+    pd.DataFrame(outputscale_diag_rows).to_csv(args.output_dir / "outputscale_diagnostics.csv", index=False)
     summary.to_csv(args.output_dir / "variant_summary.csv", index=False)
     write_asset_plots(args.output_dir, pred_rows)
 
