@@ -16,13 +16,15 @@ import run_task_covariance_rollforward as exp
 import torch
 from botorch.models.transforms.input import Normalize
 from botorch.models.transforms.outcome import StratifiedStandardize
-from gpytorch.kernels import Kernel
+from gpytorch.kernels import Kernel, ScaleKernel
+from gpytorch.priors import LogNormalPrior
 
 import bayesfolio.engine.forecast.gp.multitask_builder as multitask_builder
 from bayesfolio.engine.forecast.gp.multitask_builder import MeanKind, MeanModuleConfig, build_multitask_gp
 from bayesfolio.engine.forecast.gp.time_varying_kernel import build_time_varying_kernel
 
 RUN_ID = "20260613_time_modulation_ablation"
+RUN_ID_OUTPUTSCALE_PRIOR = "20260613_time_modulation_ablation_outputscale_prior"
 BASE_VARIANT = exp.VARIANTS["positive_no_prior"]
 MODES = ["both", "outputscale_only", "lengthscale_only", "neither"]
 
@@ -30,11 +32,16 @@ MODES = ["both", "outputscale_only", "lengthscale_only", "neither"]
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--feature-path", type=Path, default=exp.DEFAULT_FEATURE_PATH)
-    parser.add_argument("--output-dir", type=Path, default=exp.OUTPUT_ROOT / "runs" / RUN_ID)
+    parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--max-windows", type=int, default=None)
     parser.add_argument("--maxiter", type=int, default=50)
     parser.add_argument("--seed", type=int, default=27)
-    return parser.parse_args()
+    parser.add_argument("--outputscale-prior", choices=["none", "lognormal_unit"], default="none")
+    args = parser.parse_args()
+    if args.output_dir is None:
+        run_id = RUN_ID_OUTPUTSCALE_PRIOR if args.outputscale_prior != "none" else RUN_ID
+        args.output_dir = exp.OUTPUT_ROOT / "runs" / run_id
+    return args
 
 
 def modulation_builder(mode: str) -> tuple[bool, Callable[[Kernel], Kernel]]:
@@ -50,6 +57,25 @@ def modulation_builder(mode: str) -> tuple[bool, Callable[[Kernel], Kernel]]:
     raise ValueError(f"Unknown mode: {mode}")
 
 
+def apply_outputscale_prior(model: torch.nn.Module, prior_name: str) -> int:
+    if prior_name == "none":
+        return 0
+    if prior_name != "lognormal_unit":
+        raise ValueError(f"Unknown outputscale prior: {prior_name}")
+
+    applied = 0
+    for module in model.modules():
+        if isinstance(module, ScaleKernel):
+            module.register_prior(
+                "unit_lognormal_outputscale_prior",
+                LogNormalPrior(loc=0.0, scale=0.5),
+                "outputscale",
+            )
+            module.initialize(outputscale=1.0)
+            applied += 1
+    return applied
+
+
 def fit_mode(
     *,
     mode: str,
@@ -58,6 +84,7 @@ def fit_mode(
     window_index: int,
     seed: int,
     maxiter: int,
+    outputscale_prior: str,
 ) -> tuple[np.ndarray, np.ndarray]:
     add_tv_os_ls, builder = modulation_builder(mode)
     original = multitask_builder.add_time_varying_os_ls
@@ -88,6 +115,7 @@ def fit_mode(
             task_covar_prior=BASE_VARIANT.task_covar_prior,
             add_tv_os_ls=add_tv_os_ls,
         )
+        apply_outputscale_prior(model, outputscale_prior)
         return exp.fit_and_predict(model, eval_x, maxiter=maxiter)
     finally:
         multitask_builder.add_time_varying_os_ls = original
@@ -195,6 +223,7 @@ def run(args: argparse.Namespace) -> None:
         "live_date": live_date.date().isoformat() if live_date is not None else None,
         "maxiter": args.maxiter,
         "seed": args.seed,
+        "outputscale_prior": args.outputscale_prior,
         "output_dir": str(args.output_dir),
     }
     (args.output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
@@ -227,6 +256,7 @@ def run(args: argparse.Namespace) -> None:
                 window_index=window_index,
                 seed=args.seed,
                 maxiter=args.maxiter,
+                outputscale_prior=args.outputscale_prior,
             )
             pred_rows.extend(
                 prediction_records(
@@ -250,6 +280,7 @@ def run(args: argparse.Namespace) -> None:
                 window_index=len(scored_dates),
                 seed=args.seed,
                 maxiter=args.maxiter,
+                outputscale_prior=args.outputscale_prior,
             )
             live_rows.extend(
                 prediction_records(
