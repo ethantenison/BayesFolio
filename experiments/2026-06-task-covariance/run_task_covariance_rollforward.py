@@ -30,6 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+import bayesfolio.engine.forecast.gp.multitask_builder as multitask_builder  # noqa: E402
 from bayesfolio.engine.backtest.evaluate_asset_pricing import evaluate_asset_pricing  # noqa: E402
 from bayesfolio.engine.backtest.portfolio_helpers import long_short_returns_topk, portfolio_stats  # noqa: E402
 from bayesfolio.engine.forecast.gp.multitask_builder import (  # noqa: E402
@@ -49,6 +50,7 @@ from bayesfolio.engine.forecast.gp.multitask_builder import (  # noqa: E402
     RQKernelComponentConfig,
     build_multitask_gp,
 )
+from bayesfolio.engine.forecast.gp.time_varying_kernel import build_time_varying_kernel  # noqa: E402
 
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 DEFAULT_FEATURE_PATH = Path("/Users/et/.bayesfolio/artifacts/features/portfolio_etf_macro_features_2026_06.parquet")
@@ -132,6 +134,7 @@ INPUT_COLUMNS = [*TIME_COLS, *ETF_COLS, *MACRO_COLS]
 TARGET_COL = "y_excess_lead"
 TASK_FEATURE = -1
 RANK = 5
+TIME_MODULATION_MODES = ["both", "lengthscale_only", "outputscale_only", "neither"]
 
 
 @dataclass(frozen=True)
@@ -165,6 +168,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--maxiter", type=int, default=75)
     parser.add_argument("--variants", nargs="+", default=list(VARIANTS))
     parser.add_argument("--seed", type=int, default=27)
+    parser.add_argument("--time-modulation-mode", choices=TIME_MODULATION_MODES, default="both")
     return parser.parse_args()
 
 
@@ -327,7 +331,26 @@ def training_asset_means(train_df: pd.DataFrame, eval_df: pd.DataFrame) -> np.nd
     return eval_df["asset_id"].astype(str).map(means).fillna(global_mean).to_numpy(dtype=float)
 
 
-def build_model(train_x: torch.Tensor, train_y: torch.Tensor, variant: Variant) -> Any:
+def time_modulation_builder(mode: str) -> tuple[bool, Any]:
+    original = multitask_builder.add_time_varying_os_ls
+    if mode == "both":
+        return True, original
+    if mode == "lengthscale_only":
+        return True, lambda covar: build_time_varying_kernel(covar, time_feature_index=0, target="lengthscale")
+    if mode == "outputscale_only":
+        return True, lambda covar: build_time_varying_kernel(covar, time_feature_index=0, target="outputscale")
+    if mode == "neither":
+        return False, original
+    raise ValueError(f"Unknown time modulation mode: {mode}")
+
+
+def build_model(
+    train_x: torch.Tensor,
+    train_y: torch.Tensor,
+    variant: Variant,
+    *,
+    time_modulation_mode: str,
+) -> Any:
     task_idx = train_x.shape[-1] - 1
     all_task_values = train_x[:, task_idx].to(torch.long).unique(sorted=True)
     input_transform = Normalize(
@@ -339,19 +362,25 @@ def build_model(train_x: torch.Tensor, train_y: torch.Tensor, variant: Variant) 
         all_task_values=all_task_values,
         batch_shape=train_y.shape[:-2],
     )
-    model = build_multitask_gp(
-        train_X=train_x,
-        train_Y=train_y,
-        task_feature=TASK_FEATURE,
-        covar_config=build_covar_config(),
-        mean_config=MeanModuleConfig(kind=MeanKind.MULTITASK_CONSTANT),
-        rank=RANK,
-        min_inferred_noise_level=5e-3,
-        outcome_transform=outcome_transform,
-        input_transform=input_transform,
-        task_covar_prior=variant.task_covar_prior,
-        add_tv_os_ls=True,
-    )
+    add_tv_os_ls, builder = time_modulation_builder(time_modulation_mode)
+    original_builder = multitask_builder.add_time_varying_os_ls
+    multitask_builder.add_time_varying_os_ls = builder
+    try:
+        model = build_multitask_gp(
+            train_X=train_x,
+            train_Y=train_y,
+            task_feature=TASK_FEATURE,
+            covar_config=build_covar_config(),
+            mean_config=MeanModuleConfig(kind=MeanKind.MULTITASK_CONSTANT),
+            rank=RANK,
+            min_inferred_noise_level=5e-3,
+            outcome_transform=outcome_transform,
+            input_transform=input_transform,
+            task_covar_prior=variant.task_covar_prior,
+            add_tv_os_ls=add_tv_os_ls,
+        )
+    finally:
+        multitask_builder.add_time_varying_os_ls = original_builder
     if variant.task_kernel == "signed":
         replace_with_signed_index_kernel(model, eta=variant.lkj_eta)
     return model
@@ -559,8 +588,9 @@ def build_manifest(
             "rank": RANK,
             "mean_config": MeanKind.MULTITASK_CONSTANT.value,
             "task_feature": TASK_FEATURE,
-            "add_time_varying_lengthscale": True,
-            "add_time_varying_outputscale": True,
+            "time_modulation_mode": args.time_modulation_mode,
+            "add_time_varying_lengthscale": args.time_modulation_mode in {"both", "lengthscale_only"},
+            "add_time_varying_outputscale": args.time_modulation_mode in {"both", "outputscale_only"},
             "scaling": "BoTorch Normalize input_transform on non-task feature columns",
             "input_transform": {
                 "class": "botorch.models.transforms.input.Normalize",
@@ -620,7 +650,12 @@ def run(args: argparse.Namespace) -> None:
             else:
                 torch.manual_seed(stable_seed(args.seed, variant.name, window_index))
                 train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
-                model = build_model(train_x, train_y, variant)
+                model = build_model(
+                    train_x,
+                    train_y,
+                    variant,
+                    time_modulation_mode=args.time_modulation_mode,
+                )
                 y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
                 corr = task_correlation(model)
                 diag_rows.append(covariance_diagnostics(corr, variant=variant.name, window_date=window_date))
@@ -664,7 +699,12 @@ def run(args: argparse.Namespace) -> None:
             else:
                 torch.manual_seed(stable_seed(args.seed, variant.name, len(scored_dates)))
                 train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
-                model = build_model(train_x, train_y, variant)
+                model = build_model(
+                    train_x,
+                    train_y,
+                    variant,
+                    time_modulation_mode=args.time_modulation_mode,
+                )
                 y_pred, y_std = fit_and_predict(model, eval_x, maxiter=args.maxiter)
             train_means = training_asset_means(train_df, eval_df)
             for row, mean, std, train_mean in zip(
