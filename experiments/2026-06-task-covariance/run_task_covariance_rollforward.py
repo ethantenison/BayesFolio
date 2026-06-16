@@ -169,6 +169,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--variants", nargs="+", default=list(VARIANTS))
     parser.add_argument("--seed", type=int, default=27)
     parser.add_argument("--time-modulation-mode", choices=TIME_MODULATION_MODES, default="both")
+    parser.add_argument(
+        "--target-winsorize-quantile",
+        type=float,
+        default=None,
+        help=(
+            "Optional symmetric per-ETF training-target winsorization quantile. "
+            "For example, 0.01 clips train_y to the per-ETF 1st/99th percentiles "
+            "inside each roll-forward training window before StratifiedStandardize."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -302,6 +312,54 @@ def prepare_window_tensors(
     maxs = train_x[:, : len(INPUT_COLUMNS)].amax(dim=0)
     ranges = (maxs - mins).clamp_min(1e-12)
     return train_x, train_y, eval_x, task_map, mins, ranges
+
+
+def winsorize_training_target(
+    train_df: pd.DataFrame,
+    *,
+    quantile: float | None,
+    variant: str,
+    window_date: pd.Timestamp | None,
+) -> tuple[pd.DataFrame, list[dict[str, Any]]]:
+    if quantile is None:
+        return train_df, []
+    if not 0.0 < quantile < 0.5:
+        raise ValueError(f"target winsorization quantile must be in (0, 0.5), got {quantile}")
+
+    clipped = train_df.copy()
+    rows: list[dict[str, Any]] = []
+    date_label = window_date.date().isoformat() if window_date is not None else "live"
+    grouped = clipped.groupby("asset_id", observed=True)[TARGET_COL]
+    lowers = grouped.quantile(quantile)
+    uppers = grouped.quantile(1.0 - quantile)
+
+    for asset_id in ETF_TICKERS:
+        if asset_id not in lowers.index or asset_id not in uppers.index:
+            continue
+        mask = clipped["asset_id"].astype(str) == asset_id
+        original = clipped.loc[mask, TARGET_COL].to_numpy(dtype=float)
+        lower = float(lowers.loc[asset_id])
+        upper = float(uppers.loc[asset_id])
+        clipped_values = np.clip(original, lower, upper)
+        clipped.loc[mask, TARGET_COL] = clipped_values
+        rows.append(
+            {
+                "variant": variant,
+                "window_date": date_label,
+                "asset_id": asset_id,
+                "target_winsorize_quantile": quantile,
+                "lower": lower,
+                "upper": upper,
+                "n_train": int(mask.sum()),
+                "n_low_clipped": int(np.sum(original < lower)),
+                "n_high_clipped": int(np.sum(original > upper)),
+                "mean_before": float(np.mean(original)),
+                "mean_after": float(np.mean(clipped_values)),
+                "std_before": float(np.std(original, ddof=1)),
+                "std_after": float(np.std(clipped_values, ddof=1)),
+            }
+        )
+    return clipped, rows
 
 
 def _frame_to_x(df: pd.DataFrame, task_map: dict[str, int]) -> torch.Tensor:
@@ -599,6 +657,18 @@ def build_manifest(
                 "excluded_columns": ["task_feature"],
             },
             "outcome_transform": "StratifiedStandardize by ETF task",
+            "target_winsorization": (
+                {
+                    "enabled": True,
+                    "scope": "roll-forward training window only",
+                    "grouping": "per ETF asset_id",
+                    "quantile": args.target_winsorize_quantile,
+                    "order": "applied before StratifiedStandardize",
+                    "evaluation_target": "unclipped realized y_excess_lead",
+                }
+                if args.target_winsorize_quantile is not None
+                else {"enabled": False}
+            ),
             "residualized_metrics": "subtract each ETF training-window historical mean from y_true and y_pred",
         },
         "runtime": {
@@ -636,6 +706,7 @@ def run(args: argparse.Namespace) -> None:
     pred_rows: list[dict[str, Any]] = []
     window_metric_rows: list[dict[str, Any]] = []
     diag_rows: list[dict[str, Any]] = []
+    target_winsor_rows: list[dict[str, Any]] = []
     live_rows: list[dict[str, Any]] = []
 
     for variant in variants:
@@ -645,11 +716,18 @@ def run(args: argparse.Namespace) -> None:
             print(f"  window {window_date.date()}", flush=True)
             train_df = df[(df["date"] < window_date) & df[TARGET_COL].notna()].copy()
             eval_df = df[df["date"] == window_date].copy()
+            model_train_df, winsor_rows = winsorize_training_target(
+                train_df,
+                quantile=args.target_winsorize_quantile,
+                variant=variant.name,
+                window_date=window_date,
+            )
+            target_winsor_rows.extend(winsor_rows)
             if variant.task_kernel == "baseline":
-                y_pred, y_std = historical_mean_predict(train_df, eval_df)
+                y_pred, y_std = historical_mean_predict(model_train_df, eval_df)
             else:
                 torch.manual_seed(stable_seed(args.seed, variant.name, window_index))
-                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
+                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(model_train_df, eval_df)
                 model = build_model(
                     train_x,
                     train_y,
@@ -694,11 +772,18 @@ def run(args: argparse.Namespace) -> None:
             print(f"  live {live_date.date()}", flush=True)
             train_df = df[(df["date"] < live_date) & df[TARGET_COL].notna()].copy()
             eval_df = df[df["date"] == live_date].copy()
+            model_train_df, winsor_rows = winsorize_training_target(
+                train_df,
+                quantile=args.target_winsorize_quantile,
+                variant=variant.name,
+                window_date=None,
+            )
+            target_winsor_rows.extend(winsor_rows)
             if variant.task_kernel == "baseline":
-                y_pred, y_std = historical_mean_predict(train_df, eval_df)
+                y_pred, y_std = historical_mean_predict(model_train_df, eval_df)
             else:
                 torch.manual_seed(stable_seed(args.seed, variant.name, len(scored_dates)))
-                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(train_df, eval_df)
+                train_x, train_y, eval_x, _, _, _ = prepare_window_tensors(model_train_df, eval_df)
                 model = build_model(
                     train_x,
                     train_y,
@@ -743,6 +828,8 @@ def run(args: argparse.Namespace) -> None:
     pd.DataFrame(window_metric_rows).to_csv(output_dir / "window_metrics.csv", index=False)
     summary.to_csv(output_dir / "variant_summary.csv", index=False)
     pd.DataFrame(diag_rows).to_csv(output_dir / "task_covariance_diagnostics.csv", index=False)
+    if target_winsor_rows:
+        pd.DataFrame(target_winsor_rows).to_csv(output_dir / "target_winsorization_diagnostics.csv", index=False)
     if live_rows:
         pd.DataFrame(live_rows).to_csv(output_dir / "live_june_predictions.csv", index=False)
 
