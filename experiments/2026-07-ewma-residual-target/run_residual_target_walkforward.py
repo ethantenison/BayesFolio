@@ -1,8 +1,8 @@
-"""Walk-forward monthly portfolio optimization from multitask GP scenarios.
+"""Walk-forward monthly portfolio optimization with optional EWMA residual targets.
 
 Usage:
-    poetry run python experiments/2026-06-portfolio-optimization/run_monthly_optimization_walkforward.py \
-        --run-id 20260616_gp_scenario_portfolio --maxiter 50
+    poetry run python experiments/2026-07-ewma-residual-target/run_residual_target_walkforward.py \
+        --run-id 20260702_next08_residual_ewma_hl3
 """
 
 from __future__ import annotations
@@ -53,6 +53,8 @@ OUTPUT_ROOT = EXPERIMENT_DIR / "outputs"
 HELPER_ASSETS = {"MGK", "BND"}
 STARTING_VALUE = 10_000.0
 PERIODS_PER_YEAR = 12
+EWMA_BASELINE_COL = "ewma_baseline_pred"
+RESIDUAL_TARGET_COL = "y_excess_lead_residual_ewma"
 SIGNED_EXPERIMENTS = {
     "signed_no_prior",
     "signed_lkj_eta_2",
@@ -83,15 +85,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=27)
     parser.add_argument("--posterior-scenarios", type=int, default=5000)
     parser.add_argument(
-        "--train-months",
-        type=int,
-        default=None,
-        help=(
-            "If set, fit each rebalance window on only this many calendar months before the "
-            "construction date. Evaluation dates are unchanged."
-        ),
-    )
-    parser.add_argument(
         "--include-live-window",
         action="store_true",
         help="Append the unlabeled live tail date as a portfolio construction point with NaN realized return.",
@@ -100,12 +93,6 @@ def parse_args() -> argparse.Namespace:
         "--drop-incomplete-feature-dates",
         action="store_true",
         help="Drop dates before the first month where all model input feature cells are complete.",
-    )
-    parser.add_argument(
-        "--min-feature-date",
-        type=str,
-        default=None,
-        help="If set, drop feature rows before this YYYY-MM-DD date before scoring windows are selected.",
     )
     parser.add_argument(
         "--min-inferred-noise-level",
@@ -210,6 +197,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--outputscale-prior-median", type=float, default=0.05)
     parser.add_argument("--outputscale-prior-sigma", type=float, default=0.75)
     parser.add_argument(
+        "--target-mode",
+        choices=["raw", "ewma_residual"],
+        default="raw",
+        help="Fit the GP to the raw target or to target minus a trailing per-ETF EWMA baseline.",
+    )
+    parser.add_argument(
+        "--ewma-baseline-half-life-months",
+        type=float,
+        default=3.0,
+        help="Per-ETF trailing EWMA half-life used when --target-mode ewma_residual.",
+    )
+    parser.add_argument(
         "--recency-half-life-months",
         type=float,
         default=None,
@@ -293,20 +292,10 @@ def build_manifest(
             "rows": int(len(df)),
             "date_min": df["date"].min().date().isoformat(),
             "date_max": df["date"].max().date().isoformat(),
-            "min_feature_date_filter": args.min_feature_date,
             "target_col": task_exp.TARGET_COL,
             "training_universe": task_exp.ETF_TICKERS,
             "helper_assets_fit_but_excluded": sorted(HELPER_ASSETS),
             "final_portfolio_universe": final_universe,
-        },
-        "training_history": {
-            "mode": "rolling_calendar_months" if args.train_months is not None else "all_available_before_window",
-            "train_months": args.train_months,
-            "window_rule": (
-                "date >= window_date - DateOffset(months=train_months) and date < window_date"
-                if args.train_months is not None
-                else "date < window_date"
-            ),
         },
         "rebalance_dates": [date.date().isoformat() for date in scored_dates],
         "live_rebalance_date": live_date.date().isoformat() if live_date is not None else None,
@@ -419,6 +408,23 @@ def build_manifest(
             "maxiter": args.maxiter,
             "seed": args.seed,
             "mean_kind": args.mean_kind,
+            "target_mode": args.target_mode,
+            "target_transform": (
+                {
+                    "mode": "ewma_residual",
+                    "raw_target_col": task_exp.TARGET_COL,
+                    "model_target_col": RESIDUAL_TARGET_COL,
+                    "baseline_col": EWMA_BASELINE_COL,
+                    "baseline": "per-ETF trailing EWMA of prior monthly y_excess_lead values only",
+                    "half_life_months": args.ewma_baseline_half_life_months,
+                    "training_target": "y_excess_lead - ewma_baseline_pred",
+                    "prediction_reconstruction": "y_pred = ewma_baseline_pred + gp_predicted_residual",
+                    "scenario_reconstruction": "scenario = ewma_baseline_pred + gp_residual_scenario",
+                    "first_history_fallback": 0.0,
+                }
+                if args.target_mode == "ewma_residual"
+                else {"mode": "raw", "raw_target_col": task_exp.TARGET_COL}
+            ),
         },
     }
 
@@ -439,21 +445,6 @@ def input_transform_description(mode: str) -> str:
     return "BoTorch Normalize on non-task feature columns"
 
 
-def training_slice(df: pd.DataFrame, window_date: pd.Timestamp, train_months: int | None) -> pd.DataFrame:
-    train_df = df[(df["date"] < window_date) & df[task_exp.TARGET_COL].notna()].copy()
-    if train_months is None:
-        return train_df
-    cutoff = window_date - pd.DateOffset(months=train_months)
-    return train_df[train_df["date"] >= cutoff].copy()
-
-
-def apply_min_feature_date(df: pd.DataFrame, min_feature_date: str | None) -> pd.DataFrame:
-    if min_feature_date is None:
-        return df
-    cutoff = pd.Timestamp(min_feature_date)
-    return df[df["date"] >= cutoff].copy().reset_index(drop=True)
-
-
 def drop_incomplete_feature_dates(df: pd.DataFrame) -> pd.DataFrame:
     feature_na_by_date = df.groupby("date", observed=True)[task_exp.INPUT_COLUMNS].apply(
         lambda frame: int(frame.isna().sum().sum())
@@ -463,6 +454,34 @@ def drop_incomplete_feature_dates(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("No complete feature dates found in feature panel.")
     first_complete_date = complete_dates.min()
     return df[df["date"] >= first_complete_date].copy().reset_index(drop=True)
+
+
+def add_ewma_residual_target(df: pd.DataFrame, *, half_life_months: float) -> pd.DataFrame:
+    if half_life_months <= 0:
+        raise ValueError(f"EWMA half-life must be positive, got {half_life_months}")
+    out = df.sort_values(["asset_id", "date"]).copy()
+    baseline_parts: list[pd.Series] = []
+    for _, group in out.groupby("asset_id", observed=True, sort=False):
+        lagged_target = group[task_exp.TARGET_COL].astype(float).shift(1)
+        baseline = lagged_target.ewm(
+            halflife=half_life_months,
+            adjust=False,
+            min_periods=1,
+        ).mean()
+        baseline_parts.append(baseline)
+    out[EWMA_BASELINE_COL] = pd.concat(baseline_parts).sort_index().fillna(0.0)
+    out[RESIDUAL_TARGET_COL] = out[task_exp.TARGET_COL].astype(float) - out[EWMA_BASELINE_COL].astype(float)
+    return out.sort_values(["date", "asset_id"]).reset_index(drop=True)
+
+
+def model_frame_for_target(df: pd.DataFrame, *, args: argparse.Namespace) -> pd.DataFrame:
+    if args.target_mode == "raw":
+        return df
+    if args.target_mode != "ewma_residual":
+        raise ValueError(f"Unknown target mode: {args.target_mode}")
+    transformed = df.copy()
+    transformed[task_exp.TARGET_COL] = transformed[RESIDUAL_TARGET_COL]
+    return transformed
 
 
 def optimize_riskfolio(
@@ -1085,7 +1104,9 @@ def prepare_window_tensors_for_run(
     *,
     args: argparse.Namespace,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor | None, dict[str, float] | None]:
-    train_x, train_y, eval_x, _, _, _ = task_exp.prepare_window_tensors(train_df, eval_df)
+    model_train_df = model_frame_for_target(train_df, args=args)
+    model_eval_df = model_frame_for_target(eval_df, args=args)
+    train_x, train_y, eval_x, _, _, _ = task_exp.prepare_window_tensors(model_train_df, model_eval_df)
     train_yvar, recency_summary = build_recency_train_yvar(train_df, eval_df, args=args)
     if args.input_transform_mode != "june_manual_minmax":
         return train_x, train_y, eval_x, train_yvar, recency_summary
@@ -1292,17 +1313,29 @@ def fit_gp_window(
         scenario_samples = posterior.rsample(torch.Size([posterior_scenarios])).squeeze(-1).detach().cpu().numpy()
 
     assets = eval_df["asset_id"].astype(str).tolist()
-    scenarios = pd.DataFrame(scenario_samples, columns=assets)
+    baseline = (
+        eval_df[EWMA_BASELINE_COL].to_numpy(dtype=float)
+        if args.target_mode == "ewma_residual"
+        else np.zeros(len(eval_df), dtype=float)
+    )
+    raw_pred_mean = pred_mean + baseline
+    raw_scenario_samples = scenario_samples + baseline.reshape(1, -1)
+    scenarios = pd.DataFrame(raw_scenario_samples, columns=assets)
     predictions = pd.DataFrame(
         {
             "date": pd.Timestamp(eval_df["date"].iloc[0]).date().isoformat(),
             "asset_id": assets,
             "y_true": eval_df[task_exp.TARGET_COL].to_numpy(dtype=float),
-            "y_pred": pred_mean,
+            "y_pred": raw_pred_mean,
             "y_std": pred_std,
-            "score": pred_mean / np.clip(pred_std, 1e-12, None),
+            "score": raw_pred_mean / np.clip(pred_std, 1e-12, None),
         }
     )
+    if args.target_mode == "ewma_residual":
+        predictions[EWMA_BASELINE_COL] = baseline
+        predictions["y_true_residual"] = eval_df[RESIDUAL_TARGET_COL].to_numpy(dtype=float)
+        predictions["y_pred_residual"] = pred_mean
+        predictions["y_std_residual"] = pred_std
     diagnostics = collect_model_diagnostics(
         model,
         eval_x=eval_x,
@@ -1465,7 +1498,8 @@ def run(args: argparse.Namespace) -> None:
     df = task_exp.load_features(args.feature_path)
     if args.drop_incomplete_feature_dates:
         df = drop_incomplete_feature_dates(df)
-    df = apply_min_feature_date(df, args.min_feature_date)
+    if args.target_mode == "ewma_residual":
+        df = add_ewma_residual_target(df, half_life_months=args.ewma_baseline_half_life_months)
     scored_dates, live_date = task_exp.scored_and_live_dates(df, args.max_windows)
     construction_dates = [*scored_dates]
     if args.include_live_window and live_date is not None:
@@ -1493,23 +1527,12 @@ def run(args: argparse.Namespace) -> None:
     ic_rows: list[dict[str, Any]] = []
     model_diag_rows: list[dict[str, Any]] = []
     task_diag_rows: list[dict[str, Any]] = []
-    train_history_rows: list[dict[str, Any]] = []
     previous_gp_weights: pd.Series | None = None
 
     for window_index, window_date in enumerate(construction_dates):
         print(f"rebalance {window_date.date()}", flush=True)
-        train_df = training_slice(df, window_date, args.train_months)
+        train_df = df[(df["date"] < window_date) & df[task_exp.TARGET_COL].notna()].copy()
         eval_df = df[df["date"] == window_date].copy()
-        train_history_rows.append(
-            {
-                "date": window_date.date().isoformat(),
-                "train_months": args.train_months,
-                "train_rows": int(len(train_df)),
-                "train_date_min": train_df["date"].min().date().isoformat() if not train_df.empty else None,
-                "train_date_max": train_df["date"].max().date().isoformat() if not train_df.empty else None,
-                "unique_train_dates": int(train_df["date"].nunique()),
-            }
-        )
         eval_returns = (
             eval_df.set_index(eval_df["asset_id"].astype(str))[task_exp.TARGET_COL]
             .reindex(final_universe)
@@ -1621,7 +1644,6 @@ def run(args: argparse.Namespace) -> None:
     predictions_df.to_csv(output_dir / "gp_window_predictions.csv", index=False)
     ic_df.to_csv(output_dir / "gp_window_ic.csv", index=False)
     summary_df.to_csv(output_dir / "portfolio_summary.csv", index=False)
-    pd.DataFrame(train_history_rows).to_csv(output_dir / "window_training_history.csv", index=False)
     if model_diag_rows:
         pd.DataFrame(model_diag_rows).to_csv(output_dir / "model_diagnostics.csv", index=False)
     if task_diag_rows:
@@ -1647,14 +1669,18 @@ def run(args: argparse.Namespace) -> None:
         "",
         "- `MGK` and `BND` were included in GP fitting and scenario generation, then excluded from final weights.",
         (
-            "- Training history: "
-            f"`{args.train_months}` rolling calendar months before each window."
-            if args.train_months is not None
-            else "- Training history: all available rows before each window."
-        ),
-        (
             f"- `gp_scenarios_riskfolio` experiment variant: `{args.gp_experiment}`. "
             "Control is positive beta task covariance, lengthscale-only time modulation, rank 5."
+        ),
+        (
+            f"- Target mode: `{args.target_mode}`"
+            + (
+                f"; GP was fit to `{task_exp.TARGET_COL} - {EWMA_BASELINE_COL}` with EWMA half-life "
+                f"`{args.ewma_baseline_half_life_months}` months, then predictions and scenarios were "
+                "reconstructed on raw excess-return scale."
+                if args.target_mode == "ewma_residual"
+                else "."
+            )
         ),
         (
             "- `historical_y_ewma2_riskfolio` ignores GP predictions and optimizes directly on historical "

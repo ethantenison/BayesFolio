@@ -221,9 +221,10 @@ def scored_and_live_dates(df: pd.DataFrame, max_windows: int | None) -> tuple[li
     counts = df.groupby("date", observed=True)[TARGET_COL].apply(lambda s: int(s.notna().sum()))
     scored_dates = counts[counts == len(ETF_TICKERS)].index.to_list()
     live_dates = counts[counts == 0].index.to_list()
-    scored_dates = scored_dates[-12:]
     if max_windows is not None:
         scored_dates = scored_dates[-max_windows:]
+    else:
+        scored_dates = scored_dates[-12:]
     live_date = live_dates[-1] if live_dates else None
     return scored_dates, live_date
 

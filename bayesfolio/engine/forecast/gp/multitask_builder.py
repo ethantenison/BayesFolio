@@ -328,6 +328,8 @@ class KernelBlockConfig(BaseModel):
             ``ScaleKernel`` when used as a top-level additive term. When the
             block participates in an interaction product, its unscaled base
             kernel is used instead.
+        include_as_main_effect: If True, include this block as a top-level
+            additive term in addition to any interaction products.
     """
 
     name: str
@@ -335,6 +337,7 @@ class KernelBlockConfig(BaseModel):
     components: list[KernelComponentConfig]
     block_structure: BlockStructure = BlockStructure.ADDITIVE
     use_outputscale: bool = False
+    include_as_main_effect: bool = True
 
     model_config = ConfigDict(extra="forbid")
 
@@ -743,7 +746,11 @@ def build_covar_module(config: CovarModuleConfig, batch_shape: torch.Size = torc
         raise ValueError("config.blocks cannot be empty")
 
     block_lookup = {block.name: block for block in config.blocks}
-    block_kernels = [_build_block_kernel(block, batch_shape=batch_shape, scaled=True) for block in config.blocks]
+    block_kernels = [
+        _build_block_kernel(block, batch_shape=batch_shape, scaled=True)
+        for block in config.blocks
+        if block.include_as_main_effect
+    ]
 
     if config.global_structure is GlobalStructure.NON_COMPOSITIONAL:
         if len(block_kernels) != 1:
@@ -848,6 +855,7 @@ def build_multitask_gp(
     *,
     train_X: torch.Tensor,
     train_Y: torch.Tensor,
+    train_Yvar: torch.Tensor | None = None,
     task_feature: int,
     covar_config: CovarModuleConfig | None = None,
     mean_config: MeanModuleConfig | None = None,
@@ -864,6 +872,9 @@ def build_multitask_gp(
     Args:
         train_X: Training design matrix including task feature column.
         train_Y: Training targets, shape ``n x 1`` or batch equivalent.
+        train_Yvar: Optional fixed observation-noise variance, shape-compatible
+            with ``train_Y``. When supplied, BoTorch uses a fixed-noise
+            likelihood instead of learning task-specific likelihood noise.
         task_feature: Index of task feature column in ``train_X``.
         covar_config: Optional covariance configuration. If ``None``, uses one
             generic Matérn block over non-task dimensions with BoTorch-standard
@@ -901,7 +912,7 @@ def build_multitask_gp(
     mean_module = build_mean_module(mean_config)
 
     likelihood: HadamardGaussianLikelihood | None = None
-    if min_inferred_noise_level is not None:
+    if min_inferred_noise_level is not None and train_Yvar is None:
         noise_prior = LogNormalPrior(loc=-4.0, scale=1.0)
         likelihood = HadamardGaussianLikelihood(
             num_tasks=num_tasks,
@@ -916,6 +927,7 @@ def build_multitask_gp(
     return MultiTaskGP(
         train_X=train_X,
         train_Y=train_Y,
+        train_Yvar=train_Yvar,
         task_feature=task_feature,
         covar_module=covar_module,
         mean_module=mean_module,
