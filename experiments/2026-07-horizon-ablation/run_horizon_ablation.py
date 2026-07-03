@@ -456,11 +456,27 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
     curve_df.to_csv(parent_dir / "comparison_equity_curves.csv", index=True)
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    for label, curve in anchored_curves.items():
-        curve.plot(ax=ax, marker="o", linewidth=2.0, markersize=4, label=label)
+    color_by_horizon = {"monthly": "#1f77b4", "three_week": "#ff7f0e"}
+    linestyle_cycle = ["-", "--", ":"]
+    seed_styles = {
+        seed: linestyle_cycle[index % len(linestyle_cycle)]
+        for index, seed in enumerate(sorted(comparison["seed"].unique()))
+    }
+    for config in configs:
+        anchored_curves[config.label].plot(
+            ax=ax,
+            color=color_by_horizon.get(config.horizon_label),
+            linestyle=seed_styles.get(config.seed, "-"),
+            marker="o",
+            linewidth=2.0,
+            markersize=3,
+            alpha=0.9,
+            label=f"{config.horizon_label} seed {config.seed}",
+        )
     ax.set_title(f"Full3 GP Horizon Ablation from {EVAL_MIN_SCORED_DATE}: Portfolio Value from $10,000")
     ax.set_ylabel("Portfolio value")
     ax.set_xlabel("Realized rebalance date")
+    ax.legend(loc="upper left", fontsize=8, ncol=2)
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     fig.savefig(parent_dir / "comparison_equity_curve.png", dpi=160)
