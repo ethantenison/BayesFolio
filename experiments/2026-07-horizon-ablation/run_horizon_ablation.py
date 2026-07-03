@@ -632,7 +632,11 @@ def main() -> None:
         mlflow.set_tag("status", "complete")
         mlflow.log_artifact(parent_dir / "manifest.json", artifact_path="lineage")
 
-    print(json.dumps({"parent_run_id": parent_id, "parent_dir": str(parent_dir), "results": results}, indent=2))
+    print(
+        json.dumps(
+            {"parent_run_id": parent_id, "parent_dir": parent_dir, "results": results}, indent=2, default=json_default
+        )
+    )
 
 
 if __name__ == "__main__":
