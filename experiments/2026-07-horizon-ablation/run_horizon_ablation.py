@@ -47,7 +47,8 @@ RUNS_DIR = EXPERIMENT_DIR / "runs"
 START_DATE = date(2021, 3, 1)
 LOOKBACK_DATE = date(2019, 3, 1)
 END_DATE = date(2026, 7, 2)
-EVAL_MIN_SCORED_DATE = "2025-06-01"
+DEFAULT_EVAL_MIN_SCORED_DATE = "2025-06-01"
+EVAL_MIN_SCORED_DATE = DEFAULT_EVAL_MIN_SCORED_DATE
 STARTING_VALUE = 10_000.0
 
 ETF_TICKERS = [
@@ -107,9 +108,11 @@ SELECTED_MACRO_COLS = [
 @dataclass(frozen=True)
 class HorizonRunConfig:
     label: str
+    horizon_label: str
     horizon: str
     periods_per_year: float
     rebalance_frequency_label: str
+    seed: int
     run_id: str
 
 
@@ -118,9 +121,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--maxiter", type=int, default=75)
     parser.add_argument("--posterior-scenarios", type=int, default=5000)
     parser.add_argument("--seed", type=int, default=27)
+    parser.add_argument(
+        "--seeds",
+        type=str,
+        default=None,
+        help="Comma-separated GP seeds. Overrides --seed when set.",
+    )
+    parser.add_argument("--feature-seed", type=int, default=27)
+    parser.add_argument("--eval-min-scored-date", type=str, default=DEFAULT_EVAL_MIN_SCORED_DATE)
     parser.add_argument("--max-workers", type=int, default=2)
     parser.add_argument("--skip-feature-build", action="store_true")
     return parser.parse_args()
+
+
+def parse_seed_list(args: argparse.Namespace) -> list[int]:
+    if args.seeds is None:
+        return [int(args.seed)]
+    return [int(seed.strip()) for seed in args.seeds.split(",") if seed.strip()]
 
 
 def json_default(value: object) -> str:
@@ -230,7 +247,7 @@ def runner_command(
         "--maxiter",
         str(args.maxiter),
         "--seed",
-        str(args.seed),
+        str(config.seed),
         "--posterior-scenarios",
         str(args.posterior_scenarios),
         "--include-live-window",
@@ -412,11 +429,28 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
     for config in configs:
         summary = pd.read_csv(run_dirs[config.label] / "portfolio_walkforward" / "portfolio_summary.csv")
         gp = summary[summary["strategy"] == "gp_scenarios_riskfolio"].iloc[0].to_dict()
-        rows.append({"label": config.label, "horizon": config.horizon, **gp})
+        rows.append(
+            {
+                "label": config.label,
+                "horizon_label": config.horizon_label,
+                "horizon": config.horizon,
+                "seed": config.seed,
+                **gp,
+            }
+        )
         curves[config.label] = equity_curve(run_dirs[config.label])
 
     comparison = pd.DataFrame(rows)
     comparison.to_csv(parent_dir / "comparison_metrics.csv", index=False)
+    metric_cols = ["cumulative_return", "cagr", "annualized_vol", "sharpe", "max_drawdown", "mean_ic"]
+    horizon_summary = (
+        comparison.groupby(["horizon_label", "horizon"], as_index=False)[metric_cols].agg(["mean", "std"]).reset_index()
+    )
+    horizon_summary.columns = [
+        "_".join(part for part in column if part) if isinstance(column, tuple) else column
+        for column in horizon_summary.columns
+    ]
+    horizon_summary.to_csv(parent_dir / "horizon_summary_metrics.csv", index=False)
     anchored_curves = {label: add_start_anchor(curve) for label, curve in curves.items()}
     curve_df = pd.DataFrame(anchored_curves).sort_index()
     curve_df.to_csv(parent_dir / "comparison_equity_curves.csv", index=True)
@@ -424,7 +458,7 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
     fig, ax = plt.subplots(figsize=(10, 6))
     for label, curve in anchored_curves.items():
         curve.plot(ax=ax, marker="o", linewidth=2.0, markersize=4, label=label)
-    ax.set_title("Full3 GP Horizon Ablation: Portfolio Value from $10,000")
+    ax.set_title(f"Full3 GP Horizon Ablation from {EVAL_MIN_SCORED_DATE}: Portfolio Value from $10,000")
     ax.set_ylabel("Portfolio value")
     ax.set_xlabel("Realized rebalance date")
     ax.grid(True, alpha=0.3)
@@ -432,23 +466,28 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
     fig.savefig(parent_dir / "comparison_equity_curve.png", dpi=160)
     plt.close(fig)
 
-    metric_cols = ["cumulative_return", "cagr", "annualized_vol", "sharpe", "max_drawdown", "mean_ic"]
     report = [
         "# Horizon Ablation Report",
         "",
         "Decision question: does 3W-FRI improve the fixed July full3 multitask GP portfolio workflow versus BME?",
         "",
-        "Both runs use the same universe, features, GP configuration, seed, Riskfolio CVaR/Sharpe settings, "
-        "and calendar input span. The realized evaluation window is selected by `min_scored_date=2025-06-01`, "
+        "Runs use the same universe, features, GP configuration, Riskfolio CVaR/Sharpe settings, "
+        "and calendar input span. The realized evaluation window is selected by "
+        f"`min_scored_date={EVAL_MIN_SCORED_DATE}`, "
         "so each horizon uses all available native rebalance periods over that calendar span.",
+        "",
+        "## Horizon Summary",
+        "",
+        markdown_table(horizon_summary),
         "",
         "## GP Strategy Metrics",
         "",
-        markdown_table(comparison[["label", "horizon", *metric_cols]]),
+        markdown_table(comparison[["label", "horizon_label", "horizon", "seed", *metric_cols]]),
         "",
         "## Artifacts",
         "",
         f"- Metrics: `{parent_dir / 'comparison_metrics.csv'}`",
+        f"- Horizon summary: `{parent_dir / 'horizon_summary_metrics.csv'}`",
         f"- Equity curve: `{parent_dir / 'comparison_equity_curve.png'}`",
         f"- Per-run directories: `{RUNS_DIR}`",
         "",
@@ -468,25 +507,37 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
 
 
 def main() -> None:
+    global EVAL_MIN_SCORED_DATE
     args = parse_args()
+    EVAL_MIN_SCORED_DATE = args.eval_min_scored_date
+    seeds = parse_seed_list(args)
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    parent_id = f"{timestamp}_monthly_vs_three_week_full3_july_span"
-    configs = [
-        HorizonRunConfig(
-            label="monthly",
-            horizon=Horizon.MONTHLY.value,
-            periods_per_year=12.0,
-            rebalance_frequency_label="monthly",
-            run_id=f"{timestamp}_monthly_full3_july_span_control",
-        ),
-        HorizonRunConfig(
-            label="three_week",
-            horizon=Horizon.THREE_WEEK.value,
-            periods_per_year=365.25 / 21.0,
-            rebalance_frequency_label="three_week",
-            run_id=f"{timestamp}_three_week_full3_july_span_ablation",
-        ),
-    ]
+    eval_slug = EVAL_MIN_SCORED_DATE.replace("-", "")
+    parent_id = f"{timestamp}_monthly_vs_three_week_full3_from_{eval_slug}"
+    configs: list[HorizonRunConfig] = []
+    for seed in seeds:
+        configs.extend(
+            [
+                HorizonRunConfig(
+                    label=f"monthly_seed{seed}",
+                    horizon_label="monthly",
+                    horizon=Horizon.MONTHLY.value,
+                    periods_per_year=12.0,
+                    rebalance_frequency_label="monthly",
+                    seed=seed,
+                    run_id=f"{timestamp}_monthly_seed{seed}_full3_from_{eval_slug}_control",
+                ),
+                HorizonRunConfig(
+                    label=f"three_week_seed{seed}",
+                    horizon_label="three_week",
+                    horizon=Horizon.THREE_WEEK.value,
+                    periods_per_year=365.25 / 21.0,
+                    rebalance_frequency_label="three_week",
+                    seed=seed,
+                    run_id=f"{timestamp}_three_week_seed{seed}_full3_from_{eval_slug}_ablation",
+                ),
+            ]
+        )
 
     parent_dir = RUNS_DIR / parent_id
     parent_dir.mkdir(parents=True, exist_ok=False)
@@ -533,7 +584,8 @@ def main() -> None:
                 "eval_min_scored_date": EVAL_MIN_SCORED_DATE,
                 "maxiter": args.maxiter,
                 "posterior_scenarios": args.posterior_scenarios,
-                "seed": args.seed,
+                "seeds": ",".join(str(seed) for seed in seeds),
+                "feature_seed": args.feature_seed,
             }
         )
         parent_manifest["tracker"]["parent_mlflow_run_id"] = parent_run.info.run_id
@@ -553,8 +605,10 @@ def main() -> None:
                 "status": "building_features",
                 "git_sha": parent_manifest["git_sha"],
                 "git_dirty_summary_at_start": parent_manifest["git_dirty_summary_at_start"],
-                "baseline_or_incumbent_run_id": "monthly" if config.label != "monthly" else None,
+                "baseline_or_incumbent_run_id": "monthly" if config.horizon_label != "monthly" else None,
                 "candidate_label": config.label,
+                "horizon_label": config.horizon_label,
+                "seed": config.seed,
                 "resolved_config_path": run_dir / "resolved_config.json",
                 "agent_trace_path": run_dir / "agent_trace.jsonl",
                 "split_window_definition": {
@@ -571,16 +625,22 @@ def main() -> None:
                 mlflow_run_ids[config.label] = child_run.info.run_id
                 mlflow.set_tag("run_role", "child")
                 mlflow.set_tag("status", "building_features")
-                mlflow.set_tag("horizon_label", config.label)
+                mlflow.set_tag("horizon_label", config.horizon_label)
                 mlflow.log_params(asdict(config))
                 mlflow.log_params(
                     {
                         "maxiter": args.maxiter,
                         "posterior_scenarios": args.posterior_scenarios,
-                        "seed": args.seed,
+                        "seed": config.seed,
+                        "feature_seed": args.feature_seed,
                     }
                 )
-                feature_path = build_feature_artifact(config, run_dir, seed=args.seed, skip=args.skip_feature_build)
+                feature_path = build_feature_artifact(
+                    config,
+                    run_dir,
+                    seed=args.feature_seed,
+                    skip=args.skip_feature_build,
+                )
                 feature_paths[config.label] = feature_path
                 mlflow.log_artifact(run_dir / "feature_artifact_manifest.json", artifact_path="lineage")
                 mlflow.log_artifact(feature_path, artifact_path="features")
@@ -633,6 +693,7 @@ def main() -> None:
         parent_manifest["child_results"] = results
         parent_manifest["artifact_paths"] = {
             "comparison_metrics": parent_dir / "comparison_metrics.csv",
+            "horizon_summary_metrics": parent_dir / "horizon_summary_metrics.csv",
             "comparison_equity_curve": parent_dir / "comparison_equity_curve.png",
             "decision_report": parent_dir / "decision_report.md",
         }
