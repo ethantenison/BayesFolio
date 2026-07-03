@@ -383,6 +383,12 @@ def equity_curve(run_dir: Path) -> pd.Series:
     return (1.0 + frame["return"].astype(float)).cumprod() * STARTING_VALUE
 
 
+def add_start_anchor(curve: pd.Series) -> pd.Series:
+    anchor_date = pd.Timestamp(EVAL_MIN_SCORED_DATE)
+    anchored = pd.concat([pd.Series([STARTING_VALUE], index=[anchor_date]), curve])
+    return anchored[~anchored.index.duplicated(keep="last")].sort_index()
+
+
 def markdown_table(df: pd.DataFrame) -> str:
     formatted = df.copy()
     for column in formatted.columns:
@@ -411,11 +417,13 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
 
     comparison = pd.DataFrame(rows)
     comparison.to_csv(parent_dir / "comparison_metrics.csv", index=False)
-    curve_df = pd.DataFrame(curves).sort_index()
+    anchored_curves = {label: add_start_anchor(curve) for label, curve in curves.items()}
+    curve_df = pd.DataFrame(anchored_curves).sort_index()
     curve_df.to_csv(parent_dir / "comparison_equity_curves.csv", index=True)
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    curve_df.plot(ax=ax)
+    for label, curve in anchored_curves.items():
+        curve.plot(ax=ax, marker="o", linewidth=2.0, markersize=4, label=label)
     ax.set_title("Full3 GP Horizon Ablation: Portfolio Value from $10,000")
     ax.set_ylabel("Portfolio value")
     ax.set_xlabel("Realized rebalance date")
