@@ -27,6 +27,7 @@ import requests
 FRED_TIMEOUT_SECONDS = int(float(os.getenv("BAYESFOLIO_FRED_TIMEOUT_SECONDS", "30")))
 FRED_RETRY_COUNT = int(os.getenv("BAYESFOLIO_FRED_RETRY_COUNT", "1"))
 FRED_RETRY_PAUSE_SECONDS = float(os.getenv("BAYESFOLIO_FRED_RETRY_PAUSE_SECONDS", "0.1"))
+PERIOD_ROLLING_WINDOW = 12
 
 
 def _read_fred(symbols: str | list[str], start: str, end: str | None) -> pd.DataFrame:
@@ -59,7 +60,7 @@ def fetch_global_yields(
     end: str | None = None,
     horizon: str = "M",  # accepts your Horizon enum (we read .value if present)
     countries: list[str] | None = None,
-    transform: Literal["level", "diff_1p", "z12"] = "level",
+    transform: Literal["level", "diff_1p", "z_12p"] = "level",
     fred_codes: dict[str, list[str]] | None = None,
     stooq_map: dict[str, str] | None = None,
     use_tradingeconomics: bool = False,
@@ -248,11 +249,11 @@ def fetch_global_yields(
             if k in df.columns:
                 df[k] = df[k].diff(1)
         df = df.dropna()
-    elif transform == "z12":
+    elif transform == "z_12p":
         for k in keys:
             if k in df.columns:
-                m = df[k].rolling(12, min_periods=12).mean()
-                s = df[k].rolling(12, min_periods=12).std()
+                m = df[k].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).mean()
+                s = df[k].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).std()
                 df[k] = (df[k] - m) / s
         df = df.dropna()
 
@@ -364,7 +365,7 @@ def fetch_put_call_ratio(start, end=None, horizon=Horizon.MONTHLY):
 def fetch_spy_flow_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
     """
     Proxy for SPY passive flows using signed dollar volume,
-    standardized as a 12m z-score.
+    standardized as a 12-period z-score.
     """
 
     px = _download_frame(
@@ -425,16 +426,16 @@ def fetch_spy_flow_proxy(start="2010-01-01", end=None, horizon=Horizon.MONTHLY):
     df["flow_proxy"] = np.sign(df["price"].diff()) * df["price"] * df["volume"]
 
     # ------------------------------------------------------------
-    # Monthly aggregation + z-score
+    # Requested-horizon aggregation + z-score
     # ------------------------------------------------------------
     df_m = df["flow_proxy"].resample(getattr(horizon, "value", horizon)).sum().to_frame("flow_proxy")
 
-    m = df_m["flow_proxy"].rolling(12, min_periods=12).mean()
-    s = df_m["flow_proxy"].rolling(12, min_periods=12).std()
+    m = df_m["flow_proxy"].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).mean()
+    s = df_m["flow_proxy"].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).std()
 
-    df_m["spy_flow_z_12m"] = (df_m["flow_proxy"] - m) / s
+    df_m["spy_flow_z_12p"] = (df_m["flow_proxy"] - m) / s
 
-    return df_m[["spy_flow_z_12m"]].dropna().reset_index().rename(columns={"index": "date"})
+    return df_m[["spy_flow_z_12p"]].dropna().reset_index().rename(columns={"index": "date"})
 
 
 def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
@@ -458,10 +459,10 @@ def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Ho
                                     strategies often work.
                                 • < 0 (backwardation): near-term volatility higher than
                                     long-term → risk-off regime, drawdowns more likely.
-            - vix_ts_chg_1m: 1-period change in term structure slope
+            - vix_ts_chg_1p: 1-period change in term structure slope
                 • Captures regime shifts (e.g., transition from contango to backwardation).
                 • Useful as a short-term predictor for heightened risk or opportunity.
-            - vix_ts_z_12m: 12-period rolling z-score of the slope
+            - vix_ts_z_12p: 12-period rolling z-score of the slope
                 • Standardized measure of how extreme the slope is relative to its recent history.
                                 • Helps flag unusually steep or inverted curves as
                                     distinct volatility regimes.
@@ -491,16 +492,16 @@ def fetch_vix_term_structure(start="2010-01-01", end=None, horizon: Horizon = Ho
         vix3m = None  # (but we need both)
 
     df = pd.concat([vix, vix3m], axis=1).dropna().sort_index()
-    # monthly period-end
+    # requested horizon period-end
     df_m = df.resample(horizon).last().dropna()
     # term structure slope (log difference); ratio is fine too
     df_m["vix_ts_level"] = np.log(df_m["vix3m"]) - np.log(df_m["vix"])
-    df_m["vix_ts_chg_1m"] = df_m["vix_ts_level"].diff(1)
+    df_m["vix_ts_chg_1p"] = df_m["vix_ts_level"].diff(1)
 
-    # rolling z-score over 12 months
-    m = df_m["vix_ts_level"].rolling(12, min_periods=12).mean()
-    s = df_m["vix_ts_level"].rolling(12, min_periods=12).std()
-    df_m["vix_ts_z_12m"] = (df_m["vix_ts_level"] - m) / s.replace(0, np.nan)
+    # rolling z-score over 12 periods of the requested horizon
+    m = df_m["vix_ts_level"].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).mean()
+    s = df_m["vix_ts_level"].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).std()
+    df_m["vix_ts_z_12p"] = (df_m["vix_ts_level"] - m) / s.replace(0, np.nan)
 
     return df_m.reset_index().rename(columns={"index": "date", "Date": "date"})
 
@@ -676,8 +677,8 @@ def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Hor
     DataFrame with columns:
         - date
         - hy_spread          (decimal, e.g. 0.045 → 450 bps)
-        - hy_spread_chg_1m   (1-period diff)
-        - hy_spread_z_12m    (12-period rolling z-score)
+        - hy_spread_chg_1p   (1-period diff)
+        - hy_spread_z_12p    (12-period rolling z-score)
 
     Notes
     -----
@@ -710,12 +711,12 @@ def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Hor
     df = df.resample(horizon).last()
 
     # Compute derivative features
-    df["hy_spread_chg_1m"] = df["hy_spread"].diff(1)
+    df["hy_spread_chg_1p"] = df["hy_spread"].diff(1)
 
     # 12-period rolling z-score
-    mean = df["hy_spread"].rolling(12, min_periods=12).mean()
-    std = df["hy_spread"].rolling(12, min_periods=12).std()
-    df["hy_spread_z_12m"] = (df["hy_spread"] - mean) / std
+    mean = df["hy_spread"].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).mean()
+    std = df["hy_spread"].rolling(PERIOD_ROLLING_WINDOW, min_periods=PERIOD_ROLLING_WINDOW).std()
+    df["hy_spread_z_12p"] = (df["hy_spread"] - mean) / std
 
     # Clean final output
     df = df.dropna()
@@ -744,10 +745,10 @@ def fetch_earnings_yield(start, end, horizon):
 def fetch_cpi_inflation(start="2010-01-01", end=None, horizon: Horizon = Horizon.MONTHLY):
 
     cpi = _read_fred("CPIAUCSL", start=start, end=end)  # headline CPI level
-    cpi = cpi.resample(horizon).last().dropna()  # monthly
+    cpi = cpi.resample(horizon).last().dropna()
 
-    cpi["cpi_yoy"] = cpi["CPIAUCSL"].pct_change(12)
-    cpi["cpi_mom"] = cpi["CPIAUCSL"].pct_change(1)
+    cpi["cpi_chg_12p"] = cpi["CPIAUCSL"].pct_change(PERIOD_ROLLING_WINDOW)
+    cpi["cpi_chg_1p"] = cpi["CPIAUCSL"].pct_change(1)
 
     return cpi.reset_index().rename(columns={"index": "date"})
 
@@ -757,12 +758,11 @@ def fetch_macro_features(start="2010-01-01", end=None, horizon: Horizon = Horizo
     Fetch and merge a standard set of macro-finance features for ETF return prediction.
 
     Features included:
-        - VIX term structure (level, 1m change, 12m z-score)
+        - VIX term structure (level, 1-period change, 12-period z-score)
         - Term spread (10Y – 3M Treasury yield)
         - Credit spread (BAA – AAA corporate yields)
         - 3M T-bill yield
         - Dollar Index (DXY)
-        - Yield curve principal components (PC1 = level, PC2 = slope, PC3 = curvature)
 
     Args:
         start (str): Start date for data.
@@ -1013,9 +1013,9 @@ def fetch_enhanced_macro_features(start="2010-01-01", end=None, horizon: Horizon
 
         breadth_m = merged_breadth.set_index("date").resample(horizon).last().dropna()
 
-        breadth_m["rsp_spy_roc_1m"] = breadth_m["rsp_spy"].pct_change(1)
+        breadth_m["rsp_spy_roc_1p"] = breadth_m["rsp_spy"].pct_change(1)
 
-        rsp_spy_df = breadth_m[["rsp_spy", "rsp_spy_roc_1m"]].reset_index()
+        rsp_spy_df = breadth_m[["rsp_spy", "rsp_spy_roc_1p"]].reset_index()
 
     except Exception:
         rsp_spy_df = None

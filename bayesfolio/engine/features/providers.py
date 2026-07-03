@@ -19,7 +19,7 @@ from bayesfolio.engine.features.dataset_builder import FeatureProviders
 from bayesfolio.engine.features.market_fundamentals import fetch_enhanced_macro_features
 from bayesfolio.io import EtfFeaturesProvider, MacroProvider, ReturnsProvider
 
-DEFAULT_MACRO_CACHE_SUBDIR = "macro_enhanced"
+DEFAULT_MACRO_CACHE_SUBDIR = "macro_enhanced_periodic"
 
 
 def make_default_feature_providers(
@@ -40,8 +40,8 @@ def make_default_feature_providers(
         macro_fetcher: Macro feature fetch callable used by the macro provider.
             The default is the enhanced macro feature set.
         macro_cache_subdir: Cache subdirectory name for macro features.
-            Defaults to ``"macro_enhanced"`` to keep the richer schema
-            isolated from legacy reduced-schema caches.
+            Defaults to ``"macro_enhanced_periodic"`` to keep the
+            period-named schema isolated from legacy month-named caches.
         macro_max_retries: Maximum retry attempts for transient macro fetch
             failures.
         macro_retry_backoff_seconds: Linear retry backoff base in seconds for

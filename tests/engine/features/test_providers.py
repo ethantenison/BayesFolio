@@ -28,7 +28,7 @@ def test_make_default_feature_providers_uses_enhanced_macro_defaults() -> None:
     assert isinstance(macro_provider, MacroProvider)
     assert returns_provider._cache_dir == Path("artifacts/cache/returns")
     assert etf_features_provider._cache_dir == Path("artifacts/cache/etf_features")
-    assert macro_provider._cache_dir == Path("artifacts/cache/macro_enhanced")
+    assert macro_provider._cache_dir == Path("artifacts/cache/macro_enhanced_periodic")
     assert macro_provider._fetcher is fetch_enhanced_macro_features
     assert macro_provider._max_retries == 2
     assert macro_provider._retry_backoff_seconds == 1.0
