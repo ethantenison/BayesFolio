@@ -47,7 +47,7 @@ RUNS_DIR = EXPERIMENT_DIR / "runs"
 START_DATE = date(2021, 3, 1)
 LOOKBACK_DATE = date(2019, 3, 1)
 END_DATE = date(2026, 7, 2)
-EVAL_MIN_FEATURE_DATE = "2025-06-01"
+EVAL_MIN_SCORED_DATE = "2025-06-01"
 STARTING_VALUE = 10_000.0
 
 ETF_TICKERS = [
@@ -166,7 +166,7 @@ def resolve_uri(uri: str) -> Path:
 
 
 def build_feature_artifact(config: HorizonRunConfig, run_dir: Path, *, seed: int, skip: bool) -> Path:
-    feature_path = ARTIFACT_ROOT / f"portfolio_etf_macro_features_{config.label}_20260703.parquet"
+    feature_path = ARTIFACT_ROOT / f"portfolio_etf_macro_features_{config.run_id}.parquet"
     if skip and feature_path.exists():
         return feature_path
 
@@ -234,8 +234,8 @@ def runner_command(
         "--posterior-scenarios",
         str(args.posterior_scenarios),
         "--include-live-window",
-        "--min-feature-date",
-        EVAL_MIN_FEATURE_DATE,
+        "--min-scored-date",
+        EVAL_MIN_SCORED_DATE,
         "--periods-per-year",
         str(config.periods_per_year),
         "--rebalance-frequency-label",
@@ -431,7 +431,7 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
         "Decision question: does 3W-FRI improve the fixed July full3 multitask GP portfolio workflow versus BME?",
         "",
         "Both runs use the same universe, features, GP configuration, seed, Riskfolio CVaR/Sharpe settings, "
-        "and calendar input span. The realized evaluation window is selected by `min_feature_date=2025-06-01`, "
+        "and calendar input span. The realized evaluation window is selected by `min_scored_date=2025-06-01`, "
         "so each horizon uses all available native rebalance periods over that calendar span.",
         "",
         "## GP Strategy Metrics",
@@ -502,7 +502,7 @@ def main() -> None:
             "lookback_date": LOOKBACK_DATE,
             "start_date": START_DATE,
             "end_date": END_DATE,
-            "evaluation_min_feature_date": EVAL_MIN_FEATURE_DATE,
+            "evaluation_min_scored_date": EVAL_MIN_SCORED_DATE,
         },
         "configs": [asdict(config) for config in configs],
         "tracker": {"type": "mlflow", "tracking_uri": f"file://{MLFLOW_DIR.resolve()}"},
@@ -522,7 +522,7 @@ def main() -> None:
             {
                 "baseline": "monthly_BME",
                 "candidate": "three_week_3W-FRI",
-                "eval_min_feature_date": EVAL_MIN_FEATURE_DATE,
+                "eval_min_scored_date": EVAL_MIN_SCORED_DATE,
                 "maxiter": args.maxiter,
                 "posterior_scenarios": args.posterior_scenarios,
                 "seed": args.seed,
@@ -553,7 +553,7 @@ def main() -> None:
                     "lookback_date": LOOKBACK_DATE,
                     "start_date": START_DATE,
                     "end_date": END_DATE,
-                    "evaluation_min_feature_date": EVAL_MIN_FEATURE_DATE,
+                    "evaluation_min_scored_date": EVAL_MIN_SCORED_DATE,
                 },
                 "next_run_rationale": "Controlled horizon ablation requested by user; no autonomous search.",
             }

@@ -120,6 +120,12 @@ def parse_args() -> argparse.Namespace:
         help="If set, drop feature rows before this YYYY-MM-DD date before scoring windows are selected.",
     )
     parser.add_argument(
+        "--min-scored-date",
+        type=str,
+        default=None,
+        help="If set, keep full training history but only evaluate scored windows on/after this YYYY-MM-DD date.",
+    )
+    parser.add_argument(
         "--min-inferred-noise-level",
         type=float,
         default=5e-3,
@@ -306,6 +312,7 @@ def build_manifest(
             "date_min": df["date"].min().date().isoformat(),
             "date_max": df["date"].max().date().isoformat(),
             "min_feature_date_filter": args.min_feature_date,
+            "min_scored_date_filter": args.min_scored_date,
             "target_col": task_exp.TARGET_COL,
             "training_universe": task_exp.ETF_TICKERS,
             "helper_assets_fit_but_excluded": sorted(HELPER_ASSETS),
@@ -465,6 +472,13 @@ def apply_min_feature_date(df: pd.DataFrame, min_feature_date: str | None) -> pd
         return df
     cutoff = pd.Timestamp(min_feature_date)
     return df[df["date"] >= cutoff].copy().reset_index(drop=True)
+
+
+def apply_min_scored_date(scored_dates: list[pd.Timestamp], min_scored_date: str | None) -> list[pd.Timestamp]:
+    if min_scored_date is None:
+        return scored_dates
+    cutoff = pd.Timestamp(min_scored_date)
+    return [date for date in scored_dates if date >= cutoff]
 
 
 def drop_incomplete_feature_dates(df: pd.DataFrame) -> pd.DataFrame:
@@ -1483,6 +1497,7 @@ def run(args: argparse.Namespace) -> None:
         df = drop_incomplete_feature_dates(df)
     df = apply_min_feature_date(df, args.min_feature_date)
     scored_dates, live_date = task_exp.scored_and_live_dates(df, args.max_windows)
+    scored_dates = apply_min_scored_date(scored_dates, args.min_scored_date)
     construction_dates = [*scored_dates]
     if args.include_live_window and live_date is not None:
         construction_dates.append(live_date)
