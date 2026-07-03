@@ -83,6 +83,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=27)
     parser.add_argument("--posterior-scenarios", type=int, default=5000)
     parser.add_argument(
+        "--periods-per-year",
+        type=float,
+        default=PERIODS_PER_YEAR,
+        help="Annualization factor for the realized rebalance horizon.",
+    )
+    parser.add_argument(
+        "--rebalance-frequency-label",
+        type=str,
+        default="monthly",
+        help="Human-readable cadence label stored in the manifest/report.",
+    )
+    parser.add_argument(
         "--train-months",
         type=int,
         default=None,
@@ -315,7 +327,8 @@ def build_manifest(
         ],
         "portfolio": {
             "starting_value": STARTING_VALUE,
-            "rebalance_frequency": "monthly",
+            "rebalance_frequency": args.rebalance_frequency_label,
+            "periods_per_year": args.periods_per_year,
             "n_realized_rebalances": len(scored_dates),
             "n_portfolio_construction_dates": len(scored_dates) + int(live_date is not None),
             "strategies": [
@@ -349,9 +362,9 @@ def build_manifest(
             "experiment": args.gp_experiment,
             "variant": variant_name,
             "task_kernel": "IndexKernel" if is_signed else "PositiveIndexKernel",
-            "task_covar_prior": None if variant_name in {"signed_no_prior", "positive_no_prior"} else (
-                "BetaPrior(2.5, 1.5)"
-            ),
+            "task_covar_prior": None
+            if variant_name in {"signed_no_prior", "positive_no_prior"}
+            else ("BetaPrior(2.5, 1.5)"),
             "min_inferred_noise_level": args.min_inferred_noise_level,
             "time_modulation_mode": args.time_modulation_mode,
             "kernel_proposal": {
@@ -631,7 +644,6 @@ def build_experiment_model(
     args: argparse.Namespace,
 ) -> Any:
     variant_name = gp_variant_name(args.gp_experiment)
-    is_signed = args.gp_experiment in SIGNED_EXPERIMENTS
     uses_lengthscale_floor = args.gp_experiment in LENGTHSCALE_FLOOR_EXPERIMENTS
     variant = task_exp.VARIANTS[variant_name]
     original_gp_builder = task_exp.build_multitask_gp
@@ -881,8 +893,7 @@ def build_kernel_composition_config(proposal: str) -> Any:
         raise ValueError(f"Unknown kernel composition proposal: {proposal}")
 
     blocks = [
-        block.model_copy(update={"include_as_main_effect": block.name in main_effect_blocks})
-        for block in config.blocks
+        block.model_copy(update={"include_as_main_effect": block.name in main_effect_blocks}) for block in config.blocks
     ]
     blocks.extend(extra_blocks)
     return task_exp.CovarModuleConfig(
@@ -1001,9 +1012,9 @@ class ChangePointMixtureKernel(gpytorch.kernels.Kernel):
         s2 = self._recent_weight(x2)
         k_recent = self.recent_kernel(x1, x2, **kwargs).to_dense()
         k_old = self.old_kernel(x1, x2, **kwargs).to_dense()
-        return s1.unsqueeze(-1) * k_recent * s2.unsqueeze(-2) + (
-            1.0 - s1
-        ).unsqueeze(-1) * k_old * (1.0 - s2).unsqueeze(-2)
+        return s1.unsqueeze(-1) * k_recent * s2.unsqueeze(-2) + (1.0 - s1).unsqueeze(-1) * k_old * (1.0 - s2).unsqueeze(
+            -2
+        )
 
 
 def apply_kernel_proposal(
@@ -1366,7 +1377,13 @@ def information_coefficient(predictions: pd.DataFrame, final_universe: list[str]
     return float(frame["y_pred"].corr(frame["y_true"], method="spearman"))
 
 
-def performance_stats(returns: pd.Series, weights: pd.DataFrame, *, starting_value: float) -> dict[str, float]:
+def performance_stats(
+    returns: pd.Series,
+    weights: pd.DataFrame,
+    *,
+    starting_value: float,
+    periods_per_year: float,
+) -> dict[str, float]:
     returns = returns.dropna().astype(float)
     if returns.empty:
         return {
@@ -1377,6 +1394,7 @@ def performance_stats(returns: pd.Series, weights: pd.DataFrame, *, starting_val
             "sharpe": math.nan,
             "max_drawdown": math.nan,
             "terminal_value": math.nan,
+            "mean_period_return": math.nan,
             "mean_monthly_return": math.nan,
             "hit_rate": math.nan,
             "avg_turnover": math.nan,
@@ -1385,9 +1403,9 @@ def performance_stats(returns: pd.Series, weights: pd.DataFrame, *, starting_val
 
     equity = (1.0 + returns).cumprod()
     cumulative_return = float(equity.iloc[-1] - 1.0)
-    years = len(returns) / PERIODS_PER_YEAR
+    years = len(returns) / periods_per_year
     cagr = float(equity.iloc[-1] ** (1.0 / years) - 1.0) if years > 0 else math.nan
-    ann_vol = float(returns.std(ddof=0) * np.sqrt(PERIODS_PER_YEAR))
+    ann_vol = float(returns.std(ddof=0) * np.sqrt(periods_per_year))
     sharpe = float(cagr / ann_vol) if ann_vol > 0 else math.nan
     running_peak = equity.cummax()
     drawdown = equity / running_peak - 1.0
@@ -1403,6 +1421,7 @@ def performance_stats(returns: pd.Series, weights: pd.DataFrame, *, starting_val
         "sharpe": sharpe,
         "max_drawdown": float(drawdown.min()),
         "terminal_value": float(starting_value * equity.iloc[-1]),
+        "mean_period_return": float(returns.mean()),
         "mean_monthly_return": float(returns.mean()),
         "hit_rate": float((returns > 0).mean()),
         "avg_turnover": float(turnover.mean()),
@@ -1450,10 +1469,7 @@ def markdown_table(df: pd.DataFrame) -> str:
     ]
     header_line = "| " + " | ".join(header.ljust(widths[index]) for index, header in enumerate(headers)) + " |"
     sep_line = "| " + " | ".join("-" * width for width in widths) + " |"
-    body = [
-        "| " + " | ".join(row[index].ljust(widths[index]) for index in range(len(headers))) + " |"
-        for row in rows
-    ]
+    body = ["| " + " | ".join(row[index].ljust(widths[index]) for index in range(len(headers))) + " |" for row in rows]
     return "\n".join([header_line, sep_line, *body])
 
 
@@ -1605,7 +1621,15 @@ def run(args: argparse.Namespace) -> None:
             .astype(float)
         )
         strategy_returns[strategy] = strategy_ret
-        summary = {"strategy": strategy, **performance_stats(strategy_ret, weights, starting_value=STARTING_VALUE)}
+        summary = {
+            "strategy": strategy,
+            **performance_stats(
+                strategy_ret,
+                weights,
+                starting_value=STARTING_VALUE,
+                periods_per_year=args.periods_per_year,
+            ),
+        }
         if strategy == "gp_scenarios_riskfolio":
             summary["mean_ic"] = float(ic_df["ic"].mean())
             summary["median_ic"] = float(ic_df["ic"].median())
@@ -1633,7 +1657,8 @@ def run(args: argparse.Namespace) -> None:
         "",
         f"Run directory: `{output_dir}`",
         (
-            f"Portfolio construction dates: `{len(construction_dates)}` monthly windows from "
+            f"Portfolio construction dates: `{len(construction_dates)}` "
+            f"{args.rebalance_frequency_label} windows from "
             f"`{construction_dates[0].date()}` to `{construction_dates[-1].date()}` "
             f"(`{len(scored_dates)}` realized)."
         ),
@@ -1647,8 +1672,7 @@ def run(args: argparse.Namespace) -> None:
         "",
         "- `MGK` and `BND` were included in GP fitting and scenario generation, then excluded from final weights.",
         (
-            "- Training history: "
-            f"`{args.train_months}` rolling calendar months before each window."
+            f"- Training history: `{args.train_months}` rolling calendar months before each window."
             if args.train_months is not None
             else "- Training history: all available rows before each window."
         ),
