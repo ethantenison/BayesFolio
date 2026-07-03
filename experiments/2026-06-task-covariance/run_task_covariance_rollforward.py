@@ -114,16 +114,16 @@ ETF_COLS = [
 ]
 MACRO_COLS = [
     "hy_spread",
-    "hy_spread_chg_1m",
-    "hy_spread_z_12m",
+    "hy_spread_chg_1p",
+    "hy_spread_z_12p",
     "vix_slope",
-    "vix_ts_z_12m",
+    "vix_ts_z_12p",
     "vix",
-    "spy_flow_z_12m",
+    "spy_flow_z_12p",
     "spy_ret",
     "erp",
-    "cpi_yoy",
-    "cpi_mom",
+    "cpi_chg_12p",
+    "cpi_chg_1p",
     "copper_ret",
     "oil_ret",
     "gold_crude_ratio",
@@ -820,10 +820,7 @@ def run(args: argparse.Namespace) -> None:
             index=False,
         )
 
-    summary_rows = [
-        summarize_variant(name, [r for r in pred_rows if r["variant"] == name])
-        for name in args.variants
-    ]
+    summary_rows = [summarize_variant(name, [r for r in pred_rows if r["variant"] == name]) for name in args.variants]
     summary = pd.DataFrame(summary_rows)
     pd.DataFrame(pred_rows).to_csv(output_dir / "window_predictions.csv", index=False)
     pd.DataFrame(window_metric_rows).to_csv(output_dir / "window_metrics.csv", index=False)
