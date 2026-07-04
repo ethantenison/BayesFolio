@@ -73,6 +73,16 @@ class StrategyResult:
     returns: pd.Series
 
 
+@dataclass(frozen=True)
+class RiskfolioOptimizationResult:
+    weights: pd.Series
+    status: str
+    fallback_stage: str
+    clean_asset_count: int
+    clean_observation_count: int
+    message: str | None = None
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--feature-path", type=Path, default=DEFAULT_FEATURE_PATH)
@@ -499,37 +509,111 @@ def optimize_riskfolio(
     method_cov: str,
     upperlng: float,
     nea: int,
-) -> pd.Series:
+    fallback_weights: pd.Series | None = None,
+    fallback_label: str = "equal_weight",
+) -> RiskfolioOptimizationResult:
     clean = returns.replace([np.inf, -np.inf], np.nan).dropna(axis=1, how="any").dropna(axis=0, how="any")
+    clean_asset_count = int(clean.shape[1])
+    clean_observation_count = int(clean.shape[0])
     if clean.shape[1] < 2 or clean.empty:
-        return equal_weight(clean.columns.tolist())
-
-    try:
-        n_assets = clean.shape[1]
-        portfolio = rp.Portfolio(returns=clean, nea=max(1, min(int(nea), n_assets - 1)))
-        portfolio.upperlng = max(float(upperlng), 1.0 / n_assets)
-        portfolio.lowerlng = 0.0
-        portfolio.card = None
-        portfolio.alpha = 0.5
-        portfolio.assets_stats(method_mu=method_mu, method_cov=method_cov)
-        weights_df = portfolio.optimization(
-            model="Classic",
-            rm="CVaR",
-            obj="Sharpe",
-            rf=0.0,
-            hist=True,
+        weights = normalize_fallback_weights(fallback_weights, clean.columns)
+        stage = fallback_label if fallback_weights is not None and not weights.empty else "equal_weight_last_resort"
+        if weights.empty:
+            weights = equal_weight(clean.columns.tolist())
+        return RiskfolioOptimizationResult(
+            weights=weights,
+            status="fallback",
+            fallback_stage=stage,
+            clean_asset_count=clean_asset_count,
+            clean_observation_count=clean_observation_count,
+            message="Riskfolio input had fewer than two clean assets or no clean observations.",
         )
-        if weights_df is None or weights_df.empty:
-            raise RuntimeError("Riskfolio returned empty weights")
-        weights = weights_df.iloc[:, 0].astype(float)
-    except Exception:
-        weights = equal_weight(clean.columns.tolist())
 
+    attempts = [
+        {"stage": "primary", "nea": max(1, min(int(nea), clean.shape[1] - 1)), "upperlng": upperlng},
+        {"stage": "relaxed_no_nea", "nea": None, "upperlng": upperlng},
+        {"stage": "relaxed_no_nea_cap35", "nea": None, "upperlng": max(upperlng, 0.35)},
+    ]
+    messages: list[str] = []
+    for attempt in attempts:
+        try:
+            weights = solve_riskfolio(
+                clean,
+                method_mu=method_mu,
+                method_cov=method_cov,
+                upperlng=float(attempt["upperlng"]),
+                nea=attempt["nea"],
+            )
+            return RiskfolioOptimizationResult(
+                weights=weights,
+                status="solved" if attempt["stage"] == "primary" else "relaxed_solved",
+                fallback_stage=str(attempt["stage"]),
+                clean_asset_count=clean_asset_count,
+                clean_observation_count=clean_observation_count,
+            )
+        except Exception as exc:
+            messages.append(f"{attempt['stage']}: {type(exc).__name__}: {exc}")
+
+    weights = normalize_fallback_weights(fallback_weights, clean.columns)
+    if not weights.empty:
+        return RiskfolioOptimizationResult(
+            weights=weights,
+            status="fallback",
+            fallback_stage=fallback_label,
+            clean_asset_count=clean_asset_count,
+            clean_observation_count=clean_observation_count,
+            message="; ".join(messages),
+        )
+    return RiskfolioOptimizationResult(
+        weights=equal_weight(clean.columns.tolist()),
+        status="fallback",
+        fallback_stage="equal_weight_last_resort",
+        clean_asset_count=clean_asset_count,
+        clean_observation_count=clean_observation_count,
+        message="; ".join(messages),
+    )
+
+
+def solve_riskfolio(
+    clean: pd.DataFrame,
+    *,
+    method_mu: str,
+    method_cov: str,
+    upperlng: float,
+    nea: int | None,
+) -> pd.Series:
+    n_assets = clean.shape[1]
+    portfolio = rp.Portfolio(returns=clean) if nea is None else rp.Portfolio(returns=clean, nea=nea)
+    portfolio.upperlng = max(float(upperlng), 1.0 / n_assets)
+    portfolio.lowerlng = 0.0
+    portfolio.card = None
+    portfolio.alpha = 0.5
+    portfolio.assets_stats(method_mu=method_mu, method_cov=method_cov)
+    weights_df = portfolio.optimization(
+        model="Classic",
+        rm="CVaR",
+        obj="Sharpe",
+        rf=0.0,
+        hist=True,
+    )
+    if weights_df is None or weights_df.empty:
+        raise RuntimeError("Riskfolio returned empty weights")
+    weights = weights_df.iloc[:, 0].astype(float)
     weights = weights.reindex(clean.columns).fillna(0.0).clip(lower=0.0)
     total = float(weights.sum())
     if not np.isfinite(total) or total <= 0:
-        return equal_weight(clean.columns.tolist())
+        raise RuntimeError("Riskfolio returned non-positive or non-finite total weight")
     return weights / total
+
+
+def normalize_fallback_weights(weights: pd.Series | None, assets: pd.Index) -> pd.Series:
+    if weights is None:
+        return pd.Series(dtype=float)
+    normalized = weights.reindex(assets).fillna(0.0).clip(lower=0.0).astype(float)
+    total = float(normalized.sum())
+    if not np.isfinite(total) or total <= 0:
+        return pd.Series(dtype=float)
+    return normalized / total
 
 
 def equal_weight(assets: list[str] | pd.Index) -> pd.Series:
@@ -1525,7 +1609,9 @@ def run(args: argparse.Namespace) -> None:
     model_diag_rows: list[dict[str, Any]] = []
     task_diag_rows: list[dict[str, Any]] = []
     train_history_rows: list[dict[str, Any]] = []
+    riskfolio_diag_rows: list[dict[str, Any]] = []
     previous_gp_weights: pd.Series | None = None
+    previous_hist_weights: pd.Series | None = None
 
     for window_index, window_date in enumerate(construction_dates):
         print(f"rebalance {window_date.date()}", flush=True)
@@ -1566,13 +1652,32 @@ def run(args: argparse.Namespace) -> None:
             index=False,
         )
 
-        gp_weights = optimize_riskfolio(
+        hist_panel = train_df.pivot(index="date", columns="asset_id", values=task_exp.TARGET_COL).reindex(
+            columns=final_universe
+        )
+        hist_result = optimize_riskfolio(
+            hist_panel,
+            method_mu="ewma2",
+            method_cov="ewma2",
+            upperlng=args.upperlng,
+            nea=args.nea,
+            fallback_weights=previous_hist_weights,
+            fallback_label="previous_historical_weights",
+        )
+        hist_weights = hist_result.weights.reindex(final_universe).fillna(0.0)
+        previous_hist_weights = hist_weights
+        gp_fallback_weights = previous_gp_weights if previous_gp_weights is not None else hist_weights
+        gp_fallback_label = "previous_gp_weights" if previous_gp_weights is not None else "historical_y_ewma2_weights"
+        gp_result = optimize_riskfolio(
             scenarios.loc[:, final_universe],
             method_mu="hist",
             method_cov="hist",
             upperlng=args.upperlng,
             nea=args.nea,
+            fallback_weights=gp_fallback_weights,
+            fallback_label=gp_fallback_label,
         )
+        gp_weights = gp_result.weights.reindex(final_universe).fillna(0.0)
         if args.gp_experiment in TURNOVER_BLEND_EXPERIMENTS:
             gp_weights = blend_with_previous_weights(
                 gp_weights,
@@ -1580,17 +1685,29 @@ def run(args: argparse.Namespace) -> None:
                 blend=args.turnover_blend,
             )
         previous_gp_weights = gp_weights.reindex(final_universe).fillna(0.0)
-        hist_panel = train_df.pivot(index="date", columns="asset_id", values=task_exp.TARGET_COL).reindex(
-            columns=final_universe
-        )
-        hist_weights = optimize_riskfolio(
-            hist_panel,
-            method_mu="ewma2",
-            method_cov="ewma2",
-            upperlng=args.upperlng,
-            nea=args.nea,
-        )
         ew_weights = equal_weight(final_universe)
+        riskfolio_diag_rows.extend(
+            [
+                {
+                    "date": window_date.date().isoformat(),
+                    "strategy": "gp_scenarios_riskfolio",
+                    "status": gp_result.status,
+                    "fallback_stage": gp_result.fallback_stage,
+                    "clean_asset_count": gp_result.clean_asset_count,
+                    "clean_observation_count": gp_result.clean_observation_count,
+                    "message": gp_result.message,
+                },
+                {
+                    "date": window_date.date().isoformat(),
+                    "strategy": "historical_y_ewma2_riskfolio",
+                    "status": hist_result.status,
+                    "fallback_stage": hist_result.fallback_stage,
+                    "clean_asset_count": hist_result.clean_asset_count,
+                    "clean_observation_count": hist_result.clean_observation_count,
+                    "message": hist_result.message,
+                },
+            ]
+        )
 
         weights_by_strategy = {
             "gp_scenarios_riskfolio": gp_weights.reindex(final_universe).fillna(0.0),
@@ -1661,6 +1778,7 @@ def run(args: argparse.Namespace) -> None:
     ic_df.to_csv(output_dir / "gp_window_ic.csv", index=False)
     summary_df.to_csv(output_dir / "portfolio_summary.csv", index=False)
     pd.DataFrame(train_history_rows).to_csv(output_dir / "window_training_history.csv", index=False)
+    pd.DataFrame(riskfolio_diag_rows).to_csv(output_dir / "riskfolio_optimization_diagnostics.csv", index=False)
     if model_diag_rows:
         pd.DataFrame(model_diag_rows).to_csv(output_dir / "model_diagnostics.csv", index=False)
     if task_diag_rows:
