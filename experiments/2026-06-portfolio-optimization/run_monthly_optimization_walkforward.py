@@ -143,6 +143,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--upperlng", type=float, default=0.20)
     parser.add_argument("--nea", type=int, default=10)
+    parser.add_argument("--historical-method-mu", type=str, default="ewma2")
+    parser.add_argument("--historical-method-cov", type=str, default="gerber1")
     parser.add_argument(
         "--gp-experiment",
         choices=[
@@ -294,6 +296,10 @@ def resolve_output_dir(args: argparse.Namespace) -> Path:
     return OUTPUT_ROOT / "runs" / run_id
 
 
+def historical_strategy_name(args: argparse.Namespace) -> str:
+    return f"historical_y_{args.historical_method_mu}_{args.historical_method_cov}_riskfolio"
+
+
 def build_manifest(
     args: argparse.Namespace,
     output_dir: Path,
@@ -350,7 +356,7 @@ def build_manifest(
             "n_portfolio_construction_dates": len(scored_dates) + int(live_date is not None),
             "strategies": [
                 "gp_scenarios_riskfolio",
-                "historical_y_ewma2_riskfolio",
+                historical_strategy_name(args),
                 "equal_weight",
             ],
             "riskfolio_gp": {
@@ -368,8 +374,8 @@ def build_manifest(
                 "model": "Classic",
                 "rm": "CVaR",
                 "obj": "Sharpe",
-                "method_mu": "ewma2",
-                "method_cov": "ewma2",
+                "method_mu": args.historical_method_mu,
+                "method_cov": args.historical_method_cov,
                 "hist": True,
                 "upperlng": args.upperlng,
                 "nea": args.nea,
@@ -1598,10 +1604,11 @@ def run(args: argparse.Namespace) -> None:
     )
     (output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
+    hist_strategy = historical_strategy_name(args)
     return_rows: list[dict[str, Any]] = []
     weight_frames: dict[str, list[pd.Series]] = {
         "gp_scenarios_riskfolio": [],
-        "historical_y_ewma2_riskfolio": [],
+        hist_strategy: [],
         "equal_weight": [],
     }
     prediction_rows: list[pd.DataFrame] = []
@@ -1657,8 +1664,8 @@ def run(args: argparse.Namespace) -> None:
         )
         hist_result = optimize_riskfolio(
             hist_panel,
-            method_mu="ewma2",
-            method_cov="ewma2",
+            method_mu=args.historical_method_mu,
+            method_cov=args.historical_method_cov,
             upperlng=args.upperlng,
             nea=args.nea,
             fallback_weights=previous_hist_weights,
@@ -1699,7 +1706,7 @@ def run(args: argparse.Namespace) -> None:
                 },
                 {
                     "date": window_date.date().isoformat(),
-                    "strategy": "historical_y_ewma2_riskfolio",
+                    "strategy": hist_strategy,
                     "status": hist_result.status,
                     "fallback_stage": hist_result.fallback_stage,
                     "clean_asset_count": hist_result.clean_asset_count,
@@ -1711,7 +1718,7 @@ def run(args: argparse.Namespace) -> None:
 
         weights_by_strategy = {
             "gp_scenarios_riskfolio": gp_weights.reindex(final_universe).fillna(0.0),
-            "historical_y_ewma2_riskfolio": hist_weights.reindex(final_universe).fillna(0.0),
+            hist_strategy: hist_weights.reindex(final_universe).fillna(0.0),
             "equal_weight": ew_weights.reindex(final_universe).fillna(0.0),
         }
         gp_ic = information_coefficient(predictions, final_universe)
@@ -1814,8 +1821,8 @@ def run(args: argparse.Namespace) -> None:
             "Control is positive beta task covariance, lengthscale-only time modulation, rank 5."
         ),
         (
-            "- `historical_y_ewma2_riskfolio` ignores GP predictions and optimizes directly on historical "
-            "`y_excess_lead` with EWMA2, Sharpe, and CVaR."
+            f"- `{hist_strategy}` ignores GP predictions and optimizes directly on historical "
+            "`y_excess_lead`, Sharpe, and CVaR."
         ),
         "- `equal_weight` is the additional baseline requested for portfolio-run comparison.",
         "- IRA context: turnover is tracked as a stability diagnostic, not as a tax-cost veto.",

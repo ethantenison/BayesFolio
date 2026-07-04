@@ -129,6 +129,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--feature-seed", type=int, default=27)
     parser.add_argument("--eval-min-scored-date", type=str, default=DEFAULT_EVAL_MIN_SCORED_DATE)
+    parser.add_argument("--historical-method-mu", type=str, default="ewma2")
+    parser.add_argument("--historical-method-cov", type=str, default="gerber1")
     parser.add_argument("--max-workers", type=int, default=2)
     parser.add_argument("--skip-feature-build", action="store_true")
     return parser.parse_args()
@@ -263,6 +265,10 @@ def runner_command(
         "0.25",
         "--nea",
         "10",
+        "--historical-method-mu",
+        args.historical_method_mu,
+        "--historical-method-cov",
+        args.historical_method_cov,
         "--gp-experiment",
         "positive_no_prior",
         "--input-transform-mode",
@@ -391,10 +397,12 @@ def run_walkforward(
 
 
 def equity_curve(run_dir: Path) -> pd.Series:
+    return strategy_equity_curve(run_dir, "gp_scenarios_riskfolio")
+
+
+def strategy_equity_curve(run_dir: Path, strategy: str) -> pd.Series:
     returns = pd.read_csv(run_dir / "portfolio_walkforward" / "portfolio_returns.csv")
-    frame = returns[
-        (returns["strategy"] == "gp_scenarios_riskfolio") & (~returns["is_live_window"].astype(bool))
-    ].copy()
+    frame = returns[(returns["strategy"] == strategy) & (~returns["is_live_window"].astype(bool))].copy()
     frame["date"] = pd.to_datetime(frame["date"])
     frame = frame.set_index("date").sort_index()
     return (1.0 + frame["return"].astype(float)).cumprod() * STARTING_VALUE
@@ -426,25 +434,33 @@ def markdown_table(df: pd.DataFrame) -> str:
 def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[str, Path], parent_dir: Path) -> None:
     rows: list[dict[str, Any]] = []
     curves: dict[str, pd.Series] = {}
+    strategy_curves: dict[tuple[str, str], list[pd.Series]] = {}
     for config in configs:
         summary = pd.read_csv(run_dirs[config.label] / "portfolio_walkforward" / "portfolio_summary.csv")
-        gp = summary[summary["strategy"] == "gp_scenarios_riskfolio"].iloc[0].to_dict()
-        rows.append(
-            {
-                "label": config.label,
-                "horizon_label": config.horizon_label,
-                "horizon": config.horizon,
-                "seed": config.seed,
-                **gp,
-            }
-        )
+        for row in summary.to_dict(orient="records"):
+            rows.append(
+                {
+                    "label": config.label,
+                    "horizon_label": config.horizon_label,
+                    "horizon": config.horizon,
+                    "seed": config.seed,
+                    **row,
+                }
+            )
+            if row["strategy"] != "equal_weight":
+                key = (config.horizon_label, str(row["strategy"]))
+                strategy_curves.setdefault(key, []).append(
+                    add_start_anchor(strategy_equity_curve(run_dirs[config.label], str(row["strategy"])))
+                )
         curves[config.label] = equity_curve(run_dirs[config.label])
 
     comparison = pd.DataFrame(rows)
     comparison.to_csv(parent_dir / "comparison_metrics.csv", index=False)
     metric_cols = ["cumulative_return", "cagr", "annualized_vol", "sharpe", "max_drawdown", "mean_ic"]
     horizon_summary = (
-        comparison.groupby(["horizon_label", "horizon"], as_index=False)[metric_cols].agg(["mean", "std"]).reset_index()
+        comparison.groupby(["horizon_label", "horizon", "strategy"], as_index=False)[metric_cols]
+        .agg(["mean", "std"])
+        .reset_index()
     )
     horizon_summary.columns = [
         "_".join(part for part in column if part) if isinstance(column, tuple) else column
@@ -482,6 +498,31 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
     fig.savefig(parent_dir / "comparison_equity_curve.png", dpi=160)
     plt.close(fig)
 
+    strategy_mean_curves: dict[str, pd.Series] = {}
+    for (horizon_label, strategy), strategy_rows in strategy_curves.items():
+        strategy_mean_curves[f"{horizon_label}:{strategy}"] = pd.concat(strategy_rows, axis=1).mean(axis=1)
+    strategy_curve_df = pd.DataFrame(strategy_mean_curves).sort_index()
+    strategy_curve_df.to_csv(parent_dir / "strategy_mean_equity_curves.csv", index=True)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    for label, curve in strategy_mean_curves.items():
+        horizon_label, strategy = label.split(":", maxsplit=1)
+        curve.plot(
+            ax=ax,
+            color=color_by_horizon.get(horizon_label),
+            linestyle="-" if strategy == "gp_scenarios_riskfolio" else "--",
+            linewidth=2.2,
+            label=label,
+        )
+    ax.set_title(f"Mean Equity by Horizon and Strategy from {EVAL_MIN_SCORED_DATE}")
+    ax.set_ylabel("Portfolio value")
+    ax.set_xlabel("Realized rebalance date")
+    ax.legend(loc="upper left", fontsize=8)
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(parent_dir / "strategy_mean_equity_curve.png", dpi=160)
+    plt.close(fig)
+
     report = [
         "# Horizon Ablation Report",
         "",
@@ -492,19 +533,20 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
         f"`min_scored_date={EVAL_MIN_SCORED_DATE}`, "
         "so each horizon uses all available native rebalance periods over that calendar span.",
         "",
-        "## Horizon Summary",
+        "## Horizon And Strategy Summary",
         "",
         markdown_table(horizon_summary),
         "",
-        "## GP Strategy Metrics",
+        "## Per-Run Strategy Metrics",
         "",
-        markdown_table(comparison[["label", "horizon_label", "horizon", "seed", *metric_cols]]),
+        markdown_table(comparison[["label", "horizon_label", "horizon", "seed", "strategy", *metric_cols]]),
         "",
         "## Artifacts",
         "",
         f"- Metrics: `{parent_dir / 'comparison_metrics.csv'}`",
         f"- Horizon summary: `{parent_dir / 'horizon_summary_metrics.csv'}`",
         f"- Equity curve: `{parent_dir / 'comparison_equity_curve.png'}`",
+        f"- Strategy mean equity curve: `{parent_dir / 'strategy_mean_equity_curve.png'}`",
         f"- Per-run directories: `{RUNS_DIR}`",
         "",
         "## Caveats",
@@ -573,6 +615,12 @@ def main() -> None:
         "baseline": "monthly BME",
         "candidate": "3W-FRI",
         "target_metric": "gp_scenarios_riskfolio Sharpe and cumulative return over the July-portfolio calendar span",
+        "historical_baseline": {
+            "method_mu": args.historical_method_mu,
+            "method_cov": args.historical_method_cov,
+            "risk_measure": "CVaR",
+            "objective": "Sharpe",
+        },
         "data_window": {
             "lookback_date": LOOKBACK_DATE,
             "start_date": START_DATE,
@@ -602,6 +650,8 @@ def main() -> None:
                 "posterior_scenarios": args.posterior_scenarios,
                 "seeds": ",".join(str(seed) for seed in seeds),
                 "feature_seed": args.feature_seed,
+                "historical_method_mu": args.historical_method_mu,
+                "historical_method_cov": args.historical_method_cov,
             }
         )
         parent_manifest["tracker"]["parent_mlflow_run_id"] = parent_run.info.run_id
@@ -649,6 +699,8 @@ def main() -> None:
                         "posterior_scenarios": args.posterior_scenarios,
                         "seed": config.seed,
                         "feature_seed": args.feature_seed,
+                        "historical_method_mu": args.historical_method_mu,
+                        "historical_method_cov": args.historical_method_cov,
                     }
                 )
                 feature_path = build_feature_artifact(
@@ -702,7 +754,7 @@ def main() -> None:
             for metric in ["cumulative_return", "cagr", "annualized_vol", "sharpe", "max_drawdown", "mean_ic"]:
                 value = row.get(metric)
                 if isinstance(value, (int, float, np.floating)) and not pd.isna(value):
-                    mlflow.log_metric(f"{row['label']}.gp_scenarios_riskfolio.{metric}", float(value))
+                    mlflow.log_metric(f"{row['label']}.{row['strategy']}.{metric}", float(value))
         mlflow.log_artifacts(str(parent_dir), artifact_path="comparison")
         parent_manifest["status"] = "complete"
         parent_manifest["completed_at_utc"] = datetime.now(UTC).isoformat()
@@ -711,6 +763,7 @@ def main() -> None:
             "comparison_metrics": parent_dir / "comparison_metrics.csv",
             "horizon_summary_metrics": parent_dir / "horizon_summary_metrics.csv",
             "comparison_equity_curve": parent_dir / "comparison_equity_curve.png",
+            "strategy_mean_equity_curve": parent_dir / "strategy_mean_equity_curve.png",
             "decision_report": parent_dir / "decision_report.md",
         }
         write_json(parent_dir / "manifest.json", parent_manifest)
