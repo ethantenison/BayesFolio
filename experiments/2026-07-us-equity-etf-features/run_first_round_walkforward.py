@@ -10,10 +10,14 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import math
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+import numpy as np
+import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXPERIMENT_DIR = Path(__file__).resolve().parent
@@ -50,6 +54,12 @@ MACRO_COLS = [
     "term_spread",
 ]
 INPUT_COLUMNS = [*TIME_COLS, *ETF_COLS, *MACRO_COLS]
+NLL_VARIANCE_FLOOR = 1e-12
+NORMAL_COVERAGE_Z = {
+    "coverage_50": 0.6744897501960817,
+    "coverage_80": 1.2815515655446004,
+    "coverage_95": 1.959963984540054,
+}
 
 
 def load_portfolio_runner() -> Any:
@@ -97,6 +107,48 @@ def parse_wrapper_args(argv: list[str] | None = None) -> tuple[argparse.Namespac
     return args, remaining
 
 
+def forecast_metric_rows(predictions: pd.DataFrame, *, group_col: str | None) -> list[dict[str, Any]]:
+    grouped = [("overall", predictions)] if group_col is None else predictions.groupby(group_col, observed=True)
+    rows: list[dict[str, Any]] = []
+    for label, frame in grouped:
+        y_true = frame["y_true"].to_numpy(dtype=float)
+        y_pred = frame["y_pred"].to_numpy(dtype=float)
+        y_std = np.clip(frame["y_std"].to_numpy(dtype=float), math.sqrt(NLL_VARIANCE_FLOOR), None)
+        residual = y_true - y_pred
+        variance = np.square(y_std)
+        row: dict[str, Any] = {
+            "asset_id": str(label),
+            "n": int(len(frame)),
+            "rmse": float(np.sqrt(np.mean(np.square(residual)))),
+            "mae": float(np.mean(np.abs(residual))),
+            "bias": float(np.mean(y_pred - y_true)),
+            "mean_y_true": float(np.mean(y_true)),
+            "mean_y_pred": float(np.mean(y_pred)),
+            "std_y_true": float(np.std(y_true, ddof=1)) if len(frame) > 1 else math.nan,
+            "std_y_pred": float(np.std(y_pred, ddof=1)) if len(frame) > 1 else math.nan,
+            "mean_pred_std": float(np.mean(y_std)),
+            "mean_gaussian_nll": float(np.mean(0.5 * (np.log(2.0 * math.pi * variance) + np.square(residual) / variance))),
+            "standardized_residual_mean": float(np.mean(residual / y_std)),
+            "standardized_residual_std": float(np.std(residual / y_std, ddof=1)) if len(frame) > 1 else math.nan,
+        }
+        for name, z_value in NORMAL_COVERAGE_Z.items():
+            row[name] = float(np.mean(np.abs(residual) <= z_value * y_std))
+        rows.append(row)
+    return rows
+
+
+def write_forecast_metrics(output_dir: Path) -> None:
+    predictions_path = output_dir / "gp_window_predictions.csv"
+    if not predictions_path.exists():
+        return
+    predictions = pd.read_csv(predictions_path)
+    metric_columns = ["asset_id", "n", "rmse", "mae", "bias", "mean_y_true", "mean_y_pred", "std_y_true", "std_y_pred", "mean_pred_std", "mean_gaussian_nll", "standardized_residual_mean", "standardized_residual_std", *NORMAL_COVERAGE_Z]
+    by_asset = pd.DataFrame(forecast_metric_rows(predictions, group_col="asset_id")).loc[:, metric_columns]
+    overall = pd.DataFrame(forecast_metric_rows(predictions, group_col=None)).loc[:, metric_columns]
+    by_asset.to_csv(output_dir / "forecast_metrics_by_asset.csv", index=False)
+    overall.to_csv(output_dir / "forecast_metrics_overall.csv", index=False)
+
+
 def main(argv: list[str] | None = None) -> None:
     wrapper_args, remaining = parse_wrapper_args(argv)
     runner = load_portfolio_runner()
@@ -137,6 +189,8 @@ def main(argv: list[str] | None = None) -> None:
     finally:
         sys.argv = original_argv
     runner.run(args)
+    if not args.preflight_only:
+        write_forecast_metrics(Path(args.output_dir))
 
 
 if __name__ == "__main__":
