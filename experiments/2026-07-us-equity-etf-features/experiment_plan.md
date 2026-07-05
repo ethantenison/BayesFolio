@@ -9,16 +9,20 @@ The first family is:
 - `SPY`: broad U.S. large-cap equity
 - `MGK`: U.S. mega-cap growth
 - `VTV`: U.S. large-cap value
-- `IJR`: U.S. small-cap core
 - `IWM`: U.S. small-cap Russell 2000
 
 This family is intentionally narrower than the full BayesFolio universe. It keeps the tasks on the same country, currency, asset class, and return target while preserving meaningful style and size differences.
+
+`IJR` is deferred from the first testing round because it is near-identical to
+`IWM` on this target. Add it back after the four-task family has a usable
+baseline to test whether the duplicate small-cap task improves calibration or
+only slows the search.
 
 ## Decision Question
 
 Can feature selection and target/GP design produce forecasts that:
 
-- maintain non-trivial cross-sectional spread across the five U.S. equity ETF tasks,
+- maintain non-trivial cross-sectional spread across the first-round four-task U.S. equity family,
 - improve one-month-ahead ranking versus simple historical/EWMA baselines,
 - avoid overfitting one rebalance window or one ETF,
 - translate into portfolio choices that survive turnover, drawdown, and benchmark checks?

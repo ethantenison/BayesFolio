@@ -25,7 +25,8 @@ from bayesfolio.io import EtfFeaturesProvider, MacroProvider, ParquetArtifactSto
 
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 ARTIFACT_DIR = EXPERIMENT_DIR / "artifacts"
-US_EQUITY_TICKERS = ["SPY", "MGK", "VTV", "IJR", "IWM"]
+US_EQUITY_TICKERS = ["SPY", "MGK", "VTV", "IWM"]
+DEFERRED_TICKERS = ["IJR"]
 
 LOOKBACK_DATE = date(2019, 3, 1)
 START_DATE = date(2021, 3, 1)
@@ -88,7 +89,7 @@ MACRO_CANDIDATES = [
 def main() -> None:
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    artifact_name = f"us_equity_full_feature_candidates_{run_id}.parquet"
+    artifact_name = f"us_equity_first_round_feature_candidates_{run_id}.parquet"
 
     command = BuildFeaturesDatasetCommand(
         tickers=US_EQUITY_TICKERS,
@@ -138,6 +139,7 @@ def main() -> None:
         "row_count": result.artifact.row_count,
         "column_count": result.artifact.column_count,
         "tickers": US_EQUITY_TICKERS,
+        "deferred_tickers": DEFERRED_TICKERS,
         "lookback_date": LOOKBACK_DATE.isoformat(),
         "start_date": START_DATE.isoformat(),
         "end_date": END_DATE.isoformat(),

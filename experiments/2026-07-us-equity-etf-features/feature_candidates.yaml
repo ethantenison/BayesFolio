@@ -1,6 +1,13 @@
 experiment: us_equity_etf_features
 family:
   name: us_equity_style_size
+  first_round_tickers:
+    - SPY
+    - MGK
+    - VTV
+    - IWM
+  deferred_tickers:
+    - IJR
   tickers:
     - SPY
     - MGK
@@ -10,12 +17,12 @@ family:
   task_universe_variants:
     full_style_size:
       tickers: [SPY, MGK, VTV, IJR, IWM]
-      role: baseline
-      note: Keep both small-cap ETFs to test whether the MTGP handles near-duplicate tasks.
+      role: deferred_redundancy_ablation
+      note: Add IJR back after the first round to test whether the near-duplicate small-cap task adds value.
     compact_one_small_cap:
       tickers: [SPY, MGK, VTV, IWM]
-      role: redundancy_ablation
-      note: Drops IJR and keeps IWM as the canonical Russell 2000 small-cap representative.
+      role: first_round_baseline
+      note: Drops IJR and keeps IWM as the canonical Russell 2000 small-cap representative for faster first-round testing.
 
 candidate_feature_sets:
   us_equity_compact_pruned_v1:

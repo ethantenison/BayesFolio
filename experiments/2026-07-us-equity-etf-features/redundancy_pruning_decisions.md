@@ -35,19 +35,20 @@ Keep but isolate in ablations:
 
 ## IJR And IWM
 
-Do not silently drop one before the first run. They are near-duplicate tasks
-(`IJR`/`IWM` target correlation is about 0.97 in both horizons), but this is an
-MTGP task-structure question rather than a feature-pruning question.
+Leave `IJR` out of the first round. `IJR` and `IWM` are near-duplicate tasks
+(`IJR`/`IWM` target correlation is about 0.97 in both horizons), and dropping
+one keeps the first batch faster and cleaner.
 
 Run two task-universe variants:
 
-- `full_style_size`: `SPY`, `MGK`, `VTV`, `IJR`, `IWM`.
-- `compact_one_small_cap`: `SPY`, `MGK`, `VTV`, `IWM`.
+- First round, `compact_one_small_cap`: `SPY`, `MGK`, `VTV`, `IWM`.
+- Later redundancy ablation, `full_style_size`: `SPY`, `MGK`, `VTV`, `IJR`,
+  `IWM`.
 
-If the full family mostly learns a duplicated small-cap task and weakens
-style/size separation, use the compact one-small-cap universe for the main
-search. If the duplicate improves calibration without collapsing forecasts,
-keep both.
+Add `IJR` back only after the compact four-task family has a usable baseline.
+If the five-task family improves calibration or ranking without collapsing
+forecasts, keep both small-cap ETFs. Otherwise leave `IJR` out of the main
+search.
 
 ## BoTorch Input Scaling And Outliers
 
