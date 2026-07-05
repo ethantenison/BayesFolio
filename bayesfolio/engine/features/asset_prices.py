@@ -375,12 +375,12 @@ def fetch_etf_features(
     pd.DataFrame
         Long-format DataFrame with columns including:
         ['date', 'asset_id', 'price', 'volume', 'log_ret',
-         'mom1m', 'mom6m', 'mom12m', 'mom36m', 'chmom',
+         'mom1m', 'mom6m', 'mom12m', 'mom12m_skip1m', 'mom36m', 'chmom',
          'dolvol', 'turnover', 'sd_turn', 'ill',
          'vol_1w', 'vol_1m', 'vol_3m', 'vol_of_vol',
-         'vol_z', 'vol_accel',
+         'vol_z', 'vol_accel', 'vol_ratio_1m_3m', 'downside_vol_1m',
          'ma_1m', 'ma_3m', 'ma_signal', 'trend_slope',
-         'overnight_gap', 'ret_autocorr', 'vol_autocorr',
+         'overnight_gap', 'short_reversal_1m', 'ret_autocorr', 'vol_autocorr',
          'ret_skew', 'ret_kurt', 'baspread']
         Missing values are filled with 0 (neutral imputation).
     """
@@ -395,6 +395,7 @@ def fetch_etf_features(
         "mom1m": "last",
         "mom6m": "last",
         "mom12m": "last",
+        "mom12m_skip1m": "last",
         "mom36m": "last",
         "chmom": "last",
         "volume": "sum",
@@ -408,12 +409,15 @@ def fetch_etf_features(
         "vol_of_vol": "mean",
         "vol_z": "mean",
         "vol_accel": "mean",
+        "vol_ratio_1m_3m": "mean",
+        "downside_vol_1m": "mean",
         "ma_1m": "last",
         "ma_3m": "last",
         "ma_signal": "last",
         "ma_regime": "last",
         "trend_slope": "last",
         "overnight_gap": "mean",
+        "short_reversal_1m": "last",
         "ret_autocorr": "last",
         "vol_autocorr": "last",
         "ret_skew": "last",
@@ -475,8 +479,10 @@ def fetch_etf_features(
         data["mom1m"] = data["price"].pct_change(21)
         data["mom6m"] = data["price"].pct_change(126)
         data["mom12m"] = data["price"].pct_change(252)
+        data["mom12m_skip1m"] = data["price"].shift(21) / data["price"].shift(252) - 1
         data["mom36m"] = data["price"].pct_change(756)
         data["chmom"] = data["mom12m"] - data["mom6m"]
+        data["short_reversal_1m"] = -data["mom1m"]
 
         # ---- Liquidity metrics ----
         data["dolvol"] = data["price"] * data["volume"]
@@ -488,6 +494,8 @@ def fetch_etf_features(
         data["vol_1w"] = data["log_ret"].rolling(5).std()
         data["vol_1m"] = data["log_ret"].rolling(21).std()
         data["vol_3m"] = data["log_ret"].rolling(63).std()
+        data["vol_ratio_1m_3m"] = data["vol_1m"] / data["vol_3m"].replace(0, np.nan) - 1
+        data["downside_vol_1m"] = data["log_ret"].where(data["log_ret"] < 0, 0.0).rolling(21).std()
 
         # Vol-of-vol (instability of volatility)
         data["vol_of_vol"] = data["vol_1m"].diff().abs().rolling(21).std()
