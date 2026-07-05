@@ -129,9 +129,16 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--feature-seed", type=int, default=27)
     parser.add_argument("--eval-min-scored-date", type=str, default=DEFAULT_EVAL_MIN_SCORED_DATE)
+    parser.add_argument("--start-date", type=str, default=START_DATE.isoformat())
+    parser.add_argument("--lookback-date", type=str, default=LOOKBACK_DATE.isoformat())
     parser.add_argument("--historical-method-mu", type=str, default="ewma2")
     parser.add_argument("--historical-method-cov", type=str, default="gerber1")
     parser.add_argument("--max-workers", type=int, default=2)
+    parser.add_argument("--scenario-workers", type=int, default=1)
+    parser.add_argument("--resume-scenarios", action="store_true")
+    parser.add_argument("--torch-num-threads", type=int, default=None)
+    parser.add_argument("--monthly-scored-date-file", type=Path, default=None)
+    parser.add_argument("--three-week-scored-date-file", type=Path, default=None)
     parser.add_argument("--skip-feature-build", action="store_true")
     return parser.parse_args()
 
@@ -140,6 +147,10 @@ def parse_seed_list(args: argparse.Namespace) -> list[int]:
     if args.seeds is None:
         return [int(args.seed)]
     return [int(seed.strip()) for seed in args.seeds.split(",") if seed.strip()]
+
+
+def parse_iso_date(value: str) -> date:
+    return date.fromisoformat(value)
 
 
 def json_default(value: object) -> str:
@@ -235,7 +246,7 @@ def runner_command(
     output_dir: Path,
     args: argparse.Namespace,
 ) -> list[str]:
-    return [
+    command = [
         str(REPO_ROOT / ".venv" / "bin" / "python"),
         str(RUNNER_PATH),
         "--feature-path",
@@ -302,6 +313,20 @@ def runner_command(
         "--task-noise-floor-raw-std",
         "0.005",
     ]
+    if args.scenario_workers is not None:
+        command.extend(["--scenario-workers", str(args.scenario_workers)])
+    if args.resume_scenarios:
+        command.append("--resume-scenarios")
+    if args.torch_num_threads is not None:
+        command.extend(["--torch-num-threads", str(args.torch_num_threads)])
+    scored_date_file = (
+        args.monthly_scored_date_file
+        if config.horizon_label == "monthly"
+        else args.three_week_scored_date_file
+    )
+    if scored_date_file is not None:
+        command.extend(["--scored-date-file", str(scored_date_file)])
+    return command
 
 
 def update_manifest(run_dir: Path, payload: dict[str, Any]) -> None:
@@ -505,12 +530,21 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
     strategy_curve_df.to_csv(parent_dir / "strategy_mean_equity_curves.csv", index=True)
 
     fig, ax = plt.subplots(figsize=(10, 6))
+    linestyle_by_strategy = {
+        "gp_scenarios_riskfolio": "-",
+        "historical_y_ewma2_gerber1_riskfolio": "--",
+        "schwab_moderate_aggressive_static": "-.",
+    }
+    marker_by_horizon = {"monthly": "o", "three_week": "s"}
     for label, curve in strategy_mean_curves.items():
         horizon_label, strategy = label.split(":", maxsplit=1)
         curve.plot(
             ax=ax,
             color=color_by_horizon.get(horizon_label),
-            linestyle="-" if strategy == "gp_scenarios_riskfolio" else "--",
+            linestyle=linestyle_by_strategy.get(strategy, ":"),
+            marker=marker_by_horizon.get(horizon_label),
+            markersize=3,
+            markevery=max(len(curve) // 10, 1),
             linewidth=2.2,
             label=label,
         )
@@ -565,9 +599,11 @@ def build_comparison_artifacts(configs: list[HorizonRunConfig], run_dirs: dict[s
 
 
 def main() -> None:
-    global EVAL_MIN_SCORED_DATE
+    global EVAL_MIN_SCORED_DATE, START_DATE, LOOKBACK_DATE
     args = parse_args()
     EVAL_MIN_SCORED_DATE = args.eval_min_scored_date
+    START_DATE = parse_iso_date(args.start_date)
+    LOOKBACK_DATE = parse_iso_date(args.lookback_date)
     seeds = parse_seed_list(args)
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     eval_slug = EVAL_MIN_SCORED_DATE.replace("-", "")
@@ -626,6 +662,13 @@ def main() -> None:
             "start_date": START_DATE,
             "end_date": END_DATE,
             "evaluation_min_scored_date": EVAL_MIN_SCORED_DATE,
+            "monthly_scored_date_file": args.monthly_scored_date_file,
+            "three_week_scored_date_file": args.three_week_scored_date_file,
+        },
+        "scenario_generation": {
+            "scenario_workers": args.scenario_workers,
+            "resume_scenarios": args.resume_scenarios,
+            "torch_num_threads": args.torch_num_threads,
         },
         "configs": [asdict(config) for config in configs],
         "tracker": {"type": "mlflow", "tracking_uri": f"file://{MLFLOW_DIR.resolve()}"},
@@ -652,6 +695,15 @@ def main() -> None:
                 "feature_seed": args.feature_seed,
                 "historical_method_mu": args.historical_method_mu,
                 "historical_method_cov": args.historical_method_cov,
+                "scenario_workers": args.scenario_workers,
+                "resume_scenarios": args.resume_scenarios,
+                "torch_num_threads": args.torch_num_threads,
+                "monthly_scored_date_file": str(args.monthly_scored_date_file)
+                if args.monthly_scored_date_file is not None
+                else "",
+                "three_week_scored_date_file": str(args.three_week_scored_date_file)
+                if args.three_week_scored_date_file is not None
+                else "",
             }
         )
         parent_manifest["tracker"]["parent_mlflow_run_id"] = parent_run.info.run_id

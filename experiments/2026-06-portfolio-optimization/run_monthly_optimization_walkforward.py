@@ -8,6 +8,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import copy
 import hashlib
 import importlib.util
@@ -53,6 +54,27 @@ OUTPUT_ROOT = EXPERIMENT_DIR / "outputs"
 HELPER_ASSETS = {"MGK", "BND"}
 STARTING_VALUE = 10_000.0
 PERIODS_PER_YEAR = 12
+CASH_ASSET = "CASH"
+SCHWAB_MODERATE_AGGRESSIVE_STRATEGY = "schwab_moderate_aggressive_static"
+SCHWAB_MODERATE_AGGRESSIVE_TARGET_WEIGHTS = {
+    # Schwab-style Moderate Aggressive target: 80% equity, 15% fixed income,
+    # 5% cash. Cash is emitted explicitly as a zero-return allocation.
+    "SPY": 0.40,
+    "VTV": 0.08,
+    "IJR": 0.06,
+    "IWM": 0.04,
+    "VEA": 0.12,
+    "VWO": 0.05,
+    "VNQ": 0.03,
+    "VNQI": 0.02,
+    "IEF": 0.05,
+    "LQD": 0.04,
+    "BNDX": 0.03,
+    "HYG": 0.01,
+    "VWOB": 0.01,
+    "HYEM": 0.01,
+}
+SCHWAB_MODERATE_AGGRESSIVE_CASH_WEIGHT = 0.05
 SIGNED_EXPERIMENTS = {
     "signed_no_prior",
     "signed_lkj_eta_2",
@@ -134,6 +156,37 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default=None,
         help="If set, keep full training history but only evaluate scored windows on/after this YYYY-MM-DD date.",
+    )
+    parser.add_argument(
+        "--scored-date-file",
+        type=Path,
+        default=None,
+        help=(
+            "Optional text/CSV file containing explicit scored rebalance dates. When set, "
+            "these dates define the realized evaluation grid and bypass --max-windows selection."
+        ),
+    )
+    parser.add_argument(
+        "--preflight-only",
+        action="store_true",
+        help="Print scored dates and training row counts, then exit before fitting any GP windows.",
+    )
+    parser.add_argument(
+        "--scenario-workers",
+        type=int,
+        default=1,
+        help="Number of parallel worker processes for GP scenario generation. Riskfolio replay remains sequential.",
+    )
+    parser.add_argument(
+        "--resume-scenarios",
+        action="store_true",
+        help="Reuse existing per-window scenario/prediction/diagnostic artifacts when present.",
+    )
+    parser.add_argument(
+        "--torch-num-threads",
+        type=int,
+        default=None,
+        help="Optional torch thread cap applied in the main process and each scenario worker.",
     )
     parser.add_argument(
         "--min-inferred-noise-level",
@@ -329,6 +382,7 @@ def build_manifest(
             "date_max": df["date"].max().date().isoformat(),
             "min_feature_date_filter": args.min_feature_date,
             "min_scored_date_filter": args.min_scored_date,
+            "scored_date_file": str(args.scored_date_file) if args.scored_date_file is not None else None,
             "target_col": task_exp.TARGET_COL,
             "training_universe": task_exp.ETF_TICKERS,
             "helper_assets_fit_but_excluded": sorted(HELPER_ASSETS),
@@ -358,7 +412,18 @@ def build_manifest(
                 "gp_scenarios_riskfolio",
                 historical_strategy_name(args),
                 "equal_weight",
+                SCHWAB_MODERATE_AGGRESSIVE_STRATEGY,
             ],
+            "static_benchmarks": {
+                SCHWAB_MODERATE_AGGRESSIVE_STRATEGY: {
+                    "description": "Fixed Schwab-style Moderate Aggressive target benchmark.",
+                    "source_allocation": {"stocks": 0.80, "bonds": 0.15, "cash": 0.05},
+                    "weights": SCHWAB_MODERATE_AGGRESSIVE_TARGET_WEIGHTS,
+                    "cash_asset": CASH_ASSET,
+                    "cash_weight": SCHWAB_MODERATE_AGGRESSIVE_CASH_WEIGHT,
+                    "rebalance_rule": "rebalance to the same fixed target weights at each construction date",
+                }
+            },
             "riskfolio_gp": {
                 "model": "Classic",
                 "rm": "CVaR",
@@ -384,6 +449,9 @@ def build_manifest(
         "modeling": {
             "experiment": args.gp_experiment,
             "variant": variant_name,
+            "scenario_workers": args.scenario_workers,
+            "resume_scenarios": args.resume_scenarios,
+            "torch_num_threads": args.torch_num_threads,
             "task_kernel": "IndexKernel" if is_signed else "PositiveIndexKernel",
             "task_covar_prior": None
             if variant_name in {"signed_no_prior", "positive_no_prior"}
@@ -495,6 +563,54 @@ def apply_min_scored_date(scored_dates: list[pd.Timestamp], min_scored_date: str
         return scored_dates
     cutoff = pd.Timestamp(min_scored_date)
     return [date for date in scored_dates if date >= cutoff]
+
+
+def read_scored_date_file(path: Path) -> list[pd.Timestamp]:
+    raw_dates: list[str] = []
+    for line in path.read_text().splitlines():
+        value = line.strip()
+        if not value or value.startswith("#"):
+            continue
+        if "," in value:
+            value = value.split(",", maxsplit=1)[0].strip()
+        if value.lower() == "date":
+            continue
+        raw_dates.append(value)
+    if not raw_dates:
+        raise ValueError(f"No scored dates found in {path}")
+    return [pd.Timestamp(value) for value in raw_dates]
+
+
+def validate_explicit_scored_dates(df: pd.DataFrame, requested_dates: list[pd.Timestamp]) -> list[pd.Timestamp]:
+    counts = df.groupby("date", observed=True)[task_exp.TARGET_COL].apply(lambda s: int(s.notna().sum()))
+    expected = len(task_exp.ETF_TICKERS)
+    missing: list[str] = []
+    incomplete: list[str] = []
+    valid_dates: list[pd.Timestamp] = []
+    for requested in requested_dates:
+        normalized = pd.Timestamp(requested)
+        if normalized not in counts.index:
+            missing.append(normalized.date().isoformat())
+            continue
+        if int(counts.loc[normalized]) != expected:
+            incomplete.append(normalized.date().isoformat())
+            continue
+        valid_dates.append(normalized)
+    if missing or incomplete:
+        raise ValueError(
+            "Explicit scored-date file contains unavailable dates. "
+            f"missing={missing}, incomplete={incomplete}"
+        )
+    return valid_dates
+
+
+def select_scored_dates(df: pd.DataFrame, args: argparse.Namespace) -> tuple[list[pd.Timestamp], pd.Timestamp | None]:
+    if args.scored_date_file is not None:
+        scored_dates = validate_explicit_scored_dates(df, read_scored_date_file(args.scored_date_file))
+        _, live_date = task_exp.scored_and_live_dates(df, args.max_windows)
+        return scored_dates, live_date
+    scored_dates, live_date = task_exp.scored_and_live_dates(df, args.max_windows)
+    return apply_min_scored_date(scored_dates, args.min_scored_date), live_date
 
 
 def drop_incomplete_feature_dates(df: pd.DataFrame) -> pd.DataFrame:
@@ -627,6 +743,19 @@ def equal_weight(assets: list[str] | pd.Index) -> pd.Series:
     if not assets:
         return pd.Series(dtype=float)
     return pd.Series(1.0 / len(assets), index=assets, dtype=float)
+
+
+def schwab_moderate_aggressive_weights(assets: list[str] | pd.Index) -> pd.Series:
+    weights = pd.Series(SCHWAB_MODERATE_AGGRESSIVE_TARGET_WEIGHTS, dtype=float).reindex(list(assets)).fillna(0.0)
+    total = float(weights.sum())
+    expected_invested = 1.0 - SCHWAB_MODERATE_AGGRESSIVE_CASH_WEIGHT
+    if not np.isclose(total, expected_invested):
+        raise ValueError(
+            f"{SCHWAB_MODERATE_AGGRESSIVE_STRATEGY} invested weight sums to {total:.6f}; "
+            f"expected {expected_invested:.6f}"
+        )
+    weights.loc[CASH_ASSET] = SCHWAB_MODERATE_AGGRESSIVE_CASH_WEIGHT
+    return weights
 
 
 def build_time_varying_lengthscale_floor_kernel(
@@ -1468,6 +1597,98 @@ def fit_gp_window(
     return scenarios, predictions, [*diagnostics, *outputscale_prior_rows, *task_noise_floor_rows], task_diag
 
 
+def scenario_artifact_paths(output_dir: Path, window_date: pd.Timestamp) -> dict[str, Path]:
+    date_label = window_date.date().isoformat()
+    cache_dir = output_dir / "scenario_cache"
+    return {
+        "scenarios": output_dir / f"gp_scenarios_{date_label}.csv",
+        "predictions": cache_dir / f"gp_predictions_{date_label}.csv",
+        "model_diagnostics": cache_dir / f"model_diagnostics_{date_label}.csv",
+        "task_diagnostics": cache_dir / f"task_covariance_diagnostics_{date_label}.csv",
+    }
+
+
+def scenario_artifacts_complete(output_dir: Path, window_date: pd.Timestamp) -> bool:
+    paths = scenario_artifact_paths(output_dir, window_date)
+    return paths["scenarios"].exists() and paths["predictions"].exists() and paths["model_diagnostics"].exists()
+
+
+def write_gp_window_artifacts(
+    *,
+    scenarios: pd.DataFrame,
+    predictions: pd.DataFrame,
+    model_diagnostics: list[dict[str, Any]],
+    task_diag: dict[str, Any] | None,
+    output_dir: Path,
+    window_date: pd.Timestamp,
+    final_universe: list[str],
+) -> dict[str, str]:
+    paths = scenario_artifact_paths(output_dir, window_date)
+    paths["predictions"].parent.mkdir(parents=True, exist_ok=True)
+    scenarios.loc[:, final_universe].to_csv(paths["scenarios"], index=False)
+    predictions.to_csv(paths["predictions"], index=False)
+    pd.DataFrame(model_diagnostics).to_csv(paths["model_diagnostics"], index=False)
+    if task_diag is not None:
+        pd.DataFrame([task_diag]).to_csv(paths["task_diagnostics"], index=False)
+    return {name: str(path) for name, path in paths.items() if path.exists()}
+
+
+def fit_gp_window_artifact(job: dict[str, Any]) -> dict[str, Any]:
+    args = argparse.Namespace(**job["args"])
+    if args.torch_num_threads is not None:
+        torch.set_num_threads(int(args.torch_num_threads))
+    torch.set_default_dtype(torch.float64)
+    window_date = pd.Timestamp(job["window_date"])
+    output_dir = Path(job["output_dir"])
+    if args.resume_scenarios and scenario_artifacts_complete(output_dir, window_date):
+        return {
+            "date": window_date.date().isoformat(),
+            "status": "skipped_existing",
+            "paths": {
+                name: str(path)
+                for name, path in scenario_artifact_paths(output_dir, window_date).items()
+                if path.exists()
+            },
+        }
+    train_df = job["train_df"]
+    eval_df = job["eval_df"]
+    scenarios, predictions, model_diagnostics, task_diag = fit_gp_window(
+        train_df,
+        eval_df,
+        args=args,
+        seed=int(job["seed"]),
+        maxiter=int(args.maxiter),
+        posterior_scenarios=int(args.posterior_scenarios),
+    )
+    if args.gp_experiment == "scenario_mean_scale":
+        scenarios = calibrate_scenario_means(scenarios, predictions, scale=args.scenario_mean_scale)
+    paths = write_gp_window_artifacts(
+        scenarios=scenarios,
+        predictions=predictions,
+        model_diagnostics=model_diagnostics,
+        task_diag=task_diag,
+        output_dir=output_dir,
+        window_date=window_date,
+        final_universe=job["final_universe"],
+    )
+    return {"date": window_date.date().isoformat(), "status": "fit", "paths": paths}
+
+
+def run_gp_scenario_generation(
+    jobs: list[dict[str, Any]],
+    *,
+    workers: int,
+) -> list[dict[str, Any]]:
+    if workers <= 1:
+        return [fit_gp_window_artifact(job) for job in jobs]
+    results: list[dict[str, Any]] = []
+    with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(fit_gp_window_artifact, job) for job in jobs]
+        for future in concurrent.futures.as_completed(futures):
+            results.append(future.result())
+    return sorted(results, key=lambda row: row["date"])
+
+
 def realized_return(weights: pd.Series, eval_returns: pd.Series) -> float:
     aligned = weights.reindex(eval_returns.index).fillna(0.0)
     value = float(np.dot(aligned.to_numpy(dtype=float), eval_returns.to_numpy(dtype=float)))
@@ -1578,6 +1799,8 @@ def markdown_table(df: pd.DataFrame) -> str:
 
 
 def run(args: argparse.Namespace) -> None:
+    if args.torch_num_threads is not None:
+        torch.set_num_threads(int(args.torch_num_threads))
     torch.set_default_dtype(torch.float64)
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
@@ -1586,14 +1809,41 @@ def run(args: argparse.Namespace) -> None:
     if args.drop_incomplete_feature_dates:
         df = drop_incomplete_feature_dates(df)
     df = apply_min_feature_date(df, args.min_feature_date)
-    scored_dates, live_date = task_exp.scored_and_live_dates(df, args.max_windows)
-    scored_dates = apply_min_scored_date(scored_dates, args.min_scored_date)
+    scored_dates, live_date = select_scored_dates(df, args)
     construction_dates = [*scored_dates]
     if args.include_live_window and live_date is not None:
         construction_dates.append(live_date)
+    preflight_rows = [
+        {
+            "date": window_date.date().isoformat(),
+            "train_months": args.train_months,
+            "train_rows": int(len(training_slice(df, window_date, args.train_months))),
+            "unique_train_dates": int(training_slice(df, window_date, args.train_months)["date"].nunique()),
+        }
+        for window_date in construction_dates
+    ]
+    if args.preflight_only:
+        print(
+            json.dumps(
+                {
+                    "feature_path": str(args.feature_path),
+                    "scored_date_file": str(args.scored_date_file) if args.scored_date_file is not None else None,
+                    "n_scored_dates": len(scored_dates),
+                    "n_construction_dates": len(construction_dates),
+                    "scored_dates": [date.date().isoformat() for date in scored_dates],
+                    "live_date": live_date.date().isoformat() if live_date is not None else None,
+                    "training_history": preflight_rows,
+                    "scenario_workers": args.scenario_workers,
+                    "torch_num_threads": args.torch_num_threads,
+                },
+                indent=2,
+            )
+        )
+        return
     output_dir = resolve_output_dir(args)
-    output_dir.mkdir(parents=True, exist_ok=False)
+    output_dir.mkdir(parents=True, exist_ok=args.resume_scenarios)
     final_universe = [asset for asset in task_exp.ETF_TICKERS if asset not in HELPER_ASSETS]
+    weight_output_assets = [*final_universe, CASH_ASSET]
 
     manifest = build_manifest(
         args,
@@ -1610,6 +1860,7 @@ def run(args: argparse.Namespace) -> None:
         "gp_scenarios_riskfolio": [],
         hist_strategy: [],
         "equal_weight": [],
+        SCHWAB_MODERATE_AGGRESSIVE_STRATEGY: [],
     }
     prediction_rows: list[pd.DataFrame] = []
     ic_rows: list[dict[str, Any]] = []
@@ -1620,8 +1871,8 @@ def run(args: argparse.Namespace) -> None:
     previous_gp_weights: pd.Series | None = None
     previous_hist_weights: pd.Series | None = None
 
+    scenario_jobs: list[dict[str, Any]] = []
     for window_index, window_date in enumerate(construction_dates):
-        print(f"rebalance {window_date.date()}", flush=True)
         train_df = training_slice(df, window_date, args.train_months)
         eval_df = df[df["date"] == window_date].copy()
         train_history_rows.append(
@@ -1634,30 +1885,47 @@ def run(args: argparse.Namespace) -> None:
                 "unique_train_dates": int(train_df["date"].nunique()),
             }
         )
+        scenario_jobs.append(
+            {
+                "window_index": window_index,
+                "window_date": window_date.date().isoformat(),
+                "train_df": train_df,
+                "eval_df": eval_df,
+                "args": vars(args),
+                "seed": task_exp.stable_seed(args.seed, gp_variant_name(args.gp_experiment), window_index),
+                "output_dir": output_dir,
+                "final_universe": final_universe,
+            }
+        )
+
+    print(
+        f"Generating GP scenarios for {len(scenario_jobs)} windows "
+        f"with scenario_workers={args.scenario_workers}",
+        flush=True,
+    )
+    scenario_results = run_gp_scenario_generation(scenario_jobs, workers=int(args.scenario_workers))
+    (output_dir / "scenario_generation_results.json").write_text(
+        json.dumps(scenario_results, indent=2, sort_keys=True) + "\n"
+    )
+
+    for window_date in construction_dates:
+        print(f"riskfolio replay {window_date.date()}", flush=True)
+        train_df = training_slice(df, window_date, args.train_months)
+        eval_df = df[df["date"] == window_date].copy()
         eval_returns = (
             eval_df.set_index(eval_df["asset_id"].astype(str))[task_exp.TARGET_COL]
             .reindex(final_universe)
             .astype(float)
         )
 
-        scenarios, predictions, model_diagnostics, task_diag = fit_gp_window(
-            train_df,
-            eval_df,
-            args=args,
-            seed=task_exp.stable_seed(args.seed, gp_variant_name(args.gp_experiment), window_index),
-            maxiter=args.maxiter,
-            posterior_scenarios=args.posterior_scenarios,
-        )
-        if args.gp_experiment == "scenario_mean_scale":
-            scenarios = calibrate_scenario_means(scenarios, predictions, scale=args.scenario_mean_scale)
+        paths = scenario_artifact_paths(output_dir, window_date)
+        scenarios = pd.read_csv(paths["scenarios"])
+        predictions = pd.read_csv(paths["predictions"])
         prediction_rows.append(predictions)
-        model_diag_rows.extend(model_diagnostics)
-        if task_diag is not None:
-            task_diag_rows.append(task_diag)
-        scenarios.loc[:, final_universe].to_csv(
-            output_dir / f"gp_scenarios_{window_date.date().isoformat()}.csv",
-            index=False,
-        )
+        if paths["model_diagnostics"].exists():
+            model_diag_rows.extend(pd.read_csv(paths["model_diagnostics"]).to_dict(orient="records"))
+        if paths["task_diagnostics"].exists():
+            task_diag_rows.extend(pd.read_csv(paths["task_diagnostics"]).to_dict(orient="records"))
 
         hist_panel = train_df.pivot(index="date", columns="asset_id", values=task_exp.TARGET_COL).reindex(
             columns=final_universe
@@ -1693,6 +1961,7 @@ def run(args: argparse.Namespace) -> None:
             )
         previous_gp_weights = gp_weights.reindex(final_universe).fillna(0.0)
         ew_weights = equal_weight(final_universe)
+        schwab_weights = schwab_moderate_aggressive_weights(final_universe)
         riskfolio_diag_rows.extend(
             [
                 {
@@ -1717,9 +1986,10 @@ def run(args: argparse.Namespace) -> None:
         )
 
         weights_by_strategy = {
-            "gp_scenarios_riskfolio": gp_weights.reindex(final_universe).fillna(0.0),
-            hist_strategy: hist_weights.reindex(final_universe).fillna(0.0),
-            "equal_weight": ew_weights.reindex(final_universe).fillna(0.0),
+            "gp_scenarios_riskfolio": gp_weights.reindex(weight_output_assets).fillna(0.0),
+            hist_strategy: hist_weights.reindex(weight_output_assets).fillna(0.0),
+            "equal_weight": ew_weights.reindex(weight_output_assets).fillna(0.0),
+            SCHWAB_MODERATE_AGGRESSIVE_STRATEGY: schwab_weights.reindex(weight_output_assets).fillna(0.0),
         }
         gp_ic = information_coefficient(predictions, final_universe)
         ic_rows.append({"date": window_date.date().isoformat(), "strategy": "gp_scenarios_riskfolio", "ic": gp_ic})
@@ -1748,7 +2018,7 @@ def run(args: argparse.Namespace) -> None:
         weights = pd.DataFrame(rows)
         weights.index = pd.to_datetime(weights.index)
         weights.index.name = "date"
-        weights = weights.reindex(columns=final_universe).fillna(0.0)
+        weights = weights.reindex(columns=weight_output_assets).fillna(0.0)
         weights_long = weights.reset_index().melt(id_vars="date", var_name="asset_id", value_name="weight")
         weights_long["strategy"] = strategy
         weights_output.append(weights_long)
@@ -1825,6 +2095,12 @@ def run(args: argparse.Namespace) -> None:
             "`y_excess_lead`, Sharpe, and CVaR."
         ),
         "- `equal_weight` is the additional baseline requested for portfolio-run comparison.",
+        (
+            f"- `{SCHWAB_MODERATE_AGGRESSIVE_STRATEGY}` is a fixed target-weight benchmark "
+            "using an 80/15/5 stock/bond/cash Schwab-style Moderate Aggressive allocation. "
+            f"The {SCHWAB_MODERATE_AGGRESSIVE_CASH_WEIGHT:.0%} cash sleeve is written as "
+            f"`{CASH_ASSET}` with zero realized return."
+        ),
         "- IRA context: turnover is tracked as a stability diagnostic, not as a tax-cost veto.",
         "- No transaction costs, taxes, slippage, or liquidity filters are applied in this end-to-end check.",
     ]

@@ -18,6 +18,7 @@ from bayesfolio.core.settings import Horizon
 from bayesfolio.io.providers._cache_frame_ops import (
     concat_frames,
     dedupe_rows,
+    filter_expected_dates,
     missing_tickers,
     normalize_asset_id_column,
     normalize_date_column,
@@ -114,7 +115,16 @@ class ReturnsProvider:
                 start,
                 end,
             )
-            return requested_cached.sort_values(["date", "asset_id"]).reset_index(drop=True)
+            return (
+                filter_expected_dates(
+                    frame=requested_cached,
+                    start=start,
+                    end=end,
+                    freq=horizon.value,
+                )
+                .sort_values(["date", "asset_id"])
+                .reset_index(drop=True)
+            )
 
         logger.info(
             "Return cache partial/miss for %d tickers; fetching live data for %d tickers.",
@@ -143,7 +153,16 @@ class ReturnsProvider:
             sort_by=["date", "asset_id"],
         )
         self._write_cache_frame(frame=updated_cache, horizon=horizon)
-        return merged_request.sort_values(["date", "asset_id"]).reset_index(drop=True)
+        return (
+            filter_expected_dates(
+                frame=merged_request,
+                start=start,
+                end=end,
+                freq=horizon.value,
+            )
+            .sort_values(["date", "asset_id"])
+            .reset_index(drop=True)
+        )
 
     def _call_fetcher(
         self,

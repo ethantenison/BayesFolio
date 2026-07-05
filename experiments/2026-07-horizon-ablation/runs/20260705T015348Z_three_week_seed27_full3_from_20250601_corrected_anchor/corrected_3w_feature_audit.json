@@ -1,0 +1,292 @@
+{
+  "feature_path": "/Users/et/.bayesfolio/artifacts/features/horizon_ablation_20260703/portfolio_etf_macro_features_20260705T015348Z_three_week_seed27_full3_from_20250601_corrected_anchor.parquet",
+  "feature_sha256": "f9d84e5cee7b67b0c43cf076741d460b9df59857d990db3324771cfa7cf5529c",
+  "feature_manifest_sha256": "f9d84e5cee7b67b0c43cf076741d460b9df59857d990db3324771cfa7cf5529c",
+  "run_manifest_status": null,
+  "rows": 1980,
+  "n_assets": 18,
+  "assets": [
+    "BND",
+    "BNDX",
+    "EWX",
+    "HYEM",
+    "HYG",
+    "IEF",
+    "IJR",
+    "IWM",
+    "LQD",
+    "MGK",
+    "SPY",
+    "VEA",
+    "VNQ",
+    "VNQI",
+    "VSS",
+    "VTV",
+    "VWO",
+    "VWOB"
+  ],
+  "n_feature_dates": 110,
+  "feature_date_start": "2020-03-06",
+  "feature_date_end": "2026-06-12",
+  "n_scored_dates": 18,
+  "scored_date_start": "2025-06-20",
+  "scored_date_end": "2026-06-12",
+  "feature_gaps_days": {
+    "21": 109
+  },
+  "scored_gaps_days": {
+    "21": 17
+  },
+  "na_rates_top": {
+    "t_index": 0.0,
+    "baspread": 0.0,
+    "lag2_y_excess_lead": 0.0,
+    "lag_y_excess_lead": 0.0,
+    "em_fx_ret": 0.0,
+    "pct_above_50dma": 0.0,
+    "gold_crude_ratio": 0.0,
+    "oil_ret": 0.0,
+    "copper_ret": 0.0,
+    "cpi_chg_1p": 0.0
+  },
+  "etf_feature_comparison": {
+    "baspread": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "ret_kurt": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "chmom": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "mom12m": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "mom36m": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "cs_mom_rank": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "max_dd_6m": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "ma_signal": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "ret_autocorr": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "vol_z": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    }
+  },
+  "macro_feature_comparison": {
+    "hy_spread": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "hy_spread_chg_1p": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "hy_spread_z_12p": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "vix_slope": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "vix_ts_z_12p": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "vix": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "spy_flow_z_12p": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "spy_ret": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "erp": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "cpi_chg_12p": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "cpi_chg_1p": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "copper_ret": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "oil_ret": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "gold_crude_ratio": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "pct_above_50dma": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    },
+    "em_fx_ret": {
+      "bad": 0,
+      "max_abs_diff": 0.0
+    }
+  },
+  "checks": [
+    {
+      "check": "feature dates are a single 21-day grid",
+      "passed": true,
+      "detail": "{21: 109}"
+    },
+    {
+      "check": "feature dates match expected 2018-03-01 anchored 3W-FRI grid",
+      "passed": true,
+      "detail": "110 dates; first=2020-03-06, last=2026-06-12"
+    },
+    {
+      "check": "scored dates are subset of feature dates",
+      "passed": true,
+      "detail": "18 scored dates; gaps={21: 17}"
+    },
+    {
+      "check": "no duplicate feature date/asset rows",
+      "passed": true,
+      "detail": "duplicates=0"
+    },
+    {
+      "check": "constant asset coverage by date",
+      "passed": true,
+      "detail": "18 assets; counts={18: 110}"
+    },
+    {
+      "check": "t_index increments once per 21-day feature date",
+      "passed": true,
+      "detail": "t_index range=0..109"
+    },
+    {
+      "check": "returns raw cache has unique keys",
+      "passed": true,
+      "detail": "duplicates=0"
+    },
+    {
+      "check": "returns raw cache still contains historical interleaved anchors",
+      "passed": true,
+      "detail": "raw gaps={7: 129, 14: 128, 21: 17}"
+    },
+    {
+      "check": "ETF raw cache has unique keys",
+      "passed": true,
+      "detail": "duplicates=0"
+    },
+    {
+      "check": "ETF raw cache still contains historical interleaved anchors",
+      "passed": true,
+      "detail": "raw gaps={7: 129, 14: 128, 21: 17}"
+    },
+    {
+      "check": "macro raw cache has unique keys",
+      "passed": true,
+      "detail": "duplicates=0"
+    },
+    {
+      "check": "macro raw cache still contains historical interleaved anchors",
+      "passed": true,
+      "detail": "raw gaps={7: 129, 14: 128, 21: 17}"
+    },
+    {
+      "check": "returns filtered provider grid is single 21-day cadence",
+      "passed": true,
+      "detail": "{21: 144}"
+    },
+    {
+      "check": "ETF filtered provider grid is single 21-day cadence",
+      "passed": true,
+      "detail": "{21: 144}"
+    },
+    {
+      "check": "macro filtered provider grid is single 21-day cadence",
+      "passed": true,
+      "detail": "{21: 144}"
+    },
+    {
+      "check": "target y_excess_lead matches filtered 3W returns cache",
+      "passed": true,
+      "detail": "missing=0; bad=0; max_abs_diff=0"
+    },
+    {
+      "check": "lag_y_excess_lead equals prior 21-day target",
+      "passed": true,
+      "detail": "bad=0; max_abs_diff=0"
+    },
+    {
+      "check": "lag2_y_excess_lead equals two-prior 21-day target",
+      "passed": true,
+      "detail": "bad=0; max_abs_diff=0"
+    },
+    {
+      "check": "target lags have no future overlap on scored windows",
+      "passed": true,
+      "detail": "lag1=0/18, lag2=0/18"
+    },
+    {
+      "check": "all ETF feature columns equal prior-anchor filtered cache values",
+      "passed": true,
+      "detail": "{'baspread': {'bad': 0, 'max_abs_diff': 0.0}, 'ret_kurt': {'bad': 0, 'max_abs_diff': 0.0}, 'chmom': {'bad': 0, 'max_abs_diff': 0.0}, 'mom12m': {'bad': 0, 'max_abs_diff': 0.0}, 'mom36m': {'bad': 0, 'max_abs_diff': 0.0}, 'cs_mom_rank': {'bad': 0, 'max_abs_diff': 0.0}, 'max_dd_6m': {'bad': 0, 'max_abs_diff': 0.0}, 'ma_signal': {'bad': 0, 'max_abs_diff': 0.0}, 'ret_autocorr': {'bad': 0, 'max_abs_diff': 0.0}, 'vol_z': {'bad': 0, 'max_abs_diff': 0.0}}"
+    },
+    {
+      "check": "all macro feature columns equal prior-anchor filtered cache values",
+      "passed": true,
+      "detail": "{'hy_spread': {'bad': 0, 'max_abs_diff': 0.0}, 'hy_spread_chg_1p': {'bad': 0, 'max_abs_diff': 0.0}, 'hy_spread_z_12p': {'bad': 0, 'max_abs_diff': 0.0}, 'vix_slope': {'bad': 0, 'max_abs_diff': 0.0}, 'vix_ts_z_12p': {'bad': 0, 'max_abs_diff': 0.0}, 'vix': {'bad': 0, 'max_abs_diff': 0.0}, 'spy_flow_z_12p': {'bad': 0, 'max_abs_diff': 0.0}, 'spy_ret': {'bad': 0, 'max_abs_diff': 0.0}, 'erp': {'bad': 0, 'max_abs_diff': 0.0}, 'cpi_chg_12p': {'bad': 0, 'max_abs_diff': 0.0}, 'cpi_chg_1p': {'bad': 0, 'max_abs_diff': 0.0}, 'copper_ret': {'bad': 0, 'max_abs_diff': 0.0}, 'oil_ret': {'bad': 0, 'max_abs_diff': 0.0}, 'gold_crude_ratio': {'bad': 0, 'max_abs_diff': 0.0}, 'pct_above_50dma': {'bad': 0, 'max_abs_diff': 0.0}, 'em_fx_ret': {'bad': 0, 'max_abs_diff': 0.0}}"
+    },
+    {
+      "check": "macro values are date-level constants across assets",
+      "passed": true,
+      "detail": "max_nunique_by_date=1"
+    },
+    {
+      "check": "no infinities in model input/target columns",
+      "passed": true,
+      "detail": "inf_cols=[]"
+    },
+    {
+      "check": "scored windows have complete model columns",
+      "passed": true,
+      "detail": "nonzero_na={}"
+    },
+    {
+      "check": "window_training_history file exists",
+      "passed": true,
+      "detail": "columns=['date', 'train_months', 'train_rows', 'train_date_min', 'train_date_max', 'unique_train_dates'] rows=18"
+    },
+    {
+      "check": "prediction rows cover scored date x asset grid",
+      "passed": true,
+      "detail": "rows=324 expected=324; assets=18"
+    }
+  ]
+}

@@ -18,6 +18,7 @@ from bayesfolio.core.settings import Horizon
 from bayesfolio.io.providers._cache_frame_ops import (
     concat_frames,
     dedupe_rows,
+    filter_expected_dates,
     has_date_coverage,
     normalize_date_column,
     slice_requested,
@@ -81,13 +82,23 @@ class MacroProvider:
         cache_frame = self._read_cache_frame(horizon=horizon)
         if has_date_coverage(frame=cache_frame, start=start, end=end, freq=horizon.value):
             logger.info("Using cached macro features from %s to %s.", start, end)
-            return slice_requested(frame=cache_frame, start=start, end=end)
+            return filter_expected_dates(
+                frame=slice_requested(frame=cache_frame, start=start, end=end),
+                start=start,
+                end=end,
+                freq=horizon.value,
+            )
 
         logger.info("Macro cache miss/partial for %s to %s; fetching live data.", start, end)
         fetched = self._fetch_with_retries_or_fallback(start=start, end=end, horizon=horizon)
         updated_cache = dedupe_rows(concat_frames(cache_frame, fetched), subset=["date"], sort_by=["date"])
         self._write_cache_frame(frame=updated_cache, horizon=horizon)
-        return slice_requested(frame=updated_cache, start=start, end=end)
+        return filter_expected_dates(
+            frame=slice_requested(frame=updated_cache, start=start, end=end),
+            start=start,
+            end=end,
+            freq=horizon.value,
+        )
 
     def _fetch_with_retries_or_fallback(self, *, start: str, end: str, horizon: Horizon) -> pd.DataFrame:
         logger.info("Fetching macro features from %s to %s.", start, end)
