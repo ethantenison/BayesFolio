@@ -83,6 +83,15 @@ Keep but isolate in macro/risk block:
 
 ## Recommended First Feature Sets
 
+After GP-focused redundancy EDA, use `us_equity_compact_pruned_v1` in
+`feature_candidates.yaml` as the first-pass GP/MTGP feature set. The broader
+sets below remain useful as ablation blocks, but they intentionally include
+some redundant alternatives.
+
+See `redundancy_pruning_decisions.md` for pair-by-pair keep/drop rationale,
+the IJR/IWM task-universe decision, and BoTorch scaling guidance for outlier
+features.
+
 ### `us_equity_momentum_trend`
 
 - `lag_y_excess_lead`

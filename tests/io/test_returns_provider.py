@@ -77,7 +77,7 @@ def test_returns_provider_filters_cached_interleaved_three_week_anchors(tmp_path
         ["2026-01-02", "2026-01-16", "2026-01-23", "2026-02-06", "2026-02-13"],
         [0.01, 0.99, 0.02, 0.98, 0.03],
     )
-    cached.to_parquet(tmp_path / "returns_3w_fri.parquet", index=False)
+    cached.to_parquet(tmp_path / "returns_3w_fri_anchor_20260102.parquet", index=False)
 
     def fetcher(*, tickers: list[str], start: str, end: str, horizon: Horizon) -> pd.DataFrame:
         raise AssertionError("cache should satisfy the requested anchor grid")
@@ -93,3 +93,29 @@ def test_returns_provider_filters_cached_interleaved_three_week_anchors(tmp_path
 
     assert frame["date"].dt.strftime("%Y-%m-%d").tolist() == ["2026-01-02", "2026-01-23", "2026-02-13"]
     assert frame["y_excess_lead"].tolist() == [0.01, 0.02, 0.03]
+
+
+def test_returns_provider_uses_anchor_specific_three_week_cache_files(tmp_path: Path) -> None:
+    def fetcher(*, tickers: list[str], start: str, end: str, horizon: Horizon) -> pd.DataFrame:
+        return _returns_frame("SPY", [start], [0.01])
+
+    provider = ReturnsProvider(fetcher=fetcher, cache_dir=tmp_path)
+
+    provider.get_y_excess_lead_long(
+        tickers=["SPY"],
+        start="2026-01-01",
+        end="2026-01-23",
+        horizon=Horizon.THREE_WEEK,
+    )
+    provider.get_y_excess_lead_long(
+        tickers=["SPY"],
+        start="2026-01-08",
+        end="2026-01-30",
+        horizon=Horizon.THREE_WEEK,
+    )
+
+    cache_names = sorted(path.name for path in tmp_path.glob("returns_3w_fri_anchor_*.parquet"))
+    assert cache_names == [
+        "returns_3w_fri_anchor_20260102.parquet",
+        "returns_3w_fri_anchor_20260109.parquet",
+    ]
