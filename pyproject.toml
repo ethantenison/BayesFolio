@@ -51,9 +51,6 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = [
-    "--cov=bayesfolio",
-]
 filterwarnings = [
     'ignore:Field name "schema" in .* shadows an attribute in parent .*:UserWarning',
     'ignore:distutils Version classes are deprecated\. Use packaging\.version instead\.:DeprecationWarning:pandas_datareader.compat',

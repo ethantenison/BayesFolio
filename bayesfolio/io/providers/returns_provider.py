@@ -220,24 +220,3 @@ def _supports_argument(callable_obj: Callable[..., object], argument_name: str) 
         if parameter.name == argument_name:
             return True
     return False
-
-    def _cache_file_path(self, horizon: Horizon) -> Path:
-        assert self._cache_dir is not None
-        safe_horizon = str(horizon.value).replace("-", "_").lower()
-        return self._cache_dir / f"returns_{safe_horizon}.parquet"
-
-    def _read_cache_frame(self, horizon: Horizon) -> pd.DataFrame:
-        cache_path = self._cache_file_path(horizon)
-        if not cache_path.exists():
-            return pd.DataFrame(columns=["date", "asset_id", "y_excess_lead"])
-
-        frame = pd.read_parquet(cache_path)
-        return normalize_asset_id_column(normalize_date_column(frame))
-
-    def _write_cache_frame(self, frame: pd.DataFrame, horizon: Horizon) -> None:
-        if self._cache_dir is None:
-            return
-
-        self._cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_path = self._cache_file_path(horizon)
-        frame.to_parquet(cache_path, index=False)
