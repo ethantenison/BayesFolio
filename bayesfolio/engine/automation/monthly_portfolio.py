@@ -55,6 +55,19 @@ class MonthlyPortfolioRuntimeDependencies:
     artifact_store: ParquetArtifactStore
 
 
+@dataclass(frozen=True)
+class FixedMonthlyGPArtifacts:
+    """Artifacts produced by the deterministic monthly GP fit."""
+
+    result: GPWorkflowResult
+    model: object
+    likelihood: object
+    normalized_train_x: torch.Tensor
+    train_y: torch.Tensor
+    task_map: dict[str, int]
+    outcome_transform: StratifiedStandardize
+
+
 def build_default_dependencies(command: MonthlyPortfolioCommand) -> MonthlyPortfolioRuntimeDependencies:
     """Build default providers and artifact store for monthly automation."""
 
@@ -176,7 +189,7 @@ def run_monthly_portfolio(
         return result
 
 
-def _run_fixed_monthly_gp(*, training_df: pd.DataFrame, command: MonthlyPortfolioCommand):
+def _run_fixed_monthly_gp(*, training_df: pd.DataFrame, command: MonthlyPortfolioCommand) -> FixedMonthlyGPArtifacts:
     feature_columns = command.forecast.allowed_feature_columns
     feature_index = {name: idx for idx, name in enumerate(feature_columns)}
     covar_config, mean_config = build_default_monthly_gp_configs(
@@ -277,19 +290,15 @@ def _run_fixed_monthly_gp(*, training_df: pd.DataFrame, command: MonthlyPortfoli
         diagnostics=[f"Fixed monthly GP architecture applied with rank={command.forecast.rank}."],
     )
 
-    return type(
-        "FixedMonthlyGPArtifacts",
-        (),
-        {
-            "result": result,
-            "model": model,
-            "likelihood": likelihood,
-            "normalized_train_x": train_x,
-            "train_y": train_y,
-            "task_map": task_map,
-            "outcome_transform": outcome_transform,
-        },
-    )()
+    return FixedMonthlyGPArtifacts(
+        result=result,
+        model=model,
+        likelihood=likelihood,
+        normalized_train_x=train_x,
+        train_y=train_y,
+        task_map=task_map,
+        outcome_transform=outcome_transform,
+    )
 
 
 def _build_monthly_forecasts(
@@ -303,7 +312,7 @@ def _build_monthly_forecasts(
     helper_assets_only: list[str],
 ) -> tuple[pd.DataFrame, list[MonthlyPredictionRecord], ForecastResult]:
     model = gp_artifacts.model
-    normalized_x, _, _, asset_cols = _prepare_scoring_tensor(
+    normalized_x, asset_cols = _prepare_scoring_tensor(
         scoring_df=scoring_df,
         gp_artifacts=gp_artifacts,
         target_column=target_column,
@@ -344,7 +353,13 @@ def _build_monthly_forecasts(
     return scenario_frame, prediction_records, forecast_result
 
 
-def _prepare_scoring_tensor(*, scoring_df: pd.DataFrame, gp_artifacts, target_column: str, task_column: str):
+def _prepare_scoring_tensor(
+    *,
+    scoring_df: pd.DataFrame,
+    gp_artifacts: FixedMonthlyGPArtifacts,
+    target_column: str,
+    task_column: str,
+) -> tuple[torch.Tensor, list[str]]:
     feature_columns = gp_artifacts.result.feature_columns
     frame = scoring_df[[*feature_columns, target_column, task_column]].copy()
     latest_rows = frame.groupby(task_column, sort=False).tail(1).reset_index(drop=True)
@@ -359,7 +374,7 @@ def _prepare_scoring_tensor(*, scoring_df: pd.DataFrame, gp_artifacts, target_co
         x[:, idx] = torch.tensor(normalized_values, dtype=x.dtype)
     x[:, -1] = torch.tensor(row_task_ids, dtype=x.dtype)
     asset_cols = latest_rows[task_column].tolist()
-    return x, latest_rows, row_task_ids, asset_cols
+    return x, asset_cols
 
 
 def _normalize_train_x(train_x: torch.Tensor, feature_columns: list[str]) -> tuple[torch.Tensor, NormalizationStats]:
