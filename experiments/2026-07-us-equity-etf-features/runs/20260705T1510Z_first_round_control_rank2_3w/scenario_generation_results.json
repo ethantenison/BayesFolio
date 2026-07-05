@@ -1,0 +1,32 @@
+[
+  {
+    "date": "2026-04-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/model_diagnostics_2026-04-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/gp_predictions_2026-04-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/gp_scenarios_2026-04-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/task_covariance_diagnostics_2026-04-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2026-05-29",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/model_diagnostics_2026-05-29.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/gp_predictions_2026-05-29.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/gp_scenarios_2026-05-29.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/task_covariance_diagnostics_2026-05-29.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2026-06-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/model_diagnostics_2026-06-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/gp_predictions_2026-06-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/gp_scenarios_2026-06-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1510Z_first_round_control_rank2_3w/scenario_cache/task_covariance_diagnostics_2026-06-30.csv"
+    },
+    "status": "fit"
+  }
+]
