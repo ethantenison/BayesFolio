@@ -1,9 +1,9 @@
-"""Build and audit a full-feature U.S. equity ETF artifact.
+"""Build and audit the first-round U.S. equity ETF feature artifact.
 
 This script refreshes ETF-local and macro predictors for the U.S. equity family
 so newly added provider columns and horizon-aligned macro transformations are
-present, while using the local cache for return labels. Outputs are written
-under this experiment folder.
+available, then selects the pruned first-round feature set. Return labels use
+the local cache. Outputs are written under this experiment folder.
 """
 
 from __future__ import annotations
@@ -34,33 +34,17 @@ END_DATE = date(2026, 7, 2)
 
 ETF_CANDIDATES = [
     "mom6m",
-    "mom12m",
     "mom12m_skip1m",
-    "chmom",
-    "short_reversal_1m",
     "cs_mom_rank",
-    "ma_signal",
-    "ma_regime",
     "trend_slope",
-    "vol_1w",
     "vol_1m",
-    "vol_3m",
-    "vol_of_vol",
     "vol_z",
     "vol_accel",
     "vol_ratio_1m_3m",
-    "downside_vol_1m",
     "max_dd_3m",
-    "max_dd_6m",
-    "ret_skew",
-    "ret_kurt",
-    "ret_autocorr",
-    "vol_autocorr",
     "ill_log",
     "dolvol_log",
     "turnover",
-    "sd_turn",
-    "baspread",
 ]
 
 ENGINEERED_CANDIDATES = [
@@ -71,18 +55,12 @@ ENGINEERED_CANDIDATES = [
 MACRO_CANDIDATES = [
     "vix",
     "vix_slope",
-    "vix_ts_z_12p",
     "spy_ret",
-    "erp",
     "pct_above_50dma",
-    "spy_flow_z_12p",
-    "hy_spread",
     "hy_spread_chg_1p",
     "hy_spread_z_12p",
-    "cpi_chg_1p",
     "cpi_chg_12p",
     "term_spread",
-    "tbill3m",
 ]
 
 
