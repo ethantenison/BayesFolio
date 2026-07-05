@@ -71,6 +71,16 @@ Evaluate compact feature blocks before testing broad combinations:
 - macro/risk regime,
 - compact combined U.S. equity set.
 
+Do not drop a block only because its standalone run is weak. Some blocks may
+matter primarily through interactions. The first interaction screen should
+include:
+
+- momentum/trend + volatility/regime,
+- momentum/trend + macro/risk,
+- liquidity + volatility/regime,
+- target history + macro/risk,
+- target history + volatility/regime.
+
 ### 4. Anti-Collapse Variants
 
 For promising feature blocks, test GP variants designed to avoid uninformative shrinkage:
@@ -86,6 +96,7 @@ For promising feature blocks, test GP variants designed to avoid uninformative s
 Do not judge by RMSE alone. Each run should report:
 
 - prediction dispersion by rebalance date,
+- RMSE, MAE, bias, Gaussian negative log likelihood, predictive coverage, and standardized residual diagnostics by ETF,
 - cross-sectional information coefficient,
 - top-minus-bottom realized spread,
 - calibration/coverage of posterior scenarios,

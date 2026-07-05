@@ -1,0 +1,12 @@
+[
+  {
+    "date": "2026-06-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1538Z_block_smoke_momentum/scenario_cache/model_diagnostics_2026-06-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1538Z_block_smoke_momentum/scenario_cache/gp_predictions_2026-06-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1538Z_block_smoke_momentum/gp_scenarios_2026-06-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1538Z_block_smoke_momentum/scenario_cache/task_covariance_diagnostics_2026-06-30.csv"
+    },
+    "status": "fit"
+  }
+]

@@ -1,0 +1,186 @@
+{
+  "command": "experiments/2026-07-us-equity-etf-features/run_first_round_walkforward.py --feature-set momentum_plus_volatility --run-id 20260705T1540Z_block_momentum_plus_volatility_signed_lkj_rank2_6w --max-windows 6 --train-months 48 --maxiter 15 --posterior-scenarios 512 --scenario-workers 1 --torch-num-threads 2 --gp-experiment signed_lkj_eta_2 --input-transform-mode botorch_normalize --time-modulation-mode lengthscale_only --upperlng 0.35 --nea 3",
+  "created_at_utc": "2026-07-05T15:40:41.294920+00:00",
+  "data": {
+    "date_max": "2026-06-30",
+    "date_min": "2021-03-31",
+    "final_portfolio_universe": [
+      "SPY",
+      "MGK",
+      "VTV",
+      "IWM"
+    ],
+    "helper_assets_fit_but_excluded": [],
+    "min_feature_date_filter": null,
+    "min_scored_date_filter": null,
+    "rows": 256,
+    "scored_date_file": null,
+    "target_col": "y_excess_lead",
+    "training_universe": [
+      "SPY",
+      "MGK",
+      "VTV",
+      "IWM"
+    ]
+  },
+  "feature_path": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/artifacts/us_equity_first_round_feature_candidates_20260705T145015Z.parquet",
+  "feature_sha256": "8a61a62a35d4fadc92ba17d863bb8d7c8b4dac25a76c22e7894b5087d6ee3c63",
+  "git_dirty_summary_at_start": "M experiments/2026-07-us-equity-etf-features/run_first_round_walkforward.py\n?? experiments/2026-06-ewma-residual-noise-improvement/outputs/\n?? experiments/2026-06-gp-ewma-portfolio-backtest/outputs/\n?? experiments/2026-06-heteroskedastic-noise/outputs/\n?? experiments/2026-06-portfolio-optimization/outputs/20260701_run_audit_trail.md\n?? experiments/2026-06-portfolio-optimization/outputs/beta_no_floor_2024.log\n?? experiments/2026-06-portfolio-optimization/outputs/calibration/\n?? experiments/2026-06-portfolio-optimization/outputs/comparisons/\n?? experiments/2026-06-portfolio-optimization/outputs/fake_data_recovery/\n?? experiments/2026-06-portfolio-optimization/outputs/full3_history_length_sweep_20260702/\n?? experiments/2026-06-portfolio-optimization/outputs/full3_june_plus_one_year_20260702/\n?? experiments/2026-06-portfolio-optimization/outputs/hierarchy_history_em_comparison_20260702/\n?? experiments/2026-06-portfolio-optimization/outputs/june_exact_11_tvos_1999.log\n?? experiments/2026-06-portfolio-optimization/outputs/os_floor_2012.log\n?? experiments/2026-06-portfolio-optimization/outputs/os_floor_pure_2012.log\n?? experiments/2026-06-portfolio-optimization/outputs/pareto_predictive_campaign_20260701/\n?? experiments/2026-06-portfolio-optimization/outputs/pareto_predictive_campaign_20260702_wave2/\n?? experiments/2026-06-portfolio-optimization/outputs/portfolio_replay_20260701_tvls_control/\n?? experiments/2026-06-portfolio-optimization/outputs/rolling_floor_selection/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260616_signed_lkj_eta_2_task_noise_floor_00025_portfolio/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260616_signed_lkj_eta_2_task_noise_floor_0005_portfolio/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260616_signed_lkj_eta_2_task_noise_floor_0005_smoke/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260616_signed_lkj_eta_2_task_noise_floor_00075_portfolio/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260618_signed_lkj_eta_2_noise_0001_portfolio/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260620_signed_lkj_eta_2_residual_source_15w/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260621_signed_lkj_eta_2_plain_24w/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_positive_no_prior_botorch_expand_11realized_plus_live/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_positive_no_prior_common_history_botorch_expand_11realized_plus_live/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_positive_no_prior_common_history_recency_hl36_11realized_plus_live/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_positive_no_prior_june_start_june_transform_24w/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_positive_no_prior_june_transform_variant_seed_24w/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_signed_no_prior_botorch_expand_11realized_plus_live/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_signed_no_prior_common_history_botorch_expand_11realized_plus_live/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_signed_no_prior_common_history_recency_hl36_11realized_plus_live/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_signed_no_prior_june_start_june_transform_24w/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_signed_no_prior_june_transform_variant_seed_24w/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_smoke_live_window_botorch/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_smoke_positive_no_prior_common_history_recency_hl36/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260630_smoke_positive_no_prior_june_transform/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_beta_prior_et_plus_mt_plus_emt_11realized_plus_live_tvls_no_floor_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto01_control_maxiter150/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto02_control_noise0025/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto03_control_noise001/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto04_full_hierarchy_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto05_full_hierarchy_noise0025/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto06_linear_mean_control/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto07_linear_mean_full_hierarchy/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_pareto08_recency_noise_hl24/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_changepoint_mixture_202103_11realized_plus_live_detached3/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_changepoint_mixture_202103_11realized_plus_live_parallel/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_e_plus_et_plus_mt_plus_emt_11realized_plus_live_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_e_plus_et_plus_mt_plus_emt_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_e_plus_mt_plus_t_plus_emt_11realized_plus_live_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_e_plus_mt_plus_t_plus_emt_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt15_plus_emt_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_em_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_em_plus_emt_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_emt_11realized_plus_live_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_emt_11realized_plus_live_tvls_outputscale_floor_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_emt_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_emt_11realized_plus_live_tvos_both_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_emt_11realized_plus_live_tvos_outputscale_only_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_et_plus_mt_plus_emt_t15_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_forecast_recency_gate_hl36_11realized_plus_live_detached3/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_forecast_recency_gate_hl36_11realized_plus_live_parallel/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_global_time_gate_hl36_11realized_plus_live/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_global_time_gate_hl36_11realized_plus_live_detached3/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_global_time_gate_hl36_11realized_plus_live_parallel/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_no_prior_et_plus_mt_plus_emt_11realized_plus_live_tvls_outputscale_floor_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_no_prior_june_exact_11realized_plus_live_tvos_both_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_t_plus_et_plus_mt15_plus_emt_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_positive_t_plus_et_plus_mt_plus_emt_11realized_plus_live_tvls_screen/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_full_hierarchy_linear_mean_pareto/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_changepoint_mixture_202103/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_e_plus_et_plus_mt_plus_emt/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_e_plus_et_plus_mt_plus_emt_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_e_plus_mt_plus_t_plus_emt/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_e_plus_mt_plus_t_plus_emt_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_et_plus_mt15_plus_emt_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_et_plus_mt_plus_em_plus_emt_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_et_plus_mt_plus_em_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_et_plus_mt_plus_emt/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_et_plus_mt_plus_emt_t15_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_et_plus_mt_plus_emt_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_forecast_recency_gate_hl36/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_global_time_gate_hl36/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_t_plus_et_plus_mt15_plus_emt_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260701_smoke_positive_t_plus_et_plus_mt_plus_emt_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3_june_plus1y_202003_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3_train24_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3_train30_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3_train36_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3_train42_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3_train48_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3blocks_june_history_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3blocks_long_history_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full3blocks_long_history_noise0025_tvls_rerun/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full4blocks_june_history_with_em_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_full4blocks_long_history_with_em_noise0025_tvls/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_next01_low_noise_no_standardized_floor/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_next02_control_tvos_both_noise0025/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_next03_outputscale_floor_weak_prior_noise0025/\n?? experiments/2026-06-portfolio-optimization/outputs/runs/20260702_smoke_full3_train24/\n?? experiments/2026-06-portfolio-optimization/outputs/tvos_both_1991.log\n?? experiments/2026-06-portfolio-optimization/outputs/tvos_outputscale_1991.log\n?? experiments/2026-06-time-varying-residual-noise/outputs/\n?? experiments/2026-07-ewma-residual-target/outputs/\n?? experiments/2026-07-horizon-ablation/mlruns/\n?? experiments/2026-07-horizon-ablation/runs/20260703T175636Z_monthly_full3_july_span_control/\n?? experiments/2026-07-horizon-ablation/runs/20260703T175636Z_monthly_vs_three_week_full3_july_span/\n?? experiments/2026-07-horizon-ablation/runs/20260703T175636Z_three_week_full3_july_span_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260703T175853Z_monthly_full3_july_span_control/\n?? experiments/2026-07-horizon-ablation/runs/20260703T175853Z_monthly_vs_three_week_full3_july_span/\n?? experiments/2026-07-horizon-ablation/runs/20260703T175853Z_three_week_full3_july_span_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260703T192528Z_monthly_seed127_full3_from_20240601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260703T192528Z_monthly_seed227_full3_from_20240601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260703T192528Z_monthly_seed27_full3_from_20240601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260703T192528Z_monthly_vs_three_week_full3_from_20240601/\n?? experiments/2026-07-horizon-ablation/runs/20260703T192528Z_three_week_seed127_full3_from_20240601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260703T192528Z_three_week_seed227_full3_from_20240601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260703T192528Z_three_week_seed27_full3_from_20240601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260703_fallback_baseline_patch_smoke/\n?? experiments/2026-07-horizon-ablation/runs/20260703_fallback_patch_smoke/\n?? experiments/2026-07-horizon-ablation/runs/20260704T013617Z_monthly_seed27_full3_from_20250601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260704T013617Z_monthly_vs_three_week_full3_from_20250601/\n?? experiments/2026-07-horizon-ablation/runs/20260704T013617Z_three_week_seed27_full3_from_20250601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260704T014603Z_monthly_seed127_full3_from_20240601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260704T014603Z_monthly_seed227_full3_from_20240601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260704T014603Z_monthly_seed27_full3_from_20240601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260704T014603Z_monthly_vs_three_week_full3_from_20240601/\n?? experiments/2026-07-horizon-ablation/runs/20260704T014603Z_three_week_seed127_full3_from_20240601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260704T014603Z_three_week_seed227_full3_from_20240601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260704T014603Z_three_week_seed27_full3_from_20240601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260704T120259Z_monthly_seed27_full3_from_20250601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260704T120259Z_monthly_vs_three_week_full3_from_20250601/\n?? experiments/2026-07-horizon-ablation/runs/20260704T120259Z_three_week_seed27_full3_from_20250601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260704T163255Z_monthly_seed27_full3_from_20250601_control/\n?? experiments/2026-07-horizon-ablation/runs/20260704T163255Z_monthly_vs_three_week_full3_from_20250601/\n?? experiments/2026-07-horizon-ablation/runs/20260704T163255Z_three_week_seed27_full3_from_20250601_ablation/\n?? experiments/2026-07-horizon-ablation/runs/20260704_parallel_smoke_monthly_one_window/\n?? experiments/2026-07-horizon-ablation/runs/20260704_worker_smoke_1w4win_torch2/\n?? experiments/2026-07-horizon-ablation/runs/20260704_worker_smoke_4w4win_torch1/\n?? experiments/2026-07-horizon-ablation/runs/20260704_worker_smoke_4w4win_torch2/\n?? experiments/2026-07-horizon-ablation/runs/20260704_worker_smoke_4w4win_torch4/\n?? experiments/2026-07-horizon-ablation/runs/20260704_worker_smoke_8w8win_torch2/\n?? experiments/2026-07-horizon-ablation/runs/20260704_worker_smoke_assessment.md\n?? experiments/2026-07-horizon-ablation/runs/20260705T015348Z_monthly_vs_three_week_corrected_anchor_from_20250601/\n?? experiments/2026-07-horizon-ablation/runs/20260705T015348Z_three_week_seed27_full3_from_20250601_corrected_anchor/feature_artifact_manifest.json\n?? experiments/2026-07-horizon-ablation/runs/20260705T015348Z_three_week_seed27_full3_from_20250601_corrected_anchor/logs/\n?? experiments/2026-07-horizon-ablation/runs/20260705T015348Z_three_week_seed27_full3_from_20250601_corrected_anchor/portfolio_walkforward/\n?? experiments/2026-07-horizon-ablation/runs/preflight_inputs/\n?? experiments/2026-07-time-decay-kernels/logs/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1536Z_block_smoke_momentum/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1538Z_block_smoke_momentum/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_liquidity_signed_lkj_rank2_6w/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_macro_risk_signed_lkj_rank2_6w/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_momentum_trend_signed_lkj_rank2_6w/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_target_history_signed_lkj_rank2_6w/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_target_plus_macro_signed_lkj_rank2_6w/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_target_plus_momentum_signed_lkj_rank2_6w/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_target_plus_volatility_signed_lkj_rank2_6w/\n?? experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_volatility_regime_signed_lkj_rank2_6w/\n?? notebooks/outputs/",
+  "git_sha": "85b7e053bafe1d89a7613437acd4a7c07d033dbf",
+  "live_rebalance_date": null,
+  "modeling": {
+    "experiment": "signed_lkj_eta_2",
+    "input_transform": "BoTorch Normalize on non-task feature columns",
+    "kernel_composition_proposal": {
+      "components": null,
+      "name": "none"
+    },
+    "kernel_proposal": {
+      "changepoint_date": null,
+      "changepoint_width_months": null,
+      "half_life_months": null,
+      "name": "none"
+    },
+    "lengthscale_floor": null,
+    "maxiter": 15,
+    "mean_kind": "multitask_constant",
+    "min_inferred_noise_level": 0.005,
+    "outcome_transform": "StratifiedStandardize by ETF task",
+    "outputscale_floor": null,
+    "outputscale_prior_median": null,
+    "outputscale_prior_sigma": null,
+    "posterior_scenarios_per_rebalance": 512,
+    "rank": 2,
+    "recency_observation_noise": {
+      "enabled": false
+    },
+    "resume_scenarios": false,
+    "scenario_mean_scale": 1.0,
+    "scenario_workers": 1,
+    "seed": 27,
+    "task_covar_prior": "BetaPrior(2.5, 1.5)",
+    "task_kernel": "IndexKernel",
+    "task_noise_floor": {
+      "enabled": false
+    },
+    "time_modulation_mode": "lengthscale_only",
+    "torch_num_threads": 2,
+    "turnover_blend": null,
+    "variant": "signed_lkj_eta_2"
+  },
+  "output_dir": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/runs/20260705T1540Z_block_momentum_plus_volatility_signed_lkj_rank2_6w",
+  "portfolio": {
+    "n_portfolio_construction_dates": 6,
+    "n_realized_rebalances": 6,
+    "periods_per_year": 12.0,
+    "rebalance_frequency": "monthly_bme",
+    "riskfolio_gp": {
+      "alpha": 0.5,
+      "hist": true,
+      "method_cov": "hist",
+      "method_mu": "hist",
+      "model": "Classic",
+      "nea": 3,
+      "obj": "Sharpe",
+      "rm": "CVaR",
+      "upperlng": 0.35
+    },
+    "riskfolio_historical": {
+      "hist": true,
+      "method_cov": "gerber1",
+      "method_mu": "ewma2",
+      "model": "Classic",
+      "nea": 3,
+      "obj": "Sharpe",
+      "rm": "CVaR",
+      "upperlng": 0.35
+    },
+    "starting_value": 10000.0,
+    "static_benchmarks": {
+      "schwab_moderate_aggressive_static": {
+        "cash_asset": "CASH",
+        "cash_weight": 0.05,
+        "description": "Fixed Schwab-style Moderate Aggressive target benchmark.",
+        "rebalance_rule": "rebalance to the same fixed target weights at each construction date",
+        "source_allocation": {
+          "bonds": 0.15,
+          "cash": 0.05,
+          "stocks": 0.8
+        },
+        "weights": {
+          "IWM": 0.15,
+          "MGK": 0.15,
+          "SPY": 0.45,
+          "VTV": 0.2
+        }
+      }
+    },
+    "strategies": [
+      "gp_scenarios_riskfolio",
+      "historical_y_ewma2_gerber1_riskfolio",
+      "equal_weight",
+      "schwab_moderate_aggressive_static"
+    ]
+  },
+  "portfolio_construction_dates": [
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30",
+    "2026-05-29",
+    "2026-06-30"
+  ],
+  "rebalance_dates": [
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30",
+    "2026-05-29",
+    "2026-06-30"
+  ],
+  "schema": "bayesfolio.portfolio_optimization_walkforward.manifest.v1",
+  "source_experiment": "/Users/et/Documents/BayesFolio/experiments/2026-06-task-covariance/run_task_covariance_rollforward.py",
+  "training_history": {
+    "mode": "rolling_calendar_months",
+    "train_months": 48,
+    "window_rule": "date >= window_date - DateOffset(months=train_months) and date < window_date"
+  },
+  "us_equity_first_round_wrapper": {
+    "etf_columns": [
+      "mom6m",
+      "mom12m_skip1m",
+      "cs_mom_rank",
+      "trend_slope",
+      "vol_1m",
+      "vol_z",
+      "vol_accel",
+      "vol_ratio_1m_3m",
+      "max_dd_3m"
+    ],
+    "feature_set": "momentum_plus_volatility",
+    "first_round_tickers": [
+      "SPY",
+      "MGK",
+      "VTV",
+      "IWM"
+    ],
+    "input_columns": [
+      "t_index",
+      "mom6m",
+      "mom12m_skip1m",
+      "cs_mom_rank",
+      "trend_slope",
+      "vol_1m",
+      "vol_z",
+      "vol_accel",
+      "vol_ratio_1m_3m",
+      "max_dd_3m"
+    ],
+    "macro_columns": [],
+    "mtgp_rank": 2,
+    "non_time_feature_count": 9,
+    "time_columns": [
+      "t_index"
+    ]
+  }
+}

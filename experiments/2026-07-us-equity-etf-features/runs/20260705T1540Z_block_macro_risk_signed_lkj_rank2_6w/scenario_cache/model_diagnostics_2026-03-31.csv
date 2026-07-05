@@ -1,0 +1,14 @@
+experiment,date,diagnostic,module_path,module_type,mean,min,max
+signed_lkj_eta_2,2026-03-31,time_varying_effective_lengthscale_eval,covar_module.kernels.0,_Module,233.6630750919814,233.6630750919814,233.6630750919814
+signed_lkj_eta_2,2026-03-31,outputscale,covar_module.kernels.0.base_kernel.kernels.0,MaternKernel,0.08967104201750833,0.08967104201750833,0.08967104201750833
+signed_lkj_eta_2,2026-03-31,lengthscale,covar_module.kernels.0.base_kernel.kernels.0.base_kernel,MaternKernel,0.4908605597477722,0.4908605597477722,0.4908605597477722
+signed_lkj_eta_2,2026-03-31,outputscale,covar_module.kernels.0.base_kernel.kernels.1,MaternKernel,0.2690439587184029,0.2690439587184029,0.2690439587184029
+signed_lkj_eta_2,2026-03-31,lengthscale,covar_module.kernels.0.base_kernel.kernels.1.base_kernel,MaternKernel,0.5942581651275081,0.10232294929181524,0.8882321551074098
+signed_lkj_eta_2,2026-03-31,outputscale,covar_module.kernels.0.base_kernel.kernels.2,RQKernel,0.04805405979899751,0.04805405979899751,0.04805405979899751
+signed_lkj_eta_2,2026-03-31,lengthscale,covar_module.kernels.0.base_kernel.kernels.2.base_kernel,RQKernel,0.6644768215443424,0.39305174161816164,0.7659172507822577
+signed_lkj_eta_2,2026-03-31,outputscale,covar_module.kernels.0.base_kernel.kernels.3,LinearKernel,0.1441067251523931,0.1441067251523931,0.1441067251523931
+signed_lkj_eta_2,2026-03-31,outputscale,covar_module.kernels.0.base_kernel.kernels.4,ProductKernel,0.014850880549053789,0.014850880549053789,0.014850880549053789
+signed_lkj_eta_2,2026-03-31,lengthscale,covar_module.kernels.0.base_kernel.kernels.4.base_kernel.kernels.0,MaternKernel,0.1771257221232616,0.1771257221232616,0.1771257221232616
+signed_lkj_eta_2,2026-03-31,lengthscale,covar_module.kernels.0.base_kernel.kernels.4.base_kernel.kernels.1.kernels.0,MaternKernel,0.5341743833283431,0.2924433746603107,0.6956882582320335
+signed_lkj_eta_2,2026-03-31,lengthscale,covar_module.kernels.0.base_kernel.kernels.4.base_kernel.kernels.1.kernels.1,RQKernel,0.577032381250475,0.4802847319297582,0.6578126215255987
+signed_lkj_eta_2,2026-03-31,likelihood_noise,likelihood,HadamardGaussianLikelihood,0.006736946937156418,0.0066252994441548885,0.0068734516179897575

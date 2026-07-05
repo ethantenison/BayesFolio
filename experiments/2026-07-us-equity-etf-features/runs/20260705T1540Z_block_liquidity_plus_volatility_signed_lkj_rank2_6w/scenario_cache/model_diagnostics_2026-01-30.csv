@@ -1,0 +1,10 @@
+experiment,date,diagnostic,module_path,module_type,mean,min,max
+signed_lkj_eta_2,2026-01-30,time_varying_effective_lengthscale_eval,covar_module.kernels.0,_Module,14.259556881810187,14.259556881810187,14.259556881810187
+signed_lkj_eta_2,2026-01-30,outputscale,covar_module.kernels.0.base_kernel.kernels.0,MaternKernel,0.3419117565140678,0.3419117565140678,0.3419117565140678
+signed_lkj_eta_2,2026-01-30,lengthscale,covar_module.kernels.0.base_kernel.kernels.0.base_kernel,MaternKernel,0.02840001751611985,0.02840001751611985,0.02840001751611985
+signed_lkj_eta_2,2026-01-30,outputscale,covar_module.kernels.0.base_kernel.kernels.1,MaternKernel,0.0027387343330014793,0.0027387343330014793,0.0027387343330014793
+signed_lkj_eta_2,2026-01-30,lengthscale,covar_module.kernels.0.base_kernel.kernels.1.base_kernel,MaternKernel,0.7721302525972291,0.12093323798716019,1.5282634432387332
+signed_lkj_eta_2,2026-01-30,outputscale,covar_module.kernels.0.base_kernel.kernels.2,ProductKernel,0.009134309587140623,0.009134309587140623,0.009134309587140623
+signed_lkj_eta_2,2026-01-30,lengthscale,covar_module.kernels.0.base_kernel.kernels.2.base_kernel.kernels.0,MaternKernel,0.028003174179812743,0.028003174179812743,0.028003174179812743
+signed_lkj_eta_2,2026-01-30,lengthscale,covar_module.kernels.0.base_kernel.kernels.2.base_kernel.kernels.1,MaternKernel,0.8820304073388991,0.1966265153335201,3.18679046644304
+signed_lkj_eta_2,2026-01-30,likelihood_noise,likelihood,HadamardGaussianLikelihood,0.006727269707630434,0.0066834239455273396,0.006747466868865022
