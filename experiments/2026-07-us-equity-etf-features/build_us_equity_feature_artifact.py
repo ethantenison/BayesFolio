@@ -1,8 +1,9 @@
 """Build and audit a full-feature U.S. equity ETF artifact.
 
-This script refreshes ETF-local predictors for the U.S. equity family so newly
-added provider columns are present, while using local caches for returns and
-macro data. Outputs are written under this experiment folder.
+This script refreshes ETF-local and macro predictors for the U.S. equity family
+so newly added provider columns and horizon-aligned macro transformations are
+present, while using the local cache for return labels. Outputs are written
+under this experiment folder.
 """
 
 from __future__ import annotations
@@ -114,7 +115,7 @@ def main() -> None:
         ),
         macro_provider=MacroProvider(
             fetcher=fetch_enhanced_macro_features,
-            cache_dir="artifacts/cache/macro_enhanced_periodic",
+            cache_dir=None,
             max_retries=1,
             retry_backoff_seconds=0.1,
         ),
@@ -200,8 +201,8 @@ def write_correlation_report(manifest: dict[str, object]) -> None:
         "# U.S. Equity Candidate Feature Correlation Audit\n",
         f"Artifact: `{manifest['artifact_path']}`\n",
         f"Family: `{', '.join(US_EQUITY_TICKERS)}`. Horizon: `{manifest['horizon']}`.\n",
-        "ETF-local predictors were rebuilt live for this family so newly added columns are included. "
-        "Returns and macro providers used local caches.\n",
+        "ETF-local and macro predictors were rebuilt live for this family so newly added columns "
+        "and horizon-aligned macro transformations are included. Return labels used local cache.\n",
         "\n## Availability\n",
         f"- Available audited features: `{audit['available_feature_count']}`\n",
         f"- Missing from artifact: `{audit['missing_features']}`\n",
