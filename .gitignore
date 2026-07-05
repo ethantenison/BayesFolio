@@ -24,3 +24,6 @@ bayesfolio/mlflow/artifacts/
 experiments/mlflow/data_snapshots/
 experiments/mlflow/legacy_store/mlruns
 experiments/mlflow/legacy_store/nested_artifacts
+notebooks/20260601_etf_macro_excess_returns.csv
+notebooks/20260601_gameday_predictions.csv
+notebooks/20260601_gp_posterior_scenarios.csv

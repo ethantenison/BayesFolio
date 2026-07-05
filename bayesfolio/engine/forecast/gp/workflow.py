@@ -479,7 +479,6 @@ def _build_outcome_transform(train_x: torch.Tensor, train_y: torch.Tensor) -> St
     return StratifiedStandardize(
         stratification_idx=task_feature,
         all_task_values=all_task_values,
-        observed_task_values=train_x[:, task_feature].to(torch.long),
         batch_shape=train_y.shape[:-2],
     )
 

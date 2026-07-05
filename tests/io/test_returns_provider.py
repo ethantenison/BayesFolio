@@ -69,3 +69,27 @@ def test_returns_provider_fetches_only_missing_tickers(tmp_path: Path) -> None:
     assert calls == [["QQQ"]]
     assert sorted(frame["asset_id"].unique().tolist()) == ["QQQ", "SPY"]
     assert len(frame) == 4
+
+
+def test_returns_provider_filters_cached_interleaved_three_week_anchors(tmp_path: Path) -> None:
+    cached = _returns_frame(
+        "SPY",
+        ["2026-01-02", "2026-01-16", "2026-01-23", "2026-02-06", "2026-02-13"],
+        [0.01, 0.99, 0.02, 0.98, 0.03],
+    )
+    cached.to_parquet(tmp_path / "returns_3w_fri.parquet", index=False)
+
+    def fetcher(*, tickers: list[str], start: str, end: str, horizon: Horizon) -> pd.DataFrame:
+        raise AssertionError("cache should satisfy the requested anchor grid")
+
+    provider = ReturnsProvider(fetcher=fetcher, cache_dir=tmp_path)
+
+    frame = provider.get_y_excess_lead_long(
+        tickers=["SPY"],
+        start="2026-01-01",
+        end="2026-02-13",
+        horizon=Horizon.THREE_WEEK,
+    )
+
+    assert frame["date"].dt.strftime("%Y-%m-%d").tolist() == ["2026-01-02", "2026-01-23", "2026-02-13"]
+    assert frame["y_excess_lead"].tolist() == [0.01, 0.02, 0.03]

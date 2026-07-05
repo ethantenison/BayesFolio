@@ -95,6 +95,26 @@ def slice_requested(
     return output[ticker_mask & date_mask].copy().reset_index(drop=True)
 
 
+def filter_expected_dates(*, frame: pd.DataFrame, start: str, end: str, freq: str) -> pd.DataFrame:
+    """Keep only the horizon dates implied by a request.
+
+    Anchored multi-period frequencies such as ``3W-FRI`` can have different
+    valid grids depending on the request start. Cache files may contain rows
+    from multiple historical requests, so date-range slicing alone can mix
+    incompatible grids.
+    """
+
+    if frame.empty or "date" not in frame.columns:
+        return frame.copy()
+
+    expected_dates = pd.DatetimeIndex(pd.date_range(start=pd.Timestamp(start), end=pd.Timestamp(end), freq=freq))
+    if len(expected_dates) == 0:
+        return frame.iloc[0:0].copy()
+
+    output = normalize_date_column(frame)
+    return output[output["date"].isin(expected_dates)].copy().reset_index(drop=True)
+
+
 def missing_tickers(
     *,
     cache_frame: pd.DataFrame,

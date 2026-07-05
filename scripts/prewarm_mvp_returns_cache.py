@@ -35,7 +35,7 @@ START_DATE = "2020-01-01"
 END_DATE = "2025-12-31"
 RETURNS_CACHE_DIR = "artifacts/cache/returns"
 ETF_FEATURES_CACHE_DIR = "artifacts/cache/etf_features"
-MACRO_CACHE_DIR = "artifacts/cache/macro_enhanced"
+MACRO_CACHE_DIR = "artifacts/cache/macro_enhanced_periodic"
 
 
 def main() -> None:

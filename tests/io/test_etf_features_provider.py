@@ -71,3 +71,27 @@ def test_etf_provider_fetches_only_missing_tickers(tmp_path: Path) -> None:
     assert calls == [["QQQ"]]
     assert sorted(frame["asset_id"].unique().tolist()) == ["QQQ", "SPY"]
     assert len(frame) == 4
+
+
+def test_etf_provider_filters_cached_interleaved_three_week_anchors(tmp_path: Path) -> None:
+    cached = _etf_frame(
+        "SPY",
+        ["2026-01-02", "2026-01-16", "2026-01-23", "2026-02-06", "2026-02-13"],
+        [0.4, 9.9, 0.5, 9.8, 0.6],
+    )
+    cached.to_parquet(tmp_path / "etf_features_3w_fri.parquet", index=False)
+
+    def fetcher(*, tickers: list[str], start: str, end: str, horizon: Horizon) -> pd.DataFrame:
+        raise AssertionError("cache should satisfy the requested anchor grid")
+
+    provider = EtfFeaturesProvider(fetcher=fetcher, cache_dir=tmp_path)
+
+    frame = provider.get_etf_features_long(
+        tickers=["SPY"],
+        start="2026-01-01",
+        end="2026-02-13",
+        horizon=Horizon.THREE_WEEK,
+    )
+
+    assert frame["date"].dt.strftime("%Y-%m-%d").tolist() == ["2026-01-02", "2026-01-23", "2026-02-13"]
+    assert frame["mom12m"].tolist() == [0.4, 0.5, 0.6]

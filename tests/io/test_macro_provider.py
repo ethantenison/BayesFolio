@@ -114,3 +114,23 @@ def test_macro_provider_reads_cache_for_subset_window(tmp_path: Path) -> None:
     assert calls["count"] == 0
     assert len(frame) == 2
     assert frame["date"].max() <= pd.Timestamp("2024-02-29")
+
+
+def test_macro_provider_filters_cached_interleaved_three_week_anchors(tmp_path: Path) -> None:
+    cached = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2026-01-02", "2026-01-16", "2026-01-23", "2026-02-06", "2026-02-13"]),
+            "hy_spread": [0.02, 0.99, 0.025, 0.98, 0.03],
+        }
+    )
+    cached.to_parquet(tmp_path / "macro_3w_fri.parquet", index=False)
+
+    def fetcher(*, start: str, end: str, horizon: Horizon) -> pd.DataFrame:
+        raise AssertionError("cache should satisfy the requested anchor grid")
+
+    provider = MacroProvider(fetcher=fetcher, max_retries=0, retry_backoff_seconds=0.0, cache_dir=tmp_path)
+
+    frame = provider.get_macro_features(start="2026-01-01", end="2026-02-13", horizon=Horizon.THREE_WEEK)
+
+    assert frame["date"].dt.strftime("%Y-%m-%d").tolist() == ["2026-01-02", "2026-01-23", "2026-02-13"]
+    assert frame["hy_spread"].tolist() == [0.02, 0.025, 0.03]

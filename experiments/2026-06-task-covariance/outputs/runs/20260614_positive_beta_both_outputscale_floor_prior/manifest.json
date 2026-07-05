@@ -1,0 +1,32 @@
+{
+  "command": "experiments/2026-06-task-covariance/run_outputscale_floor_prior.py",
+  "created_at_utc": "2026-06-15T02:31:32.585161+00:00",
+  "feature_path": "/Users/et/.bayesfolio/artifacts/features/portfolio_etf_macro_features_2026_06.parquet",
+  "feature_sha256": "3e63653c8deba3dd2ef412e22399ea31f14fb262c0ca37dc05272b33a5b1e3f5",
+  "git_dirty_summary_at_start": "?? experiments/2026-06-task-covariance/outputs/runs/20260614_outputscale_structure_ablation/\n?? experiments/2026-06-task-covariance/outputs/runs/20260614_positive_beta_both_outputscale_floor_prior_smoke/\n?? experiments/2026-06-task-covariance/outputs/runs/20260614_positive_beta_both_time_modulation/\n?? experiments/2026-06-task-covariance/outputs/runs/20260614_positive_beta_no_time_modulation/\n?? experiments/2026-06-task-covariance/run_outputscale_floor_prior.py\n?? experiments/2026-06-task-covariance/run_outputscale_structure_ablation.py",
+  "git_sha": "e18ce604057a3113bc7b7baf8cf3d4a88750afbc",
+  "live_date": "2026-05-29",
+  "maxiter": 50,
+  "output_dir": "/Users/et/Documents/BayesFolio/experiments/2026-06-task-covariance/outputs/runs/20260614_positive_beta_both_outputscale_floor_prior",
+  "outputscale_floor": 0.01,
+  "outputscale_prior_median": 0.05,
+  "outputscale_prior_sigma": 0.75,
+  "schema": "bayesfolio.task_covariance_outputscale_floor_prior.manifest.v1",
+  "scored_dates": [
+    "2025-05-30",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-29",
+    "2025-09-30",
+    "2025-10-31",
+    "2025-11-28",
+    "2025-12-31",
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30"
+  ],
+  "seed": 27,
+  "time_modulation_mode": "both",
+  "variant": "positive_beta_prior"
+}

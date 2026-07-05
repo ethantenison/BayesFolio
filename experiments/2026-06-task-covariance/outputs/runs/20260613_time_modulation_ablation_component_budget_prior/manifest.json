@@ -1,0 +1,35 @@
+{
+  "base_variant": "positive_no_prior",
+  "command": "experiments/2026-06-task-covariance/run_time_modulation_ablation.py --outputscale-prior lognormal_component_budget",
+  "created_at_utc": "2026-06-14T02:57:54.205716+00:00",
+  "feature_path": "/Users/et/.bayesfolio/artifacts/features/portfolio_etf_macro_features_2026_06.parquet",
+  "feature_sha256": "3e63653c8deba3dd2ef412e22399ea31f14fb262c0ca37dc05272b33a5b1e3f5",
+  "git_dirty_summary_at_start": "",
+  "git_sha": "bc7c61f2e53e91f1c2822ce7413d5fb6d1564869",
+  "live_date": "2026-05-29",
+  "maxiter": 50,
+  "modes": [
+    "both",
+    "outputscale_only",
+    "lengthscale_only",
+    "neither"
+  ],
+  "output_dir": "/Users/et/Documents/BayesFolio/experiments/2026-06-task-covariance/outputs/runs/20260613_time_modulation_ablation_component_budget_prior",
+  "outputscale_prior": "lognormal_component_budget",
+  "schema": "bayesfolio.task_covariance_time_modulation_ablation.manifest.v1",
+  "scored_dates": [
+    "2025-05-30",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-29",
+    "2025-09-30",
+    "2025-10-31",
+    "2025-11-28",
+    "2025-12-31",
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30"
+  ],
+  "seed": 27
+}

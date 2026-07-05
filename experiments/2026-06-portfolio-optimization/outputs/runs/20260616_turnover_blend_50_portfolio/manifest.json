@@ -1,0 +1,122 @@
+{
+  "command": "experiments/2026-06-portfolio-optimization/run_monthly_optimization_walkforward.py --run-id 20260616_turnover_blend_50_portfolio --max-windows 12 --maxiter 50 --posterior-scenarios 5000 --gp-experiment turnover_blend --turnover-blend 0.5",
+  "created_at_utc": "2026-06-16T06:17:48.915291+00:00",
+  "data": {
+    "date_max": "2026-05-29",
+    "date_min": "2021-03-31",
+    "final_portfolio_universe": [
+      "SPY",
+      "VTV",
+      "IJR",
+      "IWM",
+      "VNQ",
+      "VNQI",
+      "VEA",
+      "VWO",
+      "VSS",
+      "IEF",
+      "BNDX",
+      "LQD",
+      "HYG",
+      "EWX",
+      "VWOB",
+      "HYEM"
+    ],
+    "helper_assets_fit_but_excluded": [
+      "BND",
+      "MGK"
+    ],
+    "rows": 1134,
+    "target_col": "y_excess_lead",
+    "training_universe": [
+      "SPY",
+      "MGK",
+      "VTV",
+      "IJR",
+      "IWM",
+      "VNQ",
+      "VNQI",
+      "VEA",
+      "VWO",
+      "VSS",
+      "BND",
+      "IEF",
+      "BNDX",
+      "LQD",
+      "HYG",
+      "EWX",
+      "VWOB",
+      "HYEM"
+    ]
+  },
+  "feature_path": "/Users/et/.bayesfolio/artifacts/features/portfolio_etf_macro_features_2026_06.parquet",
+  "feature_sha256": "3e63653c8deba3dd2ef412e22399ea31f14fb262c0ca37dc05272b33a5b1e3f5",
+  "git_dirty_summary_at_start": "?? experiments/2026-06-portfolio-optimization/",
+  "git_sha": "0fa0ac801500edadf499d71da3f9c8e07284a3dd",
+  "modeling": {
+    "experiment": "turnover_blend",
+    "input_transform": "BoTorch Normalize on non-task feature columns",
+    "lengthscale_floor": null,
+    "maxiter": 50,
+    "outcome_transform": "StratifiedStandardize by ETF task",
+    "outputscale_floor": null,
+    "outputscale_prior_median": null,
+    "posterior_scenarios_per_rebalance": 5000,
+    "rank": 5,
+    "scenario_mean_scale": 1.0,
+    "seed": 27,
+    "task_covar_prior": "BetaPrior(2.5, 1.5)",
+    "task_kernel": "PositiveIndexKernel",
+    "time_modulation_mode": "lengthscale_only",
+    "turnover_blend": 0.5,
+    "variant": "positive_beta_prior"
+  },
+  "output_dir": "/Users/et/Documents/BayesFolio/experiments/2026-06-portfolio-optimization/outputs/runs/20260616_turnover_blend_50_portfolio",
+  "portfolio": {
+    "n_rebalances": 12,
+    "rebalance_frequency": "monthly",
+    "riskfolio_gp": {
+      "alpha": 0.5,
+      "hist": true,
+      "method_cov": "hist",
+      "method_mu": "hist",
+      "model": "Classic",
+      "nea": 10,
+      "obj": "Sharpe",
+      "rm": "CVaR",
+      "upperlng": 0.2
+    },
+    "riskfolio_historical": {
+      "hist": true,
+      "method_cov": "ewma2",
+      "method_mu": "ewma2",
+      "model": "Classic",
+      "nea": 10,
+      "obj": "Sharpe",
+      "rm": "CVaR",
+      "upperlng": 0.2
+    },
+    "starting_value": 10000.0,
+    "strategies": [
+      "gp_scenarios_riskfolio",
+      "historical_y_ewma2_riskfolio",
+      "equal_weight"
+    ]
+  },
+  "rebalance_dates": [
+    "2025-05-30",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-29",
+    "2025-09-30",
+    "2025-10-31",
+    "2025-11-28",
+    "2025-12-31",
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30"
+  ],
+  "schema": "bayesfolio.portfolio_optimization_walkforward.manifest.v1",
+  "source_experiment": "/Users/et/Documents/BayesFolio/experiments/2026-06-task-covariance/run_task_covariance_rollforward.py"
+}

@@ -10,6 +10,24 @@ from bayesfolio.core.settings import Horizon, Interval
 from bayesfolio.engine import pipeline
 
 
+def _stub_pipeline_dependencies(monkeypatch, *, captured: dict[str, object]) -> None:
+    monkeypatch.setattr(pipeline, "build_forecast_payload", lambda asset_order, mean, covariance: "forecast")
+    monkeypatch.setattr(pipeline, "sample_joint_scenarios", lambda forecast, n_scenarios, seed: "scenarios")
+    monkeypatch.setattr(pipeline, "optimize_from_scenarios", lambda scenarios, request: "optimization")
+    monkeypatch.setattr(
+        pipeline,
+        "run_weighted_backtest",
+        lambda realized_returns, optimization: "backtest-result",
+    )
+
+    def _fake_assemble_report(backtest_result, features_result=None) -> ReportResult:
+        captured["backtest_result"] = backtest_result
+        captured["features_result"] = features_result
+        return ReportResult(headline_metrics={"sharpe_ratio": 0.5})
+
+    monkeypatch.setattr(pipeline, "assemble_report", _fake_assemble_report)
+
+
 def _sample_features_result() -> FeaturesDatasetResult:
     return FeaturesDatasetResult(
         artifact=ArtifactPointer(
@@ -32,22 +50,7 @@ def _sample_features_result() -> FeaturesDatasetResult:
 
 def test_run_schema_first_pipeline_forwards_features_result(monkeypatch) -> None:
     captured: dict[str, object] = {}
-
-    monkeypatch.setattr(pipeline, "build_forecast_payload", lambda asset_order, mean, covariance: "forecast")
-    monkeypatch.setattr(pipeline, "sample_joint_scenarios", lambda forecast, n_scenarios, seed: "scenarios")
-    monkeypatch.setattr(pipeline, "optimize_from_scenarios", lambda scenarios, request: "optimization")
-    monkeypatch.setattr(
-        pipeline,
-        "run_weighted_backtest",
-        lambda realized_returns, optimization: "backtest-result",
-    )
-
-    def _fake_assemble_report(backtest_result, features_result=None) -> ReportResult:
-        captured["backtest_result"] = backtest_result
-        captured["features_result"] = features_result
-        return ReportResult(headline_metrics={"sharpe_ratio": 0.5})
-
-    monkeypatch.setattr(pipeline, "assemble_report", _fake_assemble_report)
+    _stub_pipeline_dependencies(monkeypatch, captured=captured)
 
     features_result = _sample_features_result()
     result = pipeline.run_schema_first_pipeline(
@@ -65,21 +68,7 @@ def test_run_schema_first_pipeline_forwards_features_result(monkeypatch) -> None
 
 def test_run_schema_first_pipeline_defaults_features_result_to_none(monkeypatch) -> None:
     captured: dict[str, object] = {}
-
-    monkeypatch.setattr(pipeline, "build_forecast_payload", lambda asset_order, mean, covariance: "forecast")
-    monkeypatch.setattr(pipeline, "sample_joint_scenarios", lambda forecast, n_scenarios, seed: "scenarios")
-    monkeypatch.setattr(pipeline, "optimize_from_scenarios", lambda scenarios, request: "optimization")
-    monkeypatch.setattr(
-        pipeline,
-        "run_weighted_backtest",
-        lambda realized_returns, optimization: "backtest-result",
-    )
-
-    def _fake_assemble_report(backtest_result, features_result=None) -> ReportResult:
-        captured["features_result"] = features_result
-        return ReportResult(headline_metrics={"sharpe_ratio": 0.4})
-
-    monkeypatch.setattr(pipeline, "assemble_report", _fake_assemble_report)
+    _stub_pipeline_dependencies(monkeypatch, captured=captured)
 
     result = pipeline.run_schema_first_pipeline(
         asset_order=["SPY"],
@@ -88,5 +77,5 @@ def test_run_schema_first_pipeline_defaults_features_result_to_none(monkeypatch)
         realized_returns=pd.DataFrame({"SPY": [0.01]}),
     )
 
-    assert result.headline_metrics["sharpe_ratio"] == 0.4
+    assert result.headline_metrics["sharpe_ratio"] == 0.5
     assert captured["features_result"] is None

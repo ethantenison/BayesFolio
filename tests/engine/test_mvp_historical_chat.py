@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 
 import pandas as pd
+import pytest
 
 from bayesfolio.contracts.results.backtest import BacktestResult
 from bayesfolio.contracts.results.optimize import OptimizeResult
@@ -18,6 +19,41 @@ from bayesfolio.engine.mvp_historical_chat import (
     run_historical_mvp_chat_turn,
     run_historical_mvp_pipeline,
 )
+
+
+def _historical_result(
+    request: HistoricalMvpRequest,
+    *,
+    weights: list[float],
+    report_markdown: str = "### Historical MVP Portfolio Report",
+) -> HistoricalMvpResult:
+    return HistoricalMvpResult(
+        request=request,
+        universe=UniverseRecord(asset_order=["SPY", "QQQ"], n_observations=60, return_unit="decimal"),
+        data_quality=DataQualityResult(
+            pass_gate=True,
+            n_periods=60,
+            n_assets=2,
+            missing_rate_by_asset={"SPY": 0.0, "QQQ": 0.0},
+            stale_assets=[],
+            insufficient_history_assets=[],
+        ),
+        optimize_result=OptimizeResult(asset_order=["SPY", "QQQ"], weights=weights),
+        portfolio_metrics={
+            "cumulative_return": 0.12,
+            "annualized_return": 0.08,
+            "annualized_volatility": 0.11,
+            "max_drawdown": -0.09,
+            "sharpe_ratio": 0.73,
+            "sortino_ratio": 1.05,
+            "calmar_ratio": 0.89,
+        },
+        report_markdown=report_markdown,
+        weights_table=pd.DataFrame({"asset": ["SPY", "QQQ"], "weight": weights}),
+        agent_logs=["fake run"],
+        warnings=[],
+        features_result=None,
+    )
 
 
 def test_parse_chat_request_extracts_tickers_dates_and_settings() -> None:
@@ -166,14 +202,11 @@ def test_parse_chat_request_llm_mode_raises_when_no_overrides(monkeypatch) -> No
         lambda message: ({}, "missing_openai_api_key"),
     )
 
-    try:
+    with pytest.raises(ValueError, match="LLM-based parser selected"):
         parse_chat_request(
             "Build portfolio for SPY, QQQ from 2020-01-01 to 2024-12-31",
             parser_mode="llm-based",
         )
-        raise AssertionError("Expected ValueError when llm-based mode returns no overrides.")
-    except ValueError as exc:
-        assert "LLM-based parser selected" in str(exc)
 
 
 def test_assess_data_quality_flags_stale_and_insufficient_assets() -> None:
@@ -213,37 +246,10 @@ def test_run_historical_mvp_chat_turn_executes_tool_cycle(monkeypatch) -> None:
     def _fake_pipeline(request, progress=None):
         if progress is not None:
             progress("fake run")
-        return HistoricalMvpResult(
-            request=request,
-            universe=UniverseRecord(asset_order=["SPY", "QQQ"], n_observations=60, return_unit="decimal"),
-            data_quality=DataQualityResult(
-                pass_gate=True,
-                n_periods=60,
-                n_assets=2,
-                missing_rate_by_asset={"SPY": 0.0, "QQQ": 0.0},
-                stale_assets=[],
-                insufficient_history_assets=[],
-            ),
-            optimize_result=OptimizeResult(asset_order=["SPY", "QQQ"], weights=[0.6, 0.4]),
-            portfolio_metrics={
-                "cumulative_return": 0.12,
-                "annualized_return": 0.08,
-                "annualized_volatility": 0.11,
-                "max_drawdown": -0.09,
-                "sharpe_ratio": 0.73,
-                "sortino_ratio": 1.05,
-                "calmar_ratio": 0.89,
-            },
+        return _historical_result(
+            request,
+            weights=[0.6, 0.4],
             report_markdown="### Historical MVP Portfolio Report\n- Top weights: SPY: 60.0%, QQQ: 40.0%",
-            weights_table=pd.DataFrame(
-                {
-                    "asset": ["SPY", "QQQ"],
-                    "weight": [0.6, 0.4],
-                }
-            ),
-            agent_logs=["fake run"],
-            warnings=[],
-            features_result=None,
         )
 
     monkeypatch.setattr("bayesfolio.engine.mvp_historical_chat.run_historical_mvp_pipeline", _fake_pipeline)
@@ -299,33 +305,7 @@ def test_run_historical_mvp_chat_turn_applies_knowledge_normalization(monkeypatc
 
     def _fake_pipeline(request, progress=None):
         captured["request"] = request
-        return HistoricalMvpResult(
-            request=request,
-            universe=UniverseRecord(asset_order=["SPY", "QQQ"], n_observations=60, return_unit="decimal"),
-            data_quality=DataQualityResult(
-                pass_gate=True,
-                n_periods=60,
-                n_assets=2,
-                missing_rate_by_asset={"SPY": 0.0, "QQQ": 0.0},
-                stale_assets=[],
-                insufficient_history_assets=[],
-            ),
-            optimize_result=OptimizeResult(asset_order=["SPY", "QQQ"], weights=[0.5, 0.5]),
-            portfolio_metrics={
-                "cumulative_return": 0.10,
-                "annualized_return": 0.08,
-                "annualized_volatility": 0.10,
-                "max_drawdown": -0.08,
-                "sharpe_ratio": 0.80,
-                "sortino_ratio": 1.00,
-                "calmar_ratio": 0.90,
-            },
-            report_markdown="### Historical MVP Portfolio Report",
-            weights_table=pd.DataFrame({"asset": ["SPY", "QQQ"], "weight": [0.5, 0.5]}),
-            agent_logs=["fake run"],
-            warnings=[],
-            features_result=None,
-        )
+        return _historical_result(request, weights=[0.5, 0.5])
 
     monkeypatch.setattr("bayesfolio.engine.mvp_historical_chat.run_historical_mvp_pipeline", _fake_pipeline)
     monkeypatch.setattr(

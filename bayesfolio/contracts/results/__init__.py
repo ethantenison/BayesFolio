@@ -1,32 +1,3 @@
-"""Result contracts for engine execution outputs.
+from bayesfolio.contracts.results.monthly_portfolio import MonthlyPortfolioResult
 
-This package exports versioned result schemas returned by pipeline workflows.
-"""
-
-from bayesfolio.contracts.results.features import (
-    ArtifactPointer,
-    FeatureColumnSpec,
-    FeaturesDatasetResult,
-    IndexInfo,
-)
-from bayesfolio.contracts.results.gp_workflow import (
-    GPFitValidationSummary,
-    GPPlannerResponse,
-    GPRepairAttempt,
-    GPWorkflowResult,
-    PlannerSelectedDesign,
-    ResolvedFeatureBlock,
-)
-
-__all__ = [
-    "ArtifactPointer",
-    "FeatureColumnSpec",
-    "FeaturesDatasetResult",
-    "GPFitValidationSummary",
-    "GPPlannerResponse",
-    "GPRepairAttempt",
-    "GPWorkflowResult",
-    "IndexInfo",
-    "PlannerSelectedDesign",
-    "ResolvedFeatureBlock",
-]
+__all__ = ["MonthlyPortfolioResult"]

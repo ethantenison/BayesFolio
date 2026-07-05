@@ -1,0 +1,9 @@
+scale_index,module_path,base_kernel_type,outputscale_floor,outputscale_prior_median,outputscale_prior_sigma
+32,covar_module.kernels.0.base_kernel.base_kernel.kernels.0,MaternKernel,0.01,0.05,0.75
+38,covar_module.kernels.0.base_kernel.base_kernel.kernels.1,MaternKernel,0.01,0.05,0.75
+42,covar_module.kernels.0.base_kernel.base_kernel.kernels.2,MaternKernel,0.01,0.05,0.75
+46,covar_module.kernels.0.base_kernel.base_kernel.kernels.3,RQKernel,0.01,0.05,0.75
+51,covar_module.kernels.0.base_kernel.base_kernel.kernels.4,LinearKernel,0.01,0.05,0.75
+54,covar_module.kernels.0.base_kernel.base_kernel.kernels.5,ProductKernel,0.01,0.05,0.75
+63,covar_module.kernels.0.base_kernel.base_kernel.kernels.6,ProductKernel,0.01,0.05,0.75
+80,covar_module.kernels.0.base_kernel.base_kernel.kernels.7,ProductKernel,0.01,0.05,0.75

@@ -257,3 +257,9 @@ def test_build_features_dataset_unknown_selected_columns_raises(
             providers=providers,
             artifact_store=_FakeArtifactStore(),
         )
+
+
+def test_features_command_accepts_three_week_horizon() -> None:
+    command = _make_command(horizon=Horizon.THREE_WEEK)
+
+    assert command.horizon == Horizon.THREE_WEEK
