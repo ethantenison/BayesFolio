@@ -51,3 +51,4 @@ Scope: 12 feature blocks/interactions, first-round U.S. equity family (`SPY`, `M
 - `figures/ic_by_date_heatmap.png`
 - `figures/top_minus_bottom_spread.png`
 - `figures/equity_curves_top_blocks.png`
+- `figures/equity_curves_selected_vs_baselines.png`
