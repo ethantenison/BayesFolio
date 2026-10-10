@@ -78,7 +78,8 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 ### Features and forecasting
 
 - Feature dataset: `bayesfolio.engine.features.build_features_dataset`
-- Default feature providers: `bayesfolio.engine.features.make_default_feature_providers`
+- Default feature providers: `bayesfolio.application.make_default_feature_providers`
+- Deprecated provider compatibility path: `bayesfolio.engine.features.make_default_feature_providers`
 - Planned GP workflow: `bayesfolio.engine.forecast.run_planned_multitask_gp_workflow`
 - Planned GP from a DataFrame: `bayesfolio.engine.forecast.run_planned_multitask_gp_from_dataframe`
 - GP interpretation: `bayesfolio.engine.forecast.build_gp_interpretation_report`

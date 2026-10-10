@@ -52,6 +52,7 @@ def _sample_features_result(with_market_structure: bool) -> FeaturesDatasetResul
         artifact=ArtifactPointer(
             uri="memory://features/example.parquet",
             fingerprint="abc123",
+            byte_size=1,
             row_count=6,
             column_count=7,
         ),

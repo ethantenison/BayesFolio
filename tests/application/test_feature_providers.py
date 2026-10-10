@@ -1,23 +1,16 @@
-"""Tests for canonical feature-provider wiring.
-
-These tests verify the shared provider factory used by BayesFolio feature
-workflows. Inputs are cache-root and retry configuration; outputs are provider
-instances with the expected enhanced-macro defaults and cache locations.
-"""
+"""Tests for application-level feature-provider composition."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from typing import cast
 
-from bayesfolio.engine.features import make_default_feature_providers
+from bayesfolio.application import make_default_feature_providers
 from bayesfolio.engine.features.market_fundamentals import fetch_enhanced_macro_features
 from bayesfolio.io import EtfFeaturesProvider, MacroProvider, ReturnsProvider
 
 
 def test_make_default_feature_providers_uses_enhanced_macro_defaults() -> None:
-    """Build providers with the shared enhanced-macro default configuration."""
-
     providers = make_default_feature_providers(cache_root="artifacts/cache")
     returns_provider = cast(ReturnsProvider, providers.returns_provider)
     etf_features_provider = cast(EtfFeaturesProvider, providers.etf_features_provider)
@@ -35,8 +28,6 @@ def test_make_default_feature_providers_uses_enhanced_macro_defaults() -> None:
 
 
 def test_make_default_feature_providers_allows_cacheless_runtime() -> None:
-    """Disable local caches while preserving the shared enhanced-macro default."""
-
     providers = make_default_feature_providers(
         cache_root=None,
         macro_max_retries=1,

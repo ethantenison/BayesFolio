@@ -463,8 +463,7 @@ def _build_and_fit_monthly_model(
     previous_dtype = torch.get_default_dtype()
     torch.set_default_dtype(torch.float64)
     try:
-        if command.forecast.seed is not None:
-            torch.manual_seed(command.forecast.seed)
+        torch.manual_seed(command.forecast.seed)
         input_transform = Normalize(
             d=train_x.shape[-1],
             indices=list(range(len(command.forecast.allowed_feature_columns))),
@@ -589,5 +588,5 @@ def _feature_artifact_to_report_pointer(artifact) -> ArtifactPointer:
         path=artifact.uri,
         artifact_format=artifact.format,
         digest=artifact.fingerprint,
-        byte_size=0,
+        byte_size=artifact.byte_size,
     )

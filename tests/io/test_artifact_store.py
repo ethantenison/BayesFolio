@@ -47,6 +47,7 @@ def test_parquet_artifact_store_supports_pluggable_backend() -> None:
     assert pointer.row_count == 2
     assert pointer.column_count == 3
     assert pointer.fingerprint
+    assert pointer.byte_size == len(backend.payloads["features/features_pluggable.parquet"])
 
     metadata_key = "features/features_pluggable.parquet.meta.json"
     assert metadata_key in backend.payloads

@@ -63,6 +63,28 @@ def test_adapter_persists_exact_csv_and_json_bytes(tmp_path: Path) -> None:
     assert json_pointer.byte_size == len(json_bytes)
 
 
+@pytest.mark.parametrize("relative_path", ["../escape.csv", "/tmp/escape.csv"])
+def test_adapter_rejects_paths_outside_artifact_root(tmp_path: Path, relative_path: str) -> None:
+    adapter = LocalMlflowMonthlyPortfolioRunIO(artifact_root=tmp_path / "artifacts")
+
+    with pytest.raises(ValueError, match="artifact_root"):
+        adapter.save_csv(pd.DataFrame({"asset": ["SPY"]}), relative_path)
+
+
+def test_adapter_rejects_symlink_escape_from_artifact_root(tmp_path: Path) -> None:
+    artifact_root = tmp_path / "artifacts"
+    outside_root = tmp_path / "outside"
+    artifact_root.mkdir()
+    outside_root.mkdir()
+    (artifact_root / "escape").symlink_to(outside_root, target_is_directory=True)
+    adapter = LocalMlflowMonthlyPortfolioRunIO(artifact_root=artifact_root)
+
+    with pytest.raises(ValueError, match="artifact_root"):
+        adapter.save_csv(pd.DataFrame({"asset": ["SPY"]}), "escape/result.csv")
+
+    assert not (outside_root / "result.csv").exists()
+
+
 def test_adapter_loads_parquet(tmp_path: Path) -> None:
     path = tmp_path / "features.parquet"
     expected = pd.DataFrame({"asset_id": ["SPY"], "y_excess_lead": [0.02]})

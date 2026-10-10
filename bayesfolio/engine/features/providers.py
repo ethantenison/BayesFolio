@@ -1,77 +1,54 @@
-"""Canonical feature-provider wiring for BayesFolio workflows.
-
-Layer responsibility: this module centralizes the standard composition of IO
-providers used by feature-building flows, while keeping business logic in the
-engine layer and retrieval/caching behavior in injected IO adapters. Inputs are
-cache-root configuration and provider retry settings; outputs are configured
-providers for decimal-unit return labels and ETF/macro feature tables.
-"""
+"""Deprecated compatibility path for application-level provider composition."""
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable
 from pathlib import Path
 
 import pandas as pd
 
-from bayesfolio.engine.features.asset_prices import build_long_panel, fetch_etf_features
 from bayesfolio.engine.features.dataset_builder import FeatureProviders
 from bayesfolio.engine.features.market_fundamentals import fetch_enhanced_macro_features
-from bayesfolio.io import EtfFeaturesProvider, MacroProvider, ReturnsProvider
-
-DEFAULT_MACRO_CACHE_SUBDIR = "macro_enhanced_periodic"
 
 
 def make_default_feature_providers(
     *,
     cache_root: str | Path | None = "artifacts/cache",
     macro_fetcher: Callable[..., pd.DataFrame] = fetch_enhanced_macro_features,
-    macro_cache_subdir: str = DEFAULT_MACRO_CACHE_SUBDIR,
+    macro_cache_subdir: str = "macro_enhanced_periodic",
     macro_max_retries: int = 2,
     macro_retry_backoff_seconds: float = 1.0,
 ) -> FeatureProviders:
-    """Build the standard provider container for BayesFolio feature workflows.
+    """Delegate legacy engine imports to the application composition root.
 
     Args:
-        cache_root: Base cache directory. When provided, return labels, ETF
-            features, and macro features are cached under dataset-specific
-            subdirectories beneath this root. When ``None``, all providers run
-            without local parquet caching.
-        macro_fetcher: Macro feature fetch callable used by the macro provider.
-            The default is the enhanced macro feature set.
-        macro_cache_subdir: Cache subdirectory name for macro features.
-            Defaults to ``"macro_enhanced_periodic"`` to keep the
-            period-named schema isolated from legacy month-named caches.
-        macro_max_retries: Maximum retry attempts for transient macro fetch
-            failures.
-        macro_retry_backoff_seconds: Linear retry backoff base in seconds for
-            transient macro fetch failures.
+        cache_root: Base cache directory, or ``None`` to disable caching.
+        macro_fetcher: Macro feature fetch callable.
+        macro_cache_subdir: Cache subdirectory for macro features.
+        macro_max_retries: Maximum transient macro-fetch retries.
+        macro_retry_backoff_seconds: Linear retry backoff base in seconds.
 
     Returns:
-        FeatureProviders configured with the shared BayesFolio defaults for
-        decimal-unit return labels, ETF features, and enhanced macro features.
+        Application-composed concrete feature providers.
+
+    Warns:
+        DeprecationWarning: Always; import this function from
+            ``bayesfolio.application`` instead.
     """
 
-    cache_base = Path(cache_root) if cache_root is not None else None
-    return FeatureProviders(
-        returns_provider=ReturnsProvider(
-            fetcher=build_long_panel,
-            cache_dir=_resolve_cache_dir(cache_base, "returns"),
-        ),
-        macro_provider=MacroProvider(
-            fetcher=macro_fetcher,
-            max_retries=macro_max_retries,
-            retry_backoff_seconds=macro_retry_backoff_seconds,
-            cache_dir=_resolve_cache_dir(cache_base, macro_cache_subdir),
-        ),
-        etf_features_provider=EtfFeaturesProvider(
-            fetcher=fetch_etf_features,
-            cache_dir=_resolve_cache_dir(cache_base, "etf_features"),
-        ),
+    from bayesfolio.application.feature_providers import make_default_feature_providers as compose_providers
+
+    warnings.warn(
+        "bayesfolio.engine.features.make_default_feature_providers is deprecated; "
+        "use bayesfolio.application.make_default_feature_providers instead.",
+        DeprecationWarning,
+        stacklevel=2,
     )
-
-
-def _resolve_cache_dir(cache_root: Path | None, dataset: str) -> str | None:
-    if cache_root is None:
-        return None
-    return str(cache_root / dataset)
+    return compose_providers(
+        cache_root=cache_root,
+        macro_fetcher=macro_fetcher,
+        macro_cache_subdir=macro_cache_subdir,
+        macro_max_retries=macro_max_retries,
+        macro_retry_backoff_seconds=macro_retry_backoff_seconds,
+    )

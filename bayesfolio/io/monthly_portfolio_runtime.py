@@ -125,9 +125,18 @@ class LocalMlflowMonthlyPortfolioRunIO:
         return self._save_bytes(relative_path=relative_path, content=content, artifact_format="json")
 
     def _save_bytes(self, *, relative_path: str, content: bytes, artifact_format: str) -> ArtifactPointer:
-        output_path = self._artifact_root / relative_path
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_bytes(content)
+        relative = Path(relative_path)
+        if relative.is_absolute():
+            raise ValueError("Artifact output path must be relative to artifact_root.")
+
+        output_path = self._artifact_root / relative
+        resolved_root = self._artifact_root.resolve()
+        resolved_output = output_path.resolve()
+        if not resolved_output.is_relative_to(resolved_root):
+            raise ValueError("Artifact output path must remain beneath artifact_root.")
+
+        resolved_output.parent.mkdir(parents=True, exist_ok=True)
+        resolved_output.write_bytes(content)
         return ArtifactPointer(
             path=str(output_path),
             artifact_format=artifact_format,

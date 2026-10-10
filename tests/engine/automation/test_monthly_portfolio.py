@@ -135,6 +135,7 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch) -> None:
         artifact=FeaturesArtifactPointer(
             uri="memory://features.parquet",
             fingerprint="abc",
+            byte_size=321,
             row_count=6,
             column_count=6,
         ),
@@ -278,6 +279,8 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch) -> None:
     assert result.top_predictions[0].eligible_for_final_portfolio is True
     helper_prediction = next(record for record in result.top_predictions if record.asset == "MGK")
     assert helper_prediction.eligible_for_final_portfolio is False
+    assert result.artifacts.feature_dataset is not None
+    assert result.artifacts.feature_dataset.byte_size == 321
     assert result.artifacts.summary_json is not None
     assert result.gp_workflow_result.planner_client_status == "deterministic_default"
     assert captured["request"].alpha == 0.5

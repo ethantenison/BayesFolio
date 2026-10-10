@@ -146,6 +146,7 @@ def _features_result() -> FeaturesDatasetResult:
         artifact=FeaturesArtifactPointer(
             uri=str(feature_path),
             fingerprint="83aee76cfb979f56b48dbfd362464af8f431334023063604c55ee3be83b92e63",
+            byte_size=feature_path.stat().st_size,
             row_count=1152,
             column_count=32,
         ),

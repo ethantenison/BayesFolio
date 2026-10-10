@@ -63,6 +63,7 @@ def _sample_features_result() -> FeaturesDatasetResult:
         artifact=ArtifactPointer(
             uri="memory://features/example.parquet",
             fingerprint="abc123",
+            byte_size=1,
             row_count=6,
             column_count=7,
         ),

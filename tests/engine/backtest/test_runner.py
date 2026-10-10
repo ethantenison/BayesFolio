@@ -66,12 +66,43 @@ def test_run_walk_forward_backtest_tracks_alignment_turnover_and_costs() -> None
     assert result.periods[0].net_return == pytest.approx(0.049)
     assert result.periods[0].ending_value == pytest.approx(1_049.0)
     assert result.periods[1].gross_return == pytest.approx(-0.005)
-    assert result.periods[1].turnover == pytest.approx(0.25)
-    assert result.periods[1].transaction_cost_rate == pytest.approx(0.00025)
-    assert result.periods[1].net_return == pytest.approx(-0.00525)
-    assert result.terminal_value == pytest.approx(1_043.49275)
-    assert result.average_turnover == pytest.approx(0.625)
+    assert result.periods[1].turnover == pytest.approx(0.2261904761904762)
+    assert result.periods[1].transaction_cost_rate == pytest.approx(0.0002261904761904762)
+    assert result.periods[1].net_return == pytest.approx(-0.005226190476190476)
+    assert result.terminal_value == pytest.approx(1_043.5177261904762)
+    assert result.average_turnover == pytest.approx(0.6130952380952381)
     assert result.hit_rate == pytest.approx(0.5)
+
+
+def test_walk_forward_turnover_rebalances_from_drifted_holdings() -> None:
+    period_values = [
+        WalkForwardPeriod(
+            strategy_id="strategy-v1",
+            source_run_label="january-2026",
+            decision_date=date(2026, 1, 31),
+            realization_date=date(2026, 2, 28),
+            weights={"SPY": 0.5, "BND": 0.5},
+            realized_returns={"SPY": 0.10, "BND": 0.0},
+        ),
+        WalkForwardPeriod(
+            strategy_id="strategy-v1",
+            source_run_label="february-2026",
+            decision_date=date(2026, 2, 28),
+            realization_date=date(2026, 3, 31),
+            weights={"SPY": 0.5, "BND": 0.5},
+            realized_returns={"SPY": 0.0, "BND": 0.0},
+        ),
+    ]
+    command = WalkForwardBacktestCommand(
+        strategy_id="strategy-v1",
+        periods=period_values,
+        charge_initial_trade=False,
+    )
+
+    result = run_walk_forward_backtest(command)
+
+    assert result.periods[0].turnover == 0.0
+    assert result.periods[1].turnover == pytest.approx(0.023809523809523808)
 
 
 def test_build_walk_forward_period_uses_candidate_date_asset_order_and_weights() -> None:

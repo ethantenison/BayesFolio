@@ -15,7 +15,7 @@ class ArtifactPointer(VersionedContract):
         path: Storage path or URI for the artifact.
         artifact_format: File format (e.g. 'parquet', 'png').
         digest: SHA-256 hex digest for integrity.
-        byte_size: File size in bytes.
+        byte_size: File size in bytes, when known.
     """
 
     schema: Literal[SchemaName.ARTIFACT_POINTER] = SchemaName.ARTIFACT_POINTER
@@ -23,7 +23,7 @@ class ArtifactPointer(VersionedContract):
     path: str
     artifact_format: str
     digest: str
-    byte_size: int = Field(ge=0)
+    byte_size: int | None = Field(default=None, ge=0)
 
 
 class DiagnosticFigureSummary(ContractModel):

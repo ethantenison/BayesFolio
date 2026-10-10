@@ -96,6 +96,7 @@ class ParquetArtifactStore:
         return ArtifactPointer(
             uri=artifact_uri,
             fingerprint=fingerprint,
+            byte_size=len(parquet_bytes),
             row_count=int(frame.shape[0]),
             column_count=int(frame.shape[1]),
         )

@@ -97,7 +97,7 @@ def run_walk_forward_backtest(command: WalkForwardBacktestCommand) -> WalkForwar
             equal to ``-1.0``.
     """
 
-    previous_weights: dict[str, float] | None = None
+    previous_end_weights: dict[str, float] | None = None
     period_results: list[WalkForwardPeriodResult] = []
     net_returns: list[float] = []
     turnovers: list[float] = []
@@ -107,12 +107,12 @@ def run_walk_forward_backtest(command: WalkForwardBacktestCommand) -> WalkForwar
 
     for period in command.periods:
         gross_return = float(sum(period.weights[asset] * period.realized_returns[asset] for asset in period.weights))
-        if previous_weights is None:
+        if previous_end_weights is None:
             turnover = sum(abs(weight) for weight in period.weights.values()) if command.charge_initial_trade else 0.0
         else:
-            all_assets = set(previous_weights) | set(period.weights)
+            all_assets = set(previous_end_weights) | set(period.weights)
             turnover = 0.5 * sum(
-                abs(period.weights.get(asset, 0.0) - previous_weights.get(asset, 0.0)) for asset in all_assets
+                abs(period.weights.get(asset, 0.0) - previous_end_weights.get(asset, 0.0)) for asset in all_assets
             )
 
         transaction_cost_rate = turnover * cost_per_unit_turnover
@@ -137,7 +137,11 @@ def run_walk_forward_backtest(command: WalkForwardBacktestCommand) -> WalkForwar
         net_returns.append(net_return)
         turnovers.append(turnover)
         total_transaction_cost_amount += transaction_cost_amount
-        previous_weights = period.weights
+        previous_end_weights = _drifted_end_weights(
+            period.weights,
+            period.realized_returns,
+            gross_return=gross_return,
+        )
 
     return WalkForwardBacktestResult(
         strategy_id=command.strategy_id,
@@ -151,6 +155,18 @@ def run_walk_forward_backtest(command: WalkForwardBacktestCommand) -> WalkForwar
         total_transaction_cost_amount=total_transaction_cost_amount,
         hit_rate=float(np.mean(np.asarray(net_returns) > 0.0)),
     )
+
+
+def _drifted_end_weights(
+    weights: dict[str, float],
+    realized_returns: dict[str, float],
+    *,
+    gross_return: float,
+) -> dict[str, float]:
+    """Return normalized holdings after each asset realizes its period return."""
+
+    ending_value_factor = 1.0 + gross_return
+    return {asset: weight * (1.0 + realized_returns[asset]) / ending_value_factor for asset, weight in weights.items()}
 
 
 def _summarize_returns(portfolio_returns: np.ndarray, *, periods_per_year: float) -> BacktestResult:

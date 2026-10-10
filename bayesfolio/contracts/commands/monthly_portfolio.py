@@ -30,8 +30,8 @@ class MonthlyForecastConfig(VersionedContract):
         macro_feature_columns: Ordered macro feature columns.
         rank: Multitask rank passed into the GP builder.
         min_inferred_noise_level: Initial likelihood noise floor.
-        seed: Optional deterministic seed used directly for model fitting and
-            posterior sampling.
+        seed: Deterministic seed used directly for model fitting and posterior
+            sampling. Defaults to ``0``.
         maxiter: Maximum optimizer iterations used for GP hyperparameter fitting.
         input_transform: Input normalization strategy. ``"botorch_normalize"``
             applies BoTorch normalization to non-task feature columns.
@@ -85,7 +85,7 @@ class MonthlyForecastConfig(VersionedContract):
     )
     rank: int | None = Field(default=5, ge=1)
     min_inferred_noise_level: float = Field(default=5e-3, gt=0.0)
-    seed: int | None = None
+    seed: int = Field(default=0, ge=0)
     maxiter: int = Field(default=75, ge=1)
     input_transform: Literal["botorch_normalize"] = "botorch_normalize"
     time_modulation: Literal["lengthscale_only", "none"] = "lengthscale_only"

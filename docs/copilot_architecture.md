@@ -21,6 +21,7 @@ communicate through engine-owned structural protocols; I/O does not import engin
 ## Monthly Automation Boundary
 
 - `application/monthly_portfolio.py` is the canonical default-wiring and user-facing execution entry point.
+- `application/feature_providers.py` composes legacy engine fetchers with concrete I/O providers.
 - `engine/automation/monthly_portfolio.py` owns monthly feature, GP, forecast, scenario, and optimization sequencing.
 - `engine/automation/monthly_ports.py` defines the runtime side effects required by that engine workflow.
 - `io/monthly_portfolio_runtime.py` owns MLflow lifecycle and contract logging, Git revision discovery, parquet loading,
@@ -32,11 +33,16 @@ The deprecated `engine.automation.run_monthly_portfolio` entry point is a narrow
 locally delegates default composition to `application/` and must not acquire direct I/O behavior. Remove this exception
 when the historical engine import path can be retired in a future breaking release.
 
+The deprecated `engine.features.make_default_feature_providers` import follows the same compatibility rule: it lazily
+delegates to `application/feature_providers.py` and contains no concrete provider construction or direct I/O dependency.
+
 ## Backtest and Final-Decision Boundary
 
 - `engine/backtest/runner.py` evaluates serialized walk-forward periods. Every
   period identifies a decision date, a later realization date, fixed weights,
   and subsequent realized returns; the engine does not infer date shifts.
+  Rebalance turnover compares each new target with the prior portfolio's
+  post-return, normalized holdings rather than its stale target weights.
 - `engine/automation/monthly_decision.py` is the pure final-review gate. It
   requires matching candidate/backtest strategy identifiers and rejects
   evidence unavailable strictly before the candidate as-of date. Approval

@@ -7,13 +7,13 @@ the engine. It is the canonical zero-configuration programmatic entry point.
 
 from __future__ import annotations
 
+from bayesfolio.application.feature_providers import make_default_feature_providers
 from bayesfolio.contracts.commands.monthly_portfolio import MonthlyPortfolioCommand
 from bayesfolio.contracts.results.monthly_portfolio import MonthlyPortfolioResult
 from bayesfolio.engine.automation.monthly_portfolio import (
     MonthlyPortfolioRuntimeDependencies,
     execute_monthly_portfolio,
 )
-from bayesfolio.engine.features import make_default_feature_providers
 from bayesfolio.io.artifact_store import ParquetArtifactStore
 from bayesfolio.io.monthly_portfolio_runtime import build_monthly_portfolio_run_io
 
