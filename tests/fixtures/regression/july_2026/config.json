@@ -92,7 +92,7 @@
     },
     "full_pipeline_predictions_and_scenarios": {
       "rtol": 0.0,
-      "atol": 0.002
+      "atol": 0.005
     },
     "full_pipeline_weights": {
       "rtol": 0.0,

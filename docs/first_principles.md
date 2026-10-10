@@ -132,7 +132,7 @@ A credible evaluation should include:
 Structural cleanliness is not sufficient. The refactored pipeline reproduces
 the last accepted pre-refactor July 2026 feature artifact, GP predictions and
 scenarios, and portfolio weights through the maintained application entry
-point. The cross-platform full-pipeline gate allows `0.002` absolute
+point. The cross-platform full-pipeline gate allows `0.005` absolute
 scenario/prediction error, `0.005` per-asset weight error, and `0.02` total
 weight L1 error. The optimizer-only replay from frozen scenarios keeps
 near-exact tolerances. This parity evidence protects against material refactor

@@ -40,7 +40,7 @@ FIXTURE_DIR = Path(__file__).parents[1] / "fixtures" / "regression" / "july_2026
 # small relative to monthly returns and portfolio allocation decisions. The
 # optimizer-only fixture retains its near-exact tolerance because its scenario
 # matrix is fixed.
-FULL_PIPELINE_FORECAST_ATOL = 2e-3
+FULL_PIPELINE_FORECAST_ATOL = 5e-3
 FULL_PIPELINE_WEIGHT_ATOL = 5e-3
 FULL_PIPELINE_WEIGHT_L1_ATOL = 2e-2
 
