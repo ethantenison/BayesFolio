@@ -85,14 +85,19 @@
     "method_cov": "hist"
   },
   "parity": {
-    "predictions_and_scenarios": {
-      "rtol": 0.0,
-      "atol": 1e-12
-    },
-    "weights": {
+    "optimizer_only_weights": {
       "rtol": 0.0,
       "atol": 1e-10,
       "max_l1_error": 1e-9
+    },
+    "full_pipeline_predictions_and_scenarios": {
+      "rtol": 0.0,
+      "atol": 0.002
+    },
+    "full_pipeline_weights": {
+      "rtol": 0.0,
+      "atol": 0.005,
+      "max_l1_error": 0.02
     }
   },
   "reference_environment": {

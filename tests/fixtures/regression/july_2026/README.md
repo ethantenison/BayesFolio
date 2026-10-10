@@ -26,6 +26,14 @@ The historical run used Riskfolio `alpha=0.5`. Riskfolio's default is `0.05`,
 so this value must be explicit to reproduce the recorded CVaR portfolio. The
 general production default remains `0.05`.
 
+The optimizer-only gate uses the recorded scenario matrix and therefore keeps
+near-exact weight tolerances. The full GP pipeline traverses platform-specific
+linear algebra and posterior sampling, so its cross-platform gate allows
+`0.002` absolute forecast/scenario error, `0.005` per-asset weight error, and
+`0.02` total weight L1 error. These correspond to 20 basis points of monthly
+return, 50 basis points per allocation, and 2 percentage points of aggregate
+allocation drift.
+
 Run the focused gate with:
 
 ```console

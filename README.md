@@ -160,8 +160,10 @@ recorded scenarios independently, while
 application workflow from the frozen feature artifact through as-of alignment,
 GP fitting, posterior sampling, and Riskfolio optimization. The historical
 dirty source state was recovered in commit `948ba4e`; the maintained workflow
-reproduces its scenarios and predictions within `1e-12` absolute tolerance and
-its accepted weights within `1e-10` per asset and `1e-9` total L1 error.
+reproduces its scenarios and predictions within `0.002` absolute tolerance and
+its accepted weights within `0.005` per asset and `0.02` total L1 error across
+supported platforms. The optimizer-only replay from frozen scenarios retains
+near-exact weight tolerances.
 
 ## Documentation Map
 
