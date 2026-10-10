@@ -14,7 +14,7 @@ BayesFolio is undergoing an active refactor toward a smaller, schema-first packa
 | Configurable and planner-assisted multitask GP workflows | Implemented |
 | Fixed-default monthly forecast and optimization workflow | Implemented |
 | Backtesting and performance summaries | Implemented as separate workflows |
-| Reproduction of the last accepted pre-refactor portfolio weights | Optimizer-stage oracle implemented; full pipeline parity pending |
+| Reproduction of the last accepted pre-refactor portfolio weights | Feature-artifact-to-weights parity implemented |
 | Direct Schwab execution and holdings synchronization | Planned |
 | Realized gain/loss and alpha tracking | Planned |
 
@@ -31,7 +31,7 @@ The package supports the main research stages needed for a monthly allocation de
 - evaluate configurations with backtests and diagnostics; and
 - persist predictions, scenarios, weights, contracts, and reproducibility metadata.
 
-The current `run_monthly_portfolio` workflow automates feature construction, a fixed-default multitask GP fit, posterior forecasting, optimization, and artifact persistence. The application layer assembles concrete providers and runtime I/O while the engine owns computation and sequencing. Backtesting remains a separate evaluation step and should be completed before candidate weights are accepted.
+The current `run_monthly_portfolio` workflow automates feature construction, strict as-of alignment, the accepted multitask GP fit, posterior forecasting, optimization, and artifact persistence. Training rows must precede the as-of date, and scoring rows must match it exactly. The application layer assembles concrete providers and runtime I/O while the engine owns computation and sequencing. Backtesting remains a separate evaluation step and should be completed before candidate weights are accepted.
 
 ## Why Uncertainty Matters
 
@@ -105,12 +105,15 @@ Accepted monthly runs should record the as-of date, dataset cutoff, contract con
 
 The refactor is not complete until the refactored workflow reproduces the last accepted pre-refactor portfolio weights within an explicitly documented tolerance. Any difference must be traced to data, model, optimization, or dependency changes rather than assumed to be harmless.
 
-The July 2026 optimizer-stage oracle is versioned under
-`tests/fixtures/regression/july_2026/` and exercised by
-`tests/regression/test_july_2026_optimizer_parity.py`. It proves that the
-recorded posterior scenarios reproduce the accepted weights; replay of the
-upstream feature and GP stages remains pending because the historical run was
-recorded from a dirty source tree whose complete patch is unavailable.
+The July 2026 regression evidence is versioned under
+`tests/fixtures/regression/july_2026/`. The focused optimizer gate verifies the
+recorded scenarios independently, while
+`tests/regression/test_july_2026_full_pipeline_parity.py` runs the maintained
+application workflow from the frozen feature artifact through as-of alignment,
+GP fitting, posterior sampling, and Riskfolio optimization. The historical
+dirty source state was recovered in commit `948ba4e`; the maintained workflow
+reproduces its scenarios and predictions within `1e-12` absolute tolerance and
+its accepted weights within `1e-10` per asset and `1e-9` total L1 error.
 
 ## Documentation Map
 
@@ -135,8 +138,9 @@ Repository agent roles are defined in [AGENTS.md](AGENTS.md). The recommended se
 1. Run the Boundary Inspector.
 2. Run the Documentation Drift Inspector.
 3. Run the Simplicity and Redundancy Inspector when the scope warrants it.
-4. Propose minimal patches for confirmed findings.
-5. Apply only after approval.
+4. Apply the smallest in-scope patch for implementation and active-goal work.
+5. Pause only for destructive work, unauthorized breaking APIs, or unresolved
+   product-impact choices.
 6. Re-run targeted validation and report the exact commands and results.
 
 ## Disclaimer

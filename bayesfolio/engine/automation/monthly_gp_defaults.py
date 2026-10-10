@@ -25,7 +25,21 @@ def build_default_monthly_gp_configs(
     forecast_config: MonthlyForecastConfig,
     feature_index: dict[str, int],
 ) -> tuple[CovarModuleConfig, MeanModuleConfig]:
-    """Build the fixed GP architecture used in recent monthly notebooks."""
+    """Build the accepted monthly GP covariance and mean configuration.
+
+    The covariance is the July 2026 ``E + M + T + ET + MT + EMT`` model:
+    additive ETF, macro, and time main effects plus ETF-time, macro-time, and
+    ETF-macro-time interactions. Time-varying lengthscale modulation is applied
+    separately by the monthly workflow so the serialized covariance config
+    remains an explicit description of the stationary component graph.
+
+    Args:
+        forecast_config: Feature groups and model settings for the monthly fit.
+        feature_index: Mapping from ordered feature name to tensor dimension.
+
+    Returns:
+        Covariance and mean configurations for the accepted monthly GP.
+    """
 
     time_dims = [feature_index[column] for column in forecast_config.time_feature_columns]
     etf_dims = [feature_index[column] for column in forecast_config.etf_feature_columns]
@@ -92,9 +106,13 @@ def build_default_monthly_gp_configs(
         global_structure="hierarchical",
         interaction_policy=InteractionPolicy.CUSTOM,
         custom_interactions=[
-            KernelInteractionConfig(blocks=["time", "etf"], name="time_x_etf", use_outputscale=True),
-            KernelInteractionConfig(blocks=["time", "macro"], name="time_x_macro", use_outputscale=True),
-            KernelInteractionConfig(blocks=["macro", "etf"], name="macro_x_etf", use_outputscale=True),
+            KernelInteractionConfig(blocks=["etf", "time"], name="etf_x_time", use_outputscale=True),
+            KernelInteractionConfig(blocks=["macro", "time"], name="macro_x_time", use_outputscale=True),
+            KernelInteractionConfig(
+                blocks=["etf", "macro", "time"],
+                name="etf_x_macro_x_time",
+                use_outputscale=True,
+            ),
         ],
     )
     mean_config = MeanModuleConfig(kind=MeanKind.MULTITASK_CONSTANT)

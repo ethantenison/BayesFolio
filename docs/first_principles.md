@@ -90,6 +90,13 @@ BayesFolio uses decimal return units (`0.02 = 2%`). Features associated with a p
 
 Model selection is optional and separate from the fixed defaults used by the current monthly automation. Candidate kernels, mean functions, task ranks, priors, and feature groups should be evaluated with rolling or expanding time splits.
 
+The accepted monthly model uses double-precision tensors, BoTorch normalization
+of non-task inputs, task-stratified outcome standardization, rank-five positive
+task covariance without an explicit task prior, and the
+`E + M + T + ET + MT + EMT` covariance structure with lengthscale-only time
+modulation. These are versioned defaults rather than claims of universal
+optimality; replacement requires time-aware evaluation and recorded evidence.
+
 In-sample fit or marginal likelihood alone is not enough. Selection should consider out-of-sample forecast error, ranking behavior, uncertainty calibration, portfolio stability, and decision-level performance. Seeds, dataset cutoffs, and candidate definitions must be recorded so a selected configuration can be reproduced.
 
 Experiment findings remain evidence under `experiments/` until they are promoted into tested defaults and canonical documentation.
@@ -112,7 +119,13 @@ A credible evaluation should include:
 - turnover, fees, taxes, and slippage when the evidence supports them; and
 - sensitivity to seeds, windows, and reasonable modeling choices.
 
-For the current refactor, structural cleanliness is not sufficient. The refactored pipeline must reproduce the last accepted pre-refactor portfolio weights within an explicit tolerance, or explain each difference through verified data, model, optimization, or dependency changes.
+Structural cleanliness is not sufficient. The refactored pipeline reproduces
+the last accepted pre-refactor July 2026 feature artifact, GP predictions and
+scenarios, and portfolio weights through the maintained application entry
+point. The regression gate allows `1e-12` absolute scenario/prediction error,
+`1e-10` per-asset weight error, and `1e-9` total weight L1 error. This parity
+evidence protects against refactor drift; it does not establish that the July
+configuration remains the best future model.
 
 ## Failure Modes and Limitations
 

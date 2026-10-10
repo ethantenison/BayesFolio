@@ -2,8 +2,8 @@
 
 This file defines high-value repository agents that act as inspectors, maintainers,
 and patch proposers. These agents are designed to reduce complexity, prevent
-documentation drift, and enforce module boundaries without behaving like
-uncontrolled developers.
+documentation drift, and enforce module boundaries while completing authorized
+repository work without unnecessary approval pauses.
 
 ## Purpose
 
@@ -19,9 +19,13 @@ uncontrolled developers.
 
 ## Global Guardrails (All Agents)
 
-1. Read-only by default. No direct edits unless in approved Patch Proposer mode.
-2. Never create branches. Commit or push only when the human user explicitly requests it.
-3. Do not change public APIs unless the request explicitly requires it.
+1. Apply in-scope work by default when the user requests implementation, refactoring,
+   fixes, or continuation of an active goal. Use read-only mode only when the user
+   requests inspection, review, diagnosis, or a proposal without implementation.
+2. Branch creation, commits, and pushes are allowed as normal delivery steps. Merging
+   a pull request always requires explicit human approval.
+3. Do not make breaking public API changes unless the request explicitly requires
+   them or the human user approves the specific change.
 4. Do not edit unrelated files.
 5. Respect architecture rules in `.github/copilot-instructions.md`.
 6. Keep changes minimal and reversible.
@@ -29,11 +33,15 @@ uncontrolled developers.
 
 ## Operating Modes
 
-- **Inspect**: Analyze only. Produce findings and recommendations.
+- **Inspect**: Analyze only when the user requests inspection, review, diagnosis,
+  or a proposal without implementation.
 - **Propose**: Provide minimal patch plan and optional patch diff.
-- **Apply (Approved)**: Apply minimal patch after explicit authorization.
+- **Apply**: Implement requested in-scope work, including an active goal, without a
+  separate approval pause.
 
-Default mode is **Inspect**.
+Default mode follows the user's request. Explicit implementation, refactoring, fix,
+or active-goal continuation requests use **Apply**; analysis-only requests use
+**Inspect**.
 
 ## Shared Output Contract
 
@@ -67,9 +75,9 @@ Enforce package/layer boundaries and prevent architecture erosion.
 
 ### Allowed Actions
 
-- Inspect and report by default.
+- Inspect and report for analysis-only requests.
 - Propose targeted import-move/refactor patches.
-- Apply only with explicit approval.
+- Apply in-scope fixes when implementation or active-goal work is requested.
 
 ### Suggested Verification
 
@@ -99,9 +107,9 @@ Ensure documentation remains complete and synchronized with code changes.
 
 ### Allowed Actions
 
-- Inspect and report by default.
+- Inspect and report for analysis-only requests.
 - Propose doc updates in the same patch set as code changes.
-- Apply only with explicit approval.
+- Apply in-scope documentation fixes with the implementation they describe.
 
 ### Suggested Verification
 
@@ -133,12 +141,14 @@ Generate minimal, safe, and verifiable patches for approved findings.
 
 ### Trigger
 
-- Explicit user approval after inspector findings.
+- An implementation, refactoring, fix, or active-goal continuation request, or
+  explicit user approval after inspector findings.
 
 ### Allowed Actions
 
 - Propose diffs always.
-- Apply diffs only with explicit approval.
+- Apply in-scope diffs when the user requested implementation or continuation of an
+  active goal.
 
 ### Suggested Verification
 
@@ -168,9 +178,9 @@ Keep the codebase lean by identifying duplication, unnecessary indirection, and 
 
 ### Allowed Actions
 
-- Inspect and report by default with concrete consolidation candidates.
+- Inspect and report for analysis-only requests with concrete consolidation candidates.
 - Propose minimal deduplication/simplification patches with risk notes.
-- Apply only with explicit approval.
+- Apply in-scope simplifications when implementation or active-goal work is requested.
 
 ### Suggested Verification
 
@@ -183,17 +193,23 @@ Keep the codebase lean by identifying duplication, unnecessary indirection, and 
 Agent must stop and request human decision when:
 
 - Multiple valid architectural choices exist with product impact.
-- A fix requires public API contract changes.
+- A fix requires a breaking public API contract change not already authorized by the
+  request.
 - Boundary constraints conflict with requested behavior.
 - Confidence in safe minimal patch is low.
+- A destructive or materially out-of-scope action is required.
+- A pull request is ready to merge. Creating or updating the pull request does not
+  authorize merging it.
 
 ## Minimal Workflow (Recommended)
 
 1. Run **Boundary Inspector**.
 2. Run **Documentation Drift Inspector**.
 3. Run **Simplicity & Redundancy Inspector**.
-4. If findings exist, run **Patch Proposer** in Propose mode.
-5. After approval, run Patch Proposer in Apply mode.
+4. If findings exist during an implementation or active-goal request, run **Patch
+   Proposer** in Apply mode for the smallest in-scope patch.
+5. For analysis-only requests, remain in Propose mode until the user requests
+   implementation.
 6. Re-run verifications and attach outputs.
 
 Note: Role 4 may be skipped for tiny, single-file changes that do not touch public surface area, unless there is clear duplication or complexity risk.

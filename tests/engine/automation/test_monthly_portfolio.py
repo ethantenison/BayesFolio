@@ -38,6 +38,7 @@ from bayesfolio.contracts.results.report import ArtifactPointer
 from bayesfolio.core.settings import Horizon, Interval, RiskfolioConfig
 from bayesfolio.engine.automation.monthly_portfolio import (
     MonthlyPortfolioRuntimeDependencies,
+    _prepare_as_of_feature_frames,
     execute_monthly_portfolio,
 )
 
@@ -205,7 +206,7 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch) -> None:
             "result": gp_result,
             "model": fake_model,
             "likelihood": None,
-            "normalized_train_x": torch.tensor(
+            "train_x": torch.tensor(
                 [[0.0, 0.0, 0.0, 0.0], [0.0, 0.5, 0.5, 1.0], [1.0, 1.0, 1.0, 2.0]],
                 dtype=torch.float64,
             ),
@@ -314,3 +315,48 @@ def test_monthly_engine_requires_runtime_io() -> None:
         assert str(exc) == "Monthly engine execution requires an injected run_io adapter."
     else:
         raise AssertionError("Expected missing run_io to be rejected.")
+
+
+def test_monthly_feature_alignment_excludes_as_of_labels_and_future_rows() -> None:
+    frame = pd.DataFrame(
+        {
+            "date": [
+                "2026-04-30",
+                "2026-04-30",
+                "2026-05-31",
+                "2026-05-31",
+                "2026-06-30",
+                "2026-06-30",
+            ],
+            "asset_id": ["SPY", "VTV", "SPY", "VTV", "SPY", "VTV"],
+            "t_index": [0, 0, 1, 1, 2, 2],
+            "f1": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+            "f2": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            "y_excess_lead": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06],
+        }
+    )
+    command = MonthlyPortfolioCommand.model_construct(
+        as_of_date=date(2026, 5, 31),
+        training_universe=["SPY", "VTV"],
+        forecast=MonthlyForecastConfig(
+            time_feature_columns=["t_index"],
+            etf_feature_columns=["f1"],
+            macro_feature_columns=["f2"],
+        ),
+    )
+
+    training, scoring = _prepare_as_of_feature_frames(features_df=frame, command=command)
+
+    assert training["date"].dt.date.unique().tolist() == [date(2026, 4, 30)]
+    assert scoring["date"].dt.date.unique().tolist() == [date(2026, 5, 31)]
+    assert training["asset_id"].astype(str).tolist() == ["SPY", "VTV"]
+    assert scoring["asset_id"].astype(str).tolist() == ["SPY", "VTV"]
+
+
+def test_monthly_forecast_defaults_capture_accepted_model_controls() -> None:
+    forecast = MonthlyForecastConfig()
+
+    assert forecast.maxiter == 75
+    assert forecast.input_transform == "botorch_normalize"
+    assert forecast.time_modulation == "lengthscale_only"
+    assert forecast.task_covar_prior == "none"
