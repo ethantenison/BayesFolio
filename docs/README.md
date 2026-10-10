@@ -37,7 +37,7 @@ Higher-authority sources win. Correct a stale lower-authority source rather than
 | Package ownership and public entry points | [Package map](package_map.md) | Contributors and agents |
 | Public API behavior | Module, class, and function docstrings | API consumers and agents |
 | Contract field semantics | Contract class `Attributes:` docstrings | API consumers and agents |
-| Experiments and dated findings | `experiments/` | Researchers |
+| Experiments and dated findings | [`experiments/README.md`](../experiments/README.md) | Researchers |
 | Refactor evidence | `docs/refactor/` | Maintainers; historical unless promoted |
 
 ## Document Status

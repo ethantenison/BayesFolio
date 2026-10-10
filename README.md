@@ -6,7 +6,9 @@ BayesFolio is research and decision-support software. It does not place trades, 
 
 ## Status
 
-BayesFolio is undergoing an active refactor toward a smaller, schema-first package with explicit boundaries between contracts, business logic, and external I/O.
+BayesFolio's core refactor is complete: the maintained workflow is schema-first,
+uses explicit contracts/engine/I/O boundaries, and is protected by regression
+evidence for the last accepted pre-refactor portfolio.
 
 | Capability | Status |
 |---|---|
@@ -146,7 +148,10 @@ uv run --locked pytest -q
 
 Accepted monthly runs should record the as-of date, dataset cutoff, contract configuration, random seed, artifact fingerprints, and relevant model assumptions. Features used to predict month `t` must contain only information available before `t`, and returns use decimal units (`0.02 = 2%`).
 
-The refactor is not complete until the refactored workflow reproduces the last accepted pre-refactor portfolio weights within an explicitly documented tolerance. Any difference must be traced to data, model, optimization, or dependency changes rather than assumed to be harmless.
+The refactor completion gate required the maintained workflow to reproduce the
+last accepted pre-refactor portfolio weights within explicit tolerances, with
+any difference traced to data, model, optimization, or dependency changes.
+That gate is now satisfied by the July 2026 regression evidence below.
 
 The July 2026 regression evidence is versioned under
 `tests/fixtures/regression/july_2026/`. The focused optimizer gate verifies the
@@ -168,7 +173,14 @@ its accepted weights within `1e-10` per asset and `1e-9` total L1 error.
 
 ## Experiments
 
-Experiments are versioned evidence, not normative package documentation. They are excluded from routine package checks unless explicitly requested. A result becomes part of current package behavior only when it is implemented, tested, and promoted into the appropriate canonical document.
+New experiment work is isolated under [`experiments/`](experiments/README.md)
+as versioned, non-normative evidence. Historical scripts under `notebooks/`
+remain in place only to preserve their recorded paths. Experiment code,
+configuration, plans, and curated summaries remain versioned, while generated
+`outputs/`, `runs/`, `mlruns/`, and `logs/` are ignored by default. Experiments
+are excluded from routine package checks unless explicitly requested. A result
+becomes current package behavior only after it is implemented, tested, and
+promoted into the appropriate canonical document.
 
 ## Roadmap
 

@@ -1,5 +1,19 @@
 # BayesFolio New Architecture
 
+Status: Historical
+
+Audience: Maintainers and coding agents
+
+Canonical topic: Historical schema-first refactor proposal
+
+Last verified: 2026-10-10
+
+Replacement: [Architecture guardrails](../copilot_architecture.md) and
+[package map](../package_map.md)
+
+This proposal is retained as refactor evidence. It does not define current
+Pydantic syntax, package ownership, or public entry points.
+
 ## Boundary Layers
 
 | Layer | Purpose |

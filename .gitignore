@@ -11,6 +11,14 @@ artifacts/
 *.parquet
 *.parquet.meta.json
 
+# Generated research outputs. Existing tracked evidence remains versioned;
+# selectively promote durable summaries into an experiment's evidence/ folder.
+experiments/**/outputs/
+experiments/**/runs/
+experiments/**/mlruns/
+experiments/**/logs/
+notebooks/outputs/
+
 mlflow.db
 
 scratch/

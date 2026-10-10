@@ -166,7 +166,6 @@ Engine submodules (`agent`, `asset_allocation`, `backtest`, `brokerage`, `featur
 | AI agent / intent extraction | `bayesfolio/engine/agent/` |
 | Contract ↔ engine mapping | `bayesfolio/engine/mappers/` |
 | Artifact storage / MLflow logging | `bayesfolio/io/` |
-| Shared pure utilities | `bayesfolio/utils.py` |
 
 ---
 

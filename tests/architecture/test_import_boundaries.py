@@ -106,6 +106,20 @@ def test_clean_package_import_boundaries() -> None:
     assert not violations, "Import boundary violations:\n" + "\n".join(sorted(violations))
 
 
+def test_package_does_not_import_experiment_archive() -> None:
+    """Keep historical experiment code outside the maintained package graph."""
+
+    violations: list[str] = []
+    for source_path in sorted(PACKAGE_ROOT.rglob("*.py")):
+        for line_number, imported_module in _iter_import_targets(source_path):
+            if _is_package_or_child(imported_module, "experiments"):
+                violations.append(
+                    f"{source_path.relative_to(REPOSITORY_ROOT)}:{line_number}: imports {imported_module}"
+                )
+
+    assert not violations, "Package imports from experiment archive:\n" + "\n".join(sorted(violations))
+
+
 def test_monthly_orchestrator_has_no_direct_runtime_io() -> None:
     """Keep monthly engine sequencing behind its injected runtime port."""
 

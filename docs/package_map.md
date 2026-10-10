@@ -19,7 +19,6 @@ This is the canonical, high-signal routing map for `bayesfolio/`. Keep it concis
 | `bayesfolio/contracts/` | Pydantic boundary schemas for commands, results, UI, and chat payloads. | Business logic or I/O. |
 | `bayesfolio/engine/` | Business logic, domain workflows, and orchestration. | Add new provider, persistence, or network implementations. |
 | `bayesfolio/io/` | External providers, persistence, artifact handling, and MLflow adapters. | Own portfolio or modeling decisions. |
-| `bayesfolio/utils.py` | Shared pure helpers that do not belong to a domain. | Become a general dumping ground or perform hidden I/O. |
 
 ## Contracts
 

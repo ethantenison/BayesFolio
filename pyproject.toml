@@ -48,7 +48,7 @@ build-backend = "hatchling.build"
 packages = ["bayesfolio"]
 
 [tool.hatch.build.targets.sdist]
-include = [
+only-include = [
     "AGENTS.md",
     "README.md",
     "bayesfolio",
