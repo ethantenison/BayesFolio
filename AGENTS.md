@@ -20,7 +20,7 @@ uncontrolled developers.
 ## Global Guardrails (All Agents)
 
 1. Read-only by default. No direct edits unless in approved Patch Proposer mode.
-2. Never commit, push, or create branches.
+2. Never create branches. Commit or push only when the human user explicitly requests it.
 3. Do not change public APIs unless the request explicitly requires it.
 4. Do not edit unrelated files.
 5. Respect architecture rules in `.github/copilot-instructions.md`.
@@ -73,8 +73,8 @@ Enforce package/layer boundaries and prevent architecture erosion.
 
 ### Suggested Verification
 
-- `poetry run ruff check bayesfolio`
-- `poetry run pytest -q` (or targeted tests for touched modules)
+- `uv run --locked ruff check bayesfolio`
+- `uv run --locked pytest -q` (or targeted tests for touched modules)
 - Pylance diagnostics for touched files.
 
 ## Role 2: Documentation Drift Inspector
@@ -105,8 +105,8 @@ Ensure documentation remains complete and synchronized with code changes.
 
 ### Suggested Verification
 
-- `poetry run python scripts/check_new_public_docstrings.py --files <changed_py_files>`
-- `poetry run ruff check <touched_files>`
+- `uv run --locked python scripts/check_new_public_docstrings.py --files <changed_py_files>`
+- `uv run --locked ruff check <touched_files>`
 
 ## Role 3: Patch Proposer
 
@@ -142,8 +142,8 @@ Generate minimal, safe, and verifiable patches for approved findings.
 
 ### Suggested Verification
 
-- `poetry run ruff check <touched_files>`
-- `poetry run pytest -q` (or targeted tests for touched modules)
+- `uv run --locked ruff check <touched_files>`
+- `uv run --locked pytest -q` (or targeted tests for touched modules)
 - Pylance diagnostics for touched files.
 
 ## Role 4: Simplicity & Redundancy Inspector
@@ -174,8 +174,8 @@ Keep the codebase lean by identifying duplication, unnecessary indirection, and 
 
 ### Suggested Verification
 
-- `poetry run ruff check bayesfolio tests`
-- `poetry run pytest -q` (or targeted tests for simplified areas)
+- `uv run --locked ruff check bayesfolio tests`
+- `uv run --locked pytest -q` (or targeted tests for simplified areas)
 - Pylance diagnostics for touched files.
 
 ## Escalation Policy

@@ -1,7 +1,7 @@
 """Prewarm local monthly market-data caches for MVP chat.
 
 Usage:
-    poetry run python scripts/prewarm_mvp_returns_cache.py
+    uv run python scripts/prewarm_mvp_returns_cache.py
 
 This script fetches monthly return labels, ETF features, and macro features
 for a fixed ETF universe and stores them in local parquet caches used by the

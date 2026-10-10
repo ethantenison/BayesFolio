@@ -1,0 +1,49 @@
+{
+  "schema": "bayesfolio.regression.july_optimizer.v1",
+  "case_id": "july_2026_optimizer_parity",
+  "scope": "optimizer_stage_only",
+  "provenance": {
+    "source_directory": "notebooks/outputs/20260702_july_portfolio_full3",
+    "scenario_source_file": "july_gp_posterior_scenarios.csv",
+    "expected_weights_source_file": "july_recommended_weights.csv",
+    "note": "The scenario matrix is the authoritative optimizer input; this fixture does not claim to reproduce the historical GP build."
+  },
+  "inputs": {
+    "scenario_file": "scenarios.csv",
+    "sha256": "c7ce422e0bfa82b044dfd540c86aaa5d47dc2132d6582d14eb99f4df9f26f721",
+    "row_count": 5000,
+    "column_count": 16
+  },
+  "expected": {
+    "weights_file": "expected_weights.csv",
+    "source_sha256": "58dcc651d666b611013dd1eacdc6d096fe9728be11b743d7f6cd0f9f35b10840",
+    "fixture_sha256": "5616bee1cdd128fa59aff061033dc8707a08ea16820860737cf6abcf732dedb2",
+    "normalization": "The copied source's unnamed index header was renamed to asset. Numeric values and row order are unchanged."
+  },
+  "optimizer": {
+    "adapter": "optimize_from_historical_returns",
+    "model": "Classic",
+    "risk_measure": "CVaR",
+    "objective": "Sharpe",
+    "rf": 0.0,
+    "alpha": 0.5,
+    "kelly": null,
+    "hist": true,
+    "min_weight": 0.0,
+    "max_weight": 0.25,
+    "nea": 10,
+    "method_mu": "hist",
+    "method_cov": "hist"
+  },
+  "parity": {
+    "rtol": 0.0,
+    "atol": 1e-10,
+    "max_l1_error": 1e-9
+  },
+  "reference_environment": {
+    "riskfolio-lib": "7.2.1",
+    "cvxpy": "1.8.1",
+    "numpy": "2.4.2",
+    "scipy": "1.17.1"
+  }
+}

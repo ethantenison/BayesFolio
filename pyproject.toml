@@ -1,38 +1,61 @@
-[tool.poetry]
-name = "BayesFolio"
+[project]
+name = "bayesfolio"
 version = "0.3.0"
-description = "BayesFolio is a forward-looking portfolio builder that Bayesian machine learning methods."
-authors = ["ethantenison <tenison.ethan@gmail.com>"]
+description = "A monthly, uncertainty-aware ETF portfolio research workflow for retirement accounts."
+authors = [
+    { name = "ethantenison", email = "tenison.ethan@gmail.com" },
+]
 readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "botorch==0.18.1",
+    "cvxpy==1.8.1",
+    "gpytorch==1.15.2",
+    "mlflow==3.10.0",
+    "mosek==11.0.27",
+    "numpy==2.4.2",
+    "optuna==4.6.0",
+    "pandas==2.3.3",
+    "pandas-datareader==0.11.1",
+    "plotly==6.3.0",
+    "pybind11==3.0.2",
+    "pydantic==2.12.5",
+    "riskfolio-lib==7.2.1",
+    "scipy==1.17.1",
+    "seaborn==0.13.2",
+    "setuptools==82.0.0",
+    "streamlit==1.55.0",
+    "tabulate==0.10.0",
+    "torch==2.10.0",
+    "vectorbt==0.28.1",
+    "yfinance==0.2.66",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.13,<3.14"
-numpy = "^2.0.0"
-pandas = "^2.2.2"
-yfinance = "^0.2.40"
-pybind11 = "^3.0.0"
-cvxpy = "^1.7.1"
-riskfolio-lib = "^7.0.1"
-mosek = "11.0.27"
-plotly = "6.3.0"
-seaborn = "^0.13.2"
-optuna = "4.6.0"
-torch = "2.10.0"
-gpytorch = "^1.15.2"
-mlflow = "^3.3.2"
-pydantic = "2.12.5"
-botorch = "0.18.1"
-vectorbt = "0.28.1"
-pandas-datareader = "^0.10.0"
-scipy = "1.17.1"
-streamlit = "^1.43.2"
+[dependency-groups]
+dev = [
+    "jupyter==1.1.1",
+    "pre-commit==4.5.1",
+    "pytest==9.0.2",
+    "pytest-cov==7.0.0",
+    "ruff==0.15.4",
+]
 
-[tool.poetry.group.dev.dependencies]
-jupyter = "^1.0.0"
-ruff = "0.15.4"
-pytest = "9.0.2"
-pytest-cov = "7.0.0"
-pre-commit = "4.5.1"
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["bayesfolio"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "AGENTS.md",
+    "README.md",
+    "bayesfolio",
+    "docs",
+    "scripts",
+    "tests",
+]
 
 [tool.ruff]
 extend-exclude = ["experiments"]
@@ -41,10 +64,6 @@ target-version = "py313"
 
 [tool.ruff.lint]
 extend-select = ["A", "E501", "I"]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

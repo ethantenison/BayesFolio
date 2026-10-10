@@ -1,9 +1,9 @@
 """Audit module and public-symbol docstring coverage.
 
 Usage:
-    poetry run python scripts/audit_doc_coverage.py
-    poetry run python scripts/audit_doc_coverage.py --include-tests
-    poetry run python scripts/audit_doc_coverage.py --output docs/refactor/docstring_inventory.md
+    uv run python scripts/audit_doc_coverage.py
+    uv run python scripts/audit_doc_coverage.py --include-tests
+    uv run python scripts/audit_doc_coverage.py --output docs/refactor/docstring_inventory.md
 
 This script scans Python files in the repository and reports missing:
 - top-level module docstrings

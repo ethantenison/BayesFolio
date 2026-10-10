@@ -1,3 +1,5 @@
+"""Riskfolio adapters for scenario-based and historical-return optimization."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -44,6 +46,7 @@ def optimize_from_historical_returns(
             Returns must be decimal units (0.02 = 2%).
         request: Optimization command with objective/risk settings.
             ``max_weight`` maps to Riskfolio upper-long bound (``u``).
+            ``alpha`` maps to Riskfolio's downside-risk tail probability.
 
     Returns:
         OptimizeResult with stable ``asset_order`` and decimal weights.
@@ -77,6 +80,7 @@ def optimize_from_historical_returns(
         # nea must be strictly less than n_assets; equal forces equal-weighting.
         capped_nea = max(1, min(int(request.nea), n_assets - 1))
         portfolio = rp.Portfolio(returns=clean_returns, nea=capped_nea)
+        portfolio.alpha = float(request.alpha)
         portfolio.card = None
         # Apply per-asset weight bounds from the request.
         portfolio.upperlng = max(float(request.max_weight), 1.0 / n_assets)

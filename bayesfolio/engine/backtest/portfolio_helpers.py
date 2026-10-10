@@ -1,3 +1,5 @@
+"""Helpers for rolling Riskfolio portfolio backtests."""
+
 import numpy as np
 import pandas as pd
 import riskfolio as rp
@@ -117,6 +119,7 @@ def riskfolio_returns_rolling(
 
         # 3) Build portfolio
         port = rp.Portfolio(returns=R_hist_v, nea=getattr(config, "nea", 10))
+        port.alpha = float(config.alpha)
 
         # Provide expected returns with labels (Riskfolio expects indexed structure)
         port.mu = pd.DataFrame(mu_v, columns=["mu"])
@@ -432,6 +435,17 @@ def portfolio_stats(ret: pd.Series, periods_per_year=12):
 
 
 def assessing_long_short_performance(y_true: pd.DataFrame, y_pred: pd.DataFrame, label: str = "model"):
+    """Summarize long-short performance from realized and predicted returns.
+
+    Args:
+        y_true: Realized periodic returns by asset in decimal units.
+        y_pred: Predicted periodic returns aligned to ``y_true``.
+        label: Prefix applied to returned metric names.
+
+    Returns:
+        Mapping of labeled portfolio-performance metrics.
+    """
+
     ls_ret = long_short_returns(y_true, y_pred)
     stats = portfolio_stats(ls_ret, periods_per_year=12)
     stats = {f"{label}/{k}": v for k, v in stats.items()}
@@ -443,5 +457,16 @@ def assess_performance(
     label: str,
     periods_per_year: int = 12,
 ):
+    """Summarize a periodic return series with labeled metric names.
+
+    Args:
+        ret: Periodic portfolio returns in decimal units.
+        label: Prefix applied to returned metric names.
+        periods_per_year: Number of return periods used for annualization.
+
+    Returns:
+        Mapping of labeled portfolio-performance metrics.
+    """
+
     stats = portfolio_stats(ret, periods_per_year)
     return {f"{label}/{k}": v for k, v in stats.items()}

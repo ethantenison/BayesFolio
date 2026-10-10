@@ -312,6 +312,8 @@ class RiskfolioConfig(BaseModel):
         model: Portfolio optimization method.
         rm: Risk measure.
         rf: Risk-free rate.
+        alpha: Dimensionless tail probability in ``(0, 1)`` for downside-risk
+            measures such as CVaR; ``0.05`` denotes a 5% tail.
         ra: Risk aversion factor of the Utility objective function. Also known as lambda.
         hist: Use historical data for risk estimation.
         obj: Objective for portfolio optimization.
@@ -325,6 +327,12 @@ class RiskfolioConfig(BaseModel):
     model: OptModel = Field(OptModel.CLASSIC, description="Portfolio optimization method")
     rm: RiskMeasure = Field(RiskMeasure.MV, description="Risk measure")
     rf: float = Field(0.0, description="Risk-free rate")
+    alpha: float = Field(
+        0.05,
+        gt=0.0,
+        lt=1.0,
+        description="Dimensionless tail probability for downside-risk measures; 0.05 denotes a 5% tail.",
+    )
     ra: float = Field(0.5, description="Risk aversion factor of the Utility objective function. Also known as lambda.")
     hist: bool = Field(True, description="Use historical data for risk estimation")
     obj: Objective = Field(Objective.SHARPE, description="Objective for portfolio optimization")

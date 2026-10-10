@@ -1,11 +1,13 @@
+"""Tests for the monthly portfolio automation workflow."""
+
 from __future__ import annotations
 
 from contextlib import nullcontext
 from datetime import date
-from pathlib import Path
 
 import pandas as pd
 import torch
+from pydantic import BaseModel
 
 from bayesfolio.contracts.commands.features import BuildFeaturesDatasetCommand
 from bayesfolio.contracts.commands.monthly_portfolio import (
@@ -32,10 +34,11 @@ from bayesfolio.contracts.results.gp_workflow import (
     NormalizationStats,
 )
 from bayesfolio.contracts.results.optimize import OptimizeResult
+from bayesfolio.contracts.results.report import ArtifactPointer
 from bayesfolio.core.settings import Horizon, Interval, RiskfolioConfig
 from bayesfolio.engine.automation.monthly_portfolio import (
     MonthlyPortfolioRuntimeDependencies,
-    run_monthly_portfolio,
+    execute_monthly_portfolio,
 )
 
 
@@ -59,16 +62,57 @@ class _FakeModel:
 
 
 class _StubArtifactStore:
-    def __init__(self, base_dir: Path) -> None:
-        self.base_dir = base_dir
+    pass
 
 
 class _StubProviders:
     pass
 
 
-def test_monthly_portfolio_runner_outputs_result(monkeypatch, tmp_path: Path) -> None:
-    features_path = tmp_path / "features.parquet"
+class _FakeRunIO:
+    def __init__(self, frame: pd.DataFrame) -> None:
+        self.frame = frame
+        self.logged_contracts: list[str] = []
+        self.loaded_uris: list[str] = []
+        self.saved_frames: dict[str, pd.DataFrame] = {}
+        self.saved_contracts: dict[str, BaseModel] = {}
+        self.source_revision_logged = False
+
+    def start_run(self, *, run_name: str):
+        assert run_name == "monthly_portfolio_2026-05-31"
+        return nullcontext(object())
+
+    def log_contract(self, name: str, payload: BaseModel) -> None:
+        self.logged_contracts.append(name)
+
+    def log_source_revision(self) -> None:
+        self.source_revision_logged = True
+
+    def load_parquet(self, uri: str) -> pd.DataFrame:
+        self.loaded_uris.append(uri)
+        return self.frame.copy()
+
+    def save_csv(self, frame: pd.DataFrame, relative_path: str) -> ArtifactPointer:
+        self.saved_frames[relative_path] = frame.copy()
+        content = frame.to_csv(index=False).encode("utf-8")
+        return ArtifactPointer(
+            path=f"memory://{relative_path}",
+            artifact_format="csv",
+            digest="digest",
+            byte_size=len(content),
+        )
+
+    def save_json_contract(self, payload: BaseModel, relative_path: str) -> ArtifactPointer:
+        self.saved_contracts[relative_path] = payload
+        return ArtifactPointer(
+            path=f"memory://{relative_path}",
+            artifact_format="json",
+            digest="digest",
+            byte_size=1,
+        )
+
+
+def test_monthly_portfolio_runner_outputs_result(monkeypatch) -> None:
     frame = pd.DataFrame(
         {
             "date": [
@@ -86,10 +130,13 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch, tmp_path: Path) ->
             "y_excess_lead": [0.01, 0.02, 0.015, 0.03, 0.04, 0.025],
         }
     )
-    frame.to_parquet(features_path, index=False)
-
     features_result = FeaturesDatasetResult(
-        artifact=FeaturesArtifactPointer(uri=str(features_path), fingerprint="abc", row_count=6, column_count=6),
+        artifact=FeaturesArtifactPointer(
+            uri="memory://features.parquet",
+            fingerprint="abc",
+            row_count=6,
+            column_count=6,
+        ),
         index_info=IndexInfo(
             interval=Interval.DAILY,
             horizon=Horizon.MONTHLY,
@@ -189,8 +236,8 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch, tmp_path: Path) ->
             posterior_scenario_count=3,
             rank=2,
         ),
-        riskfolio=RiskfolioConfig(nea=1),
-        artifacts=MonthlyPortfolioArtifactsConfig(artifact_root=str(tmp_path), save_summary_json=True),
+        riskfolio=RiskfolioConfig(alpha=0.5, nea=1),
+        artifacts=MonthlyPortfolioArtifactsConfig(artifact_root="unused", save_summary_json=True),
     )
 
     monkeypatch.setattr(
@@ -201,19 +248,24 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch, tmp_path: Path) ->
         "bayesfolio.engine.automation.monthly_portfolio._run_fixed_monthly_gp",
         lambda training_df, command: gp_artifacts,
     )
+    captured: dict[str, object] = {}
+
+    def _fake_optimize(returns, request):
+        captured["request"] = request
+        return OptimizeResult(asset_order=returns.columns.tolist(), weights=[0.55, 0.45])
+
     monkeypatch.setattr(
         "bayesfolio.engine.automation.monthly_portfolio.optimize_from_historical_returns",
-        lambda returns, request: OptimizeResult(asset_order=returns.columns.tolist(), weights=[0.55, 0.45]),
+        _fake_optimize,
     )
-    monkeypatch.setattr("mlflow.start_run", lambda run_name=None: nullcontext())
-    monkeypatch.setattr("mlflow.log_dict", lambda *args, **kwargs: None)
-    monkeypatch.setattr("mlflow.log_param", lambda *args, **kwargs: None)
+    run_io = _FakeRunIO(frame)
 
-    result = run_monthly_portfolio(
+    result = execute_monthly_portfolio(
         command,
         dependencies=MonthlyPortfolioRuntimeDependencies(
             feature_providers=_StubProviders(),
-            artifact_store=_StubArtifactStore(tmp_path),
+            artifact_store=_StubArtifactStore(),
+            run_io=run_io,
         ),
     )
 
@@ -226,3 +278,39 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch, tmp_path: Path) ->
     assert helper_prediction.eligible_for_final_portfolio is False
     assert result.artifacts.summary_json is not None
     assert result.gp_workflow_result.planner_client_status == "deterministic_default"
+    assert captured["request"].alpha == 0.5
+    assert run_io.loaded_uris == ["memory://features.parquet"]
+    assert run_io.source_revision_logged is True
+    assert run_io.logged_contracts == [
+        "monthly_portfolio_command",
+        "features_result",
+        "gp_workflow_result",
+        "forecast_result",
+        "optimize_result",
+        "monthly_portfolio_result",
+    ]
+    run_prefix = "monthly_portfolio_2026-05-31/monthly_portfolio_2026-05-31"
+    assert set(run_io.saved_frames) == {
+        f"{run_prefix}_posterior_scenarios.csv",
+        f"{run_prefix}_predictions.csv",
+        f"{run_prefix}_weights.csv",
+    }
+    assert list(run_io.saved_frames[f"{run_prefix}_weights.csv"].columns) == ["asset", "weight"]
+    assert set(run_io.saved_contracts) == {f"{run_prefix}_summary.json"}
+
+
+def test_monthly_engine_requires_runtime_io() -> None:
+    command = MonthlyPortfolioCommand.model_construct()
+
+    try:
+        execute_monthly_portfolio(
+            command,
+            dependencies=MonthlyPortfolioRuntimeDependencies(
+                feature_providers=_StubProviders(),
+                artifact_store=_StubArtifactStore(),
+            ),
+        )
+    except ValueError as exc:
+        assert str(exc) == "Monthly engine execution requires an injected run_io adapter."
+    else:
+        raise AssertionError("Expected missing run_io to be rejected.")

@@ -126,6 +126,7 @@ Each top-level package has a single responsibility — never mix them:
 
 | Package | Responsibility |
 |---|---|
+| `bayesfolio/application/` | Composition roots that assemble engine workflows with concrete I/O adapters. |
 | `bayesfolio/contracts/` | Data schemas (Pydantic models) only. No business logic, no I/O. |
 | `bayesfolio/engine/` | Business logic only. Reads/writes contract objects. No direct I/O. |
 | `bayesfolio/core/` | App-wide settings, configs (`settings.py`), and primitive types (`types.py`). |
@@ -135,12 +136,14 @@ Each top-level package has a single responsibility — never mix them:
 - `io/` must **not** import from `engine/`.
 - `engine/` must **not** do direct file I/O or MLflow calls — delegate to `io/`.
 - `core/` must **not** import from any other `bayesfolio` package.
+- `application/` may import `contracts/`, `engine/`, and `io/` solely to assemble supported workflows.
 
 ### No Cross-Imports Between Domains
 
 Engine submodules (`agent`, `asset_allocation`, `backtest`, `features`, `forecast`, `report`, `scenarios`) are **leaf domains** and must not import from each other. (`mappers` is an intentional exception — see below.)
 
-- Cross-domain orchestration belongs in `engine/pipeline.py` or a dedicated pipeline module.
+- Cross-domain business sequencing belongs in `engine/pipeline.py` or a dedicated pipeline module; concrete runtime
+  assembly belongs in `application/`.
 - `engine/mappers/` is the only place allowed to bridge engine outputs to contract schemas; it may import from `contracts/` and individual engine leaf modules.
 - Never import a sibling engine module directly (e.g., `backtest` must not import from `forecast`).
 
@@ -148,6 +151,7 @@ Engine submodules (`agent`, `asset_allocation`, `backtest`, `features`, `forecas
 
 | What you are adding | Where it goes |
 |---|---|
+| End-to-end assembly of engine workflows and concrete I/O | `bayesfolio/application/` |
 | New data schema (command, result, or UI input) | `bayesfolio/contracts/commands/`, `contracts/results/`, or `contracts/ui/` |
 | New primitive type alias | `bayesfolio/core/types.py` |
 | New config/settings class | `bayesfolio/core/settings.py` |

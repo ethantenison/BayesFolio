@@ -6,7 +6,7 @@ This script fetches ETF excess return data and a full merged feature panel
 bayesfolio.contracts / io / engine.features stack.
 
 Usage:
-    poetry run python scratch/build_returns_dataset.py
+    uv run python scripts/build_returns_dataset.py
 
 Outputs (printed + available for downstream use):
     returns_wide  : pd.DataFrame  date × asset_id, y_excess_lead (decimal, 0.02 = 2%)

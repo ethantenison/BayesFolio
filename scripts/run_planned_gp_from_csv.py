@@ -5,7 +5,7 @@ BayesFolio's planner-driven GP workflow, and prints fit status with compiled
 mean/covariance configs.
 
 Usage:
-    poetry run python scripts/run_planned_gp_from_csv.py \
+    uv run python scripts/run_planned_gp_from_csv.py \
         --csv-path data.csv \
         --input-columns macro_1,macro_2,etf_1 \
         --target-column y_excess_lead \
@@ -13,7 +13,7 @@ Usage:
         --instruction-text "Use a matern kernel with ard for all input variables"
 
 Optional live planner mode:
-    poetry run python scripts/run_planned_gp_from_csv.py \
+    uv run python scripts/run_planned_gp_from_csv.py \
         --csv-path data.csv \
         --input-columns macro_1,macro_2,etf_1 \
         --target-column y_excess_lead \

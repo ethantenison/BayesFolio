@@ -32,8 +32,19 @@ def summarize_backtest(bt_df: pd.DataFrame):
 
 
 def opt_weights(excess_returns, risk_config):
+    """Optimize a portfolio and report its configured Riskfolio Sharpe value.
+
+    Args:
+        excess_returns: Periodic excess-return observations by asset in decimal units.
+        risk_config: Riskfolio configuration controlling estimation, risk, and constraints.
+
+    Returns:
+        Tuple containing the Riskfolio Sharpe value and the optimized weight array.
+    """
+
     # Initialize Riskfolio portfolio
     port = rp.Portfolio(returns=excess_returns)
+    port.alpha = float(risk_config.alpha)
     port.assets_stats(method_mu=risk_config.method_mu, method_cov=risk_config.method_cov)
     port.upperlng = risk_config.upperlng
     port.nea = risk_config.nea  # Update to use risk_config.nea
@@ -109,6 +120,7 @@ def backtest_portfolio(
 
             # Initialize Riskfolio portfolio
             port = rp.Portfolio(returns=train)
+            port.alpha = float(risk_config.alpha)
             port.assets_stats(method_mu=risk_config.method_mu, method_cov=risk_config.method_cov)
             port.upperlng = risk_config.upperlng
             port.nea = risk_config.nea  # Update to use risk_config.nea

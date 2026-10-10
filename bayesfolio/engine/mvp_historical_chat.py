@@ -389,6 +389,7 @@ def run_historical_mvp_pipeline(
         risk_measure=request.risk_measure,
         model=request.model,
         rf=request.rf,
+        alpha=_DEFAULT_RISKFOLIO.alpha,
         kelly=request.kelly,
         min_weight=request.min_weight,
         max_weight=request.max_weight,

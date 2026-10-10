@@ -1,10 +1,36 @@
 # Copilot Architecture Guardrails
 
+Status: Active
+
+Audience: Contributors, maintainers, and coding agents
+
+Canonical topic: Architecture rationale and boundaries
+
+Last verified: 2026-10-10
+
 ## Layer Ownership
 
 - `bayesfolio/contracts/`: boundary schemas only (Pydantic models, no business logic, no pandas dependency in contracts).
+- `bayesfolio/application/`: composition roots that assemble engine workflows with concrete I/O adapters.
 - `bayesfolio/engine/`: pure business logic and data transformations; no direct file/network I/O.
 - `bayesfolio/io/`: all external data access and artifact persistence.
+
+Dependency direction for supported workflows is `application -> engine` and `application -> io`. Engine and I/O modules
+communicate through engine-owned structural protocols; I/O does not import engine.
+
+## Monthly Automation Boundary
+
+- `application/monthly_portfolio.py` is the canonical default-wiring and user-facing execution entry point.
+- `engine/automation/monthly_portfolio.py` owns monthly feature, GP, forecast, scenario, and optimization sequencing.
+- `engine/automation/monthly_ports.py` defines the runtime side effects required by that engine workflow.
+- `io/monthly_portfolio_runtime.py` owns MLflow lifecycle and contract logging, Git revision discovery, parquet loading,
+  directory creation, index-free CSV persistence, JSON persistence, fingerprints, and artifact pointers.
+- The application layer injects providers, feature storage, and runtime I/O. Engine code does not inspect storage or
+  tracking implementation details, and the I/O adapter does not make modeling or portfolio decisions.
+
+The deprecated `engine.automation.run_monthly_portfolio` entry point is a narrowly scoped compatibility façade. It
+locally delegates default composition to `application/` and must not acquire direct I/O behavior. Remove this exception
+when the historical engine import path can be retired in a future breaking release.
 
 ## Feature Pipeline Placement
 
