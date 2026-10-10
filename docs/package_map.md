@@ -24,8 +24,8 @@ This is the canonical, high-signal routing map for `bayesfolio/`. Keep it concis
 ## Contracts
 
 - `contracts/base.py`: strict base models, schema identities, envelopes, and shared error shapes.
-- `contracts/commands/`: validated execution inputs, including feature, GP planner, and monthly portfolio commands.
-- `contracts/results/`: validated outputs, including feature, GP workflow, forecast, optimization, report, and monthly portfolio results.
+- `contracts/commands/`: validated execution inputs, including feature, GP planner, monthly portfolio, walk-forward backtest, and final-review commands.
+- `contracts/results/`: validated outputs, including feature, GP workflow, forecast, optimization, backtest, monthly candidate, and final-decision results.
 - `contracts/ui/`: UI-facing universe and scenario shapes.
 - `contracts/chat/`: parsed intent and tool-protocol schemas for agent and LLM boundaries.
 
@@ -34,6 +34,7 @@ Framework payloads from OpenAI, LangChain, LangSmith, LlamaIndex, or similar run
 ## Application
 
 - `application/monthly_portfolio.py`: canonical composition root for default providers, feature storage, monthly runtime I/O, and engine execution.
+- `application/monthly_decision.py`: canonical entry point for recording approval or rejection of a backtested monthly candidate.
 
 ## Engine
 
@@ -86,13 +87,20 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 - Scenario optimization: `bayesfolio.engine.asset_allocation.optimize_from_scenarios`
 - Historical-return optimization: `bayesfolio.engine.asset_allocation.optimize_from_historical_returns`
 - Weighted backtest: `bayesfolio.engine.backtest.run_weighted_backtest`
+- Candidate-to-period alignment: `bayesfolio.engine.backtest.build_walk_forward_period`
+- Walk-forward backtest: `bayesfolio.engine.backtest.run_walk_forward_backtest`
+- Final monthly decision: `bayesfolio.application.finalize_monthly_portfolio`
 
 ### Contracts
 
 - Monthly command: `bayesfolio.contracts.commands.MonthlyPortfolioCommand`
+- Walk-forward command: `bayesfolio.contracts.commands.WalkForwardBacktestCommand`
+- Finalize command: `bayesfolio.contracts.commands.FinalizeMonthlyPortfolioCommand`
 - Feature command: `bayesfolio.contracts.commands.BuildFeaturesDatasetCommand`
 - GP planner request: `bayesfolio.contracts.commands.GPPlannerRequest`
 - Monthly result: `bayesfolio.contracts.results.MonthlyPortfolioResult`
+- Walk-forward result: `bayesfolio.contracts.results.WalkForwardBacktestResult`
+- Final decision result: `bayesfolio.contracts.results.MonthlyPortfolioDecisionResult`
 - Chat contracts: `bayesfolio.contracts.chat`
 - UI contracts: `bayesfolio.contracts.ui`
 

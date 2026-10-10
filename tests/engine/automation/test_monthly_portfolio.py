@@ -270,6 +270,7 @@ def test_monthly_portfolio_runner_outputs_result(monkeypatch) -> None:
         ),
     )
 
+    assert result.strategy_id == command.strategy_id
     assert result.run_label == "monthly_portfolio_2026-05-31"
     assert result.final_portfolio_universe == ["SPY", "VTV"]
     assert result.optimize_result.asset_order == ["SPY", "VTV"]

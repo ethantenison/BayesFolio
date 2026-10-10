@@ -80,7 +80,8 @@ Monthly ETF and macro data
     -> joint posterior return scenarios
     -> constrained portfolio optimization
     -> walk-forward backtest and review
-    -> candidate weights
+    -> explicit human approval or rejection
+    -> finalized weights when approved
     -> manual brokerage execution
 ```
 
@@ -106,6 +107,15 @@ Experiment findings remain evidence under `experiments/` until they are promoted
 Posterior samples provide plausible joint ETF return outcomes. The optimizer can use those scenarios to estimate expected return, covariance, and tail risk while applying explicit position and diversification constraints.
 
 Uncertainty does not eliminate the need for guardrails. Position caps, investable-universe rules, risk measures, turnover considerations, and review thresholds protect against model and optimization error. Candidate weights should never be interpreted as certain or automatically executable.
+
+Walk-forward evidence must pair weights fixed on a decision date with returns
+that become observable later. BayesFolio records both dates instead of guessing
+a shift from dataframe position. Candidate and backtest strategy identifiers
+must match, and evidence realized on or after the candidate as-of date cannot
+support that decision. Approval also requires at least one benchmark evaluated on the same
+decision/realization grid. Even valid comparative evidence does not approve a
+portfolio: finalized weights require a timestamped human approval and rejected
+candidates emit no final weights.
 
 ## Validation and Refactor Parity
 

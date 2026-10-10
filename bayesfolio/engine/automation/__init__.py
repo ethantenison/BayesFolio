@@ -1,5 +1,6 @@
 """Automation workflows for scheduled BayesFolio execution."""
 
+from bayesfolio.engine.automation.monthly_decision import finalize_monthly_portfolio
 from bayesfolio.engine.automation.monthly_portfolio import (
     MonthlyPortfolioRuntimeDependencies,
     execute_monthly_portfolio,
@@ -11,5 +12,6 @@ __all__ = [
     "MonthlyPortfolioRunIO",
     "MonthlyPortfolioRuntimeDependencies",
     "execute_monthly_portfolio",
+    "finalize_monthly_portfolio",
     "run_monthly_portfolio",
 ]

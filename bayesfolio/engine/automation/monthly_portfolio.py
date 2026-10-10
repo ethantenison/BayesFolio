@@ -246,6 +246,7 @@ def execute_monthly_portfolio(
             )
 
         result = MonthlyPortfolioResult(
+            strategy_id=command.strategy_id,
             as_of_date=command.as_of_date,
             run_label=run_label,
             training_universe=command.training_universe,

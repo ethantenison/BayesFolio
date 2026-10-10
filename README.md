@@ -13,7 +13,7 @@ BayesFolio is undergoing an active refactor toward a smaller, schema-first packa
 | ETF and macro feature construction | Implemented |
 | Configurable and planner-assisted multitask GP workflows | Implemented |
 | Fixed-default monthly forecast and optimization workflow | Implemented |
-| Backtesting and performance summaries | Implemented as separate workflows |
+| Walk-forward backtesting and explicit final portfolio review | Implemented |
 | Reproduction of the last accepted pre-refactor portfolio weights | Feature-artifact-to-weights parity implemented |
 | Direct Schwab execution and holdings synchronization | Planned |
 | Realized gain/loss and alpha tracking | Planned |
@@ -31,7 +31,7 @@ The package supports the main research stages needed for a monthly allocation de
 - evaluate configurations with backtests and diagnostics; and
 - persist predictions, scenarios, weights, contracts, and reproducibility metadata.
 
-The current `run_monthly_portfolio` workflow automates feature construction, strict as-of alignment, the accepted multitask GP fit, posterior forecasting, optimization, and artifact persistence. Training rows must precede the as-of date, and scoring rows must match it exactly. The application layer assembles concrete providers and runtime I/O while the engine owns computation and sequencing. Backtesting remains a separate evaluation step and should be completed before candidate weights are accepted.
+The current `run_monthly_portfolio` workflow automates feature construction, strict as-of alignment, the accepted multitask GP fit, posterior forecasting, optimization, and artifact persistence. Training rows must precede the as-of date, and scoring rows must match it exactly. The application layer assembles concrete providers and runtime I/O while the engine owns computation and sequencing. Its optimizer output is always a candidate. `run_walk_forward_backtest` evaluates dated weights against explicitly paired subsequent returns, and `finalize_monthly_portfolio` releases final weights only after a recorded human approval using evidence available strictly before the candidate's as-of date.
 
 ## Why Uncertainty Matters
 
@@ -48,8 +48,9 @@ As-of date and ETF universe
     -> multitask GP fit
     -> posterior predictions and joint scenarios
     -> constrained portfolio optimization
-    -> separate walk-forward backtest and configuration review
-    -> reviewed candidate portfolio weights
+    -> walk-forward backtest with explicit realization dates
+    -> recorded human approval or rejection
+    -> finalized portfolio weights when approved
     -> manual brokerage execution
 ```
 
@@ -87,6 +88,47 @@ uv run --locked python -c "from bayesfolio.contracts.commands import MonthlyPort
 There is not yet a stable CLI for the full monthly workflow. Research helpers under `scripts/` are not substitutes for the canonical monthly entry point.
 
 The former `bayesfolio.engine.automation.run_monthly_portfolio` import remains as a deprecated compatibility shim. New code should use the application entry point so concrete provider, storage, and MLflow assembly stays outside the engine.
+
+Walk-forward evaluation and final review are separate, explicit steps:
+
+```python
+from datetime import UTC, datetime
+
+from bayesfolio.application import finalize_monthly_portfolio
+from bayesfolio.contracts.commands import (
+    FinalizeMonthlyPortfolioCommand,
+    WalkForwardBacktestCommand,
+)
+from bayesfolio.engine.backtest import build_walk_forward_period, run_walk_forward_backtest
+
+period = build_walk_forward_period(
+    historical_candidate,
+    realization_date=next_month_end,
+    realized_returns=next_period_returns,
+)
+backtest_command = WalkForwardBacktestCommand(
+    strategy_id=historical_candidate.strategy_id,
+    periods=[period],
+)
+backtest_result = run_walk_forward_backtest(backtest_command)
+
+finalize_command = FinalizeMonthlyPortfolioCommand(
+    candidate=current_candidate,
+    backtest=backtest_result,
+    benchmarks=benchmark_results,
+    decision="approved",
+    reviewer="portfolio-owner",
+    reviewed_at=datetime.now(UTC),
+    rationale="Reviewed the recorded strategy and benchmark evidence.",
+)
+decision_result = finalize_monthly_portfolio(finalize_command)
+```
+
+`backtest_command` must pair each decision date with a later realization date,
+the weights fixed on the decision date, and subsequent realized returns.
+`finalize_command` must contain matching strategy evidence, at least one
+benchmark evaluated on the same dates, and an explicit timestamped human
+decision. Rejected candidates never expose finalized weights.
 
 ## Validation
 

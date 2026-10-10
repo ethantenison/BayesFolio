@@ -29,6 +29,7 @@
     }
   },
   "modeling": {
+    "strategy_id": "accepted_monthly_portfolio_v1",
     "as_of_date": "2026-06-30",
     "training_date_max": "2026-05-29",
     "training_row_count": 1134,

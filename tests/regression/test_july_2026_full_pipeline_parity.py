@@ -215,6 +215,7 @@ def test_july_2026_feature_gp_and_optimizer_match_golden_outputs(monkeypatch: py
         ),
     )
 
+    assert result.strategy_id == "accepted_monthly_portfolio_v1"
     scenario_path = "july_2026_full_pipeline_parity/july_2026_full_pipeline_parity_posterior_scenarios.csv"
     actual_scenarios = run_io.saved_frames[scenario_path].loc[:, FINAL_UNIVERSE]
     expected_scenarios = pd.read_csv(FIXTURE_DIR / "scenarios.csv")

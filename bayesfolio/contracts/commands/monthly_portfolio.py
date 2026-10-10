@@ -133,6 +133,8 @@ class MonthlyPortfolioCommand(VersionedContract):
     Attributes:
         schema: Contract schema identifier.
         schema_version: Semantic schema version.
+        strategy_id: Stable identifier for the model and optimization
+            configuration being evaluated and reviewed.
         as_of_date: Effective month-end date for the run.
         training_universe: Universe used to build features and fit the GP.
         final_portfolio_universe: Optional investable subset for final weights.
@@ -145,6 +147,7 @@ class MonthlyPortfolioCommand(VersionedContract):
 
     schema: Literal["bayesfolio.monthly_portfolio.command"] = "bayesfolio.monthly_portfolio.command"
     schema_version: Literal["0.1.0"] = "0.1.0"
+    strategy_id: str = Field(default="accepted_monthly_portfolio_v1", min_length=1)
     as_of_date: date
     training_universe: list[str] = Field(min_length=2)
     final_portfolio_universe: list[str] | None = None

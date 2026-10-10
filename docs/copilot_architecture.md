@@ -32,6 +32,22 @@ The deprecated `engine.automation.run_monthly_portfolio` entry point is a narrow
 locally delegates default composition to `application/` and must not acquire direct I/O behavior. Remove this exception
 when the historical engine import path can be retired in a future breaking release.
 
+## Backtest and Final-Decision Boundary
+
+- `engine/backtest/runner.py` evaluates serialized walk-forward periods. Every
+  period identifies a decision date, a later realization date, fixed weights,
+  and subsequent realized returns; the engine does not infer date shifts.
+- `engine/automation/monthly_decision.py` is the pure final-review gate. It
+  requires matching candidate/backtest strategy identifiers and rejects
+  evidence unavailable strictly before the candidate as-of date. Approval
+  requires at least one distinct benchmark on the identical evaluation grid.
+- `application/monthly_decision.py` is the preferred public entry point for the
+  review gate.
+- A `MonthlyPortfolioResult` contains candidate optimizer weights. Only an
+  approved `MonthlyPortfolioDecisionResult` contains finalized weights, and
+  approval must be explicit human input. Brokerage execution remains outside
+  this boundary.
+
 ## Feature Pipeline Placement
 
 - Put new build commands/results in `contracts/commands/` and `contracts/results/`.
