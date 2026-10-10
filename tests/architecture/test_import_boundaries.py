@@ -125,3 +125,27 @@ def test_monthly_orchestrator_has_no_direct_runtime_io() -> None:
             violations.append(f"{source_path.relative_to(REPOSITORY_ROOT)}:{node.lineno}: {name}()")
 
     assert not violations, "Direct monthly runtime I/O:\n" + "\n".join(sorted(violations))
+
+
+def test_brokerage_and_performance_domains_are_pure_leaf_modules() -> None:
+    """Keep new account and measurement domains free of sibling or I/O imports."""
+
+    violations: list[str] = []
+    for domain in ("brokerage", "performance"):
+        domain_root = PACKAGE_ROOT / "engine" / domain
+        own_package = f"bayesfolio.engine.{domain}"
+        for source_path in sorted(domain_root.rglob("*.py")):
+            for line_number, imported_module in _iter_import_targets(source_path):
+                if _is_package_or_child(imported_module, "bayesfolio.io"):
+                    violations.append(
+                        f"{source_path.relative_to(REPOSITORY_ROOT)}:{line_number}: imports {imported_module}"
+                    )
+                if _is_package_or_child(imported_module, "bayesfolio.engine") and not _is_package_or_child(
+                    imported_module,
+                    own_package,
+                ):
+                    violations.append(
+                        f"{source_path.relative_to(REPOSITORY_ROOT)}:{line_number}: imports sibling {imported_module}"
+                    )
+
+    assert not violations, "New engine leaf-domain violations:\n" + "\n".join(sorted(violations))

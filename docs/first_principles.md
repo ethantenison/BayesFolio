@@ -149,6 +149,21 @@ configuration remains the best future model.
 - Current outputs do not account for every brokerage, tax, liquidity, or execution constraint.
 - Forecasts and backtests do not establish future alpha.
 
+Live performance measurement is distinct from backtesting. Brokerage or
+performance providers must supply returns that correctly account for external
+cash-flow timing; BayesFolio does not infer time-weighted performance from
+period-end balances alone. The tracking result reports realized and unrealized
+gain/loss changes, fees, benchmark-relative return, tracking error, information
+ratio, beta, and a descriptive single-benchmark Jensen alpha estimate. That
+estimate is not causal proof of skill and is unidentified when there are fewer
+than two periods or the benchmark has no variance.
+
+An approved portfolio decision is still not a trade. Rebalance planning uses a
+fresh read-only account snapshot and emits dollar notionals marked as
+non-executable. Quantity rounding, fractional shares, tax lots, order types,
+price protection, authentication, and explicit order authorization belong to a
+future broker adapter and execution workflow.
+
 ## Current Implementation Map
 
 - Feature construction: `bayesfolio/engine/features/`
@@ -163,4 +178,6 @@ configuration remains the best future model.
 
 Detailed API behavior belongs in module, class, and function docstrings. See the [package map](package_map.md) for preferred public entry points and the [architecture guardrails](copilot_architecture.md) for ownership rules.
 
-Direct Schwab execution, holdings synchronization, realized gain/loss tracking, and alpha attribution are planned boundaries, not current capabilities.
+Broker-neutral holdings, planning, and realized performance boundaries are
+implemented. Direct Schwab authentication, holdings retrieval, and order
+execution remain future I/O/application capabilities.

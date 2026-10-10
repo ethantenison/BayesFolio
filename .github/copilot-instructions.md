@@ -140,7 +140,7 @@ Each top-level package has a single responsibility — never mix them:
 
 ### No Cross-Imports Between Domains
 
-Engine submodules (`agent`, `asset_allocation`, `backtest`, `features`, `forecast`, `report`, `scenarios`) are **leaf domains** and must not import from each other. (`mappers` is an intentional exception — see below.)
+Engine submodules (`agent`, `asset_allocation`, `backtest`, `brokerage`, `features`, `forecast`, `performance`, `report`, `scenarios`) are **leaf domains** and must not import from each other. (`mappers` is an intentional exception — see below.)
 
 - Cross-domain business sequencing belongs in `engine/pipeline.py` or a dedicated pipeline module; concrete runtime
   assembly belongs in `application/`.
@@ -158,6 +158,8 @@ Engine submodules (`agent`, `asset_allocation`, `backtest`, `features`, `forecas
 | Forecasting logic | `bayesfolio/engine/forecast/` |
 | Portfolio optimization logic | `bayesfolio/engine/asset_allocation/` |
 | Backtesting logic | `bayesfolio/engine/backtest/` |
+| Brokerage-neutral account ports and rebalance planning | `bayesfolio/engine/brokerage/` |
+| Realized performance and benchmark-relative measurement | `bayesfolio/engine/performance/` |
 | Feature engineering | `bayesfolio/engine/features/` |
 | Scenario sampling | `bayesfolio/engine/scenarios/` |
 | Reporting or visualization | `bayesfolio/engine/report/` |

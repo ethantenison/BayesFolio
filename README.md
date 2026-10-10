@@ -15,8 +15,9 @@ BayesFolio is undergoing an active refactor toward a smaller, schema-first packa
 | Fixed-default monthly forecast and optimization workflow | Implemented |
 | Walk-forward backtesting and explicit final portfolio review | Implemented |
 | Reproduction of the last accepted pre-refactor portfolio weights | Feature-artifact-to-weights parity implemented |
-| Direct Schwab execution and holdings synchronization | Planned |
-| Realized gain/loss and alpha tracking | Planned |
+| Brokerage-neutral holdings and rebalance-planning boundary | Implemented; Schwab adapter planned |
+| Realized gain/loss and benchmark-relative alpha tracking | Implemented; account history adapter planned |
+| Direct Schwab order execution | Planned |
 
 ## What BayesFolio Does
 
@@ -171,7 +172,18 @@ Experiments are versioned evidence, not normative package documentation. They ar
 
 ## Roadmap
 
-Planned extensions include a Charles Schwab adapter, holdings synchronization, transaction tracking, realized gain/loss reporting, and attribution of portfolio performance and alpha. These capabilities need explicit contracts and I/O boundaries before implementation; none should be inferred from the current optimization output.
+The package now has explicit, broker-neutral boundaries for read-only account
+snapshots, non-executing dollar-notional rebalance plans, cash-flow-aware return
+periods, realized and unrealized gain/loss changes, fees, benchmark-relative
+performance, beta, and descriptive Jensen alpha. `build_rebalance_plan` always
+returns `executable=False`; it never creates or submits orders.
+
+A future Charles Schwab adapter belongs under `bayesfolio/io/` and can satisfy
+the structural account and performance reader protocols without moving broker
+logic into the engine. Live authentication, holdings synchronization, tax-lot
+selection, fractional-share capability, order previews, explicit execution
+authorization, and order submission remain planned. No current result should
+be treated as a brokerage order.
 
 ## Contributor Workflow
 

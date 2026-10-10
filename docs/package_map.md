@@ -24,8 +24,8 @@ This is the canonical, high-signal routing map for `bayesfolio/`. Keep it concis
 ## Contracts
 
 - `contracts/base.py`: strict base models, schema identities, envelopes, and shared error shapes.
-- `contracts/commands/`: validated execution inputs, including feature, GP planner, monthly portfolio, walk-forward backtest, and final-review commands.
-- `contracts/results/`: validated outputs, including feature, GP workflow, forecast, optimization, backtest, monthly candidate, and final-decision results.
+- `contracts/commands/`: validated execution inputs, including feature, GP planner, monthly portfolio, walk-forward backtest, final-review, rebalance-planning, and performance-tracking commands.
+- `contracts/results/`: validated outputs, including feature, GP workflow, forecast, optimization, backtest, monthly decision, brokerage snapshot/plan, and realized-performance results.
 - `contracts/ui/`: UI-facing universe and scenario shapes.
 - `contracts/chat/`: parsed intent and tool-protocol schemas for agent and LLM boundaries.
 
@@ -45,6 +45,8 @@ Framework payloads from OpenAI, LangChain, LangSmith, LlamaIndex, or similar run
 - `engine/forecast/`: forecast payloads, metrics, scaling, cross-validation, and GP modeling workflows.
 - `engine/asset_allocation/`: portfolio optimization logic and Riskfolio adaptation.
 - `engine/backtest/`: backtest execution and performance summaries.
+- `engine/brokerage/`: broker-neutral account-reader protocol and non-executing rebalance planning.
+- `engine/performance/`: externally measured return/P&L aggregation and benchmark-relative statistics.
 - `engine/scenarios/`: scenario sampling from predictive distributions.
 - `engine/report/`: report assembly and visualization logic.
 - `engine/mappers/`: the explicit contract-to-engine and engine-to-contract field-mapping bridge.
@@ -90,17 +92,24 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 - Candidate-to-period alignment: `bayesfolio.engine.backtest.build_walk_forward_period`
 - Walk-forward backtest: `bayesfolio.engine.backtest.run_walk_forward_backtest`
 - Final monthly decision: `bayesfolio.application.finalize_monthly_portfolio`
+- Non-executing rebalance plan: `bayesfolio.engine.brokerage.build_rebalance_plan`
+- Realized performance tracking: `bayesfolio.engine.performance.track_portfolio_performance`
 
 ### Contracts
 
 - Monthly command: `bayesfolio.contracts.commands.MonthlyPortfolioCommand`
 - Walk-forward command: `bayesfolio.contracts.commands.WalkForwardBacktestCommand`
 - Finalize command: `bayesfolio.contracts.commands.FinalizeMonthlyPortfolioCommand`
+- Rebalance command: `bayesfolio.contracts.commands.BuildRebalancePlanCommand`
+- Performance command: `bayesfolio.contracts.commands.TrackPortfolioPerformanceCommand`
 - Feature command: `bayesfolio.contracts.commands.BuildFeaturesDatasetCommand`
 - GP planner request: `bayesfolio.contracts.commands.GPPlannerRequest`
 - Monthly result: `bayesfolio.contracts.results.MonthlyPortfolioResult`
 - Walk-forward result: `bayesfolio.contracts.results.WalkForwardBacktestResult`
 - Final decision result: `bayesfolio.contracts.results.MonthlyPortfolioDecisionResult`
+- Brokerage snapshot: `bayesfolio.contracts.results.BrokerageAccountSnapshot`
+- Rebalance plan: `bayesfolio.contracts.results.RebalancePlanResult`
+- Realized performance: `bayesfolio.contracts.results.PortfolioPerformanceResult`
 - Chat contracts: `bayesfolio.contracts.chat`
 - UI contracts: `bayesfolio.contracts.ui`
 

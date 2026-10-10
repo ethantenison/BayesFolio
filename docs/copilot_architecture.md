@@ -54,6 +54,24 @@ when the historical engine import path can be retired in a future breaking relea
 - Put feature engineering/transforms and orchestration in `engine/features/`.
 - Put fetch/persist adapters and providers in `io/`.
 
+## Brokerage and Performance Extension Boundary
+
+- `engine/brokerage/ports.py` defines the read-only structural account protocol.
+  A future `io` implementation satisfies it by shape and does not import the
+  engine package.
+- `engine/brokerage/planner.py` converts an approved portfolio decision plus a
+  fresh account snapshot into dollar-notional planning instructions. Its result
+  is permanently marked `executable=False`; it is not an order request.
+- `engine/performance/ports.py` defines the structural boundary for externally
+  measured, cash-flow-aware portfolio/benchmark return periods.
+- `engine/performance/tracker.py` aggregates returns, gain/loss changes, fees,
+  active risk, beta, and descriptive single-benchmark Jensen alpha without file,
+  network, or brokerage access.
+- Future Schwab authentication, account retrieval, and order execution belong
+  in `io/` plus an application composition root. Order submission requires a
+  separate explicit authorization contract and is not implied by final weights
+  or a rebalance plan.
+
 ## Transitional Rule
 
 Current `engine/features/asset_prices.py` and `engine/features/market_fundamentals.py` include legacy I/O helpers.
