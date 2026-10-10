@@ -52,11 +52,12 @@ def _command(
     *,
     decision: Literal["approved", "rejected"] = "approved",
     strategy_id: str = "strategy-v1",
+    realization_date: date = date(2026, 3, 31),
 ) -> FinalizeMonthlyPortfolioCommand:
     return FinalizeMonthlyPortfolioCommand(
         candidate=_candidate(),
-        backtest=_backtest(strategy_id=strategy_id),
-        benchmarks=[_backtest(strategy_id="equal-weight-v1")],
+        backtest=_backtest(strategy_id=strategy_id, realization_date=realization_date),
+        benchmarks=[_backtest(strategy_id="equal-weight-v1", realization_date=realization_date)],
         decision=decision,
         reviewer="portfolio-owner",
         reviewed_at=datetime(2026, 4, 30, 15, 0, tzinfo=UTC),
@@ -85,44 +86,10 @@ def test_decision_rejects_strategy_mismatch() -> None:
         finalize_monthly_portfolio(_command(strategy_id="different-strategy"))
 
 
-def test_decision_rejects_evidence_after_candidate_as_of_date() -> None:
-    command = FinalizeMonthlyPortfolioCommand(
-        candidate=_candidate(),
-        backtest=_backtest(realization_date=date(2026, 5, 31)),
-        benchmarks=[
-            _backtest(
-                strategy_id="equal-weight-v1",
-                realization_date=date(2026, 5, 31),
-            )
-        ],
-        decision="approved",
-        reviewer="portfolio-owner",
-        reviewed_at=datetime(2026, 4, 30, 15, 0, tzinfo=UTC),
-        rationale="This should be rejected because the evidence is from the future.",
-    )
-
+@pytest.mark.parametrize("realization_date", [date(2026, 4, 30), date(2026, 5, 31)])
+def test_decision_rejects_evidence_not_strictly_before_candidate(realization_date: date) -> None:
     with pytest.raises(ValueError, match="strictly before the candidate as_of_date"):
-        finalize_monthly_portfolio(command)
-
-
-def test_decision_rejects_evidence_realized_on_candidate_date() -> None:
-    command = FinalizeMonthlyPortfolioCommand(
-        candidate=_candidate(),
-        backtest=_backtest(realization_date=date(2026, 4, 30)),
-        benchmarks=[
-            _backtest(
-                strategy_id="equal-weight-v1",
-                realization_date=date(2026, 4, 30),
-            )
-        ],
-        decision="approved",
-        reviewer="portfolio-owner",
-        reviewed_at=datetime(2026, 4, 30, 15, 0, tzinfo=UTC),
-        rationale="Same-day evidence must not support the candidate decision.",
-    )
-
-    with pytest.raises(ValueError, match="strictly before the candidate as_of_date"):
-        finalize_monthly_portfolio(command)
+        finalize_monthly_portfolio(_command(realization_date=realization_date))
 
 
 def test_decision_contract_rejects_review_before_candidate_date() -> None:

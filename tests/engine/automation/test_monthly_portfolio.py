@@ -6,8 +6,9 @@ from contextlib import nullcontext
 from datetime import date
 
 import pandas as pd
+import pytest
 import torch
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from bayesfolio.contracts.commands.features import BuildFeaturesDatasetCommand
 from bayesfolio.contracts.commands.monthly_portfolio import (
@@ -360,7 +361,11 @@ def test_monthly_feature_alignment_excludes_as_of_labels_and_future_rows() -> No
 def test_monthly_forecast_defaults_capture_accepted_model_controls() -> None:
     forecast = MonthlyForecastConfig()
 
+    assert forecast.seed == 0
     assert forecast.maxiter == 75
     assert forecast.input_transform == "botorch_normalize"
     assert forecast.time_modulation == "lengthscale_only"
     assert forecast.task_covar_prior == "none"
+
+    with pytest.raises(ValidationError, match="seed"):
+        MonthlyForecastConfig.model_validate({"seed": None})

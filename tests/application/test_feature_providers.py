@@ -5,7 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+import pytest
+
 from bayesfolio.application import make_default_feature_providers
+from bayesfolio.engine.features import make_default_feature_providers as make_legacy_feature_providers
 from bayesfolio.engine.features.market_fundamentals import fetch_enhanced_macro_features
 from bayesfolio.io import EtfFeaturesProvider, MacroProvider, ReturnsProvider
 
@@ -43,3 +46,12 @@ def test_make_default_feature_providers_allows_cacheless_runtime() -> None:
     assert macro_provider._fetcher is fetch_enhanced_macro_features
     assert macro_provider._max_retries == 1
     assert macro_provider._retry_backoff_seconds == 0.0
+
+
+def test_legacy_provider_factory_delegates_with_a_warning() -> None:
+    with pytest.warns(DeprecationWarning, match="bayesfolio.application"):
+        providers = make_legacy_feature_providers(cache_root=None)
+
+    assert providers.returns_provider is not None
+    assert providers.macro_provider is not None
+    assert providers.etf_features_provider is not None
