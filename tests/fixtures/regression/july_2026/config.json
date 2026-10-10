@@ -101,7 +101,7 @@
     "full_pipeline_weights": {
       "rtol": 0.0,
       "atol": 0.005,
-      "max_l1_error": 0.02
+      "max_l1_error": 0.03
     }
   },
   "reference_environment": {

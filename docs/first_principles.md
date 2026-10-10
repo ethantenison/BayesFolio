@@ -134,7 +134,7 @@ the last accepted pre-refactor July 2026 feature artifact, GP predictions and
 scenarios, and portfolio weights through the maintained application entry
 point. The cross-platform full-pipeline gate allows `0.005` absolute
 scenario/return-prediction error, `0.01` dimensionless standardized-score
-error, `0.005` per-asset weight error, and `0.02` total weight L1 error. The
+error, `0.005` per-asset weight error, and `0.03` total weight L1 error. The
 optimizer-only replay from frozen scenarios keeps near-exact tolerances. This
 parity evidence protects against material refactor drift without treating
 platform-level numerical differences as behavioral changes; it does not

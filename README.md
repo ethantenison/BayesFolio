@@ -162,7 +162,7 @@ GP fitting, posterior sampling, and Riskfolio optimization. The historical
 dirty source state was recovered in commit `948ba4e`; the maintained workflow
 reproduces its scenarios and return predictions within `0.005` absolute
 tolerance, standardized forecast scores within `0.01`, and its accepted weights
-within `0.005` per asset and `0.02` total L1 error across supported platforms.
+within `0.005` per asset and `0.03` total L1 error across supported platforms.
 The optimizer-only replay from frozen scenarios retains near-exact weight
 tolerances.
 
