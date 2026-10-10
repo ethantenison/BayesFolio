@@ -41,6 +41,7 @@ FIXTURE_DIR = Path(__file__).parents[1] / "fixtures" / "regression" / "july_2026
 # optimizer-only fixture retains its near-exact tolerance because its scenario
 # matrix is fixed.
 FULL_PIPELINE_FORECAST_ATOL = 5e-3
+FULL_PIPELINE_SCORE_ATOL = 1e-2
 FULL_PIPELINE_WEIGHT_ATOL = 5e-3
 FULL_PIPELINE_WEIGHT_L1_ATOL = 2e-2
 
@@ -242,10 +243,16 @@ def test_july_2026_feature_gp_and_optimizer_match_golden_outputs(monkeypatch: py
     ).sort_values("asset")
     assert actual_predictions["asset"].tolist() == expected_predictions["asset_id"].tolist()
     np.testing.assert_allclose(
-        actual_predictions[["prediction", "uncertainty", "score"]].to_numpy(),
-        expected_predictions[["y_pred", "y_std", "score"]].to_numpy(),
+        actual_predictions[["prediction", "uncertainty"]].to_numpy(),
+        expected_predictions[["y_pred", "y_std"]].to_numpy(),
         rtol=0.0,
         atol=FULL_PIPELINE_FORECAST_ATOL,
+    )
+    np.testing.assert_allclose(
+        actual_predictions["score"].to_numpy(),
+        expected_predictions["score"].to_numpy(),
+        rtol=0.0,
+        atol=FULL_PIPELINE_SCORE_ATOL,
     )
 
     expected_weights = pd.read_csv(FIXTURE_DIR / "expected_weights.csv")

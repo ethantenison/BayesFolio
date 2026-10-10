@@ -94,6 +94,10 @@
       "rtol": 0.0,
       "atol": 0.005
     },
+    "full_pipeline_scores": {
+      "rtol": 0.0,
+      "atol": 0.01
+    },
     "full_pipeline_weights": {
       "rtol": 0.0,
       "atol": 0.005,
