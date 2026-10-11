@@ -63,8 +63,12 @@ delegates to `application/feature_providers.py` and contains no concrete provide
 ## Brokerage and Performance Extension Boundary
 
 - `engine/brokerage/ports.py` defines the read-only structural account protocol.
-  A future `io` implementation satisfies it by shape and does not import the
-  engine package.
+  `io/schwab/` satisfies it by shape without importing the engine package and
+  owns Apple credential access, OAuth tokens, and GET-only Schwab retrieval.
+- `application/schwab_account.py` is the composition root for the Schwab
+  adapter. It exposes authorization, redacted account discovery, and validated
+  account snapshots without exposing an order API. The default-account alias
+  and opaque reference are local I/O preferences stored in macOS Keychain.
 - `engine/brokerage/planner.py` converts an approved portfolio decision plus a
   fresh account snapshot into dollar-notional planning instructions. Its result
   is permanently marked `executable=False`; it is not an order request.
@@ -73,8 +77,8 @@ delegates to `application/feature_providers.py` and contains no concrete provide
 - `engine/performance/tracker.py` aggregates returns, gain/loss changes, fees,
   active risk, beta, and descriptive single-benchmark Jensen alpha without file,
   network, or brokerage access.
-- Future Schwab authentication, account retrieval, and order execution belong
-  in `io/` plus an application composition root. Order submission requires a
+- Schwab authentication and account retrieval belong in `io/` plus the
+  application composition root. Any future order submission requires a
   separate explicit authorization contract and is not implied by final weights
   or a rebalance plan.
 

@@ -2,7 +2,8 @@
 
 BayesFolio is a monthly, uncertainty-aware ETF portfolio research workflow for a retirement IRA. It combines ETF and macroeconomic data, multitask Gaussian process forecasts, posterior scenarios, portfolio optimization, and out-of-sample evaluation to produce candidate portfolio weights.
 
-BayesFolio is research and decision-support software. It does not place trades, connect to Charles Schwab, or provide financial advice.
+BayesFolio is research and decision-support software. It can read a user-authorized
+Charles Schwab retail account, but it does not place trades or provide financial advice.
 
 ## Status
 
@@ -17,7 +18,7 @@ evidence for the last accepted pre-refactor portfolio.
 | Fixed-default monthly forecast and optimization workflow | Implemented |
 | Walk-forward backtesting and explicit final portfolio review | Implemented |
 | Reproduction of the last accepted pre-refactor portfolio weights | Feature-artifact-to-weights parity implemented |
-| Brokerage-neutral holdings and rebalance-planning boundary | Implemented; Schwab adapter planned |
+| Read-only Schwab holdings and brokerage-neutral rebalance planning | Implemented |
 | Realized gain/loss and benchmark-relative alpha tracking | Implemented; account history adapter planned |
 | Direct Schwab order execution | Planned |
 
@@ -68,6 +69,14 @@ uv sync --locked --all-groups
 ```
 
 Some data providers require network access. MLflow tracking and artifact locations are configured by the command or runtime environment used for a run.
+
+## Connecting a Schwab Retail IRA
+
+BayesFolio supports user-authorized, read-only balances, positions, and
+transactions through Schwab Trader API - Individual. It exposes no order-entry
+operations. See [Read-Only Schwab Account Access](docs/schwab_read_only.md) for
+the Schwab application settings, macOS Keychain setup, authorization command,
+and security boundary.
 
 ## Running the Monthly Workflow
 
@@ -172,6 +181,7 @@ tolerances.
 - [First-principles modeling rationale](docs/first_principles.md)
 - [Architecture guardrails](docs/copilot_architecture.md)
 - [Package map and public entry points](docs/package_map.md)
+- [Read-only Schwab account access](docs/schwab_read_only.md)
 - [Agent roles and repository workflow](AGENTS.md)
 
 ## Experiments
@@ -193,12 +203,12 @@ periods, realized and unrealized gain/loss changes, fees, benchmark-relative
 performance, beta, and descriptive Jensen alpha. `build_rebalance_plan` always
 returns `executable=False`; it never creates or submits orders.
 
-A future Charles Schwab adapter belongs under `bayesfolio/io/` and can satisfy
-the structural account and performance reader protocols without moving broker
-logic into the engine. Live authentication, holdings synchronization, tax-lot
-selection, fractional-share capability, order previews, explicit execution
-authorization, and order submission remain planned. No current result should
-be treated as a brokerage order.
+The read-only Charles Schwab adapter lives under `bayesfolio/io/` and satisfies
+the structural account-reader protocol without moving broker logic into the
+engine. Historical valuation persistence, cash-flow-aware performance periods,
+tax-lot selection, fractional-share capability, order previews, explicit
+execution authorization, and order submission remain planned. No current
+result should be treated as a brokerage order.
 
 ## Contributor Workflow
 

@@ -20,6 +20,7 @@ dependencies = [
     "plotly==6.3.0",
     "pybind11==3.0.2",
     "pydantic==2.12.5",
+    "requests==2.34.2",
     "riskfolio-lib==7.2.1",
     "scipy==1.17.1",
     "seaborn==0.13.2",

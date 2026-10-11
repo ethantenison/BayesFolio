@@ -21,6 +21,14 @@ from bayesfolio.io.mlflow_logger import log_artifact_ref, log_contract
 from bayesfolio.io.parquet_store import write_parquet_with_metadata
 from bayesfolio.io.providers import EtfFeaturesProvider, MacroProvider, ReturnsProvider
 from bayesfolio.io.report_artifacts import persist_report_diagnostic_figures
+from bayesfolio.io.schwab import (
+    AppleKeychainCredentialStore,
+    AppleKeychainDefaultAccountStore,
+    AppleKeychainTokenStore,
+    SchwabBrokerageAccountReader,
+    SchwabOAuthClient,
+    SchwabReadOnlyClient,
+)
 
 __all__ = [
     "log_artifact_ref",
@@ -42,6 +50,12 @@ __all__ = [
     "EtfFeaturesProvider",
     "MacroProvider",
     "ReturnsProvider",
+    "AppleKeychainCredentialStore",
+    "AppleKeychainDefaultAccountStore",
+    "AppleKeychainTokenStore",
+    "SchwabBrokerageAccountReader",
+    "SchwabOAuthClient",
+    "SchwabReadOnlyClient",
     "sha256_digest",
     "sha256_fingerprint",
     "write_parquet_with_metadata",

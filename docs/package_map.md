@@ -34,6 +34,7 @@ Framework payloads from OpenAI, LangChain, LangSmith, LlamaIndex, or similar run
 
 - `application/monthly_portfolio.py`: canonical composition root for default providers, feature storage, monthly runtime I/O, and engine execution.
 - `application/monthly_decision.py`: canonical entry point for recording approval or rejection of a backtested monthly candidate.
+- `application/schwab_account.py`: canonical composition root for read-only Schwab OAuth, account discovery, and snapshots.
 
 ## Engine
 
@@ -64,6 +65,7 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 - `io/mlflow_logger.py`: MLflow contract and artifact logging.
 - `io/monthly_portfolio_runtime.py`: local artifact and MLflow implementation of the monthly runtime-I/O protocol.
 - `io/agent_tool_executor.py`: registry-backed execution of agent tool calls.
+- `io/schwab/`: Apple credential/default-account storage, Schwab OAuth, GET-only account access, and snapshot mapping.
 
 ## Preferred Public Entry Points
 
@@ -93,6 +95,7 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 - Walk-forward backtest: `bayesfolio.engine.backtest.run_walk_forward_backtest`
 - Final monthly decision: `bayesfolio.application.finalize_monthly_portfolio`
 - Non-executing rebalance plan: `bayesfolio.engine.brokerage.build_rebalance_plan`
+- Read-only Schwab account access: `bayesfolio.application.make_default_schwab_account_access`
 - Realized performance tracking: `bayesfolio.engine.performance.track_portfolio_performance`
 
 ### Contracts
@@ -117,6 +120,7 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 
 - Parquet artifact store: `bayesfolio.io.ParquetArtifactStore`
 - Providers: `bayesfolio.io.EtfFeaturesProvider`, `bayesfolio.io.MacroProvider`, `bayesfolio.io.ReturnsProvider`
+- Schwab adapter: `bayesfolio.io.SchwabBrokerageAccountReader`
 - Artifact backends: `bayesfolio.io.LocalArtifactBackend`, `bayesfolio.io.FsspecArtifactBackend`
 - Fingerprints: `bayesfolio.io.sha256_digest`, `bayesfolio.io.sha256_fingerprint`
 

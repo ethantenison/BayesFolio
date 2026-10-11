@@ -35,6 +35,7 @@ Higher-authority sources win. Correct a stale lower-authority source rather than
 | Prediction, uncertainty, and multitask GP rationale | [First principles](first_principles.md) | Users, modelers, and agents |
 | Architecture rationale and boundaries | [Architecture guardrails](copilot_architecture.md) | Contributors and agents |
 | Package ownership and public entry points | [Package map](package_map.md) | Contributors and agents |
+| Read-only Schwab connection | [Schwab account access](schwab_read_only.md) | Users and contributors |
 | Public API behavior | Module, class, and function docstrings | API consumers and agents |
 | Contract field semantics | Contract class `Attributes:` docstrings | API consumers and agents |
 | Experiments and dated findings | [`experiments/README.md`](../experiments/README.md) | Researchers |
@@ -76,6 +77,7 @@ Canonical documents should identify one or more of these audiences:
 - For contributor or agent rules, read [AGENTS.md](../AGENTS.md).
 - For a normative boundary decision, read the [Copilot instructions](../.github/copilot-instructions.md), then the [architecture guardrails](copilot_architecture.md).
 - For current package ownership and preferred entry points, read the [package map](package_map.md) and the relevant package `__init__.py`.
+- For retail IRA account connection and secret handling, read [Schwab account access](schwab_read_only.md).
 - For field semantics, read the defining contract class.
 - For modeling rationale, read [first principles](first_principles.md).
 - For historical evidence, search `experiments/` and `docs/refactor/`; do not infer current policy from them.
