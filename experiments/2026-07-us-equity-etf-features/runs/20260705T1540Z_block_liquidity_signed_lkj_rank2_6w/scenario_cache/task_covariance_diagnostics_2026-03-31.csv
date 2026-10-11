@@ -1,0 +1,2 @@
+variant,window_date,corr_min,corr_max,corr_mean_offdiag,negative_corr_share,eig1_share,eig5_share,corr_mean_within_group,corr_mean_between_group
+signed_lkj_eta_2,2026-03-31,0.4846722176154824,0.8167850935920948,0.6808388869134329,0.0,0.7638169617138753,1.0,0.6808388869134326,

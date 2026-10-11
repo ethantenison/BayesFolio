@@ -54,12 +54,16 @@ from bayesfolio.engine.agent.orchestrator import run_orchestration_cycle
 from bayesfolio.engine.asset_allocation import optimize_from_historical_returns
 from bayesfolio.engine.backtest import run_weighted_backtest
 from bayesfolio.engine.features import (
+    FeatureProviders,
     build_features_dataset,
     build_long_panel,
-    make_default_feature_providers,
+    fetch_enhanced_macro_features,
+    fetch_etf_features,
 )
 from bayesfolio.engine.features.universe_loader import build_universe_snapshot
 from bayesfolio.io import (
+    EtfFeaturesProvider,
+    MacroProvider,
     ParquetArtifactStore,
     RegistryToolExecutor,
     ReturnsProvider,
@@ -389,6 +393,7 @@ def run_historical_mvp_pipeline(
         risk_measure=request.risk_measure,
         model=request.model,
         rf=request.rf,
+        alpha=_DEFAULT_RISKFOLIO.alpha,
         kelly=request.kelly,
         min_weight=request.min_weight,
         max_weight=request.max_weight,
@@ -752,13 +757,34 @@ def _run_feature_agent(request: HistoricalMvpRequest) -> FeaturesDatasetResult:
         horizon=Horizon.MONTHLY,
         artifact_name=(f"mvp_features_{request.start_date.isoformat()}_{request.end_date.isoformat()}"),
     )
-    providers = make_default_feature_providers(
+    providers = _make_historical_feature_providers(
         cache_root=request.cache_dir if request.use_local_cache else None,
-        macro_max_retries=1,
-        macro_retry_backoff_seconds=0.0,
     )
     artifact_store = ParquetArtifactStore(base_dir="artifacts/features")
     return build_features_dataset(feature_command, providers=providers, artifact_store=artifact_store)
+
+
+def _make_historical_feature_providers(*, cache_root: str | Path | None) -> FeatureProviders:
+    """Compose legacy chat providers inside its approved orchestration boundary."""
+
+    cache_base = Path(cache_root) if cache_root is not None else None
+
+    def cache_dir(name: str) -> str | None:
+        return str(cache_base / name) if cache_base is not None else None
+
+    return FeatureProviders(
+        returns_provider=ReturnsProvider(fetcher=build_long_panel, cache_dir=cache_dir("returns")),
+        macro_provider=MacroProvider(
+            fetcher=fetch_enhanced_macro_features,
+            max_retries=1,
+            retry_backoff_seconds=0.0,
+            cache_dir=cache_dir("macro_enhanced_periodic"),
+        ),
+        etf_features_provider=EtfFeaturesProvider(
+            fetcher=fetch_etf_features,
+            cache_dir=cache_dir("etf_features"),
+        ),
+    )
 
 
 def _render_report_markdown(

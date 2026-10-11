@@ -1,3 +1,5 @@
+"""Tests for the historical MVP chat workflow."""
+
 from __future__ import annotations
 
 from datetime import date
@@ -386,5 +388,6 @@ def test_run_historical_mvp_pipeline_uses_riskfolio_defaults(monkeypatch) -> Non
     _ = run_historical_mvp_pipeline(request=request)
 
     opt_request = captured["opt_request"]
+    assert opt_request.alpha == _DEFAULT_RISKFOLIO.alpha
     assert opt_request.max_weight == defaults.upperlng
     assert opt_request.nea == _DEFAULT_RISKFOLIO.nea  # pipeline uses module default, not bare RiskfolioConfig()

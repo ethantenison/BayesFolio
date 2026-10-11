@@ -93,7 +93,7 @@ class ReturnsProvider:
                 include_unlabeled_tail=include_unlabeled_tail,
             )
 
-        cache_frame = self._read_cache_frame(horizon)
+        cache_frame = self._read_cache_frame(horizon=horizon, start=start, end=end)
         requested_cached = slice_requested(
             frame=cache_frame,
             tickers=normalized_tickers,
@@ -152,7 +152,7 @@ class ReturnsProvider:
             subset=["date", "asset_id"],
             sort_by=["date", "asset_id"],
         )
-        self._write_cache_frame(frame=updated_cache, horizon=horizon)
+        self._write_cache_frame(frame=updated_cache, horizon=horizon, start=start, end=end)
         return (
             filter_expected_dates(
                 frame=merged_request,
@@ -186,25 +186,28 @@ class ReturnsProvider:
             raise ValueError(msg)
         return frame
 
-    def _cache_file_path(self, horizon: Horizon) -> Path:
+    def _cache_file_path(self, horizon: Horizon, *, start: str, end: str) -> Path:
         assert self._cache_dir is not None
         safe_horizon = str(horizon.value).replace("-", "_").lower()
+        if horizon == Horizon.THREE_WEEK:
+            anchor = _expected_anchor(start=start, end=end, freq=horizon.value)
+            return self._cache_dir / f"returns_{safe_horizon}_anchor_{anchor}.parquet"
         return self._cache_dir / f"returns_{safe_horizon}.parquet"
 
-    def _read_cache_frame(self, horizon: Horizon) -> pd.DataFrame:
-        cache_path = self._cache_file_path(horizon)
+    def _read_cache_frame(self, *, horizon: Horizon, start: str, end: str) -> pd.DataFrame:
+        cache_path = self._cache_file_path(horizon, start=start, end=end)
         if not cache_path.exists():
             return pd.DataFrame(columns=["date", "asset_id", "y_excess_lead"])
 
         frame = pd.read_parquet(cache_path)
         return normalize_asset_id_column(normalize_date_column(frame))
 
-    def _write_cache_frame(self, frame: pd.DataFrame, horizon: Horizon) -> None:
+    def _write_cache_frame(self, frame: pd.DataFrame, horizon: Horizon, *, start: str, end: str) -> None:
         if self._cache_dir is None:
             return
 
         self._cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_path = self._cache_file_path(horizon)
+        cache_path = self._cache_file_path(horizon, start=start, end=end)
         frame.to_parquet(cache_path, index=False)
 
 
@@ -220,3 +223,10 @@ def _supports_argument(callable_obj: Callable[..., object], argument_name: str) 
         if parameter.name == argument_name:
             return True
     return False
+
+
+def _expected_anchor(*, start: str, end: str, freq: str) -> str:
+    expected_dates = pd.DatetimeIndex(pd.date_range(start=pd.Timestamp(start), end=pd.Timestamp(end), freq=freq))
+    if len(expected_dates) == 0:
+        return pd.Timestamp(start).strftime("%Y%m%d")
+    return expected_dates[0].strftime("%Y%m%d")

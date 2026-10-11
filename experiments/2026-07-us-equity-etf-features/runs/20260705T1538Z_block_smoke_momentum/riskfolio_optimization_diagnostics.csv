@@ -1,0 +1,3 @@
+date,strategy,status,fallback_stage,clean_asset_count,clean_observation_count,message
+2026-06-30,gp_scenarios_riskfolio,solved,primary,4,128,
+2026-06-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,48,

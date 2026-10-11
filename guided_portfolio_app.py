@@ -5,7 +5,7 @@ A step-by-step conversational UI that walks the user through four questions
 optimization pipeline.
 
 Usage:
-    poetry run streamlit run guided_portfolio_app.py
+    uv run streamlit run guided_portfolio_app.py
 """
 
 from __future__ import annotations

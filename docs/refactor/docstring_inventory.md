@@ -1,5 +1,19 @@
 # Docstring Coverage Audit
 
+Status: Historical
+
+Audience: Maintainers and coding agents
+
+Canonical topic: Point-in-time docstring audit snapshot
+
+Last verified: 2026-10-10
+
+Replacement: Run `uv run --locked python scripts/audit_doc_coverage.py` for a
+current inventory and follow [documentation policy](../README.md).
+
+The findings below are preserved as refactor evidence and are not a current
+coverage report.
+
 - Scanned files: **90**
 - Included tests: **False**
 - Files missing module docstrings: **54**

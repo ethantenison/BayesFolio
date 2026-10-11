@@ -1,3 +1,5 @@
+"""Mappings between optimization contracts and engine inputs."""
+
 from __future__ import annotations
 
 from bayesfolio.contracts.commands.optimize import OptimizeCommand
@@ -12,11 +14,12 @@ def command_to_engine_inputs(command: OptimizeCommand) -> dict[str, object]:
 
     Returns:
         Dict of engine keyword arguments
-        (objective, risk_measure, min_weight, max_weight, nea, hist).
+        (objective, risk_measure, alpha, min_weight, max_weight, nea, hist).
     """
     return {
         "objective": command.objective,
         "risk_measure": command.risk_measure,
+        "alpha": command.alpha,
         "min_weight": command.min_weight,
         "max_weight": command.max_weight,
         "nea": command.nea,

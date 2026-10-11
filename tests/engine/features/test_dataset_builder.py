@@ -65,6 +65,7 @@ class _FakeArtifactStore:
         return ArtifactPointer(
             uri=f"memory://{artifact_name}",
             fingerprint="fake-sha256",
+            byte_size=1,
             row_count=int(frame.shape[0]),
             column_count=int(frame.shape[1]),
         )

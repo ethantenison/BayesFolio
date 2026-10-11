@@ -1,0 +1,13 @@
+date,strategy,status,fallback_stage,clean_asset_count,clean_observation_count,message
+2026-01-30,gp_scenarios_riskfolio,fallback,historical_y_ewma2_weights,4,512,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2026-01-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,48,
+2026-02-27,gp_scenarios_riskfolio,fallback,previous_gp_weights,4,512,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2026-02-27,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,48,
+2026-03-31,gp_scenarios_riskfolio,solved,primary,4,512,
+2026-03-31,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,48,
+2026-04-30,gp_scenarios_riskfolio,solved,primary,4,512,
+2026-04-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,47,
+2026-05-29,gp_scenarios_riskfolio,solved,primary,4,512,
+2026-05-29,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,48,
+2026-06-30,gp_scenarios_riskfolio,solved,primary,4,512,
+2026-06-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,48,

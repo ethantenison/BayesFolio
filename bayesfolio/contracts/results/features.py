@@ -24,6 +24,7 @@ class ArtifactPointer(ContractModel):
         uri: Storage URI or local path to the parquet artifact.
         format: Artifact serialization format. Always ``"parquet"``.
         fingerprint: SHA-256 hex digest of the persisted parquet bytes.
+        byte_size: Size of the persisted parquet payload in bytes, when known.
         row_count: Number of rows in the persisted dataset.
         column_count: Number of columns in the persisted dataset.
     """
@@ -31,6 +32,7 @@ class ArtifactPointer(ContractModel):
     uri: str
     format: Literal["parquet"] = "parquet"
     fingerprint: str
+    byte_size: int | None = Field(default=None, ge=0)
     row_count: int = Field(ge=0)
     column_count: int = Field(ge=0)
 

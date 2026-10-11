@@ -36,10 +36,32 @@ class MonthlyRunArtifacts(ContractModel):
 
 
 class MonthlyPortfolioResult(VersionedContract):
-    """Final result contract for end-to-end monthly automation."""
+    """Candidate result contract for end-to-end monthly automation.
+
+    Optimizer weights remain candidates until an explicit portfolio decision
+    records walk-forward evidence and human approval.
+
+    Attributes:
+        schema: Stable schema identifier.
+        schema_version: Semantic version of this contract.
+        strategy_id: Stable model and optimization configuration identifier.
+        as_of_date: Date at which the candidate portfolio was constructed.
+        run_label: Unique label for this monthly run.
+        training_universe: Assets used to fit the forecast model.
+        final_portfolio_universe: Assets eligible for candidate weights.
+        helper_assets_only: Training assets excluded from final weights.
+        features_result: Feature artifact and alignment metadata.
+        gp_workflow_result: Fitted GP configuration and diagnostics.
+        forecast_result: Candidate return distribution summary.
+        optimize_result: Candidate, not yet finalized, portfolio weights.
+        top_predictions: Asset-level forecast summaries.
+        artifacts: Pointers to persisted run artifacts.
+        diagnostics: Workflow-level diagnostic messages.
+    """
 
     schema: Literal["bayesfolio.monthly_portfolio.result"] = "bayesfolio.monthly_portfolio.result"
     schema_version: Literal["0.1.0"] = "0.1.0"
+    strategy_id: str = "accepted_monthly_portfolio_v1"
     as_of_date: date
     run_label: str
     training_universe: list[str]

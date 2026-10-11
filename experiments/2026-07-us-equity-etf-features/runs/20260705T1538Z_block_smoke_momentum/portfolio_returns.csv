@@ -1,0 +1,5 @@
+date,strategy,return,gp_ic,is_live_window
+2026-06-30,gp_scenarios_riskfolio,-0.0027095606181711043,-1.0,False
+2026-06-30,historical_y_ewma2_gerber1_riskfolio,-0.0014409546564194842,,False
+2026-06-30,equal_weight,-0.002054378045267813,,False
+2026-06-30,schwab_moderate_aggressive_static,-0.0018153566590758284,,False

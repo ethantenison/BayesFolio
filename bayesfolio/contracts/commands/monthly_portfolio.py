@@ -30,7 +30,16 @@ class MonthlyForecastConfig(VersionedContract):
         macro_feature_columns: Ordered macro feature columns.
         rank: Multitask rank passed into the GP builder.
         min_inferred_noise_level: Initial likelihood noise floor.
-        seed: Optional deterministic seed.
+        seed: Deterministic seed used directly for model fitting and posterior
+            sampling. Defaults to ``0``.
+        maxiter: Maximum optimizer iterations used for GP hyperparameter fitting.
+        input_transform: Input normalization strategy. ``"botorch_normalize"``
+            applies BoTorch normalization to non-task feature columns.
+        time_modulation: Time-varying covariance mode. ``"lengthscale_only"``
+            applies the accepted monthly lengthscale modulation; ``"none"``
+            disables time modulation.
+        task_covar_prior: Task-covariance prior mode. The accepted monthly model
+            uses no explicit task-covariance prior.
         posterior_scenario_count: Number of posterior scenarios to sample.
     """
 
@@ -76,7 +85,11 @@ class MonthlyForecastConfig(VersionedContract):
     )
     rank: int | None = Field(default=5, ge=1)
     min_inferred_noise_level: float = Field(default=5e-3, gt=0.0)
-    seed: int | None = None
+    seed: int = Field(default=0, ge=0)
+    maxiter: int = Field(default=75, ge=1)
+    input_transform: Literal["botorch_normalize"] = "botorch_normalize"
+    time_modulation: Literal["lengthscale_only", "none"] = "lengthscale_only"
+    task_covar_prior: Literal["none"] = "none"
     posterior_scenario_count: int = Field(default=5000, ge=1)
 
     @property
@@ -120,6 +133,8 @@ class MonthlyPortfolioCommand(VersionedContract):
     Attributes:
         schema: Contract schema identifier.
         schema_version: Semantic schema version.
+        strategy_id: Stable identifier for the model and optimization
+            configuration being evaluated and reviewed.
         as_of_date: Effective month-end date for the run.
         training_universe: Universe used to build features and fit the GP.
         final_portfolio_universe: Optional investable subset for final weights.
@@ -132,6 +147,7 @@ class MonthlyPortfolioCommand(VersionedContract):
 
     schema: Literal["bayesfolio.monthly_portfolio.command"] = "bayesfolio.monthly_portfolio.command"
     schema_version: Literal["0.1.0"] = "0.1.0"
+    strategy_id: str = Field(default="accepted_monthly_portfolio_v1", min_length=1)
     as_of_date: date
     training_universe: list[str] = Field(min_length=2)
     final_portfolio_universe: list[str] | None = None

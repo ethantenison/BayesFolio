@@ -1,16 +1,82 @@
 # Copilot Architecture Guardrails
 
+Status: Active
+
+Audience: Contributors, maintainers, and coding agents
+
+Canonical topic: Architecture rationale and boundaries
+
+Last verified: 2026-10-10
+
 ## Layer Ownership
 
 - `bayesfolio/contracts/`: boundary schemas only (Pydantic models, no business logic, no pandas dependency in contracts).
+- `bayesfolio/application/`: composition roots that assemble engine workflows with concrete I/O adapters.
 - `bayesfolio/engine/`: pure business logic and data transformations; no direct file/network I/O.
 - `bayesfolio/io/`: all external data access and artifact persistence.
+
+Dependency direction for supported workflows is `application -> engine` and `application -> io`. Engine and I/O modules
+communicate through engine-owned structural protocols; I/O does not import engine.
+
+## Monthly Automation Boundary
+
+- `application/monthly_portfolio.py` is the canonical default-wiring and user-facing execution entry point.
+- `application/feature_providers.py` composes legacy engine fetchers with concrete I/O providers.
+- `engine/automation/monthly_portfolio.py` owns monthly feature, GP, forecast, scenario, and optimization sequencing.
+- `engine/automation/monthly_ports.py` defines the runtime side effects required by that engine workflow.
+- `io/monthly_portfolio_runtime.py` owns MLflow lifecycle and contract logging, Git revision discovery, parquet loading,
+  directory creation, index-free CSV persistence, JSON persistence, fingerprints, and artifact pointers.
+- The application layer injects providers, feature storage, and runtime I/O. Engine code does not inspect storage or
+  tracking implementation details, and the I/O adapter does not make modeling or portfolio decisions.
+
+The deprecated `engine.automation.run_monthly_portfolio` entry point is a narrowly scoped compatibility façade. It
+locally delegates default composition to `application/` and must not acquire direct I/O behavior. Remove this exception
+when the historical engine import path can be retired in a future breaking release.
+
+The deprecated `engine.features.make_default_feature_providers` import follows the same compatibility rule: it lazily
+delegates to `application/feature_providers.py` and contains no concrete provider construction or direct I/O dependency.
+
+## Backtest and Final-Decision Boundary
+
+- `engine/backtest/runner.py` evaluates serialized walk-forward periods. Every
+  period identifies a decision date, a later realization date, fixed weights,
+  and subsequent realized returns; the engine does not infer date shifts.
+  Rebalance turnover compares each new target with the prior portfolio's
+  post-return, normalized holdings rather than its stale target weights.
+- `engine/automation/monthly_decision.py` is the pure final-review gate. It
+  requires matching candidate/backtest strategy identifiers and rejects
+  evidence unavailable strictly before the candidate as-of date. Approval
+  requires at least one distinct benchmark on the identical evaluation grid.
+- `application/monthly_decision.py` is the preferred public entry point for the
+  review gate.
+- A `MonthlyPortfolioResult` contains candidate optimizer weights. Only an
+  approved `MonthlyPortfolioDecisionResult` contains finalized weights, and
+  approval must be explicit human input. Brokerage execution remains outside
+  this boundary.
 
 ## Feature Pipeline Placement
 
 - Put new build commands/results in `contracts/commands/` and `contracts/results/`.
 - Put feature engineering/transforms and orchestration in `engine/features/`.
 - Put fetch/persist adapters and providers in `io/`.
+
+## Brokerage and Performance Extension Boundary
+
+- `engine/brokerage/ports.py` defines the read-only structural account protocol.
+  A future `io` implementation satisfies it by shape and does not import the
+  engine package.
+- `engine/brokerage/planner.py` converts an approved portfolio decision plus a
+  fresh account snapshot into dollar-notional planning instructions. Its result
+  is permanently marked `executable=False`; it is not an order request.
+- `engine/performance/ports.py` defines the structural boundary for externally
+  measured, cash-flow-aware portfolio/benchmark return periods.
+- `engine/performance/tracker.py` aggregates returns, gain/loss changes, fees,
+  active risk, beta, and descriptive single-benchmark Jensen alpha without file,
+  network, or brokerage access.
+- Future Schwab authentication, account retrieval, and order execution belong
+  in `io/` plus an application composition root. Order submission requires a
+  separate explicit authorization contract and is not implied by final weights
+  or a rebalance plan.
 
 ## Transitional Rule
 

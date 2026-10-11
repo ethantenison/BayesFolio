@@ -62,7 +62,7 @@ class FsspecArtifactBackend:
         try:
             import fsspec
         except ImportError as exc:
-            msg = "fsspec is required for remote artifact storage backends. Install it with `poetry add fsspec`."
+            msg = "fsspec is required for remote artifact storage backends. Install it with `uv add fsspec`."
             raise ImportError(msg) from exc
 
         self._root_uri = root_uri.rstrip("/")

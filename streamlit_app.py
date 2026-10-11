@@ -1,5 +1,5 @@
 """
-To run streamlit app: poetry run streamlit run streamlit_app.py
+To run streamlit app: uv run streamlit run streamlit_app.py
 """
 
 from __future__ import annotations

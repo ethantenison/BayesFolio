@@ -1,0 +1,2 @@
+variant,window_date,corr_min,corr_max,corr_mean_offdiag,negative_corr_share,eig1_share,eig5_share,corr_mean_within_group,corr_mean_between_group
+control,2026-04-30,0.6583343561392432,0.99201714686264,0.8611749791177473,0.0,0.8982296535982901,1.0,0.8611749791177473,

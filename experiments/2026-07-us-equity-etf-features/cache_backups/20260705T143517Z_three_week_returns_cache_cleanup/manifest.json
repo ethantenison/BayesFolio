@@ -1,0 +1,28 @@
+{
+  "schema": "bayesfolio.cache_cleanup.v1",
+  "created_at": "2026-07-05T14:35:18.043702+00:00",
+  "cache_path": "artifacts/cache/returns/returns_3w_fri.parquet",
+  "backup_path": "experiments/2026-07-us-equity-etf-features/cache_backups/20260705T143517Z_three_week_returns_cache_cleanup/returns_3w_fri_interleaved_backup.parquet",
+  "raw_rows": 4950,
+  "raw_date_count": 275,
+  "raw_date_min": "2018-03-02",
+  "raw_date_max": "2026-07-10",
+  "raw_date_delta_counts": {
+    "7": 129,
+    "14": 128,
+    "21": 17
+  },
+  "raw_sha256": "37157ff1b664e3f4dccb93afa6d33c99579285724d8ed1401e32654e69a5d38f",
+  "clean_rows": 2610,
+  "clean_date_count": 145,
+  "clean_date_min": "2018-03-02",
+  "clean_date_max": "2026-06-12",
+  "clean_date_delta_counts": {
+    "21": 144
+  },
+  "clean_sha256": "587e6a22e830d6acca74c2d71c0363d6f564efdd8068f914739497939ff0b658",
+  "notes": [
+    "Raw 3W cache contained interleaved 3W-FRI anchors from older provider behavior.",
+    "Clean cache was produced through ReturnsProvider so the corrected horizon-grid filter was applied before writing."
+  ]
+}

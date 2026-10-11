@@ -1,0 +1,39 @@
+{
+  "schema": "bayesfolio.us_equity_horizon_feature_validation.v1",
+  "run_id": "20260705T135534Z_bme",
+  "created_at": "2026-07-05T13:55:47.401047+00:00",
+  "horizon": "BME",
+  "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/artifacts/us_equity_full_feature_candidates_20260705T135534Z_bme.parquet",
+  "sha256": "f417a731974ce6edad07dd16d40d8abaf768f412199d9e7ceebde0bd69f1a1bb",
+  "row_count": 320,
+  "column_count": 48,
+  "diagnostics": [
+    "Look-ahead policy applied: ETF and macro predictors are shifted by one period per asset before model use.",
+    "Return unit is decimal for y_excess_lead and lagged target columns."
+  ],
+  "audit": {
+    "path": "/Users/et/Documents/BayesFolio/experiments/2026-07-us-equity-etf-features/artifacts/us_equity_full_feature_candidates_20260705T135534Z_bme.parquet",
+    "shape": [
+      320,
+      48
+    ],
+    "dates": [
+      "2021-03-31",
+      "2026-06-30"
+    ],
+    "available_count": 44,
+    "missing_features": [],
+    "features_with_missing": {},
+    "constant_features": [],
+    "perfect_correlations": [],
+    "high_correlations": [],
+    "hy_nunique": {
+      "hy_spread": 15,
+      "hy_spread_chg_1p": 16,
+      "hy_spread_z_12p": 16
+    },
+    "has_mom12m_skip1m": true,
+    "has_downside_vol_1m": true,
+    "has_overnight_gap": false
+  }
+}

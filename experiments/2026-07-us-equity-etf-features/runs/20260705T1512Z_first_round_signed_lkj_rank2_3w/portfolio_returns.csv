@@ -1,0 +1,13 @@
+date,strategy,return,gp_ic,is_live_window
+2026-04-30,gp_scenarios_riskfolio,0.05399117744128808,1.0,False
+2026-04-30,historical_y_ewma2_gerber1_riskfolio,0.05297076207180476,,False
+2026-04-30,equal_weight,0.04898869640742565,,False
+2026-04-30,schwab_moderate_aggressive_static,0.04531135945568151,,False
+2026-05-29,gp_scenarios_riskfolio,0.002197124702034767,0.7999999999999999,False
+2026-05-29,historical_y_ewma2_gerber1_riskfolio,-0.009168267362022371,,False
+2026-05-29,equal_weight,0.002950351161097653,,False
+2026-05-29,schwab_moderate_aggressive_static,-0.0007364026163911297,,False
+2026-06-30,gp_scenarios_riskfolio,-0.0027465833889396907,-0.7999999999999999,False
+2026-06-30,historical_y_ewma2_gerber1_riskfolio,-0.0014409546564194842,,False
+2026-06-30,equal_weight,-0.002054378045267813,,False
+2026-06-30,schwab_moderate_aggressive_static,-0.0018153566590758284,,False

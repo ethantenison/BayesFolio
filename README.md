@@ -1,165 +1,217 @@
 # BayesFolio
 
-BayesFolio is an AI-assisted portfolio research prototype that explores how machine learning, conversational interfaces, and risk-aware optimization can improve portfolio construction workflows in financial services.
+BayesFolio is a monthly, uncertainty-aware ETF portfolio research workflow for a retirement IRA. It combines ETF and macroeconomic data, multitask Gaussian process forecasts, posterior scenarios, portfolio optimization, and out-of-sample evaluation to produce candidate portfolio weights.
 
-The project combines natural-language portfolio intake, LLM-assisted intent extraction, optimization pipelines, and transparent diagnostics in a sandbox environment for experimentation. It is designed to test product concepts, modeling workflows, and user experience patterns before productionization.
+BayesFolio is research and decision-support software. It does not place trades, connect to Charles Schwab, or provide financial advice.
 
-------------------------------------------------------------
+## Status
 
-## Project Status
+BayesFolio's core refactor is complete: the maintained workflow is schema-first,
+uses explicit contracts/engine/I/O boundaries, and is protected by regression
+evidence for the last accepted pre-refactor portfolio.
 
-BayesFolio is currently undergoing a major refactor toward a cleaner schema-first architecture with stricter separation between contracts, business logic, and I/O.
+| Capability | Status |
+|---|---|
+| ETF and macro feature construction | Implemented |
+| Configurable and planner-assisted multitask GP workflows | Implemented |
+| Fixed-default monthly forecast and optimization workflow | Implemented |
+| Walk-forward backtesting and explicit final portfolio review | Implemented |
+| Reproduction of the last accepted pre-refactor portfolio weights | Feature-artifact-to-weights parity implemented |
+| Brokerage-neutral holdings and rebalance-planning boundary | Implemented; Schwab adapter planned |
+| Realized gain/loss and benchmark-relative alpha tracking | Implemented; account history adapter planned |
+| Direct Schwab order execution | Planned |
 
-This repository should be viewed as an active R&D codebase rather than a polished end-user application. The most relevant artifacts today are the system design, prototype workflows, and architecture decisions that support AI-assisted financial decision tooling.
+## What BayesFolio Does
 
-What this status means in practice:
+The package supports the main research stages needed for a monthly allocation decision:
 
-- The project contains working prototype flows and orchestration patterns
-- The repository is being reorganized for clearer boundaries and better maintainability
-- The focus is on validating ideas, workflows, and engineering patterns rather than packaging a finished product
+- acquire and cache ETF returns, ETF characteristics, and macroeconomic features;
+- clean, align, and lag predictors to prevent look-ahead bias;
+- fit uncertainty-aware multitask Gaussian process models;
+- optionally evaluate alternative GP structures in time-aware experiments;
+- sample joint posterior return scenarios;
+- construct constrained ETF portfolio weights;
+- evaluate configurations with backtests and diagnostics; and
+- persist predictions, scenarios, weights, contracts, and reproducibility metadata.
 
-------------------------------------------------------------
+The current `run_monthly_portfolio` workflow automates feature construction, strict as-of alignment, the accepted multitask GP fit, posterior forecasting, optimization, and artifact persistence. Training rows must precede the as-of date, and scoring rows must match it exactly. The application layer assembles concrete providers and runtime I/O while the engine owns computation and sequencing. Its optimizer output is always a candidate. `run_walk_forward_backtest` evaluates dated weights against explicitly paired subsequent returns, and `finalize_monthly_portfolio` releases final weights only after a recorded human approval using evidence available strictly before the candidate's as-of date.
 
-## Why This Project Exists
+## Why Uncertainty Matters
 
-BayesFolio started as an exploration of a simple question: how could a portfolio tool move beyond purely historical optimization and toward a more intelligent, more interactive, and more transparent decision-support experience?
+Monthly ETF returns are noisy, data histories are short relative to the number of possible predictors, and assets share changing market and macroeconomic drivers. A point forecast alone does not describe how uncertain the estimate is or how assets may move together.
 
-The project focuses on three R&D themes:
+BayesFolio uses multitask Gaussian processes to share information across related ETFs and produce a joint predictive distribution. Portfolio construction can then use posterior scenarios rather than treating one return estimate as certain. See [Prediction, Uncertainty, and Multitask Gaussian Processes](docs/first_principles.md) for the canonical rationale and limitations.
 
-- AI-assisted workflow design for financial tasks
-- Bayesian and uncertainty-aware approaches to portfolio construction
-- Explainable reporting that keeps assumptions, constraints, and risk structure visible
+## Monthly Decision Workflow
 
-This makes BayesFolio less of a static optimizer and more of a research platform for testing how ML and GenAI concepts could fit into future wealth-management experiences.
+```text
+As-of date and ETF universe
+    -> ETF and macro data acquisition
+    -> cleaning, transformation, and time alignment
+    -> multitask GP fit
+    -> posterior predictions and joint scenarios
+    -> constrained portfolio optimization
+    -> walk-forward backtest with explicit realization dates
+    -> recorded human approval or rejection
+    -> finalized portfolio weights when approved
+    -> manual brokerage execution
+```
 
-------------------------------------------------------------
+Model selection and tuning are optional research activities. They must use time-aware out-of-sample validation and should not silently change the fixed monthly defaults.
 
-## Current Prototype Capabilities
+## Installation
 
-Today, BayesFolio demonstrates several prototype patterns that are directly relevant to AI/ML R&D work:
+BayesFolio requires Python 3.13 and uses [uv](https://docs.astral.sh/uv/) for dependency and environment management.
 
-- Guided portfolio construction through a conversational step-by-step flow
-- Free-form chat-based portfolio intake with rule-based and LLM-assisted parsing
-- Extraction of user goals, risk preferences, and portfolio constraints from natural language
-- Historical portfolio optimization with diagnostics, warnings, and summary reporting
-- A schema-first design direction for keeping AI, domain logic, and external integrations cleanly separated
+```bash
+uv sync --locked --all-groups
+```
 
-Representative prototype surfaces in the repository include:
+Some data providers require network access. MLflow tracking and artifact locations are configured by the command or runtime environment used for a run.
 
-- A guided portfolio builder for structured conversational intake
-- A chat-based MVP interface for free-form portfolio requests
-- Orchestration modules that connect parsing, data quality checks, optimization, and report assembly
+## Running the Monthly Workflow
 
-------------------------------------------------------------
+The current monthly entry point is programmatic:
 
-## Current Workflow
+```python
+from bayesfolio.contracts.commands import MonthlyPortfolioCommand
+from bayesfolio.application import run_monthly_portfolio
 
-The current BayesFolio workflow centers on turning ambiguous user intent into a structured portfolio workflow:
+def run_validated_monthly_command(command: MonthlyPortfolioCommand):
+    """Run an already validated monthly configuration."""
+    return run_monthly_portfolio(command)
+```
 
-    User Request or Guided Input
-        ↓
-    Intent / Constraint Extraction
-        ↓
-    Universe Construction and Data Quality Checks
-        ↓
-    Feature and Forecasting Pipeline Scaffolding
-        ↓
-    Portfolio Optimization
-        ↓
-    Diagnostics, Backtest Metrics, and Report Assembly
+Inspect the command schema when constructing a configuration:
 
-The longer-term vision extends beyond historical optimization, but the present repository already captures the orchestration and UX patterns required to test those future concepts.
+```bash
+uv run --locked python -c "from bayesfolio.contracts.commands import MonthlyPortfolioCommand; print(MonthlyPortfolioCommand.model_json_schema())"
+```
 
-------------------------------------------------------------
+There is not yet a stable CLI for the full monthly workflow. Research helpers under `scripts/` are not substitutes for the canonical monthly entry point.
 
-## Technical Focus
+The former `bayesfolio.engine.automation.run_monthly_portfolio` import remains as a deprecated compatibility shim. New code should use the application entry point so concrete provider, storage, and MLflow assembly stays outside the engine.
 
-BayesFolio is intentionally structured around the kinds of concerns that matter in applied AI/ML prototyping:
+Walk-forward evaluation and final review are separate, explicit steps:
 
-- Python-first experimentation and orchestration
-- Typed contracts and schema-driven interfaces using Pydantic
-- Separation between engine logic and external I/O boundaries
-- LLM-assisted extraction layered on top of deterministic fallbacks
-- Portfolio optimization and backtest evaluation workflows
-- Artifact persistence, caching, and reproducible experimentation patterns
-- Transparent diagnostic outputs rather than opaque model responses
+```python
+from datetime import UTC, datetime
 
-From an engineering perspective, the repository reflects an emphasis on rapid prototyping without abandoning software design discipline.
+from bayesfolio.application import finalize_monthly_portfolio
+from bayesfolio.contracts.commands import (
+    FinalizeMonthlyPortfolioCommand,
+    WalkForwardBacktestCommand,
+)
+from bayesfolio.engine.backtest import build_walk_forward_period, run_walk_forward_backtest
 
-------------------------------------------------------------
+period = build_walk_forward_period(
+    historical_candidate,
+    realization_date=next_month_end,
+    realized_returns=next_period_returns,
+)
+backtest_command = WalkForwardBacktestCommand(
+    strategy_id=historical_candidate.strategy_id,
+    periods=[period],
+)
+backtest_result = run_walk_forward_backtest(backtest_command)
 
-## Architecture Direction
+finalize_command = FinalizeMonthlyPortfolioCommand(
+    candidate=current_candidate,
+    backtest=backtest_result,
+    benchmarks=benchmark_results,
+    decision="approved",
+    reviewer="portfolio-owner",
+    reviewed_at=datetime.now(UTC),
+    rationale="Reviewed the recorded strategy and benchmark evidence.",
+)
+decision_result = finalize_monthly_portfolio(finalize_command)
+```
 
-The refactor is moving BayesFolio toward a clearer architecture with distinct responsibilities across the codebase:
+`backtest_command` must pair each decision date with a later realization date,
+the weights fixed on the decision date, and subsequent realized returns.
+`finalize_command` must contain matching strategy evidence, at least one
+benchmark evaluated on the same dates, and an explicit timestamped human
+decision. Rejected candidates never expose finalized weights.
 
-- `bayesfolio/core/` for primitive types and configuration
-- `bayesfolio/contracts/` for typed schemas at system boundaries
-- `bayesfolio/engine/` for pure business logic and orchestration
-- `bayesfolio/io/` for providers, persistence, and external system interaction
+## Validation
 
-That direction matters because the project is intended to support experimentation without allowing prototype code to collapse into tightly coupled application logic.
+Run targeted checks first, followed by the broader suite when the change warrants it:
 
-------------------------------------------------------------
+```bash
+uv run --locked pytest -q tests/contracts
+uv run --locked pytest -q tests/engine/automation tests/application tests/io/test_monthly_portfolio_runtime.py
+uv run --locked ruff check bayesfolio scripts tests
+uv run --locked pytest -q
+```
 
-## Relevance To AI/ML R&D
+## Reproducibility and Refactor Parity
 
-BayesFolio is meant to be credible as a research-and-development prototype, not just as a modeling exercise. The project emphasizes capabilities that are common in exploratory AI engineering work:
+Accepted monthly runs should record the as-of date, dataset cutoff, contract configuration, random seed, artifact fingerprints, and relevant model assumptions. Features used to predict month `t` must contain only information available before `t`, and returns use decimal units (`0.02 = 2%`).
 
-- Turning ambiguous ideas into functional prototypes
-- Testing user-facing AI concepts in sandbox environments
-- Combining traditional ML logic with emerging LLM interaction patterns
-- Evaluating whether a prototype is informative, explainable, and directionally useful before hardening it for production
-- Designing systems that can be presented, discussed, and iterated on with non-technical stakeholders
+The refactor completion gate required the maintained workflow to reproduce the
+last accepted pre-refactor portfolio weights within explicit tolerances, with
+any difference traced to data, model, optimization, or dependency changes.
+That gate is now satisfied by the July 2026 regression evidence below.
 
-In that sense, BayesFolio is as much about workflow invention and product experimentation as it is about forecasting and optimization.
+The July 2026 regression evidence is versioned under
+`tests/fixtures/regression/july_2026/`. The focused optimizer gate verifies the
+recorded scenarios independently, while
+`tests/regression/test_july_2026_full_pipeline_parity.py` runs the maintained
+application workflow from the frozen feature artifact through as-of alignment,
+GP fitting, posterior sampling, and Riskfolio optimization. The historical
+dirty source state was recovered in commit `948ba4e`; the maintained workflow
+reproduces its scenarios and return predictions within `0.005` absolute
+tolerance, standardized forecast scores within `0.01`, and its accepted weights
+within `0.005` per asset and `0.03` total L1 error across supported platforms.
+The optimizer-only replay from frozen scenarios retains near-exact weight
+tolerances.
 
-------------------------------------------------------------
+## Documentation Map
 
-## Research Direction
+- [Documentation authority and navigation](docs/README.md)
+- [First-principles modeling rationale](docs/first_principles.md)
+- [Architecture guardrails](docs/copilot_architecture.md)
+- [Package map and public entry points](docs/package_map.md)
+- [Agent roles and repository workflow](AGENTS.md)
 
-BayesFolio is evolving toward a more forward-looking portfolio intelligence platform that may eventually include:
+## Experiments
 
-- Bayesian forecasting models such as multitask Gaussian processes and hierarchical approaches
-- Domain-knowledge-aware model structure and kernel design
-- Black-Litterman-style view integration
-- Scenario-based optimization beyond purely historical estimates
-- Richer interactive reporting and model explanation layers
-- More agentic conversational workflows for portfolio construction
-- Responsible AI safeguards tailored to financial decision support
+New experiment work is isolated under [`experiments/`](experiments/README.md)
+as versioned, non-normative evidence. Historical scripts under `notebooks/`
+remain in place only to preserve their recorded paths. Experiment code,
+configuration, plans, and curated summaries remain versioned, while generated
+`outputs/`, `runs/`, `mlruns/`, and `logs/` are ignored by default. Experiments
+are excluded from routine package checks unless explicitly requested. A result
+becomes current package behavior only after it is implemented, tested, and
+promoted into the appropriate canonical document.
 
-These are active research directions rather than committed product promises.
+## Roadmap
 
-------------------------------------------------------------
+The package now has explicit, broker-neutral boundaries for read-only account
+snapshots, non-executing dollar-notional rebalance plans, cash-flow-aware return
+periods, realized and unrealized gain/loss changes, fees, benchmark-relative
+performance, beta, and descriptive Jensen alpha. `build_rebalance_plan` always
+returns `executable=False`; it never creates or submits orders.
 
-## Responsible AI Principles
+A future Charles Schwab adapter belongs under `bayesfolio/io/` and can satisfy
+the structural account and performance reader protocols without moving broker
+logic into the engine. Live authentication, holdings synchronization, tax-lot
+selection, fractional-share capability, order previews, explicit execution
+authorization, and order submission remain planned. No current result should
+be treated as a brokerage order.
 
-BayesFolio emphasizes:
+## Contributor Workflow
 
-- Transparent model structure and assumptions
-- Visibility into risk diagnostics rather than black-box recommendations
-- Clear distinction between historical evidence and predictive estimates
-- Explicit treatment of uncertainty where possible
-- Reproducibility through deterministic seeds and experiment logging
+Repository agent roles are defined in [AGENTS.md](AGENTS.md). The recommended sequence is:
 
-The project is intended to make portfolio risk structure easier to inspect, question, and communicate.
-
-------------------------------------------------------------
-
-## Contributor Workflow (Agents)
-
-BayesFolio includes repository-level agent roles in [AGENTS.md](AGENTS.md) to improve maintainability and reduce architecture and documentation drift during the refactor.
-
-Recommended PR workflow:
-
-1. Run **Boundary Inspector** checks for package and layer violations.
-2. Run **Documentation Drift Inspector** checks for docstring and documentation sync.
-3. If findings exist, use **Patch Proposer** in propose mode for minimal diffs.
-4. Apply patches only after explicit approval.
-5. Re-run linting, targeted tests, and touched-file diagnostics before handoff.
-
-
-------------------------------------------------------------
+1. Run the Boundary Inspector.
+2. Run the Documentation Drift Inspector.
+3. Run the Simplicity and Redundancy Inspector when the scope warrants it.
+4. Apply the smallest in-scope patch for implementation and active-goal work.
+5. Pause only for destructive work, unauthorized breaking APIs, or unresolved
+   product-impact choices.
+6. Re-run targeted validation and report the exact commands and results.
 
 ## Disclaimer
 
-BayesFolio is for research and educational purposes only. It does not constitute financial advice.
+BayesFolio is for research and educational purposes only. It does not constitute financial, investment, tax, or legal advice. Forecasts and optimized weights can be wrong, and past or backtested performance does not guarantee future results.

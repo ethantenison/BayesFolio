@@ -707,8 +707,14 @@ def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Hor
     if df is None:
         raise RuntimeError("Could not fetch any High-Yield spread series from FRED.")
 
-    # Resample to requested horizon
-    df = df.resample(horizon).last()
+    # Align to the same anchored horizon grid the providers later request.
+    # Plain ``resample("3W-FRI")`` can choose a different phase after the
+    # rolling warmup, which causes valid HY rows to be dropped by downstream
+    # expected-date filtering.
+    horizon_value = getattr(horizon, "value", horizon)
+    end_ts = pd.to_datetime(end) if end else pd.Timestamp.today()
+    expected_dates = pd.date_range(pd.to_datetime(start), end_ts, freq=horizon_value)
+    df = df.sort_index().reindex(expected_dates, method="ffill")
 
     # Compute derivative features
     df["hy_spread_chg_1p"] = df["hy_spread"].diff(1)
@@ -721,7 +727,6 @@ def fetch_high_yield_spread(start="2010-01-01", end=None, horizon: Horizon = Hor
     # Clean final output
     df = df.dropna()
     df = df.reset_index().rename(columns={"index": "date", "DATE": "date"})
-    print(df.columns)
     df["date"] = pd.to_datetime(df["date"])
 
     return df

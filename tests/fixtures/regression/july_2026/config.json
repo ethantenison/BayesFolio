@@ -1,0 +1,116 @@
+{
+  "schema": "bayesfolio.regression.july_pipeline.v1",
+  "case_id": "july_2026_feature_gp_optimizer_parity",
+  "scope": "feature_artifact_to_gp_to_optimizer",
+  "provenance": {
+    "source_directory": "notebooks/outputs/20260702_july_portfolio_full3",
+    "dirty_worktree_base_commit": "469413e",
+    "recovered_source_commit": "948ba4ebd53df2b2f3efb27650ff5edc98e14698",
+    "feature_source_file": "/Users/et/.bayesfolio/artifacts/features/portfolio_etf_macro_features_2026_07.parquet",
+    "prediction_source_file": "july_gameday_predictions.csv",
+    "scenario_source_file": "july_gp_posterior_scenarios.csv",
+    "expected_weights_source_file": "july_recommended_weights.csv",
+    "note": "The recovered source reproduces the recorded GP predictions and scenarios to CSV round-trip precision. The maintained application entry point is the parity subject."
+  },
+  "inputs": {
+    "feature_artifact": {
+      "file": "features.parquet",
+      "sha256": "83aee76cfb979f56b48dbfd362464af8f431334023063604c55ee3be83b92e63",
+      "row_count": 1152,
+      "column_count": 32,
+      "date_min": "2021-03-31",
+      "date_max": "2026-06-30"
+    },
+    "scenario_artifact": {
+      "file": "scenarios.csv",
+      "sha256": "c7ce422e0bfa82b044dfd540c86aaa5d47dc2132d6582d14eb99f4df9f26f721",
+      "row_count": 5000,
+      "column_count": 16
+    }
+  },
+  "modeling": {
+    "strategy_id": "accepted_monthly_portfolio_v1",
+    "as_of_date": "2026-06-30",
+    "training_date_max": "2026-05-29",
+    "training_row_count": 1134,
+    "training_universe_size": 18,
+    "final_universe_size": 16,
+    "feature_blocks": {
+      "time": ["t_index"],
+      "etf_count": 11,
+      "macro_count": 16
+    },
+    "covariance": "E + M + T + ET + MT + EMT",
+    "rank": 5,
+    "dtype": "float64",
+    "input_transform": "botorch_normalize_non_task_features",
+    "outcome_transform": "stratified_standardize",
+    "time_modulation": "lengthscale_only",
+    "task_covar_prior": null,
+    "min_inferred_noise_level": 0.0025,
+    "maxiter": 75,
+    "feature_build_seed": 27,
+    "fit_and_sampling_seed": 16638,
+    "posterior_scenario_count": 5000
+  },
+  "expected": {
+    "predictions": {
+      "file": "expected_predictions.csv",
+      "sha256": "aff01264daeb19ed15df58a759b93b6be3e0b8cce0da8093dee72ecbe6b44f8c"
+    },
+    "scenarios": {
+      "file": "scenarios.csv",
+      "sha256": "c7ce422e0bfa82b044dfd540c86aaa5d47dc2132d6582d14eb99f4df9f26f721"
+    },
+    "weights": {
+      "file": "expected_weights.csv",
+      "source_sha256": "58dcc651d666b611013dd1eacdc6d096fe9728be11b743d7f6cd0f9f35b10840",
+      "fixture_sha256": "5616bee1cdd128fa59aff061033dc8707a08ea16820860737cf6abcf732dedb2",
+      "normalization": "The copied source's unnamed index header was renamed to asset. Numeric values and row order are unchanged."
+    }
+  },
+  "optimizer": {
+    "adapter": "optimize_from_historical_returns",
+    "model": "Classic",
+    "risk_measure": "CVaR",
+    "objective": "Sharpe",
+    "rf": 0.0,
+    "alpha": 0.5,
+    "kelly": null,
+    "hist": true,
+    "min_weight": 0.0,
+    "max_weight": 0.25,
+    "nea": 10,
+    "method_mu": "hist",
+    "method_cov": "hist"
+  },
+  "parity": {
+    "optimizer_only_weights": {
+      "rtol": 0.0,
+      "atol": 1e-10,
+      "max_l1_error": 1e-9
+    },
+    "full_pipeline_predictions_and_scenarios": {
+      "rtol": 0.0,
+      "atol": 0.005
+    },
+    "full_pipeline_scores": {
+      "rtol": 0.0,
+      "atol": 0.01
+    },
+    "full_pipeline_weights": {
+      "rtol": 0.0,
+      "atol": 0.005,
+      "max_l1_error": 0.03
+    }
+  },
+  "reference_environment": {
+    "torch": "2.10.0",
+    "gpytorch": "1.15.2",
+    "botorch": "0.18.1",
+    "riskfolio-lib": "7.2.1",
+    "cvxpy": "1.8.1",
+    "numpy": "2.4.2",
+    "scipy": "1.17.1"
+  }
+}
