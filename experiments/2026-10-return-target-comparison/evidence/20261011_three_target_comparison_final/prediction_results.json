@@ -1,0 +1,448 @@
+{
+  "paired_bayesian_comparisons": {
+    "mae": {
+      "comparisons": {
+        "decomposed": {
+          "credible_interval_90": [
+            -0.00014618939192986724,
+            0.0010491187438782467
+          ],
+          "credible_interval_95": [
+            -0.00024210345013208078,
+            0.0012166491721893927
+          ],
+          "posterior_mean_reference_advantage": 0.00039878638666808697,
+          "posterior_probability_reference_better": 0.8763
+        },
+        "price_only": {
+          "credible_interval_90": [
+            0.0007379729359896189,
+            0.0016592597531088508
+          ],
+          "credible_interval_95": [
+            0.0006430805096018467,
+            0.0017287462366465639
+          ],
+          "posterior_mean_reference_advantage": 0.0012179737467462846,
+          "posterior_probability_reference_better": 1.0
+        }
+      },
+      "draws": 20000,
+      "higher_is_better": false,
+      "method": "Bayesian bootstrap over eight non-overlapping three-month blocks",
+      "metric": "absolute_error",
+      "reference": "total_return",
+      "square_root_after_weighting": false
+    },
+    "rmse": {
+      "comparisons": {
+        "decomposed": {
+          "credible_interval_90": [
+            0.00018960505652148367,
+            0.0018923524935041756
+          ],
+          "credible_interval_95": [
+            9.63358429538267e-05,
+            0.002115781872119115
+          ],
+          "posterior_mean_reference_advantage": 0.0009000500147992711,
+          "posterior_probability_reference_better": 0.9886
+        },
+        "price_only": {
+          "credible_interval_90": [
+            0.0005754419691815043,
+            0.0021276545928575323
+          ],
+          "credible_interval_95": [
+            0.00044715688695714606,
+            0.0022684493962633087
+          ],
+          "posterior_mean_reference_advantage": 0.001310510718856344,
+          "posterior_probability_reference_better": 0.9992
+        }
+      },
+      "draws": 20000,
+      "higher_is_better": false,
+      "method": "Bayesian bootstrap over eight non-overlapping three-month blocks",
+      "metric": "squared_error",
+      "reference": "total_return",
+      "square_root_after_weighting": true
+    }
+  },
+  "primary_evaluation_target": "realized adjusted total excess return",
+  "results": {
+    "decomposed": {
+      "decision_total_return": {
+        "asset_pricing_metrics": {
+          "HitRatio": 0.5,
+          "IC": 0.07083333333333335,
+          "IC_p_value": 0.5392401877244617,
+          "IR": 0.12722413971866378,
+          "R2_avg": -0.17754597735107341,
+          "R2_pooled": -0.16911240772886438
+        },
+        "bias_prediction_minus_actual": -0.004430416572312063,
+        "by_asset": {
+          "BNDX": {
+            "bias_prediction_minus_actual": -0.0010136443405203402,
+            "directional_accuracy": 0.4583333333333333,
+            "mae": 0.008017621055401209,
+            "n": 24,
+            "rmse": 0.010462706143744
+          },
+          "IEF": {
+            "bias_prediction_minus_actual": -0.0030772101466939876,
+            "directional_accuracy": 0.5,
+            "mae": 0.01280787956423383,
+            "n": 24,
+            "rmse": 0.016827067225262213
+          },
+          "IJR": {
+            "bias_prediction_minus_actual": -0.0027110183127768,
+            "directional_accuracy": 0.375,
+            "mae": 0.04515706718521114,
+            "n": 24,
+            "rmse": 0.05580478273188197
+          },
+          "SPY": {
+            "bias_prediction_minus_actual": -0.0042960765731192944,
+            "directional_accuracy": 0.5,
+            "mae": 0.029355121331375147,
+            "n": 24,
+            "rmse": 0.03731194158762418
+          },
+          "VEA": {
+            "bias_prediction_minus_actual": -0.011054133488449885,
+            "directional_accuracy": 0.6666666666666666,
+            "mae": 0.03193673565363869,
+            "n": 24,
+            "rmse": 0.04023940332774709
+          }
+        },
+        "directional_accuracy": 0.5,
+        "mae": 0.025454884957972,
+        "n_observations": 120,
+        "rmse": 0.03610590741753423
+      },
+      "native_target": {
+        "asset_pricing_metrics": {
+          "HitRatio": 0.5,
+          "IC": 0.07083333333333335,
+          "IC_p_value": 0.5392401877244617,
+          "IR": 0.12722413971866378,
+          "R2_avg": -0.17754597735107341,
+          "R2_pooled": -0.16911240772886438
+        },
+        "bias_prediction_minus_actual": -0.004430416572312063,
+        "by_asset": {
+          "BNDX": {
+            "bias_prediction_minus_actual": -0.0010136443405203402,
+            "directional_accuracy": 0.4583333333333333,
+            "mae": 0.008017621055401209,
+            "n": 24,
+            "rmse": 0.010462706143744
+          },
+          "IEF": {
+            "bias_prediction_minus_actual": -0.0030772101466939876,
+            "directional_accuracy": 0.5,
+            "mae": 0.01280787956423383,
+            "n": 24,
+            "rmse": 0.016827067225262213
+          },
+          "IJR": {
+            "bias_prediction_minus_actual": -0.0027110183127768,
+            "directional_accuracy": 0.375,
+            "mae": 0.04515706718521114,
+            "n": 24,
+            "rmse": 0.05580478273188197
+          },
+          "SPY": {
+            "bias_prediction_minus_actual": -0.0042960765731192944,
+            "directional_accuracy": 0.5,
+            "mae": 0.029355121331375147,
+            "n": 24,
+            "rmse": 0.03731194158762418
+          },
+          "VEA": {
+            "bias_prediction_minus_actual": -0.011054133488449885,
+            "directional_accuracy": 0.6666666666666666,
+            "mae": 0.03193673565363869,
+            "n": 24,
+            "rmse": 0.04023940332774709
+          }
+        },
+        "directional_accuracy": 0.5,
+        "mae": 0.025454884957972,
+        "n_observations": 120,
+        "rmse": 0.03610590741753423
+      }
+    },
+    "decomposed_distribution_component": {
+      "native_target": {
+        "asset_pricing_metrics": {
+          "HitRatio": 0.8083333333333332,
+          "IC": 0.2083333333333333,
+          "IC_p_value": 0.040411814074605104,
+          "IR": 0.44336568658664377,
+          "R2_avg": -0.37973959209620023,
+          "R2_pooled": -0.35770600767109895
+        },
+        "bias_prediction_minus_actual": 0.00017534721191842225,
+        "by_asset": {
+          "BNDX": {
+            "bias_prediction_minus_actual": 0.00011320113176853089,
+            "directional_accuracy": 0.9583333333333334,
+            "mae": 0.0034369006428129193,
+            "n": 24,
+            "rmse": 0.006550230294429063
+          },
+          "IEF": {
+            "bias_prediction_minus_actual": -0.00045621022200894554,
+            "directional_accuracy": 0.9583333333333334,
+            "mae": 0.0010781137099111048,
+            "n": 24,
+            "rmse": 0.001619264621409585
+          },
+          "IJR": {
+            "bias_prediction_minus_actual": 0.0001248131835665237,
+            "directional_accuracy": 0.6666666666666666,
+            "mae": 0.00201819559756642,
+            "n": 24,
+            "rmse": 0.002409832797104437
+          },
+          "SPY": {
+            "bias_prediction_minus_actual": 0.0003530481995525016,
+            "directional_accuracy": 0.7083333333333334,
+            "mae": 0.0015409264400282837,
+            "n": 24,
+            "rmse": 0.001657247569059239
+          },
+          "VEA": {
+            "bias_prediction_minus_actual": 0.0007418837667135008,
+            "directional_accuracy": 0.75,
+            "mae": 0.004190706908712623,
+            "n": 24,
+            "rmse": 0.005381122478899928
+          }
+        },
+        "directional_accuracy": 0.8083333333333333,
+        "mae": 0.0024529686598062706,
+        "n_observations": 120,
+        "rmse": 0.004075236866055274
+      }
+    },
+    "price_only": {
+      "decision_total_return": {
+        "asset_pricing_metrics": {
+          "HitRatio": 0.4666666666666666,
+          "IC": 0.09166666666666667,
+          "IC_p_value": 0.44020481733923844,
+          "IR": 0.16032991737654767,
+          "R2_avg": -0.27753965021049554,
+          "R2_pooled": -0.19450960504124004
+        },
+        "bias_prediction_minus_actual": -0.0069519666358133555,
+        "by_asset": {
+          "BNDX": {
+            "bias_prediction_minus_actual": -0.004671680016613832,
+            "directional_accuracy": 0.4583333333333333,
+            "mae": 0.009319461669310471,
+            "n": 24,
+            "rmse": 0.011818742664679286
+          },
+          "IEF": {
+            "bias_prediction_minus_actual": -0.005742762273757047,
+            "directional_accuracy": 0.4583333333333333,
+            "mae": 0.01394414655784186,
+            "n": 24,
+            "rmse": 0.017531431617185633
+          },
+          "IJR": {
+            "bias_prediction_minus_actual": -0.004252943857470434,
+            "directional_accuracy": 0.375,
+            "mae": 0.04505845927524065,
+            "n": 24,
+            "rmse": 0.05575863563356799
+          },
+          "SPY": {
+            "bias_prediction_minus_actual": -0.005630739383335543,
+            "directional_accuracy": 0.5,
+            "mae": 0.029629842669518375,
+            "n": 24,
+            "rmse": 0.03735136278432149
+          },
+          "VEA": {
+            "bias_prediction_minus_actual": -0.014461707647889926,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.03343003013869837,
+            "n": 24,
+            "rmse": 0.04133517731081511
+          }
+        },
+        "directional_accuracy": 0.4666666666666667,
+        "mae": 0.026276388062121948,
+        "n_observations": 120,
+        "rmse": 0.036495973491883965
+      },
+      "native_target": {
+        "asset_pricing_metrics": {
+          "HitRatio": 0.47500000000000003,
+          "IC": 0.14166666666666666,
+          "IC_p_value": 0.24250434151005185,
+          "IR": 0.2448686784740461,
+          "R2_avg": -0.16611237590993805,
+          "R2_pooled": -0.16703693489273186
+        },
+        "bias_prediction_minus_actual": -0.004621656921008394,
+        "by_asset": {
+          "BNDX": {
+            "bias_prediction_minus_actual": -0.001103633178019148,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.010392944371589913,
+            "n": 24,
+            "rmse": 0.013242913983964393
+          },
+          "IEF": {
+            "bias_prediction_minus_actual": -0.0026231653196445745,
+            "directional_accuracy": 0.4166666666666667,
+            "mae": 0.013375836167573324,
+            "n": 24,
+            "rmse": 0.017088665950853274
+          },
+          "IJR": {
+            "bias_prediction_minus_actual": -0.0028813754179671676,
+            "directional_accuracy": 0.375,
+            "mae": 0.04580025756812565,
+            "n": 24,
+            "rmse": 0.056728001829615224
+          },
+          "SPY": {
+            "bias_prediction_minus_actual": -0.004631973449564741,
+            "directional_accuracy": 0.5,
+            "mae": 0.029598069439335656,
+            "n": 24,
+            "rmse": 0.03768212323576898
+          },
+          "VEA": {
+            "bias_prediction_minus_actual": -0.011868137239846338,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.03328355408289659,
+            "n": 24,
+            "rmse": 0.04186603136464826
+          }
+        },
+        "directional_accuracy": 0.475,
+        "mae": 0.026490132325904227,
+        "n_observations": 120,
+        "rmse": 0.037035578732156335
+      }
+    },
+    "total_return": {
+      "decision_total_return": {
+        "asset_pricing_metrics": {
+          "HitRatio": 0.5083333333333334,
+          "IC": 0.11249999999999999,
+          "IC_p_value": 0.37141751606892587,
+          "IR": 0.1860866808455245,
+          "R2_avg": -0.11500735185304807,
+          "R2_pooled": -0.10907818618650222
+        },
+        "bias_prediction_minus_actual": -0.005358029308760502,
+        "by_asset": {
+          "BNDX": {
+            "bias_prediction_minus_actual": -0.00238591539895767,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.007922297797606198,
+            "n": 24,
+            "rmse": 0.010163069448049466
+          },
+          "IEF": {
+            "bias_prediction_minus_actual": -0.004233708119884742,
+            "directional_accuracy": 0.5833333333333334,
+            "mae": 0.013157071954596748,
+            "n": 24,
+            "rmse": 0.01655473147366753
+          },
+          "IJR": {
+            "bias_prediction_minus_actual": -0.0037643597947094056,
+            "directional_accuracy": 0.3333333333333333,
+            "mae": 0.04417505124557713,
+            "n": 24,
+            "rmse": 0.05494747588306176
+          },
+          "SPY": {
+            "bias_prediction_minus_actual": -0.004615437788151224,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.02843502032609524,
+            "n": 24,
+            "rmse": 0.03640387945047487
+          },
+          "VEA": {
+            "bias_prediction_minus_actual": -0.011790725442099468,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.03161012597722379,
+            "n": 24,
+            "rmse": 0.03823163269954261
+          }
+        },
+        "directional_accuracy": 0.5083333333333333,
+        "mae": 0.025059913460219817,
+        "n_observations": 120,
+        "rmse": 0.03516666716823819
+      },
+      "native_target": {
+        "asset_pricing_metrics": {
+          "HitRatio": 0.5083333333333334,
+          "IC": 0.11249999999999999,
+          "IC_p_value": 0.37141751606892587,
+          "IR": 0.1860866808455245,
+          "R2_avg": -0.11500735185304807,
+          "R2_pooled": -0.10907818618650222
+        },
+        "bias_prediction_minus_actual": -0.005358029308760502,
+        "by_asset": {
+          "BNDX": {
+            "bias_prediction_minus_actual": -0.00238591539895767,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.007922297797606198,
+            "n": 24,
+            "rmse": 0.010163069448049466
+          },
+          "IEF": {
+            "bias_prediction_minus_actual": -0.004233708119884742,
+            "directional_accuracy": 0.5833333333333334,
+            "mae": 0.013157071954596748,
+            "n": 24,
+            "rmse": 0.01655473147366753
+          },
+          "IJR": {
+            "bias_prediction_minus_actual": -0.0037643597947094056,
+            "directional_accuracy": 0.3333333333333333,
+            "mae": 0.04417505124557713,
+            "n": 24,
+            "rmse": 0.05494747588306176
+          },
+          "SPY": {
+            "bias_prediction_minus_actual": -0.004615437788151224,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.02843502032609524,
+            "n": 24,
+            "rmse": 0.03640387945047487
+          },
+          "VEA": {
+            "bias_prediction_minus_actual": -0.011790725442099468,
+            "directional_accuracy": 0.5416666666666666,
+            "mae": 0.03161012597722379,
+            "n": 24,
+            "rmse": 0.03823163269954261
+          }
+        },
+        "directional_accuracy": 0.5083333333333333,
+        "mae": 0.025059913460219817,
+        "n_observations": 120,
+        "rmse": 0.03516666716823819
+      }
+    }
+  },
+  "schema": "bayesfolio.return_target_comparison.prediction_results.v1"
+}

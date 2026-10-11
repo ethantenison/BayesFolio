@@ -1,0 +1,272 @@
+{
+  "accepted_configuration_source": "tests/regression/test_july_2026_full_pipeline_parity.py",
+  "covariance_config": {
+    "blocks": [
+      {
+        "block_structure": "additive",
+        "components": [
+          {
+            "ard": true,
+            "dims": [
+              0
+            ],
+            "kind": "matern",
+            "lengthscale_policy": {
+              "manual": null,
+              "policy": "adaptive"
+            },
+            "matern_nu": 0.5,
+            "use_outputscale": true
+          }
+        ],
+        "include_as_main_effect": true,
+        "name": "time",
+        "use_outputscale": false,
+        "variable_type": "time"
+      },
+      {
+        "block_structure": "additive",
+        "components": [
+          {
+            "ard": true,
+            "dims": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11
+            ],
+            "kind": "matern",
+            "lengthscale_policy": {
+              "manual": null,
+              "policy": "adaptive"
+            },
+            "matern_nu": 0.5,
+            "use_outputscale": true
+          }
+        ],
+        "include_as_main_effect": true,
+        "name": "etf",
+        "use_outputscale": false,
+        "variable_type": "etf"
+      },
+      {
+        "block_structure": "additive",
+        "components": [
+          {
+            "ard": true,
+            "dims": [
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ],
+            "kind": "matern",
+            "lengthscale_policy": {
+              "manual": null,
+              "policy": "adaptive"
+            },
+            "matern_nu": 0.5,
+            "use_outputscale": true
+          },
+          {
+            "ard": true,
+            "dims": [
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ],
+            "kind": "rq",
+            "lengthscale_policy": {
+              "manual": null,
+              "policy": "adaptive"
+            },
+            "use_outputscale": true
+          },
+          {
+            "dims": [
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ],
+            "kind": "linear",
+            "use_outputscale": true
+          }
+        ],
+        "include_as_main_effect": true,
+        "name": "macro",
+        "use_outputscale": false,
+        "variable_type": "macro"
+      }
+    ],
+    "custom_interactions": [
+      {
+        "blocks": [
+          "etf",
+          "time"
+        ],
+        "name": "etf_x_time",
+        "use_outputscale": true
+      },
+      {
+        "blocks": [
+          "macro",
+          "time"
+        ],
+        "name": "macro_x_time",
+        "use_outputscale": true
+      },
+      {
+        "blocks": [
+          "etf",
+          "macro",
+          "time"
+        ],
+        "name": "etf_x_macro_x_time",
+        "use_outputscale": true
+      }
+    ],
+    "global_structure": "hierarchical",
+    "interaction_policy": "custom",
+    "terms": null
+  },
+  "decomposed_dependence_assumption": "Price and distribution GPs share covariates and configuration but posterior draws are conditionally independent.",
+  "feature_columns": [
+    "t_index",
+    "lag_target",
+    "baspread",
+    "ret_kurt",
+    "chmom",
+    "mom12m",
+    "mom36m",
+    "cs_mom_rank",
+    "max_dd_6m",
+    "ma_signal",
+    "ret_autocorr",
+    "vol_z",
+    "hy_spread",
+    "hy_spread_chg_1m",
+    "hy_spread_z_12m",
+    "vix_slope",
+    "vix_ts_z_12m",
+    "vix",
+    "spy_flow_z_12m",
+    "spy_ret",
+    "erp",
+    "cpi_yoy",
+    "cpi_mom",
+    "copper_ret",
+    "oil_ret",
+    "gold_crude_ratio",
+    "pct_above_50dma",
+    "em_fx_ret"
+  ],
+  "forecast_config": {
+    "etf_feature_columns": [
+      "lag_target",
+      "baspread",
+      "ret_kurt",
+      "chmom",
+      "mom12m",
+      "mom36m",
+      "cs_mom_rank",
+      "max_dd_6m",
+      "ma_signal",
+      "ret_autocorr",
+      "vol_z"
+    ],
+    "input_transform": "botorch_normalize",
+    "macro_feature_columns": [
+      "hy_spread",
+      "hy_spread_chg_1m",
+      "hy_spread_z_12m",
+      "vix_slope",
+      "vix_ts_z_12m",
+      "vix",
+      "spy_flow_z_12m",
+      "spy_ret",
+      "erp",
+      "cpi_yoy",
+      "cpi_mom",
+      "copper_ret",
+      "oil_ret",
+      "gold_crude_ratio",
+      "pct_above_50dma",
+      "em_fx_ret"
+    ],
+    "maxiter": 75,
+    "min_inferred_noise_level": 0.0025,
+    "posterior_scenario_count": 5000,
+    "rank": 5,
+    "schema": "bayesfolio.monthly_portfolio.forecast_config",
+    "schema_version": "0.1.0",
+    "seed": 16638,
+    "target_column": "y_excess_lead",
+    "task_column": "asset_id",
+    "task_covar_prior": "none",
+    "time_feature_columns": [
+      "t_index"
+    ],
+    "time_modulation": "lengthscale_only"
+  },
+  "input_transform": "BoTorch Normalize over all non-task features",
+  "mean_config": {
+    "input_size": null,
+    "kind": "multitask_constant",
+    "num_tasks": null
+  },
+  "outcome_transform": "StratifiedStandardize by ETF task",
+  "runtime": {
+    "dtype": "float64",
+    "maxiter": 75,
+    "posterior_scenarios": 5000,
+    "seed": 16638
+  },
+  "schema": "bayesfolio.return_target_comparison.gp_config.v1",
+  "task_covariance_prior": null,
+  "time_modulation": "lengthscale_only"
+}

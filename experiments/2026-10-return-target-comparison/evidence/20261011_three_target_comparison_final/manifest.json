@@ -1,0 +1,159 @@
+{
+  "asset_classes": {
+    "BNDX": "developed_international_fixed_income",
+    "IEF": "us_fixed_income",
+    "IJR": "us_small_cap_equity",
+    "SPY": "us_large_cap_equity",
+    "VEA": "developed_international_equity"
+  },
+  "assets": [
+    "SPY",
+    "IJR",
+    "IEF",
+    "VEA",
+    "BNDX"
+  ],
+  "command": "experiments/2026-10-return-target-comparison/run_return_target_comparison.py --input-panel experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/input_panel.parquet --output-dir experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final",
+  "created_at_utc": "2026-10-11T18:24:40.719454+00:00",
+  "data_provenance": {
+    "input_panel": "experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/input_panel.parquet",
+    "input_panel_sha256": "0b8fc2dc6214851a2bab448a712766093dda2487c5c32ea6fcfb406cbacc8033",
+    "market_data_snapshot": "experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/market_data_snapshot.csv",
+    "market_data_snapshot_sha256": "769e9d648a9808ad0f77e17a52f0152606094e79b0a073cc8c6c1e2bce69db04",
+    "mode": "offline_replay"
+  },
+  "evaluation": {
+    "comparison_uncertainty": "Bayesian bootstrap over eight non-overlapping three-month blocks",
+    "dates": [
+      "2024-05-31",
+      "2024-06-28",
+      "2024-07-31",
+      "2024-08-30",
+      "2024-09-30",
+      "2024-10-31",
+      "2024-11-29",
+      "2024-12-31",
+      "2025-01-31",
+      "2025-02-28",
+      "2025-03-31",
+      "2025-04-30",
+      "2025-05-30",
+      "2025-06-30",
+      "2025-07-31",
+      "2025-08-29",
+      "2025-09-30",
+      "2025-10-31",
+      "2025-11-28",
+      "2025-12-31",
+      "2026-01-30",
+      "2026-02-27",
+      "2026-03-31",
+      "2026-04-30"
+    ],
+    "design": "expanding-window one-month-ahead walk-forward",
+    "end": "2026-04-30",
+    "primary_target": "adjusted total excess return",
+    "start": "2024-05-31",
+    "training_start": "2021-03-31",
+    "window_count": 24
+  },
+  "git_sha": "29d73d6be7454fcd0ae7ac124e51128eede5291f",
+  "git_status_at_start": "M bayesfolio/engine/forecast/gp/multitask_builder.py\n M experiments/2026-06-portfolio-optimization/run_monthly_optimization_walkforward.py\n M experiments/2026-07-us-equity-etf-features/build_us_equity_feature_artifact.py\n M experiments/2026-07-us-equity-etf-features/experiment_plan.md\n M experiments/2026-07-us-equity-etf-features/run_first_round_walkforward.py\n?? .learnings/\n?? experiments/2026-07-international-equity-etf-features/\n?? experiments/2026-07-us-equity-etf-features/INTERNATIONAL_LEGACY_NOTICE.md\n?? experiments/2026-07-us-equity-etf-features/correlation_audit_international_equity_custom_20260707T172312Z.md\n?? experiments/2026-07-us-equity-etf-features/correlation_audit_international_equity_custom_20260707T182133Z.md\n?? experiments/2026-07-us-equity-etf-features/correlation_audit_with_ijr_20260707T101602Z.md\n?? experiments/2026-07-us-equity-etf-features/decision_log.md\n?? experiments/2026-07-us-equity-etf-features/run_broad_kernel_search.py\n?? experiments/2026-07-us-equity-etf-features/run_international_feature_screen_dynamic.py\n?? experiments/2026-07-us-equity-etf-features/run_international_remaining_feature_screen.py\n?? experiments/2026-07-us-equity-etf-features/run_macro_split_kernel_batch.py\n?? experiments/2026-07-us-equity-etf-features/run_residual_scale_calibration.py\n?? experiments/2026-07-us-equity-etf-features/run_student_t_likelihood_probe.py\n?? experiments/2026-10-return-target-comparison/",
+  "gp_config": {
+    "path": "experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/gp_config.json",
+    "sha256": "e16be407a3b3fb39163d09e133ef1c8c5ff16367814caeadbab41da717bb8e9e"
+  },
+  "input_panel": {
+    "columns": [
+      "t_index",
+      "date",
+      "asset_id",
+      "baspread",
+      "ret_kurt",
+      "chmom",
+      "mom12m",
+      "mom36m",
+      "cs_mom_rank",
+      "max_dd_6m",
+      "ma_signal",
+      "ret_autocorr",
+      "vol_z",
+      "hy_spread",
+      "hy_spread_chg_1m",
+      "hy_spread_z_12m",
+      "vix_slope",
+      "vix_ts_z_12m",
+      "vix",
+      "spy_flow_z_12m",
+      "spy_ret",
+      "erp",
+      "cpi_yoy",
+      "cpi_mom",
+      "copper_ret",
+      "oil_ret",
+      "gold_crude_ratio",
+      "pct_above_50dma",
+      "em_fx_ret",
+      "lag_y_excess_lead",
+      "lag2_y_excess_lead",
+      "y_excess_lead",
+      "target_total_excess",
+      "target_price_excess",
+      "target_distribution_contribution",
+      "cash_distribution_yield",
+      "lag_total_excess",
+      "lag_price_excess",
+      "lag_distribution_contribution"
+    ],
+    "path": "experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/input_panel.parquet",
+    "rows": 315,
+    "sha256": "0b8fc2dc6214851a2bab448a712766093dda2487c5c32ea6fcfb406cbacc8033"
+  },
+  "limitations": [
+    "The five-asset universe is diagnostic and does not estimate behavior for the full retirement universe.",
+    "Common non-lag covariates are held fixed and were originally engineered from the accepted feature artifact.",
+    "The decomposed setup adds independent price and distribution posterior draws and therefore omits residual cross-component dependence.",
+    "No transaction costs or taxes are applied; the account of interest is a tax-deferred IRA."
+  ],
+  "objective": "Compare total, price-only, and decomposed monthly multitask-GP targets on prediction, uncertainty, and downstream total-return portfolio quality.",
+  "replay_command": "uv run --locked python experiments/2026-10-return-target-comparison/run_return_target_comparison.py --input-panel experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/input_panel.parquet --output-dir /tmp/bayesfolio-return-target-replay",
+  "reproducibility_check": {
+    "exact_hash_matches": [
+      "gp_config.json",
+      "input_panel.parquet",
+      "portfolio_results.json",
+      "portfolio_weights.csv",
+      "prediction_details.csv",
+      "prediction_results.json",
+      "uncertainty_details.csv",
+      "uncertainty_results.json"
+    ],
+    "fit_diagnostics_note": "All fit diagnostics except wall-clock fit_seconds matched exactly.",
+    "status": "passed"
+  },
+  "results": {
+    "portfolio_results": {
+      "path": "experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/portfolio_results.json",
+      "sha256": "42523472f54eadf94a37583fbd3627cbfe3e8a115137d8a79d86d0c3613e6d11"
+    },
+    "prediction_results": {
+      "path": "experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/prediction_results.json",
+      "sha256": "122d99d2f251d3bd4715fe521c1985053da964bf10d16b716e67a68ef4f9488e"
+    },
+    "uncertainty_results": {
+      "path": "experiments/2026-10-return-target-comparison/evidence/20261011_three_target_comparison_final/uncertainty_results.json",
+      "sha256": "b5ebf927f910bfc847745d9ada50cab91d48ba53d8c74e45ecb55a0a6c6415e3"
+    }
+  },
+  "schema": "bayesfolio.return_target_comparison.manifest.v1",
+  "software": {
+    "botorch": "0.18.1",
+    "gpytorch": "1.15.2",
+    "numpy": "2.4.2",
+    "pandas": "2.3.3",
+    "python": "3.13.12 (v3.13.12:1cbe4818347, Feb  3 2026, 13:36:53) [Clang 16.0.0 (clang-1600.0.26.6)]",
+    "riskfolio": "7.2.1",
+    "torch": "2.10.0",
+    "yfinance": "0.2.66"
+  }
+}
