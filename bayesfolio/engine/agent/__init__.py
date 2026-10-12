@@ -10,6 +10,15 @@ from bayesfolio.engine.agent.orchestrator import (
     run_orchestration_cycle,
 )
 from bayesfolio.engine.agent.planner import PipelinePlan, PlanStep, default_plan
+from bayesfolio.engine.agent.portfolio_adjustment import (
+    PORTFOLIO_ADJUSTMENT_SYSTEM_PROMPT,
+    PROMPT_VERSION,
+    PortfolioAdjustmentError,
+    StructuredAdjustmentModel,
+    blend_portfolio_weights,
+    build_adjustment_user_prompt,
+    generate_portfolio_adjustment,
+)
 from bayesfolio.engine.agent.prompts import DEFAULT_GP_PLANNER_PROMPT
 from bayesfolio.engine.agent.ticker_extractor import (
     extract_constraints_with_llm,
@@ -21,7 +30,13 @@ from bayesfolio.engine.agent.ticker_extractor import (
 __all__ = [
     "DEFAULT_GP_PLANNER_PROMPT",
     "PipelinePlan",
+    "PORTFOLIO_ADJUSTMENT_SYSTEM_PROMPT",
+    "PROMPT_VERSION",
     "PlanStep",
+    "PortfolioAdjustmentError",
+    "StructuredAdjustmentModel",
+    "blend_portfolio_weights",
+    "build_adjustment_user_prompt",
     "default_plan",
     "plan_gp_design",
     "plan_gp_design_with_status",
@@ -30,6 +45,7 @@ __all__ = [
     "extract_objective_with_llm",
     "extract_risk_preference_with_llm",
     "extract_tickers_with_llm",
+    "generate_portfolio_adjustment",
     "OrchestratorAction",
     "OrchestratorDecision",
     "evaluate_turn",

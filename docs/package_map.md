@@ -35,10 +35,12 @@ Framework payloads from OpenAI, LangChain, LangSmith, LlamaIndex, or similar run
 - `application/monthly_portfolio.py`: canonical composition root for default providers, feature storage, monthly runtime I/O, and engine execution.
 - `application/monthly_decision.py`: canonical entry point for recording approval or rejection of a backtested monthly candidate.
 - `application/schwab_account.py`: canonical composition root for read-only Schwab OAuth, account discovery, and snapshots.
+- `application/portfolio_adjustment.py`: composition root for constrained LLM review with an injected model adapter.
 
 ## Engine
 
 - `engine/agent/`: intent extraction, planning, and LLM-backed GP design helpers.
+- `engine/agent/portfolio_adjustment.py`: fixed prompt, structured validation, and deterministic portfolio blending.
 - `engine/automation/`: monthly business sequencing through injected provider, store, and runtime-I/O interfaces; it contains no concrete persistence or MLflow implementation.
 - `engine/automation/monthly_ports.py`: structural runtime-I/O protocol required by monthly engine execution.
 - `engine/features/`: feature engineering, time alignment, dataset assembly, and provider protocols.
@@ -65,6 +67,7 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 - `io/mlflow_logger.py`: MLflow contract and artifact logging.
 - `io/monthly_portfolio_runtime.py`: local artifact and MLflow implementation of the monthly runtime-I/O protocol.
 - `io/agent_tool_executor.py`: registry-backed execution of agent tool calls.
+- `io/llm/`: provider transports for structured generation; provider payloads do not cross into contracts.
 - `io/schwab/`: Apple credential/default-account storage, Schwab OAuth, GET-only account access, and snapshot mapping.
 
 ## Preferred Public Entry Points
@@ -96,6 +99,7 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 - Final monthly decision: `bayesfolio.application.finalize_monthly_portfolio`
 - Non-executing rebalance plan: `bayesfolio.engine.brokerage.build_rebalance_plan`
 - Read-only Schwab account access: `bayesfolio.application.make_default_schwab_account_access`
+- Structured portfolio adjustment: `bayesfolio.application.run_portfolio_adjustment`
 - Realized performance tracking: `bayesfolio.engine.performance.track_portfolio_performance`
 
 ### Contracts
@@ -107,12 +111,14 @@ Engine leaf domains should not cross-import sibling domains. Cross-domain compos
 - Performance command: `bayesfolio.contracts.commands.TrackPortfolioPerformanceCommand`
 - Feature command: `bayesfolio.contracts.commands.BuildFeaturesDatasetCommand`
 - GP planner request: `bayesfolio.contracts.commands.GPPlannerRequest`
+- Portfolio-adjustment command: `bayesfolio.contracts.commands.GeneratePortfolioAdjustmentCommand`
 - Monthly result: `bayesfolio.contracts.results.MonthlyPortfolioResult`
 - Walk-forward result: `bayesfolio.contracts.results.WalkForwardBacktestResult`
 - Final decision result: `bayesfolio.contracts.results.MonthlyPortfolioDecisionResult`
 - Brokerage snapshot: `bayesfolio.contracts.results.BrokerageAccountSnapshot`
 - Rebalance plan: `bayesfolio.contracts.results.RebalancePlanResult`
 - Realized performance: `bayesfolio.contracts.results.PortfolioPerformanceResult`
+- Portfolio-adjustment result: `bayesfolio.contracts.results.PortfolioAdjustmentResult`
 - Chat contracts: `bayesfolio.contracts.chat`
 - UI contracts: `bayesfolio.contracts.ui`
 

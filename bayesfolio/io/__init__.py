@@ -17,6 +17,7 @@ from bayesfolio.io.backends import (
     resolve_backend_and_key,
 )
 from bayesfolio.io.fingerprints import sha256_digest, sha256_fingerprint
+from bayesfolio.io.llm import OpenAICompatibleChatModel, OpenAICompatibleModelError
 from bayesfolio.io.mlflow_logger import log_artifact_ref, log_contract
 from bayesfolio.io.parquet_store import write_parquet_with_metadata
 from bayesfolio.io.providers import EtfFeaturesProvider, MacroProvider, ReturnsProvider
@@ -34,6 +35,8 @@ __all__ = [
     "log_artifact_ref",
     "log_contract",
     "RegistryToolExecutor",
+    "OpenAICompatibleChatModel",
+    "OpenAICompatibleModelError",
     "ToolHandler",
     "ParquetArtifactStore",
     "ArtifactBackend",

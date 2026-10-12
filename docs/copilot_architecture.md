@@ -118,6 +118,19 @@ inside `io` modules.
 - Keep framework SDK payloads (LangChain/LangSmith/OpenAI/LlamaIndex) out of
 	contracts; adapt them at orchestration or IO adapter boundaries.
 
+### Portfolio-adjustment boundary
+
+- `contracts/commands/portfolio_adjustment.py` owns the point-in-time evidence,
+  retrieval audit, model settings, and restricted action-space schemas.
+- `engine/agent/portfolio_adjustment.py` owns the immutable prompt, response
+  validation, and deterministic current-to-optimizer interpolation.
+- `io/llm/` owns provider HTTP payloads and response parsing.
+- `application/portfolio_adjustment.py` is the supported composition root.
+- The LLM selects only a permitted blend and timing action. It must not produce
+  unconstrained asset weights or perform brokerage actions.
+- Historical evaluation must use publication-dated evidence at or before each
+  decision cutoff; current mutable pages are not valid historical evidence.
+
 ## Assembler vs Mapper Boundary
 
 Use this rule to separate responsibilities inside `engine/`:

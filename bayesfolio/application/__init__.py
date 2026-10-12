@@ -7,6 +7,12 @@ from bayesfolio.application.monthly_portfolio import (
     complete_monthly_portfolio_dependencies,
     run_monthly_portfolio,
 )
+from bayesfolio.application.portfolio_adjustment import (
+    DEFAULT_LOCAL_QWEN_BASE_URL,
+    DEFAULT_LOCAL_QWEN_MODEL,
+    make_local_qwen_adjustment_model,
+    run_portfolio_adjustment,
+)
 from bayesfolio.application.schwab_account import (
     DEFAULT_SCHWAB_REDIRECT_URI,
     SchwabAccountAccess,
@@ -17,9 +23,13 @@ __all__ = [
     "build_default_monthly_portfolio_dependencies",
     "complete_monthly_portfolio_dependencies",
     "finalize_monthly_portfolio",
+    "make_local_qwen_adjustment_model",
     "make_default_feature_providers",
     "make_default_schwab_account_access",
     "run_monthly_portfolio",
+    "run_portfolio_adjustment",
     "DEFAULT_SCHWAB_REDIRECT_URI",
+    "DEFAULT_LOCAL_QWEN_BASE_URL",
+    "DEFAULT_LOCAL_QWEN_MODEL",
     "SchwabAccountAccess",
 ]
