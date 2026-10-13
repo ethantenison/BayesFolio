@@ -105,6 +105,18 @@ Do not judge by RMSE alone. Each run should report:
 - portfolio equity curve, drawdown, turnover, and max weight,
 - slice readout by ETF and by stress/risk regime.
 
+## Interim Learnings
+
+- `2026-07-05`: Expanding windows are the intended walk-forward design for this
+  experiment. Rolling 48-month Stage A artifacts are superseded for decision use.
+- `2026-07-05`: The liquidity and volatility blocks appear more useful for calibration
+  than cross-sectional ranking in the small Stage A screen, while `momentum_plus_macro`
+  is the stronger ranking/portfolio candidate.
+- `2026-07-05`: Simple heteroskedastic formulas from liquidity/volatility did not
+  improve NLL for `momentum_plus_macro`. A post-fit Student-t predictive wrapper did
+  improve NLL over 12 monthly dates, but this is a likelihood-shape diagnostic, not a
+  true Student-t GP refit. See `decision_log.md`.
+
 ## Literature Anchors
 
 - Gu, Kelly, and Xiu, "Empirical Asset Pricing via Machine Learning" (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3159577): broad stock-return evidence that nonlinear interactions among firm characteristics and macro predictors can improve risk-premium forecasts.

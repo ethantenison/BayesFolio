@@ -8,6 +8,7 @@ the local cache. Outputs are written under this experiment folder.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from datetime import date, datetime, timezone
@@ -63,14 +64,110 @@ MACRO_CANDIDATES = [
     "term_spread",
 ]
 
+INTERNATIONAL_EQUITY_MACRO_CANDIDATES = [
+    # Global risk / volatility
+    "vix",
+    "vix3m",
+    "vix_slope",
+    "vix_ts_level",
+    "vix_ts_chg_1p",
+    "vix_ts_z_12p",
+    "skew_proxy",
+    "move_proxy",
+    "dealer_gamma_proxy",
+    # Dollar / FX
+    "dxy",
+    "em_fx",
+    "em_fx_ret",
+    # Regional/global equity risk appetite and breadth
+    "spy_ret",
+    "erp",
+    "rsp_spy",
+    "rsp_spy_roc_1p",
+    "pct_above_50dma",
+    "spy_flow_z_12p",
+    # Global rates / real-rate proxies
+    "tnote10y",
+    "tbill3m",
+    "term_spread",
+    "y10_nominal",
+    "schp_ret",
+    "y10_real_proxy",
+    "breakeven_proxy",
+    "de10y",
+    "jp10y",
+    "uk10y",
+    "cn10y",
+    # Credit / EM risk
+    "credit_spread",
+    "credit_spread_chg_1p",
+    "hy_spread",
+    "hy_spread_chg_1p",
+    "hy_spread_z_12p",
+    # Inflation
+    "cpi_chg_12p",
+    "cpi_chg_1p",
+    # Commodity sensitivity
+    "oil",
+    "copper",
+    "gold",
+    "oil_ret",
+    "copper_ret",
+    "gold_crude_ratio",
+]
+
+MACRO_PRESETS = {
+    "us_equity": MACRO_CANDIDATES,
+    "international_equity": INTERNATIONAL_EQUITY_MACRO_CANDIDATES,
+}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--include-ijr",
+        action="store_true",
+        help="Include deferred IJR in the U.S. equity feature artifact.",
+    )
+    parser.add_argument(
+        "--tickers",
+        default=None,
+        help="Comma-separated ETF family override. When set, --include-ijr is ignored.",
+    )
+    parser.add_argument(
+        "--family-name",
+        default="us_equity",
+        help="Artifact/report family name used in output filenames and manifests.",
+    )
+    parser.add_argument(
+        "--macro-preset",
+        choices=sorted(MACRO_PRESETS),
+        default=None,
+        help="Candidate macro feature preset. Defaults to --family-name when available, else us_equity.",
+    )
+    return parser.parse_args()
+
 
 def main() -> None:
+    args = parse_args()
+    if args.tickers:
+        tickers = [ticker.strip().upper() for ticker in args.tickers.split(",") if ticker.strip()]
+        if not tickers:
+            raise ValueError("--tickers must contain at least one ETF ticker")
+        deferred_tickers = []
+    else:
+        tickers = [*US_EQUITY_TICKERS, *DEFERRED_TICKERS] if args.include_ijr else list(US_EQUITY_TICKERS)
+        deferred_tickers = [] if args.include_ijr else list(DEFERRED_TICKERS)
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    artifact_name = f"us_equity_first_round_feature_candidates_{run_id}.parquet"
+    family_name = str(args.family_name).strip().lower().replace(" ", "_")
+    macro_preset = args.macro_preset or (family_name if family_name in MACRO_PRESETS else "us_equity")
+    macro_candidates = list(MACRO_PRESETS[macro_preset])
+    suffix = "custom" if args.tickers else ("with_ijr" if args.include_ijr else "first_round")
+    artifact_name = f"{family_name}_{suffix}_feature_candidates_{run_id}.parquet"
 
     command = BuildFeaturesDatasetCommand(
-        tickers=US_EQUITY_TICKERS,
+        tickers=tickers,
         drop_assets=[],
         lookback_date=LOOKBACK_DATE,
         start_date=START_DATE,
@@ -78,7 +175,7 @@ def main() -> None:
         interval=Interval.DAILY,
         horizon=Horizon.MONTHLY,
         etf_cols=ETF_CANDIDATES,
-        macro_cols=MACRO_CANDIDATES,
+        macro_cols=macro_candidates,
         drop_etf_cols=[],
         drop_macro_cols=[],
         clip_quantile=0.99,
@@ -106,37 +203,40 @@ def main() -> None:
     store = ParquetArtifactStore(base_dir=ARTIFACT_DIR)
     result = build_features_dataset(command=command, providers=providers, artifact_store=store)
     artifact_path = resolve_uri(str(result.artifact.uri))
-    audit = audit_correlations(artifact_path)
+    audit = audit_correlations(artifact_path, macro_candidates=macro_candidates)
 
     manifest = {
-        "schema": "bayesfolio.us_equity_feature_artifact.v1",
+        "schema": "bayesfolio.etf_family_feature_artifact.v1",
         "run_id": run_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "family_name": family_name,
         "artifact_path": str(artifact_path),
         "sha256": sha256_file(artifact_path),
         "row_count": result.artifact.row_count,
         "column_count": result.artifact.column_count,
-        "tickers": US_EQUITY_TICKERS,
-        "deferred_tickers": DEFERRED_TICKERS,
+        "tickers": tickers,
+        "deferred_tickers": deferred_tickers,
         "lookback_date": LOOKBACK_DATE.isoformat(),
         "start_date": START_DATE.isoformat(),
         "end_date": END_DATE.isoformat(),
         "horizon": Horizon.MONTHLY.value,
         "engineered_candidates": ENGINEERED_CANDIDATES,
         "etf_candidates": ETF_CANDIDATES,
-        "macro_candidates": MACRO_CANDIDATES,
+        "macro_preset": macro_preset,
+        "macro_candidates": macro_candidates,
         "diagnostics": result.diagnostics,
         "correlation_audit": audit,
     }
     manifest_path = ARTIFACT_DIR / f"manifest_{run_id}.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    write_correlation_report(manifest)
+    report_name = f"correlation_audit_{family_name}_{suffix}_{run_id}.md"
+    write_correlation_report(manifest, tickers=tickers, report_path=EXPERIMENT_DIR / report_name)
     print(json.dumps({"artifact": str(artifact_path), "manifest": str(manifest_path)}, indent=2))
 
 
-def audit_correlations(artifact_path: Path) -> dict[str, object]:
+def audit_correlations(artifact_path: Path, *, macro_candidates: list[str]) -> dict[str, object]:
     frame = pd.read_parquet(artifact_path)
-    requested_cols = [*ENGINEERED_CANDIDATES, *ETF_CANDIDATES, *MACRO_CANDIDATES]
+    requested_cols = [*ENGINEERED_CANDIDATES, *ETF_CANDIDATES, *macro_candidates]
     candidate_cols = [column for column in requested_cols if column in frame.columns]
     missing_cols = [column for column in requested_cols if column not in frame.columns]
     numeric = frame[candidate_cols].apply(pd.to_numeric, errors="coerce")
@@ -174,13 +274,16 @@ def audit_correlations(artifact_path: Path) -> dict[str, object]:
     }
 
 
-def write_correlation_report(manifest: dict[str, object]) -> None:
+def write_correlation_report(manifest: dict[str, object], *, tickers: list[str], report_path: Path) -> None:
     audit = manifest["correlation_audit"]
     assert isinstance(audit, dict)
     lines = [
-        "# U.S. Equity Candidate Feature Correlation Audit\n",
+        "# ETF Family Candidate Feature Correlation Audit\n",
         f"Artifact: `{manifest['artifact_path']}`\n",
-        f"Family: `{', '.join(US_EQUITY_TICKERS)}`. Horizon: `{manifest['horizon']}`.\n",
+        (
+            f"Family: `{manifest.get('family_name', 'unknown')}` / `{', '.join(tickers)}`. "
+            f"Horizon: `{manifest['horizon']}`.\n"
+        ),
         "ETF-local and macro predictors were rebuilt live for this family so newly added columns "
         "and horizon-aligned macro transformations are included. Return labels used local cache.\n",
         "\n## Availability\n",
@@ -192,9 +295,7 @@ def write_correlation_report(manifest: dict[str, object]) -> None:
     assert isinstance(perfect, list)
     if perfect:
         for row in perfect:
-            lines.append(
-                f"- `{row['feature_a']}` vs `{row['feature_b']}`: corr `{row['corr']:.6f}`, n `{row['n']}`\n"
-            )
+            lines.append(f"- `{row['feature_a']}` vs `{row['feature_b']}`: corr `{row['corr']:.6f}`, n `{row['n']}`\n")
     else:
         lines.append("- No pair had absolute Pearson correlation >= `0.999999` among available candidates.\n")
 
@@ -203,9 +304,7 @@ def write_correlation_report(manifest: dict[str, object]) -> None:
     assert isinstance(high, list)
     if high:
         for row in high[:30]:
-            lines.append(
-                f"- `{row['feature_a']}` vs `{row['feature_b']}`: corr `{row['corr']:.4f}`, n `{row['n']}`\n"
-            )
+            lines.append(f"- `{row['feature_a']}` vs `{row['feature_b']}`: corr `{row['corr']:.4f}`, n `{row['n']}`\n")
     else:
         lines.append("- No pair had absolute Pearson correlation >= `0.98` below the perfect-correlation threshold.\n")
 
@@ -218,7 +317,7 @@ def write_correlation_report(manifest: dict[str, object]) -> None:
     else:
         lines.append("- No available audited candidate was constant.\n")
 
-    (EXPERIMENT_DIR / "correlation_audit.md").write_text("".join(lines), encoding="utf-8")
+    report_path.write_text("".join(lines), encoding="utf-8")
 
 
 def resolve_uri(uri: str) -> Path:

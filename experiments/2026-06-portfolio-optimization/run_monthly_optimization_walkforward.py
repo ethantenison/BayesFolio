@@ -83,7 +83,11 @@ SIGNED_EXPERIMENTS = {
     "signed_lkj_eta_2_task_noise_floor",
 }
 LENGTHSCALE_FLOOR_EXPERIMENTS = {"lengthscale_floor", "signed_lkj_eta_2_lengthscale_floor"}
-OUTPUTSCALE_FLOOR_EXPERIMENTS = {"component_outputscale_floor", "positive_no_prior_outputscale_floor"}
+OUTPUTSCALE_FLOOR_EXPERIMENTS = {
+    "component_outputscale_floor",
+    "positive_no_prior_outputscale_floor",
+    "signed_lkj_eta_2_outputscale_floor",
+}
 TURNOVER_BLEND_EXPERIMENTS = {"turnover_blend", "signed_lkj_eta_2_turnover_blend"}
 TASK_NOISE_FLOOR_EXPERIMENTS = {"signed_lkj_eta_2_task_noise_floor"}
 
@@ -196,6 +200,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--upperlng", type=float, default=0.20)
     parser.add_argument("--nea", type=int, default=10)
+    parser.add_argument("--gp-riskfolio-rm", type=str, default="CVaR")
+    parser.add_argument("--gp-riskfolio-obj", type=str, default="Sharpe")
     parser.add_argument("--historical-method-mu", type=str, default="ewma2")
     parser.add_argument("--historical-method-cov", type=str, default="gerber1")
     parser.add_argument(
@@ -208,6 +214,7 @@ def parse_args() -> argparse.Namespace:
             "lengthscale_floor",
             "component_outputscale_floor",
             "positive_no_prior_outputscale_floor",
+            "signed_lkj_eta_2_outputscale_floor",
             "scenario_mean_scale",
             "turnover_blend",
             "signed_lkj_eta_2_turnover_blend",
@@ -426,8 +433,8 @@ def build_manifest(
             },
             "riskfolio_gp": {
                 "model": "Classic",
-                "rm": "CVaR",
-                "obj": "Sharpe",
+                "rm": args.gp_riskfolio_rm,
+                "obj": args.gp_riskfolio_obj,
                 "method_mu": "hist",
                 "method_cov": "hist",
                 "hist": True,
@@ -532,7 +539,7 @@ def gp_variant_name(experiment: str) -> str:
         return "positive_no_prior"
     if experiment == "signed_no_prior":
         return "signed_no_prior"
-    if experiment in SIGNED_EXPERIMENTS:
+    if experiment in {*SIGNED_EXPERIMENTS, "signed_lkj_eta_2_outputscale_floor"}:
         return "signed_lkj_eta_2"
     return "positive_beta_prior"
 
@@ -629,6 +636,8 @@ def optimize_riskfolio(
     *,
     method_mu: str,
     method_cov: str,
+    rm: str = "CVaR",
+    obj: str = "Sharpe",
     upperlng: float,
     nea: int,
     fallback_weights: pd.Series | None = None,
@@ -663,6 +672,8 @@ def optimize_riskfolio(
                 clean,
                 method_mu=method_mu,
                 method_cov=method_cov,
+                rm=rm,
+                obj=obj,
                 upperlng=float(attempt["upperlng"]),
                 nea=attempt["nea"],
             )
@@ -701,6 +712,8 @@ def solve_riskfolio(
     *,
     method_mu: str,
     method_cov: str,
+    rm: str = "CVaR",
+    obj: str = "Sharpe",
     upperlng: float,
     nea: int | None,
 ) -> pd.Series:
@@ -713,8 +726,8 @@ def solve_riskfolio(
     portfolio.assets_stats(method_mu=method_mu, method_cov=method_cov)
     weights_df = portfolio.optimization(
         model="Classic",
-        rm="CVaR",
-        obj="Sharpe",
+        rm=rm,
+        obj=obj,
         rf=0.0,
         hist=True,
     )
@@ -1947,6 +1960,8 @@ def run(args: argparse.Namespace) -> None:
             scenarios.loc[:, final_universe],
             method_mu="hist",
             method_cov="hist",
+            rm=args.gp_riskfolio_rm,
+            obj=args.gp_riskfolio_obj,
             upperlng=args.upperlng,
             nea=args.nea,
             fallback_weights=gp_fallback_weights,

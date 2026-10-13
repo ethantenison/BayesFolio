@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bayesfolio.etf_family_next_experiment_candidates.v1",
+  "title": "Next deterministic U.S. ETF confirmation experiment batch",
+  "type": "object",
+  "required": [
+    "schema",
+    "based_on",
+    "objectives",
+    "batch_design",
+    "candidates",
+    "execution_order",
+    "stopping_rules",
+    "deferred_ideas"
+  ],
+  "properties": {
+    "schema": {
+      "const": "bayesfolio.etf_family_next_experiment_candidates.v1"
+    },
+    "based_on": {
+      "type": "object",
+      "required": ["evidence_sha256", "current_hypervolume", "reference_point", "seeds"],
+      "properties": {
+        "evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "current_hypervolume": {"type": "number", "exclusiveMinimum": 0},
+        "reference_point": {"type": "object"},
+        "seeds": {"const": [27, 127, 227]}
+      }
+    },
+    "objectives": {
+      "type": "object",
+      "required": ["maximize", "minimize", "diagnostic_only", "turnover_excluded"]
+    },
+    "batch_design": {
+      "type": "object",
+      "required": ["candidate_count", "exploit_count", "bridge_count", "explore_count", "selection_logic"]
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "mode",
+          "priority",
+          "parent_configurations",
+          "hypothesis",
+          "frontier_gap_targeted",
+          "exact_feature_changes",
+          "exact_model_changes",
+          "exact_runner_args",
+          "cached_columns_required",
+          "evidence",
+          "expected_direction",
+          "falsification_condition",
+          "risk",
+          "compute"
+        ],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$"},
+          "mode": {"enum": ["exploit", "bridge", "explore"]},
+          "priority": {"type": "integer", "minimum": 1},
+          "parent_configurations": {"type": "array", "items": {"type": "string"}},
+          "hypothesis": {"type": "string"},
+          "frontier_gap_targeted": {"type": "array", "items": {"enum": ["mean_ic", "mean_gaussian_nll", "sharpe"]}},
+          "exact_feature_changes": {
+            "type": "object",
+            "required": ["add", "remove"],
+            "properties": {
+              "add": {"type": "array", "items": {"type": "string"}},
+              "remove": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "exact_model_changes": {"type": "array", "items": {"type": "string"}},
+          "exact_runner_args": {"type": "array", "items": {"type": "string"}},
+          "cached_columns_required": {"type": "array", "items": {"type": "string"}},
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["path", "finding"],
+              "properties": {
+                "path": {"type": "string"},
+                "finding": {"type": "string"}
+              }
+            }
+          },
+          "expected_direction": {
+            "type": "object",
+            "required": ["mean_ic", "mean_gaussian_nll", "sharpe"]
+          },
+          "falsification_condition": {"type": "string"},
+          "risk": {"type": "string"},
+          "compute": {
+            "type": "object",
+            "required": ["seeds", "windows", "run_count"],
+            "properties": {
+              "seeds": {"const": [27, 127, 227]},
+              "windows": {"const": 24},
+              "run_count": {"const": 3}
+            }
+          }
+        }
+      }
+    },
+    "execution_order": {"type": "array", "items": {"type": "string"}},
+    "stopping_rules": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "deferred_ideas": {"type": "array"}
+  }
+}

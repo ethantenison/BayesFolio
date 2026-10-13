@@ -1,0 +1,37 @@
+{
+  "all_passed": true,
+  "configurations": [
+    "U-AC",
+    "U-C005",
+    "U-C009",
+    "U-ALL-MATCH"
+  ],
+  "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+  "date_max": "2026-05-29",
+  "date_min": "2024-06-28",
+  "diagnostic_only": [
+    "cumulative_return",
+    "rmse"
+  ],
+  "failures": [],
+  "n_dates": 24,
+  "pareto_objectives": {
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ]
+  },
+  "schema": "bayesfolio.etf_family_confirmation_validation.v1",
+  "seed": 27,
+  "sharpe_definition": {
+    "formula": "mean(monthly_return) / sample_std(monthly_return) * sqrt(12)",
+    "periods_per_year": 12.0,
+    "return_series": "y_excess_lead portfolio return, already adjusted for the integrated risk-free return",
+    "risk_free_return_per_period": 0.0,
+    "standard_deviation_ddof": 1
+  },
+  "turnover_excluded": true
+}

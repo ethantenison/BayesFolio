@@ -31,10 +31,13 @@ from gpytorch.kernels import (
     LinearKernel,
     MaternKernel,
     PeriodicKernel,
+    PolynomialKernel,
     ProductKernel,
     RBFKernel,
     RQKernel,
     ScaleKernel,
+    SpectralDeltaKernel,
+    SpectralMixtureKernel,
 )
 from gpytorch.likelihoods import HadamardGaussianLikelihood
 from gpytorch.means import ConstantMean, LinearMean, Mean, MultitaskMean, ZeroMean
@@ -63,6 +66,9 @@ class KernelKind(StrEnum):
     RQ = "rq"
     PERIODIC = "periodic"
     LINEAR = "linear"
+    POLYNOMIAL = "polynomial"
+    SPECTRAL_MIXTURE = "spectral_mixture"
+    SPECTRAL_DELTA = "spectral_delta"
 
 
 class MeanKind(StrEnum):
@@ -290,12 +296,66 @@ class LinearKernelComponentConfig(BaseKernelComponentConfig):
     kind: Literal[KernelKind.LINEAR] = KernelKind.LINEAR
 
 
+class PolynomialKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``PolynomialKernel``.
+
+    Attributes:
+        kind: Discriminator for a polynomial kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+        ard: Whether to use ARD lengthscales.
+        power: Polynomial degree.
+        lengthscale_policy: Lengthscale prior and lower-bound policy.
+    """
+
+    kind: Literal[KernelKind.POLYNOMIAL] = KernelKind.POLYNOMIAL
+    ard: bool = True
+    power: int = 2
+    lengthscale_policy: LengthscalePolicyConfig = Field(default_factory=LengthscalePolicyConfig)
+
+
+class SpectralMixtureKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``SpectralMixtureKernel``.
+
+    Attributes:
+        kind: Discriminator for a spectral mixture kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+        ard: Whether to use separate spectral parameters per input dimension.
+        num_mixtures: Number of mixture components.
+    """
+
+    kind: Literal[KernelKind.SPECTRAL_MIXTURE] = KernelKind.SPECTRAL_MIXTURE
+    ard: bool = True
+    num_mixtures: int = 2
+
+
+class SpectralDeltaKernelComponentConfig(BaseKernelComponentConfig):
+    """Kernel component configuration for ``SpectralDeltaKernel``.
+
+    Attributes:
+        kind: Discriminator for a spectral delta kernel.
+        dims: Active feature indices for this component.
+        use_outputscale: Whether to wrap the component in ``ScaleKernel`` when
+            the component is used directly as an additive term.
+        num_deltas: Number of spectral delta samples.
+    """
+
+    kind: Literal[KernelKind.SPECTRAL_DELTA] = KernelKind.SPECTRAL_DELTA
+    num_deltas: int = 128
+
+
 KernelComponentConfig = Annotated[
     MaternKernelComponentConfig
     | RBFKernelComponentConfig
     | RQKernelComponentConfig
     | PeriodicKernelComponentConfig
-    | LinearKernelComponentConfig,
+    | LinearKernelComponentConfig
+    | PolynomialKernelComponentConfig
+    | SpectralMixtureKernelComponentConfig
+    | SpectralDeltaKernelComponentConfig,
     Field(discriminator="kind"),
 ]
 
@@ -536,16 +596,38 @@ def _build_kernel_component(
         should_scale = component.use_outputscale if apply_outputscale is None else apply_outputscale
         return ScaleKernel(kernel, batch_shape=batch_shape) if should_scale else kernel
 
-    ard_num_dims = len(component.dims) if component.ard else 1
+    if isinstance(component, SpectralDeltaKernelComponentConfig):
+        kernel = SpectralDeltaKernel(
+            num_dims=len(component.dims),
+            num_deltas=component.num_deltas,
+            active_dims=tuple(component.dims),
+            batch_shape=batch_shape,
+        )
+        should_scale = component.use_outputscale if apply_outputscale is None else apply_outputscale
+        return ScaleKernel(kernel, batch_shape=batch_shape) if should_scale else kernel
+
+    if isinstance(component, SpectralMixtureKernelComponentConfig):
+        spectral_ard_num_dims = len(component.dims) if component.ard else 1
+        kernel = SpectralMixtureKernel(
+            num_mixtures=component.num_mixtures,
+            ard_num_dims=spectral_ard_num_dims,
+            active_dims=tuple(component.dims),
+            batch_shape=batch_shape,
+        )
+        should_scale = component.use_outputscale if apply_outputscale is None else apply_outputscale
+        return ScaleKernel(kernel, batch_shape=batch_shape) if should_scale else kernel
+
+    prior_ard_num_dims = len(component.dims) if component.ard else 1
+    kernel_ard_num_dims = len(component.dims) if component.ard else None
     prior, constraint = _resolve_lengthscale_prior_and_constraint(
         policy=component.lengthscale_policy,
-        ard_num_dims=ard_num_dims,
+        ard_num_dims=prior_ard_num_dims,
     )
 
     if isinstance(component, MaternKernelComponentConfig):
         kernel = MaternKernel(
             nu=component.matern_nu,
-            ard_num_dims=ard_num_dims,
+            ard_num_dims=kernel_ard_num_dims,
             active_dims=tuple(component.dims),
             batch_shape=batch_shape,
             lengthscale_prior=prior,
@@ -553,7 +635,7 @@ def _build_kernel_component(
         )
     elif isinstance(component, RBFKernelComponentConfig):
         kernel = RBFKernel(
-            ard_num_dims=ard_num_dims,
+            ard_num_dims=kernel_ard_num_dims,
             active_dims=tuple(component.dims),
             batch_shape=batch_shape,
             lengthscale_prior=prior,
@@ -561,7 +643,7 @@ def _build_kernel_component(
         )
     elif isinstance(component, RQKernelComponentConfig):
         kernel = RQKernel(
-            ard_num_dims=ard_num_dims,
+            ard_num_dims=kernel_ard_num_dims,
             active_dims=tuple(component.dims),
             batch_shape=batch_shape,
             lengthscale_prior=prior,
@@ -572,11 +654,20 @@ def _build_kernel_component(
         period_prior_cv = component.period_prior.cv if component.period_prior is not None else 0.5
         period_prior = make_period_length_prior(period_length, period_prior_cv)
         kernel = PeriodicKernel(
-            ard_num_dims=ard_num_dims,
+            ard_num_dims=prior_ard_num_dims,
             active_dims=tuple(component.dims),
             batch_shape=batch_shape,
             period_length_prior=period_prior,
             period_length=period_length,
+            lengthscale_prior=prior,
+            lengthscale_constraint=constraint,
+        )
+    elif isinstance(component, PolynomialKernelComponentConfig):
+        kernel = PolynomialKernel(
+            power=component.power,
+            ard_num_dims=kernel_ard_num_dims,
+            active_dims=tuple(component.dims),
+            batch_shape=batch_shape,
             lengthscale_prior=prior,
             lengthscale_constraint=constraint,
         )
@@ -844,8 +935,15 @@ def default_covar_config_for_non_task_dims(
     )
 
 
-#########Time varying add on from gparchitect
 def add_time_varying_os_ls(covar_module: Kernel) -> Kernel:
+    """Apply time-varying lengthscale and outputscale wrappers.
+
+    Args:
+        covar_module: Base covariance module to wrap.
+
+    Returns:
+        Kernel with time-varying lengthscale and outputscale behavior.
+    """
     covar_module = build_time_varying_kernel(covar_module, time_feature_index=0, target="lengthscale")
     covar_module = build_time_varying_kernel(covar_module, time_feature_index=0, target="outputscale")
     return covar_module
@@ -960,8 +1058,11 @@ __all__ = [
     "MeanModuleConfig",
     "PeriodicKernelComponentConfig",
     "PeriodLengthPriorConfig",
+    "PolynomialKernelComponentConfig",
     "RBFKernelComponentConfig",
     "RQKernelComponentConfig",
+    "SpectralDeltaKernelComponentConfig",
+    "SpectralMixtureKernelComponentConfig",
     "build_covar_module",
     "build_mean_module",
     "build_multitask_gp",

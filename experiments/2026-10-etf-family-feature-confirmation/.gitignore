@@ -1,0 +1,8 @@
+# Runtime audit bundles duplicate the exact source snapshots and remain local.
+/executions/
+
+# Ephemeral local-model process and workflow logs/status.
+/planning/qwen_server.log
+/planning/qwen_step4.log
+/planning/qwen_step4_final.txt
+/planning/qwen_workflow_status.json
