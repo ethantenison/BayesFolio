@@ -11,7 +11,15 @@
     "us_u005_ac_s27",
     "us_c005_s27",
     "us_c009_s27",
-    "us_all_match_s27"
+    "us_all_match_s27",
+    "us_u005_ac_s127",
+    "us_c005_s127",
+    "us_c009_s127",
+    "us_all_match_s127",
+    "us_u005_ac_s227",
+    "us_c005_s227",
+    "us_c009_s227",
+    "us_all_match_s227"
   ],
   "failures": [],
   "n_dates": 24,
@@ -26,7 +34,9 @@
   },
   "schema": "bayesfolio.etf_family_confirmation_validation.v2",
   "seeds": [
-    27
+    27,
+    127,
+    227
   ],
   "sharpe_definition": {
     "formula": "mean(monthly_excess_return) / sample_std(monthly_excess_return) * sqrt(12)",

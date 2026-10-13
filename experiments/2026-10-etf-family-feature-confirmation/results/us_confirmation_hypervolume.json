@@ -6,7 +6,7 @@
     "mean_ic": "maximize",
     "sharpe": "maximize"
   },
-  "pareto_configuration_count": 4,
+  "pareto_configuration_count": 3,
   "reference_point_maximization_space": {
     "mean_ic": 0.0,
     "negative_mean_gaussian_nll": 0.0,
@@ -18,5 +18,5 @@
     "sharpe": 0.0
   },
   "schema": "bayesfolio.etf_family_confirmation_hypervolume.v1",
-  "value": 0.5589256113307556
+  "value": 0.6102258300032914
 }

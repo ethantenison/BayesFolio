@@ -1,0 +1,480 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet"
+  ],
+  "configuration_aggregates": [
+    {
+      "configuration": "U-AC",
+      "cumulative_return_diagnostic_only": 0.3667842397960879,
+      "mean_gaussian_nll": -1.653460005175997,
+      "mean_ic": 0.1305555555555555,
+      "pareto_nondominated": false,
+      "rmse_diagnostic_only": 0.0461385610548352,
+      "seed_count": 3,
+      "seeds": "27,127,227",
+      "sharpe": 1.2691293297416706,
+      "std_gaussian_nll": 0.0263403596842265,
+      "std_ic": 0.0315494908100015,
+      "std_sharpe": 0.0962719688394009,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C005",
+      "cumulative_return_diagnostic_only": 0.3405400211124355,
+      "mean_gaussian_nll": -1.7058857080827978,
+      "mean_ic": 0.2722222222222222,
+      "pareto_nondominated": true,
+      "rmse_diagnostic_only": 0.0452603778339379,
+      "seed_count": 3,
+      "seeds": "27,127,227",
+      "sharpe": 1.217001314005479,
+      "std_gaussian_nll": 0.022155983027919,
+      "std_ic": 0.0535758375610719,
+      "std_sharpe": 0.1042616011629626,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C009",
+      "cumulative_return_diagnostic_only": 0.3079453124109677,
+      "mean_gaussian_nll": -1.7132160145294602,
+      "mean_ic": 0.075,
+      "pareto_nondominated": true,
+      "rmse_diagnostic_only": 0.0451867034585078,
+      "seed_count": 3,
+      "seeds": "27,127,227",
+      "sharpe": 1.151083402072545,
+      "std_gaussian_nll": 0.0202663466312143,
+      "std_ic": 0.0381881307912986,
+      "std_sharpe": 0.1199609032499527,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-ALL-MATCH",
+      "cumulative_return_diagnostic_only": 0.3856007814017239,
+      "mean_gaussian_nll": -1.658456136336144,
+      "mean_ic": 0.2277777777777777,
+      "pareto_nondominated": true,
+      "rmse_diagnostic_only": 0.04619879354314,
+      "seed_count": 3,
+      "seeds": "27,127,227",
+      "sharpe": 1.3346474163564104,
+      "std_gaussian_nll": 0.0195045036210042,
+      "std_ic": 0.0292657048690353,
+      "std_sharpe": 0.0552137793936253,
+      "validation_passed": true
+    }
+  ],
+  "evaluated_configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro",
+        "--custom-etf-cols",
+        "mom6m,mom12m_skip1m,cs_mom_rank,trend_slope",
+        "--custom-macro-cols",
+        "vix,vix_slope,spy_ret,pct_above_50dma,hy_spread_chg_1p,hy_spread_z_12p,cpi_chg_12p,term_spread",
+        "--covar-grouping-proposal",
+        "macro_split_custom_pending",
+        "--macro-market-kernel-id",
+        "rq_lin_ard_on",
+        "--macro-market-ard",
+        "true",
+        "--macro-credit-inflation-kernel-id",
+        "m05_ard_on",
+        "--macro-credit-inflation-ard",
+        "true",
+        "--include-time-etf-market-three-way",
+        "--include-macro-market-credit-interaction",
+        "--include-macro-market-credit-etf-three-way",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "id": "us_u005_ac",
+      "label": "U-AC"
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "matern_linear",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "id": "us_c005",
+      "label": "U-C005"
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "matern_linear",
+        "--interactions-only",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "id": "us_c009",
+      "label": "U-C009"
+    },
+    {
+      "args": [
+        "--feature-set",
+        "compact_pruned",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,baspread,ret_kurt,chmom,mom12m,mom36m,cs_mom_rank,max_dd_6m,ma_signal,ret_autocorr,vol_z",
+        "--custom-macro-cols",
+        "hy_spread,hy_spread_chg_1p,hy_spread_z_12p,vix_slope,vix_ts_z_12p,vix,spy_flow_z_12p,spy_ret,erp,cpi_chg_12p,cpi_chg_1p,copper_ret,oil_ret,gold_crude_ratio,pct_above_50dma,em_fx_ret",
+        "--kernel-composition-proposal",
+        "e_plus_m_plus_t_plus_et_plus_mt_plus_emt",
+        "--time-modulation-mode",
+        "lengthscale_only"
+      ],
+      "id": "us_all_match",
+      "label": "U-ALL-MATCH"
+    }
+  ],
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "exclude_ijr": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "aggregation": "configuration means across the requested seed panel",
+    "configuration_count": 4,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "pareto_configuration_count": 3,
+    "reference_point_maximization_space": {
+      "mean_ic": 0.0,
+      "negative_mean_gaussian_nll": 0.0,
+      "sharpe": 0.0
+    },
+    "reference_point_raw_objectives": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "schema": "bayesfolio.etf_family_confirmation_hypervolume.v1",
+    "value": 0.6102258300032914
+  },
+  "objectives": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "turnover_excluded": true
+  },
+  "pareto_front": [
+    {
+      "configuration": "U-C005",
+      "cumulative_return_diagnostic_only": 0.3405400211124355,
+      "mean_gaussian_nll": -1.7058857080827978,
+      "mean_ic": 0.2722222222222222,
+      "pareto_nondominated": true,
+      "rmse_diagnostic_only": 0.0452603778339379,
+      "seed_count": 3,
+      "seeds": "27,127,227",
+      "sharpe": 1.217001314005479,
+      "std_gaussian_nll": 0.022155983027919,
+      "std_ic": 0.0535758375610719,
+      "std_sharpe": 0.1042616011629626,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C009",
+      "cumulative_return_diagnostic_only": 0.3079453124109677,
+      "mean_gaussian_nll": -1.7132160145294602,
+      "mean_ic": 0.075,
+      "pareto_nondominated": true,
+      "rmse_diagnostic_only": 0.0451867034585078,
+      "seed_count": 3,
+      "seeds": "27,127,227",
+      "sharpe": 1.151083402072545,
+      "std_gaussian_nll": 0.0202663466312143,
+      "std_ic": 0.0381881307912986,
+      "std_sharpe": 0.1199609032499527,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-ALL-MATCH",
+      "cumulative_return_diagnostic_only": 0.3856007814017239,
+      "mean_gaussian_nll": -1.658456136336144,
+      "mean_ic": 0.2277777777777777,
+      "pareto_nondominated": true,
+      "rmse_diagnostic_only": 0.04619879354314,
+      "seed_count": 3,
+      "seeds": "27,127,227",
+      "sharpe": 1.3346474163564104,
+      "std_gaussian_nll": 0.0195045036210042,
+      "std_ic": 0.0292657048690353,
+      "std_sharpe": 0.0552137793936253,
+      "validation_passed": true
+    }
+  ],
+  "research_allowlist": [
+    "experiments/2026-10-etf-family-feature-confirmation/README.md",
+    "experiments/2026-10-etf-family-feature-confirmation/PLAN.md",
+    "experiments/2026-10-etf-family-feature-confirmation/us_confirmation_config.json",
+    "experiments/2026-07-us-equity-etf-features/experiment_plan.md",
+    "experiments/2026-07-us-equity-etf-features/decision_log.md",
+    "experiments/2026-07-us-equity-etf-features/redundancy_pruning_decisions.md",
+    "experiments/2026-07-us-equity-etf-features/run_first_round_walkforward.py",
+    "experiments/2026-07-international-equity-etf-features/README.md",
+    "experiments/2026-07-international-equity-etf-features/runs/xgboost_shap_optuna_rankspace_400_20260709T0036Z/REPORT.md"
+  ],
+  "research_root": "/Users/et/Documents/BayesFolio",
+  "run_objectives": [
+    {
+      "configuration": "U-AC",
+      "cumulative_return_diagnostic_only": 0.3546650692537176,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.6533934738379068,
+      "mean_ic": 0.1166666666666666,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0452451499163719,
+      "seed": 27,
+      "sharpe": 1.2055941806529011,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C005",
+      "cumulative_return_diagnostic_only": 0.318380713290523,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.683704528869031,
+      "mean_ic": 0.2333333333333333,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0455985151322579,
+      "seed": 27,
+      "sharpe": 1.1413446077273062,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C009",
+      "cumulative_return_diagnostic_only": 0.2726499432194658,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.703156506449471,
+      "mean_ic": 0.1083333333333333,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0458523467478309,
+      "seed": 27,
+      "sharpe": 1.0143529755487417,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-ALL-MATCH",
+      "cumulative_return_diagnostic_only": 0.3757403441306248,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.636079705940929,
+      "mean_ic": 0.2583333333333333,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0462693056120522,
+      "seed": 27,
+      "sharpe": 1.2870462375543037,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-AC",
+      "cumulative_return_diagnostic_only": 0.3959896269823328,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.6798335675115603,
+      "mean_ic": 0.1083333333333333,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0462670073869051,
+      "seed": 127,
+      "sharpe": 1.379895357479238,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C005",
+      "cumulative_return_diagnostic_only": 0.3777898155032462,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.705936186709781,
+      "mean_ic": 0.3333333333333333,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.044315582803077,
+      "seed": 127,
+      "sharpe": 1.3359316311985785,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C009",
+      "cumulative_return_diagnostic_only": 0.3295279651607521,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.7365441162726765,
+      "mean_ic": 0.0833333333333333,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0448229460261446,
+      "seed": 127,
+      "sharpe": 1.200233747249845,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-ALL-MATCH",
+      "cumulative_return_diagnostic_only": 0.3781319370205471,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.671857309639513,
+      "mean_ic": 0.1999999999999999,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0460393678158627,
+      "seed": 127,
+      "sharpe": 1.3217171295439116,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-AC",
+      "cumulative_return_diagnostic_only": 0.3496980231522131,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.6271529741785231,
+      "mean_ic": 0.1666666666666666,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0469035258612285,
+      "seed": 227,
+      "sharpe": 1.2218984510928723,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C005",
+      "cumulative_return_diagnostic_only": 0.3254495345435373,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.7280164086695813,
+      "mean_ic": 0.2499999999999999,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.0458670355664788,
+      "seed": 227,
+      "sharpe": 1.1737277030905522,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-C009",
+      "cumulative_return_diagnostic_only": 0.3216580288526853,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.6999474208662324,
+      "mean_ic": 0.0333333333333333,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.044884817601548,
+      "seed": 227,
+      "sharpe": 1.238663483419048,
+      "validation_passed": true
+    },
+    {
+      "configuration": "U-ALL-MATCH",
+      "cumulative_return_diagnostic_only": 0.4029300630539996,
+      "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+      "diagnostic_metrics_affect_pareto": false,
+      "mean_gaussian_nll": -1.6674313934279896,
+      "mean_ic": 0.2249999999999999,
+      "n_dates": 24,
+      "rmse_diagnostic_only": 0.046287707201505,
+      "seed": 227,
+      "sharpe": 1.3951788819710162,
+      "validation_passed": true
+    }
+  ],
+  "schema": "bayesfolio.etf_family_next_experiment_evidence.v1",
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "source_sha256": {
+    "experiments/2026-10-etf-family-feature-confirmation/results/us_confirmation_configuration_aggregates.csv": "5b279bf707e9c83939cf067f0b1edd9060887fee016a288d4dced8cb9f350971",
+    "experiments/2026-10-etf-family-feature-confirmation/results/us_confirmation_hypervolume.json": "2c911def7295a416ccff2d5e60c33615d461f80ec47408818a577f4a7d8e5317",
+    "experiments/2026-10-etf-family-feature-confirmation/results/us_confirmation_pareto.csv": "50166c2f443c54000117674d14eb2d892312ec65922e8f257b250f89c82ac5fb",
+    "experiments/2026-10-etf-family-feature-confirmation/results/us_confirmation_run_objectives.csv": "f41ac5328ec39d34ff996338a28ad68548adef184c307ed322b72afaa74d7421",
+    "experiments/2026-10-etf-family-feature-confirmation/results/us_confirmation_validation.json": "295fb82773b8d3bec2152a5718da63bfe547d9f7364f2d2d77a9d501cf7dfa49",
+    "experiments/2026-10-etf-family-feature-confirmation/us_confirmation_config.json": "dade0aee286718e923b44f993b8dc7f4548ec613113a8d7bae1536c515b4c2b9"
+  },
+  "stage": 4,
+  "stage_3_status": "complete_and_validated",
+  "validation": {
+    "all_passed": true,
+    "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+    "date_max": "2026-05-29",
+    "date_min": "2024-06-28",
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "expected_runs": [
+      "us_u005_ac_s27",
+      "us_c005_s27",
+      "us_c009_s27",
+      "us_all_match_s27",
+      "us_u005_ac_s127",
+      "us_c005_s127",
+      "us_c009_s127",
+      "us_all_match_s127",
+      "us_u005_ac_s227",
+      "us_c005_s227",
+      "us_c009_s227",
+      "us_all_match_s227"
+    ],
+    "failures": [],
+    "n_dates": 24,
+    "pareto_objectives": {
+      "maximize": [
+        "mean_ic",
+        "sharpe"
+      ],
+      "minimize": [
+        "mean_gaussian_nll"
+      ]
+    },
+    "schema": "bayesfolio.etf_family_confirmation_validation.v2",
+    "seeds": [
+      27,
+      127,
+      227
+    ],
+    "sharpe_definition": {
+      "formula": "mean(monthly_excess_return) / sample_std(monthly_excess_return) * sqrt(12)",
+      "periods_per_year": 12.0,
+      "return_series": "y_excess_lead portfolio return, already adjusted for the integrated risk-free return",
+      "standard_deviation_ddof": 1
+    },
+    "turnover_excluded": true
+  }
+}
