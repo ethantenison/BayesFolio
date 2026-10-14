@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 from prepare_next_experiment_turn import validate_step3_results
+from summarize_next_experiment_batch import add_promotion_results, objective_hypervolume
 from summarize_us_confirmation import hypervolume_3d
 from validate_next_experiment_plan import validate_candidate
 
@@ -75,3 +76,30 @@ def test_candidate_validator_accepts_fixed_controls() -> None:
         "compute": {"seeds": [27, 127, 227], "windows": 24, "run_count": 3},
     }
     assert validate_candidate(candidate, allowlist={evidence_path}) == []
+
+
+def test_next_batch_promotion_requires_frontier_and_hypervolume_gain() -> None:
+    """Only a nondominated candidate with positive incumbent-relative gain is promoted."""
+    reference = {"mean_ic": 0.0, "mean_gaussian_nll": 0.0, "sharpe": 0.0}
+    incumbents = pd.DataFrame(
+        [{"configuration": "incumbent", "mean_ic": 0.2, "mean_gaussian_nll": -1.0, "sharpe": 1.0}]
+    )
+    candidates = pd.DataFrame(
+        [
+            {"configuration": "improver", "mean_ic": 0.2, "mean_gaussian_nll": -1.1, "sharpe": 1.1},
+            {"configuration": "dominated", "mean_ic": 0.1, "mean_gaussian_nll": -0.9, "sharpe": 0.9},
+        ]
+    )
+    baseline = objective_hypervolume(incumbents, reference)
+
+    result = add_promotion_results(
+        candidates,
+        incumbents,
+        baseline_hypervolume=baseline,
+        reference=reference,
+    ).set_index("configuration")
+
+    assert bool(result.loc["improver", "promoted"])
+    assert result.loc["improver", "incremental_hypervolume"] > 0.0
+    assert not bool(result.loc["dominated", "nondominated_vs_incumbents"])
+    assert not bool(result.loc["dominated", "promoted"])

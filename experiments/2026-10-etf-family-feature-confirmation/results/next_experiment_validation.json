@@ -1,0 +1,35 @@
+{
+  "all_passed": true,
+  "candidate_count": 4,
+  "candidate_plan_sha256": "54ef3dc976b4ef026bf9460d18ab2e2a687e5553684a3231c288cdbcbf3642e3",
+  "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+  "date_max": "2026-05-29",
+  "date_min": "2024-06-28",
+  "diagnostic_only": [
+    "cumulative_return",
+    "rmse"
+  ],
+  "evidence_sha256": "c3d37dc58815e57c1bb50eb90ce8f3636cadd39dcc2156cbfe2b4985852ca661",
+  "failures": [],
+  "n_dates": 24,
+  "pareto_objectives": {
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ]
+  },
+  "promoted_candidates": [
+    "all_match_redundancy_pruned"
+  ],
+  "run_count": 12,
+  "schema": "bayesfolio.etf_family_next_batch_validation.v1",
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "turnover_excluded": true
+}

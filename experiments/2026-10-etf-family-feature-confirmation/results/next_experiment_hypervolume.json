@@ -1,0 +1,17 @@
+{
+  "baseline_value": 0.6102258300032914,
+  "candidate_individual_increments": {
+    "all_match_redundancy_pruned": 0.00040949668365397596,
+    "c005_breadth_flow_bridge": 0.0,
+    "c005_three_way": 0.0,
+    "target_macro_revisit": 0.0
+  },
+  "combined_increment": 0.000409496683654087,
+  "combined_value": 0.6106353266869455,
+  "reference_point_raw_objectives": {
+    "mean_gaussian_nll": 0.0,
+    "mean_ic": 0.0,
+    "sharpe": 0.0
+  },
+  "schema": "bayesfolio.etf_family_next_batch_hypervolume.v1"
+}
