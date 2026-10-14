@@ -1,0 +1,506 @@
+{
+  "schema": "bayesfolio.etf_family_next_experiment_candidates.v1",
+  "based_on": {
+    "evidence_sha256": "c3d37dc58815e57c1bb50eb90ce8f3636cadd39dcc2156cbfe2b4985852ca661",
+    "current_hypervolume": 0.6102258300032914,
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "seeds": [
+      27,
+      127,
+      227
+    ]
+  },
+  "objectives": {
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "turnover_excluded": true
+  },
+  "batch_design": {
+    "candidate_count": 4,
+    "exploit_count": 2,
+    "bridge_count": 1,
+    "explore_count": 1,
+    "selection_logic": "Use two evidence-backed refinements of existing Pareto regions, one narrow transfer between the IC and Sharpe regions, and one previously competitive but under-confirmed feature family. Evaluate all choices on the unchanged 24-window, three-seed panel and promote only through nondominance plus fixed-reference hypervolume gain."
+  },
+  "candidates": [
+    {
+      "id": "all_match_redundancy_pruned",
+      "mode": "exploit",
+      "priority": 1,
+      "parent_configurations": [
+        "U-ALL-MATCH"
+      ],
+      "hypothesis": "Replacing redundant long-horizon momentum and drawdown inputs with the retained alternatives, while dropping the spread proxy, will reduce density noise without losing the parent configuration's Sharpe advantage.",
+      "frontier_gap_targeted": [
+        "mean_gaussian_nll",
+        "sharpe"
+      ],
+      "exact_feature_changes": {
+        "add": [
+          "mom12m_skip1m",
+          "max_dd_3m"
+        ],
+        "remove": [
+          "baspread",
+          "mom12m",
+          "max_dd_6m"
+        ]
+      },
+      "exact_model_changes": [
+        "Keep the U-ALL-MATCH covariance composition and lengthscale-only time modulation unchanged.",
+        "Change only the explicitly enumerated ETF input columns."
+      ],
+      "exact_runner_args": [
+        "--feature-path",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_confirmation_cached_inputs_20261012.parquet",
+        "--output-root",
+        "experiments/2026-10-etf-family-feature-confirmation/runs",
+        "--run-id",
+        "{candidate_id}_s{seed}",
+        "--tickers",
+        "SPY,MGK,VTV,IWM",
+        "--scored-date-file",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_scored_dates_24.txt",
+        "--seed",
+        "{seed}",
+        "--mtgp-rank",
+        "2",
+        "--maxiter",
+        "15",
+        "--posterior-scenarios",
+        "256",
+        "--resume-scenarios",
+        "--gp-experiment",
+        "signed_lkj_eta_2",
+        "--upperlng",
+        "0.35",
+        "--nea",
+        "3",
+        "--gp-riskfolio-rm",
+        "CVaR",
+        "--gp-riskfolio-obj",
+        "MaxRet",
+        "--feature-set",
+        "compact_pruned",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,ret_kurt,chmom,mom12m_skip1m,mom36m,cs_mom_rank,max_dd_3m,ma_signal,ret_autocorr,vol_z",
+        "--custom-macro-cols",
+        "hy_spread,hy_spread_chg_1p,hy_spread_z_12p,vix_slope,vix_ts_z_12p,vix,spy_flow_z_12p,spy_ret,erp,cpi_chg_12p,cpi_chg_1p,copper_ret,oil_ret,gold_crude_ratio,pct_above_50dma,em_fx_ret",
+        "--kernel-composition-proposal",
+        "e_plus_m_plus_t_plus_et_plus_mt_plus_emt",
+        "--time-modulation-mode",
+        "lengthscale_only"
+      ],
+      "cached_columns_required": [
+        "t_index",
+        "lag_y_excess_lead",
+        "ret_kurt",
+        "chmom",
+        "mom12m_skip1m",
+        "mom36m",
+        "cs_mom_rank",
+        "max_dd_3m",
+        "ma_signal",
+        "ret_autocorr",
+        "vol_z",
+        "hy_spread",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "vix_slope",
+        "vix_ts_z_12p",
+        "vix",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "erp",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "copper_ret",
+        "oil_ret",
+        "gold_crude_ratio",
+        "pct_above_50dma",
+        "em_fx_ret"
+      ],
+      "evidence": [
+        {
+          "path": "experiments/2026-07-us-equity-etf-features/redundancy_pruning_decisions.md",
+          "finding": "The U.S. pruning record prefers skip-month 12-month momentum over plain 12-month momentum, drops the spread proxy in the first pass, and keeps three-month rather than six-month maximum drawdown."
+        },
+        {
+          "path": "experiments/2026-10-etf-family-feature-confirmation/us_confirmation_config.json",
+          "finding": "U-ALL-MATCH explicitly contains the three removable inputs and fixes the covariance and time-modulation controls retained here."
+        }
+      ],
+      "expected_direction": {
+        "mean_ic": "neutral",
+        "mean_gaussian_nll": "decrease",
+        "sharpe": "neutral"
+      },
+      "falsification_condition": "Reject the hypothesis if the three-seed aggregate is dominated by U-ALL-MATCH or adds no positive fixed-reference hypervolume when inserted into the incumbent set.",
+      "risk": "The removed spread and longer drawdown variables may contain useful tail-state information that is not duplicated by the retained inputs.",
+      "compute": {
+        "seeds": [
+          27,
+          127,
+          227
+        ],
+        "windows": 24,
+        "run_count": 3
+      }
+    },
+    {
+      "id": "c005_three_way",
+      "mode": "exploit",
+      "priority": 2,
+      "parent_configurations": [
+        "U-C005"
+      ],
+      "hypothesis": "Adding the time x ETF x macro interaction to U-C005 will improve Gaussian density fit while preserving its strong cross-sectional ranking behavior.",
+      "frontier_gap_targeted": [
+        "mean_ic",
+        "mean_gaussian_nll"
+      ],
+      "exact_feature_changes": {
+        "add": [],
+        "remove": []
+      },
+      "exact_model_changes": [
+        "Enable the runner's time x ETF x macro three-way interaction.",
+        "Keep default grouping, the macro Matern+Linear component, and disabled time modulation unchanged."
+      ],
+      "exact_runner_args": [
+        "--feature-path",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_confirmation_cached_inputs_20261012.parquet",
+        "--output-root",
+        "experiments/2026-10-etf-family-feature-confirmation/runs",
+        "--run-id",
+        "{candidate_id}_s{seed}",
+        "--tickers",
+        "SPY,MGK,VTV,IWM",
+        "--scored-date-file",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_scored_dates_24.txt",
+        "--seed",
+        "{seed}",
+        "--mtgp-rank",
+        "2",
+        "--maxiter",
+        "15",
+        "--posterior-scenarios",
+        "256",
+        "--resume-scenarios",
+        "--gp-experiment",
+        "signed_lkj_eta_2",
+        "--upperlng",
+        "0.35",
+        "--nea",
+        "3",
+        "--gp-riskfolio-rm",
+        "CVaR",
+        "--gp-riskfolio-obj",
+        "MaxRet",
+        "--feature-set",
+        "momentum_plus_macro",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "matern_linear",
+        "--include-three-way-interaction",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "cached_columns_required": [
+        "t_index",
+        "mom6m",
+        "mom12m_skip1m",
+        "cs_mom_rank",
+        "trend_slope",
+        "vix",
+        "vix_slope",
+        "spy_ret",
+        "pct_above_50dma",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "cpi_chg_12p",
+        "term_spread"
+      ],
+      "evidence": [
+        {
+          "path": "experiments/2026-07-us-equity-etf-features/decision_log.md",
+          "finding": "The prior Stage B test found that a time x momentum x macro interaction improved Gaussian NLL without materially hurting the 12-month path at maxiter 15."
+        },
+        {
+          "path": "experiments/2026-10-etf-family-feature-confirmation/us_confirmation_config.json",
+          "finding": "The current U-C005 control uses the momentum-plus-macro input block, default grouping, macro Matern+Linear, and no time modulation."
+        }
+      ],
+      "expected_direction": {
+        "mean_ic": "neutral",
+        "mean_gaussian_nll": "decrease",
+        "sharpe": "neutral"
+      },
+      "falsification_condition": "Reject the hypothesis if the three-seed aggregate is dominated by U-C005 or adds no positive fixed-reference hypervolume when inserted into the incumbent set.",
+      "risk": "The higher-order term can overfit a short history and may create seed instability even when average density fit improves.",
+      "compute": {
+        "seeds": [
+          27,
+          127,
+          227
+        ],
+        "windows": 24,
+        "run_count": 3
+      }
+    },
+    {
+      "id": "c005_breadth_flow_bridge",
+      "mode": "bridge",
+      "priority": 3,
+      "parent_configurations": [
+        "U-C005",
+        "U-ALL-MATCH"
+      ],
+      "hypothesis": "Adding a compact breadth, risk-premium, and inflation-update block to U-C005 will transfer part of U-ALL-MATCH's Sharpe advantage without importing its full input dimensionality.",
+      "frontier_gap_targeted": [
+        "mean_ic",
+        "sharpe"
+      ],
+      "exact_feature_changes": {
+        "add": [
+          "spy_flow_z_12p",
+          "erp",
+          "cpi_chg_1p"
+        ],
+        "remove": []
+      },
+      "exact_model_changes": [
+        "Keep the U-C005 default grouping, macro Matern+Linear component, and disabled time modulation unchanged.",
+        "Use explicit custom column lists so the only change is the three added macro inputs."
+      ],
+      "exact_runner_args": [
+        "--feature-path",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_confirmation_cached_inputs_20261012.parquet",
+        "--output-root",
+        "experiments/2026-10-etf-family-feature-confirmation/runs",
+        "--run-id",
+        "{candidate_id}_s{seed}",
+        "--tickers",
+        "SPY,MGK,VTV,IWM",
+        "--scored-date-file",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_scored_dates_24.txt",
+        "--seed",
+        "{seed}",
+        "--mtgp-rank",
+        "2",
+        "--maxiter",
+        "15",
+        "--posterior-scenarios",
+        "256",
+        "--resume-scenarios",
+        "--gp-experiment",
+        "signed_lkj_eta_2",
+        "--upperlng",
+        "0.35",
+        "--nea",
+        "3",
+        "--gp-riskfolio-rm",
+        "CVaR",
+        "--gp-riskfolio-obj",
+        "MaxRet",
+        "--feature-set",
+        "momentum_plus_macro",
+        "--custom-etf-cols",
+        "mom6m,mom12m_skip1m,cs_mom_rank,trend_slope",
+        "--custom-macro-cols",
+        "vix,vix_slope,spy_ret,pct_above_50dma,hy_spread_chg_1p,hy_spread_z_12p,cpi_chg_12p,term_spread,spy_flow_z_12p,erp,cpi_chg_1p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "matern_linear",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "cached_columns_required": [
+        "t_index",
+        "mom6m",
+        "mom12m_skip1m",
+        "cs_mom_rank",
+        "trend_slope",
+        "vix",
+        "vix_slope",
+        "spy_ret",
+        "pct_above_50dma",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "cpi_chg_12p",
+        "term_spread",
+        "spy_flow_z_12p",
+        "erp",
+        "cpi_chg_1p"
+      ],
+      "evidence": [
+        {
+          "path": "experiments/2026-10-etf-family-feature-confirmation/us_confirmation_config.json",
+          "finding": "The three added cached variables occur in U-ALL-MATCH, while U-C005 supplies the lower-dimensional parent model used for the bridge."
+        },
+        {
+          "path": "experiments/2026-10-etf-family-feature-confirmation/PLAN.md",
+          "finding": "The family plan identifies breadth, flow, and risk-premium variables as a distinct compact macro hypothesis rather than requiring the entire all-input block."
+        }
+      ],
+      "expected_direction": {
+        "mean_ic": "neutral",
+        "mean_gaussian_nll": "uncertain",
+        "sharpe": "increase"
+      },
+      "falsification_condition": "Reject the transfer hypothesis if the three-seed aggregate is dominated by both parents or adds no positive fixed-reference hypervolume when inserted into the incumbent set.",
+      "risk": "The added macro variables may be correlated proxies that raise dimensionality without providing stable incremental signal.",
+      "compute": {
+        "seeds": [
+          27,
+          127,
+          227
+        ],
+        "windows": 24,
+        "run_count": 3
+      }
+    },
+    {
+      "id": "target_macro_revisit",
+      "mode": "explore",
+      "priority": 4,
+      "parent_configurations": [
+        "U-C005"
+      ],
+      "hypothesis": "A compact two-lag target-history block paired with the established macro inputs will occupy a different IC and NLL region from momentum-based U-C005 on the longer common panel.",
+      "frontier_gap_targeted": [
+        "mean_ic",
+        "mean_gaussian_nll"
+      ],
+      "exact_feature_changes": {
+        "add": [
+          "lag_y_excess_lead",
+          "lag2_y_excess_lead"
+        ],
+        "remove": [
+          "mom6m",
+          "mom12m_skip1m",
+          "cs_mom_rank",
+          "trend_slope"
+        ]
+      },
+      "exact_model_changes": [
+        "Keep the U-C005 default grouping, macro Matern+Linear component, and disabled time modulation unchanged.",
+        "Swap only the ETF-side input family from momentum and trend to two target lags."
+      ],
+      "exact_runner_args": [
+        "--feature-path",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_confirmation_cached_inputs_20261012.parquet",
+        "--output-root",
+        "experiments/2026-10-etf-family-feature-confirmation/runs",
+        "--run-id",
+        "{candidate_id}_s{seed}",
+        "--tickers",
+        "SPY,MGK,VTV,IWM",
+        "--scored-date-file",
+        "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_scored_dates_24.txt",
+        "--seed",
+        "{seed}",
+        "--mtgp-rank",
+        "2",
+        "--maxiter",
+        "15",
+        "--posterior-scenarios",
+        "256",
+        "--resume-scenarios",
+        "--gp-experiment",
+        "signed_lkj_eta_2",
+        "--upperlng",
+        "0.35",
+        "--nea",
+        "3",
+        "--gp-riskfolio-rm",
+        "CVaR",
+        "--gp-riskfolio-obj",
+        "MaxRet",
+        "--feature-set",
+        "target_plus_macro",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "matern_linear",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "cached_columns_required": [
+        "t_index",
+        "lag_y_excess_lead",
+        "lag2_y_excess_lead",
+        "vix",
+        "vix_slope",
+        "spy_ret",
+        "pct_above_50dma",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "cpi_chg_12p",
+        "term_spread"
+      ],
+      "evidence": [
+        {
+          "path": "experiments/2026-07-us-equity-etf-features/decision_log.md",
+          "finding": "A prior full run of target-plus-macro with default macro Matern+Linear produced competitive IC and NLL and was the strongest genuinely different feature family behind the incumbent branch."
+        },
+        {
+          "path": "experiments/2026-07-us-equity-etf-features/redundancy_pruning_decisions.md",
+          "finding": "The pruning record explicitly reserves target-lag and reversal variables for a later ablation rather than mixing them into the first-pass momentum block."
+        }
+      ],
+      "expected_direction": {
+        "mean_ic": "uncertain",
+        "mean_gaussian_nll": "decrease",
+        "sharpe": "uncertain"
+      },
+      "falsification_condition": "Reject the hypothesis if the three-seed aggregate is dominated by U-C005 or adds no positive fixed-reference hypervolume when inserted into the incumbent set.",
+      "risk": "Lagged target variables may fit persistence that is unstable across assets or dates and may improve density without improving portfolio ranking.",
+      "compute": {
+        "seeds": [
+          27,
+          127,
+          227
+        ],
+        "windows": 24,
+        "run_count": 3
+      }
+    }
+  ],
+  "execution_order": [
+    "all_match_redundancy_pruned",
+    "c005_three_way",
+    "c005_breadth_flow_bridge",
+    "target_macro_revisit"
+  ],
+  "stopping_rules": [
+    "Stop before fitting if any Step-3 source hash, cached column, scored date, or fixed control fails validation.",
+    "Once a candidate starts, evaluate all three seeds unless a technical failure occurs; never promote from a partial seed panel.",
+    "Stop the batch on a reproducibility or aggregation failure and repair the deterministic pipeline before continuing.",
+    "After all valid candidates are aggregated, stop this round if none produces a nondominated point and a strict increase over the fixed-reference hypervolume of 0.6102258300032914."
+  ],
+  "deferred_ideas": [
+    "Jointly fitted robust predictive likelihoods",
+    "Higher optimizer iteration counts",
+    "Structured macro group splits",
+    "Time-index ablations",
+    "Calibrated proposal optimization",
+    "New holdout discipline"
+  ]
+}
