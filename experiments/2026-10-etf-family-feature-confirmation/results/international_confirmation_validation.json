@@ -1,0 +1,48 @@
+{
+  "all_passed": true,
+  "date_hash_sha256": "bea704cb64a42d1d9aeb112ed76ddb28e9487ca8cedbfcccd137f2ee993dde13",
+  "date_max": "2026-05-29",
+  "date_min": "2024-06-28",
+  "diagnostic_only": [
+    "cumulative_return",
+    "rmse"
+  ],
+  "expected_runs": [
+    "intl_i_breadth_s27",
+    "intl_i_market_s27",
+    "intl_i_mom_s27",
+    "intl_i_all_match_s27",
+    "intl_i_breadth_s127",
+    "intl_i_market_s127",
+    "intl_i_mom_s127",
+    "intl_i_all_match_s127",
+    "intl_i_breadth_s227",
+    "intl_i_market_s227",
+    "intl_i_mom_s227",
+    "intl_i_all_match_s227"
+  ],
+  "failures": [],
+  "n_dates": 24,
+  "pareto_objectives": {
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ]
+  },
+  "phase": "confirmation",
+  "schema": "bayesfolio.international_equity_experiment_validation.v1",
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "sharpe_definition": {
+    "formula": "mean(monthly_excess_return) / sample_std(monthly_excess_return) * sqrt(12)",
+    "periods_per_year": 12.0,
+    "standard_deviation_ddof": 1
+  },
+  "turnover_excluded": true
+}

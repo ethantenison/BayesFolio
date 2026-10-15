@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pandas as pd
 import pytest
+from orchestrate_international_experiments import validate_config as validate_international_config
 from prepare_next_experiment_turn import validate_step3_results
+from summarize_international_experiments import validate_run_manifest
 from summarize_next_experiment_batch import add_promotion_results, objective_hypervolume
 from summarize_us_confirmation import hypervolume_3d
 from validate_next_experiment_plan import validate_candidate
@@ -103,3 +108,61 @@ def test_next_batch_promotion_requires_frontier_and_hypervolume_gain() -> None:
     assert result.loc["improver", "incremental_hypervolume"] > 0.0
     assert not bool(result.loc["dominated", "nondominated_vs_incumbents"])
     assert not bool(result.loc["dominated", "promoted"])
+
+
+def test_international_configs_preserve_fixed_contract() -> None:
+    """Both phases must retain the exact universe, objectives, and time input."""
+    experiment_dir = Path(__file__).resolve().parent
+    for name in ["international_confirmation_config.json", "international_targeted_ablation_config.json"]:
+        path = experiment_dir / name
+        config = json.loads(path.read_text(encoding="utf-8"))
+        paths = validate_international_config(config, path)
+        assert len(config["configurations"]) == 4
+        assert paths["feature"].exists()
+        assert all(item["expected_input_columns"][0] == "t_index" for item in config["configurations"])
+
+
+def test_international_manifest_validator_checks_exact_inputs() -> None:
+    """A changed input list must fail deterministic run validation."""
+    configuration = {
+        "label": "I-MOM",
+        "expected_input_columns": ["t_index", "mom6m"],
+        "args": [
+            "--feature-set",
+            "momentum_trend",
+            "--covar-grouping-proposal",
+            "default",
+            "--macro-component-proposal",
+            "default",
+            "--time-modulation-mode",
+            "neither",
+        ],
+    }
+    manifest = {
+        "data": {
+            "training_universe": ["VEA", "VWO", "VSS", "EWX"],
+            "final_portfolio_universe": ["VEA", "VWO", "VSS", "EWX"],
+        },
+        "modeling": {
+            "seed": 27,
+            "rank": 2,
+            "maxiter": 15,
+            "posterior_scenarios_per_rebalance": 256,
+            "experiment": "signed_lkj_eta_2",
+            "time_modulation_mode": "neither",
+            "kernel_composition_proposal": {"name": "none"},
+        },
+        "portfolio": {"n_realized_rebalances": 1},
+        "rebalance_dates": ["2026-05-29"],
+        "us_equity_first_round_wrapper": {
+            "time_index_included": True,
+            "input_columns": ["t_index", "trend_slope"],
+            "feature_set": "momentum_trend",
+            "covar_grouping_proposal": "default",
+            "macro_component_proposal": "default",
+        },
+    }
+    failures = validate_run_manifest(
+        "I-MOM", configuration, manifest, ["2026-05-29"], ["VEA", "VWO", "VSS", "EWX"], expected_seed=27
+    )
+    assert failures == ["I-MOM: input_columns"]

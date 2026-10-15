@@ -1,96 +1,110 @@
 # ETF Family Feature Confirmation Status
 
-Milestone: the first ChatGPT-planned follow-up batch is complete. All 12 new
-fits passed deterministic validation, and one candidate expanded the existing
-three-objective Pareto frontier.
+Milestone: the U.S. follow-up batch and both international equity stages are
+complete. The international workflow produced 24 new validated fits: 12 for
+the four-way confirmation and 12 for targeted macro ablations.
 
 ## Summary
 
-- The committed Step-3 baseline remains the comparison set: U-C005, U-C009,
-  and U-ALL-MATCH are nondominated, with fixed-reference hypervolume
-  `0.6102258300032914`.
-- ChatGPT/Codex replaced the failed local-model planning turn and produced four
-  validator-approved candidates: two exploitation, one bridge, and one
-  exploration candidate.
-- All four candidates completed seeds `27`, `127`, and `227` on the frozen
-  24-window panel with SPY/MGK/VTV/IWM, `t_index`, rank 2, maxiter 15, and 256
-  scenarios.
-- `all_match_redundancy_pruned` is the only promoted candidate. Adding it to
-  the incumbents raises hypervolume to `0.6106353266869455`, an increase of
-  `0.000409496683654087`.
+- The international task universe is `VEA`, `VWO`, `VSS`, and `EWX`. Every run
+  uses the same cached 24-window panel, seeds `27`, `127`, and `227`, `t_index`,
+  rank 2, maxiter 15, and 256 scenarios.
+- The corrected momentum-plus-breadth/flow candidate (`I-BREADTH`) dominates
+  momentum-plus-market, momentum-only, and the compute-matched all-input model
+  on all three aggregate objectives.
+- Adding FX, breakeven inflation, or credit to `I-BREADTH` is dominated by the
+  unchanged baseline. Adding oil and gold/crude improves mean NLL slightly but
+  gives up IC and Sharpe, so it joins rather than replaces the Pareto frontier.
+- Return and RMSE are recorded only. Turnover is absent from the evaluation and
+  selection outputs.
 
 ## Findings
 
-Three-seed candidate aggregates are:
+The international confirmation aggregates are:
 
-- `all_match_redundancy_pruned`: IC `0.213889`, NLL `-1.664957`, Sharpe
-  `1.335338`; nondominated; promoted;
-- `c005_three_way`: IC `0.263889`, NLL `-1.673605`, Sharpe `1.168122`;
-  dominated by an incumbent;
-- `c005_breadth_flow_bridge`: IC `0.172222`, NLL `-1.597127`, Sharpe
-  `1.133363`; dominated;
-- `target_macro_revisit`: IC `0.255556`, NLL `-1.643259`, Sharpe `1.185022`;
-  dominated by an incumbent.
+- `I-BREADTH`: IC `0.136111`, NLL `-1.861688`, Sharpe `1.340510`;
+- `I-MARKET`: IC `0.113889`, NLL `-1.522946`, Sharpe `1.265790`;
+- `I-MOM`: IC `0.025000`, NLL `-1.730624`, Sharpe `1.178977`;
+- `I-ALL-MATCH`: IC `0.005556`, NLL `-1.802055`, Sharpe `1.168111`.
 
-The pruning result is narrow but directionally coherent: compared with
-U-ALL-MATCH, it improves mean NLL from `-1.658456` to `-1.664957` and Sharpe
-from `1.334647` to `1.335338`, while IC falls from `0.227778` to `0.213889`.
-That tradeoff creates a distinct Pareto point rather than a universal winner.
+`I-BREADTH` is the sole confirmation-stage nondominated configuration. The
+fixed-reference hypervolume is `0.33968051082932643`.
 
-The three-way interaction did not reproduce its earlier advantage on the
-current confirmation panel. The bridge variables added noise across all three
-objectives, and the target-lag family did not beat U-C005 after full three-seed
-confirmation.
+The targeted ablation aggregates, compared with the same `I-BREADTH` runs, are:
+
+- `I-BREADTH+FX`: IC `0.050000`, NLL `-1.745432`, Sharpe `1.253096`;
+- `I-BREADTH+INFLATION`: IC `0.050000`, NLL `-1.753976`, Sharpe `1.201915`;
+- `I-BREADTH+CREDIT`: IC `0.072222`, NLL `-1.796184`, Sharpe `1.263735`;
+- `I-BREADTH+COMMODITIES`: IC `0.027778`, NLL `-1.867543`, Sharpe `1.213128`.
+
+The commodities block improves NLL by `0.005855` relative to `I-BREADTH`, but
+reduces IC by `0.108333` and Sharpe by `0.127382`. The resulting two-point
+frontier has hypervolume `0.3398777952385972`, an increase of only
+`0.00019728440927077`. This is a calibration-versus-ranking/portfolio tradeoff,
+not evidence that the commodities block is an overall winner.
+
+The preceding U.S. result remains unchanged: `all_match_redundancy_pruned` is
+the only promoted follow-up candidate, expanding the U.S. frontier by
+`0.000409496683654087`.
 
 ## Impact
 
-The evidence now supports a more compact version of the all-input model region:
-replace plain 12-month momentum with skip-month momentum, replace six-month
-maximum drawdown with the three-month measure, and omit the spread proxy. The
-gain is small, so this is a Pareto-front expansion rather than grounds for a
-production-model replacement.
+For the international equity family, the evidence supports the corrected
+momentum-plus-breadth/flow feature set as the primary compact model. The broad
+all-input model adds noise and is dominated. FX, inflation, and credit should
+not be added in the tested forms. The oil/gold block should be retained only as
+an explicit calibration-oriented Pareto alternative pending a later selection
+policy or holdout test.
 
-The unsuccessful candidates are useful negative evidence. They should not be
-rerun unchanged in the next hypothesis round.
+No production model or deployment configuration was changed.
 
 ## Proposed Fix
 
-Preserve `all_match_redundancy_pruned` on the active frontier and use it as the
-parent for any next exploitation proposal. Keep U-C005 and U-C009 as the IC and
-NLL anchors. Any next batch should make one coherent change at a time and remain
-bound to the same cached panel and objective contract.
+Use `I-BREADTH` as the international equity default candidate for subsequent
+confirmation or integration work. Preserve `I-BREADTH+COMMODITIES` as a
+research alternative, not an automatic replacement. Do not rerun the three
+dominated macro blocks unchanged.
 
-Patch/result scope:
+The next family-level work is the deferred sequence from the plan: investment-
+grade bonds/Treasuries, high-yield and emerging-market debt, REITs, then
+commodities. The calibrated proposal optimizer and new holdout discipline also
+remain deferred as requested.
 
-- deterministic next-batch summarizer and promotion logic;
-- 12 validated candidate runs;
-- run-level objectives, candidate aggregates, combined Pareto front,
-  fixed-reference hypervolume, and validation artifacts;
-- no production-model or deployment changes.
-
-Rollback: revert the result commit. Generated run directories and execution
-snapshots remain ignored local artifacts.
+Rollback: revert the international result commit. Generated run directories
+and execution snapshots remain ignored local artifacts.
 
 ## Verification
 
 ```bash
 .venv/bin/ruff check \
-  experiments/2026-10-etf-family-feature-confirmation/summarize_next_experiment_batch.py \
+  experiments/2026-10-etf-family-feature-confirmation/build_cached_international_confirmation_artifact.py \
+  experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py \
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
   experiments/2026-10-etf-family-feature-confirmation/test_confirmation_workflow.py
 .venv/bin/ruff format --check \
-  experiments/2026-10-etf-family-feature-confirmation/summarize_next_experiment_batch.py \
+  experiments/2026-10-etf-family-feature-confirmation/build_cached_international_confirmation_artifact.py \
+  experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py \
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
   experiments/2026-10-etf-family-feature-confirmation/test_confirmation_workflow.py
 .venv/bin/pytest -q \
   experiments/2026-10-etf-family-feature-confirmation/test_confirmation_workflow.py
 .venv/bin/python \
-  experiments/2026-10-etf-family-feature-confirmation/summarize_next_experiment_batch.py
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_confirmation_config.json \
+  --seeds 27,127,227
+.venv/bin/python \
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_targeted_ablation_config.json \
+  --seeds 27,127,227
 ```
 
-Expected result: 12/12 runs valid, promoted candidates
-`['all_match_redundancy_pruned']`, and combined hypervolume
-`0.6106353266869455`.
+Expected result: 24/24 newly executed international runs and all three reused
+`I-BREADTH` comparison runs validate; the confirmation frontier is
+`I-BREADTH`, and the targeted frontier is `I-BREADTH` plus
+`I-BREADTH+COMMODITIES`.
 
 ## Open Questions
 
-The next hypothesis round has not been preregistered. Work on a calibrated
-proposal optimizer and new holdout discipline remains deferred as requested.
+No question blocks this milestone. A later decision is still needed on whether
+the small NLL-only commodities tradeoff merits a separate holdout confirmation
+or should remain research-only.

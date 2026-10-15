@@ -1,6 +1,39 @@
 # ETF Family Feature Confirmation
 
-Status: One-command U.S. controller verified; post-results xhigh planning turn configured; seeds 127 and 227 not launched
+Status: U.S. follow-up and international confirmation/ablation stages complete
+
+## International equity orchestration
+
+The international task universe is `VEA`, `VWO`, `VSS`, and `EWX`. A cached
+artifact builder joins the verified July international feature panel with the
+missing ETF columns from the local production cache, then freezes the last 24
+complete dates. The phase controller validates hashes, preflights every
+configuration, executes or safely reuses the three-seed runs, and writes the
+Pareto and hypervolume reports.
+
+Run the confirmation matrix:
+
+```bash
+uv run --locked python \
+  experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_confirmation_config.json \
+  --execute --seeds 27,127,227
+```
+
+Run the targeted macro ablations after the confirmation baseline exists:
+
+```bash
+uv run --locked python \
+  experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_targeted_ablation_config.json \
+  --execute --seeds 27,127,227
+```
+
+The completed results select the corrected momentum-plus-breadth/flow model as
+the primary international candidate. The oil plus gold/crude block is also
+nondominated because it slightly improves NLL while materially reducing IC and
+Sharpe; it is retained as a calibration-oriented research alternative. See
+`STATUS.md` and the two international result reports for the full metrics.
 
 ## One-command U.S. orchestration
 
