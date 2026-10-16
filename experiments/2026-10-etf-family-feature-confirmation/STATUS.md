@@ -1,10 +1,11 @@
 # ETF Family Feature Confirmation Status
 
 Milestone: the U.S. follow-up batch and both international equity stages are
-complete. The international workflow produced 51 new validated fits: 12 for
+complete. The international workflow produced 69 new validated fits: 12 for
 the four-way confirmation, 12 for targeted macro ablations, and three for the
 oil-only follow-up, three for the gold/crude-ratio-only follow-up, plus 21 for
-the oil-centered backward-selection and FX batch.
+the oil-centered backward-selection and FX batch and 18 for the second
+oil-interaction refinement.
 
 ## Summary
 
@@ -26,6 +27,9 @@ the oil-centered backward-selection and FX batch.
   aggregate Sharpe and another IC gain, with materially worse NLL.
 - The DXY and EM-FX additions are dominated, as are the oil candidates that
   remove `rsp_spy_roc_1p` or `pct_above_50dma`.
+- Removing both `erp` and `spy_flow_z_12p` from the oil model improves all
+  three objectives over every earlier candidate. Removing `erp` without oil
+  remains nondominated because it has the highest aggregate Sharpe.
 - Return and RMSE are recorded only. Turnover is absent from the evaluation and
   selection outputs.
 
@@ -87,34 +91,54 @@ hypervolume, dropping `spy_ret` adds `0.04850206342543795`, and dropping
 none. The final nondominated set has six points: the prior three plus those
 three backward eliminations.
 
+The second oil-interaction refinement produced:
+
+- `I-BREADTH DROP ERP`: IC `0.213889`, NLL `-1.781311`, Sharpe `1.395827`;
+- `I-BREADTH+OIL DROP ERP+SPY-RET`: IC `0.161111`, NLL `-1.654478`, Sharpe `1.351071`;
+- `I-BREADTH+OIL DROP ERP+SPY-FLOW`: IC `0.252778`, NLL `-1.917061`, Sharpe `1.382449`;
+- `I-BREADTH+OIL DROP ERP+SPY-RET+SPY-FLOW`: IC `0.075000`, NLL `-1.699727`, Sharpe `1.301757`;
+- `I-BREADTH+COMMODITIES DROP ERP`: IC `0.130556`, NLL `-1.903091`, Sharpe `1.273767`;
+- `I-BREADTH DROP SPY-RET`: IC `0.022222`, NLL `-1.755382`, Sharpe `1.303634`.
+
+The new oil/drop-ERP/drop-flow candidate dominates the entire preceding
+six-point frontier. Relative to `I-BREADTH+OIL DROP ERP`, it improves IC by
+`0.011111`, improves NLL by `0.075859`, and improves Sharpe by `0.048867`.
+The no-oil/drop-ERP candidate is the only other final Pareto point because its
+Sharpe is `0.013378` higher. The fixed-reference hypervolume increased from
+`0.6072236686688807` to `0.6750184934043326`, a gain of
+`0.0677948247354519`.
+
+The factorial attribution is conditional rather than additive. Dropping
+`spy_ret` only helped when ERP remained present; combining both removals was
+dominated. Likewise, dropping flow helped strongly when `spy_ret` remained,
+while the three-variable removal was dominated. The oil-plus-ratio/drop-ERP
+candidate improved calibration but was dominated by the oil-only/drop-ERP/
+drop-flow candidate.
+
 The preceding U.S. result remains unchanged: `all_match_redundancy_pruned` is
 the only promoted follow-up candidate, expanding the U.S. frontier by
 `0.000409496683654087`.
 
 ## Impact
 
-For the international equity family, the evidence supports the corrected
-momentum-plus-breadth/flow feature set as the primary compact model. The broad
-all-input model adds noise and is dominated. FX, inflation, and credit should
-not be added in the tested forms. The oil/gold block should be retained only as
-an explicit calibration-oriented Pareto alternative pending a later selection
-policy or holdout test. Oil alone is no longer the strongest tested
-international model for IC or Sharpe. The drop-ERP specification is the
-strongest aggregate IC model and the drop-SPY-return specification is the
-strongest aggregate Sharpe model, but their tradeoffs prevent either from
-dominating the better-calibrated alternatives.
+For the international equity family, the corrected momentum-plus-breadth/flow
+feature set was a productive compact starting point. The broad all-input model
+adds noise and is dominated. FX, inflation, and credit should not be added in
+the tested forms. The oil/drop-ERP/drop-flow specification is now the
+strongest tested model for both IC and NLL and also improves Sharpe over every
+earlier candidate. The no-oil/drop-ERP specification has the highest Sharpe,
+so the final in-sample discovery frontier contains those two configurations.
 
 No production model or deployment configuration was changed.
 
 ## Proposed Fix
 
-Use `I-BREADTH` as the international equity default candidate for subsequent
-confirmation or integration work. Preserve the six nondominated
-specifications pending later holdout discipline. For the next hypothesis
-round, center exploitation around the drop-ERP and drop-SPY-return oil
-specifications; retain `rsp_spy_roc_1p` and `pct_above_50dma`, and do not retry
-DXY, EM-FX, the three dominated macro blocks, or the ratio-only candidate
-unchanged.
+Advance `I-BREADTH+OIL DROP ERP+SPY-FLOW` as the primary international
+confirmation candidate and `I-BREADTH DROP ERP` as the higher-Sharpe
+alternative. Retain `spy_ret`, `rsp_spy_roc_1p`, and `pct_above_50dma` in the
+primary candidate. Do not continue combinatorial optimization on this same
+24-date discovery panel without the deferred holdout discipline; doing so
+would increasingly optimize to the evaluation sample.
 
 The next family-level work is the deferred sequence from the plan: investment-
 grade bonds/Treasuries, high-yield and emerging-market debt, REITs, then
@@ -159,16 +183,22 @@ and execution snapshots remain ignored local artifacts.
   experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
   --config experiments/2026-10-etf-family-feature-confirmation/international_oil_backward_selection_config.json \
   --seeds 27,127,227
+.venv/bin/python \
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_oil_interaction_refinement_config.json \
+  --seeds 27,127,227
 ```
 
-Expected result: 51/51 newly executed international runs and all reused
-`I-BREADTH` comparison runs validate; the confirmation frontier is
+Expected result: 69/69 newly executed international runs and all reused
+comparison runs validate; the confirmation frontier is
 `I-BREADTH`, and the oil follow-up frontier contains `I-BREADTH`,
 `I-BREADTH+COMMODITIES`, and `I-BREADTH+OIL`. The ratio-only candidate is
 dominated. The expanded oil-centered frontier contains those three plus the
 drop-SPY-flow, drop-ERP, and drop-SPY-return configurations.
+The second refinement reduces the final frontier to `I-BREADTH DROP ERP` and
+`I-BREADTH+OIL DROP ERP+SPY-FLOW`.
 
 ## Open Questions
 
-No question blocks this milestone. A later decision is still needed on which
-of the six Pareto alternatives merit a separate holdout confirmation.
+No question blocks this milestone. The deferred holdout design should compare
+the two final Pareto candidates before either changes production behavior.

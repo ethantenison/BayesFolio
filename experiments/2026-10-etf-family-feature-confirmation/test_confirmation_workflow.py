@@ -120,6 +120,7 @@ def test_international_configs_preserve_fixed_contract() -> None:
         "international_oil_only_config.json": 1,
         "international_ratio_only_config.json": 1,
         "international_oil_backward_selection_config.json": 7,
+        "international_oil_interaction_refinement_config.json": 6,
     }
     for name, expected_count in configs.items():
         path = experiment_dir / name
