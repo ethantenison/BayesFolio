@@ -368,6 +368,160 @@ def main() -> None:
     ]
     write_config("international_fixed_income_combination_refinement_config.json", international_combinations)
 
+    international_sparsity = base_config(
+        "international_fixed_income", "refinement", "international_fixed_income_sparsity_ablation"
+    )
+    primary_macro = [column for column in ALL_MACRO if column not in {"hy_spread_chg_1m", "copper_ret"}]
+    international_sparsity["configurations"] = [
+        *[
+            configuration(
+                f"intfi_primary_no_{feature}",
+                f"INTFI-PRIMARY-NO-{feature.upper().replace('_', '-')}",
+                [column for column in TREND if column != feature],
+                primary_macro,
+            )
+            for feature in TREND
+        ],
+        *[
+            configuration(
+                f"intfi_primary_no_{feature}",
+                f"INTFI-PRIMARY-NO-{feature.upper().replace('_', '-')}",
+                TREND,
+                [column for column in primary_macro if column != feature],
+            )
+            for feature in primary_macro
+        ],
+    ]
+    international_sparsity["comparison_configurations"] = [
+        configuration(
+            "intfi_all_macro_no_hy_change_no_copper",
+            "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-COPPER",
+            TREND,
+            primary_macro,
+        ),
+        configuration(
+            "intfi_all_macro_no_hy_change_no_erp_no_cpi_mom_no_copper",
+            "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-ERP-NO-CPI-MOM-NO-COPPER",
+            TREND,
+            [column for column in primary_macro if column not in {"erp", "cpi_mom"}],
+        ),
+        configuration("intfi_trend_market_risk", "INTFI-TREND+MARKET-RISK", TREND, MARKET_RISK),
+    ]
+    write_config("international_fixed_income_sparsity_ablation_config.json", international_sparsity)
+
+    international_sparse_combinations = base_config(
+        "international_fixed_income", "refinement", "international_fixed_income_sparsity_combination"
+    )
+    sparse_specs = [
+        ("no_lag_no_erp", ["lag_y_excess_lead"], ["erp"]),
+        ("no_lag_no_cpi_mom", ["lag_y_excess_lead"], ["cpi_mom"]),
+        ("no_lag_no_ma_signal", ["lag_y_excess_lead", "ma_signal"], []),
+        ("no_lag_no_spy_flow", ["lag_y_excess_lead"], ["spy_flow_z_12m"]),
+        ("no_lag_no_gold_ratio", ["lag_y_excess_lead"], ["gold_crude_ratio"]),
+        ("no_lag_no_vix", ["lag_y_excess_lead"], ["vix"]),
+        ("no_lag_no_erp_no_cpi_mom", ["lag_y_excess_lead"], ["erp", "cpi_mom"]),
+        (
+            "no_lag_no_erp_no_cpi_mom_no_gold_ratio",
+            ["lag_y_excess_lead"],
+            ["erp", "cpi_mom", "gold_crude_ratio"],
+        ),
+        ("no_lag_no_ma_no_erp_no_cpi_mom", ["lag_y_excess_lead", "ma_signal"], ["erp", "cpi_mom"]),
+        (
+            "no_lag_no_ma_no_erp_no_cpi_mom_no_gold_ratio",
+            ["lag_y_excess_lead", "ma_signal"],
+            ["erp", "cpi_mom", "gold_crude_ratio"],
+        ),
+        ("no_lag_no_vix_no_spy_flow", ["lag_y_excess_lead"], ["vix", "spy_flow_z_12m"]),
+        (
+            "no_lag_no_ma_no_vix_no_spy_flow",
+            ["lag_y_excess_lead", "ma_signal"],
+            ["vix", "spy_flow_z_12m"],
+        ),
+    ]
+    international_sparse_combinations["configurations"] = [
+        configuration(
+            f"intfi_primary_{identifier}",
+            f"INTFI-PRIMARY-{identifier.upper().replace('_', '-')}",
+            [column for column in TREND if column not in local_removed],
+            [column for column in primary_macro if column not in macro_removed],
+        )
+        for identifier, local_removed, macro_removed in sparse_specs
+    ]
+    international_sparse_combinations["comparison_configurations"] = [
+        configuration(
+            "intfi_primary_no_lag_y_excess_lead",
+            "INTFI-PRIMARY-NO-LAG-Y-EXCESS-LEAD",
+            [column for column in TREND if column != "lag_y_excess_lead"],
+            primary_macro,
+        ),
+        configuration(
+            "intfi_all_macro_no_hy_change_no_copper",
+            "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-COPPER",
+            TREND,
+            primary_macro,
+        ),
+        configuration("intfi_trend_market_risk", "INTFI-TREND+MARKET-RISK", TREND, MARKET_RISK),
+    ]
+    write_config("international_fixed_income_sparsity_combination_config.json", international_sparse_combinations)
+
+    international_sparse_final = base_config(
+        "international_fixed_income", "refinement", "international_fixed_income_sparsity_final"
+    )
+    final_sparse_specs = [
+        ("no_lag_no_ma_no_gold", ["lag_y_excess_lead", "ma_signal"], ["gold_crude_ratio"]),
+        ("no_lag_no_erp_no_gold", ["lag_y_excess_lead"], ["erp", "gold_crude_ratio"]),
+        ("no_lag_no_cpi_no_gold", ["lag_y_excess_lead"], ["cpi_mom", "gold_crude_ratio"]),
+        ("no_lag_no_ma_no_erp", ["lag_y_excess_lead", "ma_signal"], ["erp"]),
+        ("no_lag_no_ma_no_cpi", ["lag_y_excess_lead", "ma_signal"], ["cpi_mom"]),
+        (
+            "no_lag_no_ma_no_erp_no_gold",
+            ["lag_y_excess_lead", "ma_signal"],
+            ["erp", "gold_crude_ratio"],
+        ),
+        (
+            "no_lag_no_ma_no_cpi_no_gold",
+            ["lag_y_excess_lead", "ma_signal"],
+            ["cpi_mom", "gold_crude_ratio"],
+        ),
+    ]
+    international_sparse_final["configurations"] = [
+        configuration(
+            f"intfi_primary_{identifier}",
+            f"INTFI-PRIMARY-{identifier.upper().replace('_', '-')}",
+            [column for column in TREND if column not in local_removed],
+            [column for column in primary_macro if column not in macro_removed],
+        )
+        for identifier, local_removed, macro_removed in final_sparse_specs
+    ]
+    international_sparse_final["comparison_configurations"] = [
+        configuration(
+            "intfi_primary_no_lag_y_excess_lead",
+            "INTFI-PRIMARY-NO-LAG-Y-EXCESS-LEAD",
+            [column for column in TREND if column != "lag_y_excess_lead"],
+            primary_macro,
+        ),
+        configuration(
+            "intfi_primary_no_lag_no_gold_ratio",
+            "INTFI-PRIMARY-NO-LAG-NO-GOLD-RATIO",
+            [column for column in TREND if column != "lag_y_excess_lead"],
+            [column for column in primary_macro if column != "gold_crude_ratio"],
+        ),
+        configuration(
+            "intfi_primary_no_lag_no_ma_signal",
+            "INTFI-PRIMARY-NO-LAG-NO-MA-SIGNAL",
+            [column for column in TREND if column not in {"lag_y_excess_lead", "ma_signal"}],
+            primary_macro,
+        ),
+        configuration(
+            "intfi_primary_no_lag_no_erp_no_cpi_mom_no_gold_ratio",
+            "INTFI-PRIMARY-NO-LAG-NO-ERP-NO-CPI-MOM-NO-GOLD-RATIO",
+            [column for column in TREND if column != "lag_y_excess_lead"],
+            [column for column in primary_macro if column not in {"erp", "cpi_mom", "gold_crude_ratio"}],
+        ),
+        configuration("intfi_trend_market_risk", "INTFI-TREND+MARKET-RISK", TREND, MARKET_RISK),
+    ]
+    write_config("international_fixed_income_sparsity_final_config.json", international_sparse_final)
+
 
 if __name__ == "__main__":
     main()

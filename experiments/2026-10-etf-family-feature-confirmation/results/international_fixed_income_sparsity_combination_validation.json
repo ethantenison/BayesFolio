@@ -1,0 +1,82 @@
+{
+  "all_passed": true,
+  "date_hash_sha256": "094ad6740466edb33fbbfd9c354092c1d8f87ad1a8076d380148f0bb2e01bf33",
+  "date_max": "2026-04-30",
+  "date_min": "2024-05-31",
+  "diagnostic_only": [
+    "cumulative_return",
+    "rmse"
+  ],
+  "expected_runs": [
+    "intfi_primary_no_lag_y_excess_lead_s27",
+    "intfi_all_macro_no_hy_change_no_copper_s27",
+    "intfi_trend_market_risk_s27",
+    "intfi_primary_no_lag_no_erp_s27",
+    "intfi_primary_no_lag_no_cpi_mom_s27",
+    "intfi_primary_no_lag_no_ma_signal_s27",
+    "intfi_primary_no_lag_no_spy_flow_s27",
+    "intfi_primary_no_lag_no_gold_ratio_s27",
+    "intfi_primary_no_lag_no_vix_s27",
+    "intfi_primary_no_lag_no_erp_no_cpi_mom_s27",
+    "intfi_primary_no_lag_no_erp_no_cpi_mom_no_gold_ratio_s27",
+    "intfi_primary_no_lag_no_ma_no_erp_no_cpi_mom_s27",
+    "intfi_primary_no_lag_no_ma_no_erp_no_cpi_mom_no_gold_ratio_s27",
+    "intfi_primary_no_lag_no_vix_no_spy_flow_s27",
+    "intfi_primary_no_lag_no_ma_no_vix_no_spy_flow_s27",
+    "intfi_primary_no_lag_y_excess_lead_s127",
+    "intfi_all_macro_no_hy_change_no_copper_s127",
+    "intfi_trend_market_risk_s127",
+    "intfi_primary_no_lag_no_erp_s127",
+    "intfi_primary_no_lag_no_cpi_mom_s127",
+    "intfi_primary_no_lag_no_ma_signal_s127",
+    "intfi_primary_no_lag_no_spy_flow_s127",
+    "intfi_primary_no_lag_no_gold_ratio_s127",
+    "intfi_primary_no_lag_no_vix_s127",
+    "intfi_primary_no_lag_no_erp_no_cpi_mom_s127",
+    "intfi_primary_no_lag_no_erp_no_cpi_mom_no_gold_ratio_s127",
+    "intfi_primary_no_lag_no_ma_no_erp_no_cpi_mom_s127",
+    "intfi_primary_no_lag_no_ma_no_erp_no_cpi_mom_no_gold_ratio_s127",
+    "intfi_primary_no_lag_no_vix_no_spy_flow_s127",
+    "intfi_primary_no_lag_no_ma_no_vix_no_spy_flow_s127",
+    "intfi_primary_no_lag_y_excess_lead_s227",
+    "intfi_all_macro_no_hy_change_no_copper_s227",
+    "intfi_trend_market_risk_s227",
+    "intfi_primary_no_lag_no_erp_s227",
+    "intfi_primary_no_lag_no_cpi_mom_s227",
+    "intfi_primary_no_lag_no_ma_signal_s227",
+    "intfi_primary_no_lag_no_spy_flow_s227",
+    "intfi_primary_no_lag_no_gold_ratio_s227",
+    "intfi_primary_no_lag_no_vix_s227",
+    "intfi_primary_no_lag_no_erp_no_cpi_mom_s227",
+    "intfi_primary_no_lag_no_erp_no_cpi_mom_no_gold_ratio_s227",
+    "intfi_primary_no_lag_no_ma_no_erp_no_cpi_mom_s227",
+    "intfi_primary_no_lag_no_ma_no_erp_no_cpi_mom_no_gold_ratio_s227",
+    "intfi_primary_no_lag_no_vix_no_spy_flow_s227",
+    "intfi_primary_no_lag_no_ma_no_vix_no_spy_flow_s227"
+  ],
+  "failures": [],
+  "family": "international_fixed_income",
+  "n_dates": 24,
+  "pareto_objectives": {
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ]
+  },
+  "phase": "refinement",
+  "schema": "bayesfolio.etf_family_experiment_validation.v1",
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "sharpe_definition": {
+    "formula": "mean(monthly_excess_return) / sample_std(monthly_excess_return) * sqrt(12)",
+    "periods_per_year": 12.0,
+    "standard_deviation_ddof": 1
+  },
+  "turnover_excluded": true
+}

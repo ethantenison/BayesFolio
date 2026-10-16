@@ -16,23 +16,35 @@ from summarize_us_confirmation import hypervolume_3d, is_dominated
 
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = EXPERIMENT_DIR / "results"
-ROUND_NAMES = ["block_screen", "targeted_ablation", "feature_refinement", "combination_refinement"]
+BASE_ROUND_NAMES = ["block_screen", "targeted_ablation", "feature_refinement", "combination_refinement"]
 FAMILIES = {
     "us_fixed_income": {
         "title": "U.S. fixed income",
         "universe": ["BND", "IEF", "LQD", "HYG"],
         "prefix": "us_fixed_income",
-        "primary": "USFI-COMPACT-NO-CS+RET-AUTOCORR",
-        "challenger": "USFI-COMPACT+VOL-Z",
-        "calibration": "USFI-TREND",
+        "round_names": BASE_ROUND_NAMES,
+        "selections": [
+            ("primary", "USFI-COMPACT-NO-CS+RET-AUTOCORR"),
+            ("challenger", "USFI-COMPACT+VOL-Z"),
+            ("calibration_anchor", "USFI-TREND"),
+        ],
     },
     "international_fixed_income": {
         "title": "International fixed income",
         "universe": ["BNDX", "VWOB", "HYEM"],
         "prefix": "international_fixed_income",
-        "primary": "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-COPPER",
-        "challenger": "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-ERP-NO-CPI-MOM-NO-COPPER",
-        "calibration": "INTFI-TREND+MARKET-RISK",
+        "round_names": [
+            *BASE_ROUND_NAMES,
+            "sparsity_ablation",
+            "sparsity_combination",
+            "sparsity_final",
+        ],
+        "selections": [
+            ("primary", "INTFI-PRIMARY-NO-LAG-NO-CPI-NO-GOLD"),
+            ("high_ic_challenger", "INTFI-PRIMARY-NO-LAG-NO-ERP"),
+            ("sparse_sharpe_challenger", "INTFI-PRIMARY-NO-LAG-NO-ERP-NO-CPI-MOM-NO-GOLD-RATIO"),
+            ("calibration_anchor", "INTFI-TREND+MARKET-RISK"),
+        ],
     },
 }
 OBJECTIVE_COLUMNS = ["mean_ic", "mean_gaussian_nll", "sharpe"]
@@ -70,12 +82,12 @@ def load_feature_map(family: str) -> dict[str, list[str]]:
     return feature_map
 
 
-def load_family(family: str, prefix: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+def load_family(family: str, prefix: str, round_names: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load, validate, and deduplicate all configuration aggregates for a family."""
     frames: list[pd.DataFrame] = []
     cumulative: list[pd.DataFrame] = []
     progression: list[dict[str, Any]] = []
-    for round_name in ROUND_NAMES:
+    for round_name in round_names:
         path = RESULTS_DIR / f"{prefix}_{round_name}_configuration_aggregates.csv"
         frame = pd.read_csv(path)
         frame.insert(1, "observed_in_round", round_name)
@@ -134,7 +146,7 @@ def main() -> None:
         "# Fixed-Income ETF Feature Search",
         "",
         "This report consolidates the U.S. and international fixed-income searches across block screening,",
-        "targeted ablations, feature-level add/remove tests, and final combination refinement.",
+        "targeted ablations, feature-level add/remove tests, combination refinement, and sparsity refinement.",
         "",
         "The Pareto objectives are higher mean IC, lower mean Gaussian NLL, and higher conventional annualized",
         "Sharpe. Cumulative return and RMSE are recorded only; turnover is excluded. All results use cached data,",
@@ -143,14 +155,10 @@ def main() -> None:
     ]
 
     for family, metadata in FAMILIES.items():
-        frame, progression = load_family(family, str(metadata["prefix"]))
+        frame, progression = load_family(family, str(metadata["prefix"]), list(metadata["round_names"]))
         feature_map = load_feature_map(family)
         pareto = frame.loc[frame["pareto_nondominated"]].copy()
-        selected = [
-            selected_row(frame, str(metadata["primary"]), "primary", feature_map),
-            selected_row(frame, str(metadata["challenger"]), "challenger", feature_map),
-            selected_row(frame, str(metadata["calibration"]), "calibration_anchor", feature_map),
-        ]
+        selected = [selected_row(frame, str(label), str(role), feature_map) for role, label in metadata["selections"]]
         recommendations["families"][family] = {
             "universe": metadata["universe"],
             "configurations_evaluated": len(frame),
@@ -205,12 +213,12 @@ def main() -> None:
             "- U.S. fixed income favored local time-series features. Credit/inflation and broader macro additions",
             "  were noise at this screening budget. Removing `mom36m` opened the useful region; removing",
             "  `cs_mom_rank` and adding `ret_autocorr` produced the best Sharpe-oriented balance.",
-            "- International fixed income required macro context. The broad macro model became materially better",
-            "  after removing `hy_spread_chg_1m` and `copper_ret`; also removing `erp` and `cpi_mom` maximized IC",
-            "  while retaining a strong Sharpe and slightly better NLL.",
+            "- International fixed income required macro context, but the broad model was over-specified. The final",
+            "  primary removes `hy_spread_chg_1m`, `copper_ret`, `lag_y_excess_lead`, `cpi_mom`, and",
+            "  `gold_crude_ratio` while retaining `oil_ret`; it dominates the former 21-input primary.",
             "- `INTFI-TREND+COMMODITY-RET` remains mathematically nondominated only because it has the best NLL;",
             "  its negative IC means it contributes no hypervolume above the fixed zero reference and is not promoted.",
-            "- Promote the primary and challenger for each family to longer-history/full-budget confirmation.",
+            "- Promote each listed primary and challenger to longer-history/full-budget confirmation.",
             "  Keep the calibration anchor in that confirmation so selection remains genuinely multi-objective.",
             "  Do not replace production inputs from this screen alone.",
             "",

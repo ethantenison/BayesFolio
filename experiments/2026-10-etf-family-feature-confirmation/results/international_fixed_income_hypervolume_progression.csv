@@ -3,3 +3,6 @@ block_screen,7,0.5588583149439905
 targeted_ablation,15,0.5588610529056834
 feature_refinement,36,0.6983285984893722
 combination_refinement,48,0.8946498158893588
+sparsity_ablation,68,0.9367611186370194
+sparsity_combination,80,1.0082910108518588
+sparsity_final,87,1.0101099270608744

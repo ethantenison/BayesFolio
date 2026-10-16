@@ -88,16 +88,15 @@
         "VWOB",
         "HYEM"
       ],
-      "configurations_evaluated": 48,
-      "valid_fits": 144,
-      "final_hypervolume": 0.8946498158893588,
+      "configurations_evaluated": 87,
+      "valid_fits": 261,
+      "final_hypervolume": 1.0101099270608744,
       "promotions": [
         {
           "role": "primary",
-          "configuration": "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-COPPER",
+          "configuration": "INTFI-PRIMARY-NO-LAG-NO-CPI-NO-GOLD",
           "input_columns": [
             "t_index",
-            "lag_y_excess_lead",
             "chmom",
             "mom12m",
             "mom36m",
@@ -112,24 +111,51 @@
             "spy_ret",
             "erp",
             "cpi_yoy",
+            "oil_ret",
+            "pct_above_50dma",
+            "em_fx_ret"
+          ],
+          "mean_ic": 0.3888888888888889,
+          "mean_gaussian_nll": -2.6333923291829513,
+          "sharpe": 0.8831913581689593,
+          "cumulative_return_diagnostic_only": 0.070511586519081,
+          "rmse_diagnostic_only": 0.0151341948948325
+        },
+        {
+          "role": "high_ic_challenger",
+          "configuration": "INTFI-PRIMARY-NO-LAG-NO-ERP",
+          "input_columns": [
+            "t_index",
+            "chmom",
+            "mom12m",
+            "mom36m",
+            "cs_mom_rank",
+            "ma_signal",
+            "hy_spread",
+            "hy_spread_z_12m",
+            "vix_slope",
+            "vix_ts_z_12m",
+            "vix",
+            "spy_flow_z_12m",
+            "spy_ret",
+            "cpi_yoy",
             "cpi_mom",
             "oil_ret",
             "gold_crude_ratio",
             "pct_above_50dma",
             "em_fx_ret"
           ],
-          "mean_ic": 0.3541666666666667,
-          "mean_gaussian_nll": -2.601980110012964,
-          "sharpe": 0.8701387777189941,
-          "cumulative_return_diagnostic_only": 0.0698770045344165,
-          "rmse_diagnostic_only": 0.0157018214015626
+          "mean_ic": 0.4305555555555556,
+          "mean_gaussian_nll": -2.6076032372703715,
+          "sharpe": 0.8748006580659234,
+          "cumulative_return_diagnostic_only": 0.0700077799419353,
+          "rmse_diagnostic_only": 0.0151986689949787
         },
         {
-          "role": "challenger",
-          "configuration": "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-ERP-NO-CPI-MOM-NO-COPPER",
+          "role": "sparse_sharpe_challenger",
+          "configuration": "INTFI-PRIMARY-NO-LAG-NO-ERP-NO-CPI-MOM-NO-GOLD-RATIO",
           "input_columns": [
             "t_index",
-            "lag_y_excess_lead",
             "chmom",
             "mom12m",
             "mom36m",
@@ -144,15 +170,14 @@
             "spy_ret",
             "cpi_yoy",
             "oil_ret",
-            "gold_crude_ratio",
             "pct_above_50dma",
             "em_fx_ret"
           ],
-          "mean_ic": 0.3888888888888889,
-          "mean_gaussian_nll": -2.6059729232012105,
-          "sharpe": 0.8598857777305451,
-          "cumulative_return_diagnostic_only": 0.0690011101819179,
-          "rmse_diagnostic_only": 0.0152443676027544
+          "mean_ic": 0.3194444444444444,
+          "mean_gaussian_nll": -2.6076659799051822,
+          "sharpe": 0.8851927032048513,
+          "cumulative_return_diagnostic_only": 0.0706648816047149,
+          "rmse_diagnostic_only": 0.0150739450014512
         },
         {
           "role": "calibration_anchor",

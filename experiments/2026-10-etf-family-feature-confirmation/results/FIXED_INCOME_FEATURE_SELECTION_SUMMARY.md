@@ -1,7 +1,7 @@
 # Fixed-Income ETF Feature Search
 
 This report consolidates the U.S. and international fixed-income searches across block screening,
-targeted ablations, feature-level add/remove tests, and final combination refinement.
+targeted ablations, feature-level add/remove tests, combination refinement, and sparsity refinement.
 
 The Pareto objectives are higher mean IC, lower mean Gaussian NLL, and higher conventional annualized
 Sharpe. Cumulative return and RMSE are recorded only; turnover is excluded. All results use cached data,
@@ -41,20 +41,22 @@ Universe: `BND, IEF, LQD, HYG`. Evaluated `31` unique configurations and `93` va
 
 ## International fixed income
 
-Universe: `BNDX, VWOB, HYEM`. Evaluated `48` unique configurations and `144` valid fits.
+Universe: `BNDX, VWOB, HYEM`. Evaluated `87` unique configurations and `261` valid fits.
 
 ### Final Pareto front
 
-| configuration                                            |   mean_ic |   mean_gaussian_nll |   sharpe |   cumulative_return_diagnostic_only |   rmse_diagnostic_only |
-|:---------------------------------------------------------|----------:|--------------------:|---------:|------------------------------------:|-----------------------:|
-| INTFI-TREND+EQUITY-RISK                                  |  0.062500 |           -2.631626 | 0.850382 |                            0.068254 |               0.017250 |
-| INTFI-TREND+COMMODITY-RET                                | -0.083333 |           -2.710271 | 0.819405 |                            0.065428 |               0.015601 |
-| INTFI-TREND+MARKET-RISK                                  |  0.159722 |           -2.688399 | 0.847268 |                            0.067871 |               0.015314 |
-| INTFI-TREND+GLOBAL                                       |  0.229167 |           -2.649867 | 0.849766 |                            0.068428 |               0.013867 |
-| INTFI-ALL-MACRO-NO-HY-SPREAD-CHG-1M                      |  0.277778 |           -2.605438 | 0.860532 |                            0.069081 |               0.015558 |
-| INTFI-ALL-MACRO-NO-HY-CHANGE-NO-CPI-MOM                  |  0.277778 |           -2.602178 | 0.862439 |                            0.069168 |               0.015353 |
-| INTFI-ALL-MACRO-NO-HY-CHANGE-NO-COPPER                   |  0.354167 |           -2.601980 | 0.870139 |                            0.069877 |               0.015702 |
-| INTFI-ALL-MACRO-NO-HY-CHANGE-NO-ERP-NO-CPI-MOM-NO-COPPER |  0.388889 |           -2.605973 | 0.859886 |                            0.069001 |               0.015244 |
+| configuration                                        |   mean_ic |   mean_gaussian_nll |   sharpe |   cumulative_return_diagnostic_only |   rmse_diagnostic_only |
+|:-----------------------------------------------------|----------:|--------------------:|---------:|------------------------------------:|-----------------------:|
+| INTFI-TREND+COMMODITY-RET                            | -0.083333 |           -2.710271 | 0.819405 |                            0.065428 |               0.015601 |
+| INTFI-TREND+GLOBAL                                   |  0.229167 |           -2.649867 | 0.849766 |                            0.068428 |               0.013867 |
+| INTFI-PRIMARY-NO-LAG-NO-ERP                          |  0.430556 |           -2.607603 | 0.874801 |                            0.070008 |               0.015199 |
+| INTFI-PRIMARY-NO-LAG-Y-EXCESS-LEAD                   |  0.402778 |           -2.614493 | 0.877914 |                            0.070189 |               0.015585 |
+| INTFI-PRIMARY-NO-LAG-NO-MA-SIGNAL                    |  0.395833 |           -2.623165 | 0.879086 |                            0.070326 |               0.015358 |
+| INTFI-PRIMARY-NO-LAG-NO-ERP-NO-CPI-MOM-NO-GOLD-RATIO |  0.319444 |           -2.607666 | 0.885193 |                            0.070665 |               0.015074 |
+| INTFI-TREND+MARKET-RISK                              |  0.159722 |           -2.688399 | 0.847268 |                            0.067871 |               0.015314 |
+| INTFI-PRIMARY-NO-LAG-NO-MA-NO-GOLD                   |  0.402778 |           -2.632185 | 0.874315 |                            0.070082 |               0.015078 |
+| INTFI-PRIMARY-NO-LAG-NO-CPI-NO-GOLD                  |  0.388889 |           -2.633392 | 0.883191 |                            0.070512 |               0.015134 |
+| INTFI-PRIMARY-NO-LAG-NO-MA-NO-ERP                    |  0.409722 |           -2.618535 | 0.871866 |                            0.069719 |               0.015061 |
 
 ### Hypervolume progression
 
@@ -64,11 +66,15 @@ Universe: `BNDX, VWOB, HYEM`. Evaluated `48` unique configurations and `144` val
 | targeted_ablation      |                      15 |   0.558861053 |
 | feature_refinement     |                      36 |   0.698328598 |
 | combination_refinement |                      48 |   0.894649816 |
+| sparsity_ablation      |                      68 |   0.936761119 |
+| sparsity_combination   |                      80 |   1.008291011 |
+| sparsity_final         |                      87 |   1.010109927 |
 
 ### Promotion set
 
-- **primary — INTFI-ALL-MACRO-NO-HY-CHANGE-NO-COPPER**: IC `0.354167`, NLL `-2.601980`, Sharpe `0.870139`; inputs: `t_index, lag_y_excess_lead, chmom, mom12m, mom36m, cs_mom_rank, ma_signal, hy_spread, hy_spread_z_12m, vix_slope, vix_ts_z_12m, vix, spy_flow_z_12m, spy_ret, erp, cpi_yoy, cpi_mom, oil_ret, gold_crude_ratio, pct_above_50dma, em_fx_ret`.
-- **challenger — INTFI-ALL-MACRO-NO-HY-CHANGE-NO-ERP-NO-CPI-MOM-NO-COPPER**: IC `0.388889`, NLL `-2.605973`, Sharpe `0.859886`; inputs: `t_index, lag_y_excess_lead, chmom, mom12m, mom36m, cs_mom_rank, ma_signal, hy_spread, hy_spread_z_12m, vix_slope, vix_ts_z_12m, vix, spy_flow_z_12m, spy_ret, cpi_yoy, oil_ret, gold_crude_ratio, pct_above_50dma, em_fx_ret`.
+- **primary — INTFI-PRIMARY-NO-LAG-NO-CPI-NO-GOLD**: IC `0.388889`, NLL `-2.633392`, Sharpe `0.883191`; inputs: `t_index, chmom, mom12m, mom36m, cs_mom_rank, ma_signal, hy_spread, hy_spread_z_12m, vix_slope, vix_ts_z_12m, vix, spy_flow_z_12m, spy_ret, erp, cpi_yoy, oil_ret, pct_above_50dma, em_fx_ret`.
+- **high_ic_challenger — INTFI-PRIMARY-NO-LAG-NO-ERP**: IC `0.430556`, NLL `-2.607603`, Sharpe `0.874801`; inputs: `t_index, chmom, mom12m, mom36m, cs_mom_rank, ma_signal, hy_spread, hy_spread_z_12m, vix_slope, vix_ts_z_12m, vix, spy_flow_z_12m, spy_ret, cpi_yoy, cpi_mom, oil_ret, gold_crude_ratio, pct_above_50dma, em_fx_ret`.
+- **sparse_sharpe_challenger — INTFI-PRIMARY-NO-LAG-NO-ERP-NO-CPI-MOM-NO-GOLD-RATIO**: IC `0.319444`, NLL `-2.607666`, Sharpe `0.885193`; inputs: `t_index, chmom, mom12m, mom36m, cs_mom_rank, ma_signal, hy_spread, hy_spread_z_12m, vix_slope, vix_ts_z_12m, vix, spy_flow_z_12m, spy_ret, cpi_yoy, oil_ret, pct_above_50dma, em_fx_ret`.
 - **calibration_anchor — INTFI-TREND+MARKET-RISK**: IC `0.159722`, NLL `-2.688399`, Sharpe `0.847268`; inputs: `t_index, lag_y_excess_lead, chmom, mom12m, mom36m, cs_mom_rank, ma_signal, vix_slope, vix_ts_z_12m, vix, spy_flow_z_12m, spy_ret, erp, pct_above_50dma`.
 
 ## Findings and recommendation
@@ -76,12 +82,12 @@ Universe: `BNDX, VWOB, HYEM`. Evaluated `48` unique configurations and `144` val
 - U.S. fixed income favored local time-series features. Credit/inflation and broader macro additions
   were noise at this screening budget. Removing `mom36m` opened the useful region; removing
   `cs_mom_rank` and adding `ret_autocorr` produced the best Sharpe-oriented balance.
-- International fixed income required macro context. The broad macro model became materially better
-  after removing `hy_spread_chg_1m` and `copper_ret`; also removing `erp` and `cpi_mom` maximized IC
-  while retaining a strong Sharpe and slightly better NLL.
+- International fixed income required macro context, but the broad model was over-specified. The final
+  primary removes `hy_spread_chg_1m`, `copper_ret`, `lag_y_excess_lead`, `cpi_mom`, and
+  `gold_crude_ratio` while retaining `oil_ret`; it dominates the former 21-input primary.
 - `INTFI-TREND+COMMODITY-RET` remains mathematically nondominated only because it has the best NLL;
   its negative IC means it contributes no hypervolume above the fixed zero reference and is not promoted.
-- Promote the primary and challenger for each family to longer-history/full-budget confirmation.
+- Promote each listed primary and challenger to longer-history/full-budget confirmation.
   Keep the calibration anchor in that confirmation so selection remains genuinely multi-objective.
   Do not replace production inputs from this screen alone.
 
