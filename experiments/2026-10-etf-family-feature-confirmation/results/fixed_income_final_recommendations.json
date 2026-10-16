@@ -80,7 +80,58 @@
           "cumulative_return_diagnostic_only": 0.0348604507637494,
           "rmse_diagnostic_only": 0.015502980398389
         }
-      ]
+      ],
+      "rate_aware_lag_challenge": {
+        "training_panel": [
+          "2021-03-31",
+          "2026-04-30"
+        ],
+        "scored_panel": [
+          "2024-05-31",
+          "2026-04-30"
+        ],
+        "configurations_evaluated": 22,
+        "valid_fits": 66,
+        "pareto_no_lag_count": 5,
+        "pareto_count": 6,
+        "promotions": [
+          {
+            "role": "balanced_no_lag_challenger",
+            "configuration": "USFI-RATE-REAL-RATE-NO-LAG",
+            "input_columns": [
+              "t_index",
+              "chmom",
+              "mom12m",
+              "ma_signal",
+              "ret_autocorr",
+              "y10_nominal",
+              "schp_ret",
+              "y10_real_proxy"
+            ],
+            "mean_ic": 0.1305555555555555,
+            "mean_gaussian_nll": -2.624057699842464,
+            "sharpe": 0.4335660084962238,
+            "cumulative_return_diagnostic_only": 0.0359236492654483,
+            "rmse_diagnostic_only": 0.0162059754539072
+          },
+          {
+            "role": "no_lag_calibration_anchor",
+            "configuration": "USFI-RATE-BALANCED-NO-LAG",
+            "input_columns": [
+              "t_index",
+              "chmom",
+              "mom12m",
+              "ma_signal",
+              "ret_autocorr"
+            ],
+            "mean_ic": 0.1083333333333333,
+            "mean_gaussian_nll": -2.663281405783248,
+            "sharpe": 0.4327552745189921,
+            "cumulative_return_diagnostic_only": 0.0346615090404604,
+            "rmse_diagnostic_only": 0.0158039965911997
+          }
+        ]
+      }
     },
     "international_fixed_income": {
       "universe": [

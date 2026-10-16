@@ -522,6 +522,127 @@ def main() -> None:
     ]
     write_config("international_fixed_income_sparsity_final_config.json", international_sparse_final)
 
+    us_no_lag = base_config("us_fixed_income", "block_screen", "us_fixed_income_no_lag_block_screen")
+    no_lag_core = ["chmom", "mom12m", "cs_mom_rank", "ma_signal"]
+    no_lag_all_local = [column for column in ALL_LOCAL if column != "lag_y_excess_lead"]
+    us_no_lag_specs = [
+        ("core", no_lag_core, []),
+        ("core_autocorr", [*no_lag_core, "ret_autocorr"], []),
+        ("core_vol", [*no_lag_core, "vol_z"], []),
+        ("core_autocorr_vol", [*no_lag_core, "ret_autocorr", "vol_z"], []),
+        ("core_risk_dynamics", [*no_lag_core, "max_dd_6m", "ret_autocorr", "vol_z"], []),
+        ("all_local", no_lag_all_local, []),
+        ("core_credit_level_z", no_lag_core, ["hy_spread", "hy_spread_z_12m"]),
+        ("core_credit_all", no_lag_core, ["hy_spread", "hy_spread_chg_1m", "hy_spread_z_12m"]),
+        ("core_inflation", no_lag_core, ["cpi_yoy", "cpi_mom"]),
+        ("core_market_risk", no_lag_core, MARKET_RISK),
+        ("core_credit_market", no_lag_core, [*CREDIT_INFLATION[:3], *MARKET_RISK]),
+        ("core_global", no_lag_core, GLOBAL),
+        ("core_all_macro", no_lag_core, ALL_MACRO),
+        ("all_match", no_lag_all_local, ALL_MACRO),
+        ("no_cs_autocorr_vol", ["chmom", "mom12m", "ma_signal", "ret_autocorr", "vol_z"], []),
+        ("no_mom12_autocorr_vol", ["chmom", "cs_mom_rank", "ma_signal", "ret_autocorr", "vol_z"], []),
+    ]
+    us_no_lag["configurations"] = [
+        configuration(f"usfi_nolag_{identifier}", f"USFI-NOLAG-{identifier.upper().replace('_', '-')}", local, macro)
+        for identifier, local, macro in us_no_lag_specs
+    ]
+    us_no_lag["comparison_configurations"] = [
+        configuration(
+            "usfi_compact_no_cs_add_ret_autocorr",
+            "USFI-COMPACT-NO-CS+RET-AUTOCORR",
+            ["lag_y_excess_lead", "chmom", "mom12m", "ma_signal", "ret_autocorr"],
+            [],
+        ),
+        configuration(
+            "usfi_compact_add_vol_z",
+            "USFI-COMPACT+VOL-Z",
+            ["lag_y_excess_lead", "chmom", "mom12m", "cs_mom_rank", "ma_signal", "vol_z"],
+            [],
+        ),
+        configuration("usfi_trend", "USFI-TREND", TREND, []),
+        configuration(
+            "usfi_compact_no_lag_y_excess_lead",
+            "USFI-COMPACT-NO-LAG-Y-EXCESS-LEAD",
+            ["chmom", "mom12m", "cs_mom_rank", "ma_signal"],
+            [],
+        ),
+    ]
+    write_config("us_fixed_income_no_lag_block_screen_config.json", us_no_lag)
+
+    us_rate = base_config("us_fixed_income", "block_screen", "us_fixed_income_rate_no_lag_screen")
+    artifact_root = "experiments/2026-10-etf-family-feature-confirmation/artifacts"
+    us_rate["feature_path"] = f"{artifact_root}/us_fixed_income_rate_cached_inputs_20261016.parquet"
+    us_rate["feature_manifest"] = f"{artifact_root}/us_fixed_income_rate_cached_inputs_20261016.manifest.json"
+    us_rate["scored_date_file"] = f"{artifact_root}/us_fixed_income_rate_scored_dates_24.txt"
+    balanced_base = ["chmom", "mom12m", "ma_signal", "ret_autocorr"]
+    high_ic_base = ["chmom", "mom12m", "cs_mom_rank", "ma_signal", "vol_z"]
+    rate_blocks = [
+        ("treasury_curve", ["tnote10y", "tbill3m", "term_spread"]),
+        ("duration_curve", ["tnote10y", "term_spread"]),
+        ("real_rate", ["y10_nominal", "schp_ret", "y10_real_proxy"]),
+        ("breakeven", ["breakeven_proxy"]),
+        ("rate_vol", ["move_proxy"]),
+        ("curve_rate_vol", ["tnote10y", "tbill3m", "term_spread", "move_proxy"]),
+        (
+            "curve_real_inflation",
+            [
+                "tnote10y",
+                "tbill3m",
+                "term_spread",
+                "y10_nominal",
+                "schp_ret",
+                "y10_real_proxy",
+                "breakeven_proxy",
+            ],
+        ),
+        (
+            "all_rates",
+            [
+                "tnote10y",
+                "tbill3m",
+                "term_spread",
+                "move_proxy",
+                "y10_nominal",
+                "schp_ret",
+                "y10_real_proxy",
+                "breakeven_proxy",
+            ],
+        ),
+        (
+            "all_rates_credit",
+            [
+                "tnote10y",
+                "tbill3m",
+                "term_spread",
+                "credit_spread",
+                "credit_spread_chg_1p",
+                "move_proxy",
+                "y10_nominal",
+                "schp_ret",
+                "y10_real_proxy",
+                "breakeven_proxy",
+            ],
+        ),
+    ]
+    paired_rate_specs = [
+        ("balanced", balanced_base, []),
+        ("high_ic", high_ic_base, []),
+        *[(identifier, balanced_base, macro) for identifier, macro in rate_blocks],
+    ]
+    us_rate["configurations"] = [
+        configuration(
+            f"usfi_rate_{identifier}_{lag_suffix}",
+            f"USFI-RATE-{identifier.upper().replace('_', '-')}-{'WITH-LAG' if include_lag else 'NO-LAG'}",
+            ["lag_y_excess_lead", *local] if include_lag else local,
+            macro,
+        )
+        for identifier, local, macro in paired_rate_specs
+        for include_lag, lag_suffix in ((False, "no_lag"), (True, "with_lag"))
+    ]
+    us_rate["comparison_configurations"] = []
+    write_config("us_fixed_income_rate_no_lag_screen_config.json", us_rate)
+
 
 if __name__ == "__main__":
     main()

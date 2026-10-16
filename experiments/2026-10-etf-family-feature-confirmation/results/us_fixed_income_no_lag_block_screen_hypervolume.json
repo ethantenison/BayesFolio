@@ -1,0 +1,22 @@
+{
+  "aggregation": "configuration means across the requested seed panel",
+  "configuration_count": 20,
+  "objective_transform": {
+    "mean_gaussian_nll": "negate_then_maximize",
+    "mean_ic": "maximize",
+    "sharpe": "maximize"
+  },
+  "pareto_configuration_count": 3,
+  "reference_point_maximization_space": {
+    "mean_ic": 0.0,
+    "negative_mean_gaussian_nll": 0.0,
+    "sharpe": 0.0
+  },
+  "reference_point_raw_objectives": {
+    "mean_gaussian_nll": 0.0,
+    "mean_ic": 0.0,
+    "sharpe": 0.0
+  },
+  "schema": "bayesfolio.etf_family_confirmation_hypervolume.v1",
+  "value": 0.28019256686788097
+}

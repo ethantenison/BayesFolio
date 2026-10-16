@@ -48,6 +48,8 @@ FAMILIES = {
     },
 }
 OBJECTIVE_COLUMNS = ["mean_ic", "mean_gaussian_nll", "sharpe"]
+RATE_CHALLENGE_CONFIG = EXPERIMENT_DIR / "us_fixed_income_rate_no_lag_screen_config.json"
+RATE_CHALLENGE_RESULTS = RESULTS_DIR / "us_fixed_income_rate_no_lag_screen_configuration_aggregates.csv"
 
 
 def pareto_mask(frame: pd.DataFrame) -> list[bool]:
@@ -132,6 +134,21 @@ def selected_row(frame: pd.DataFrame, label: str, role: str, feature_map: dict[s
     }
 
 
+def load_rate_challenge() -> tuple[pd.DataFrame, dict[str, list[str]]]:
+    """Load the separately comparable recent-history rate-aware lag challenge."""
+    frame = pd.read_csv(RATE_CHALLENGE_RESULTS)
+    if not bool(frame["validation_passed"].all()):
+        raise ValueError("Rate-aware lag challenge contains an invalid aggregate.")
+    payload = json.loads(RATE_CHALLENGE_CONFIG.read_text(encoding="utf-8"))
+    feature_map = {
+        str(item["label"]): [str(value) for value in item["expected_input_columns"]]
+        for item in payload["configurations"]
+    }
+    frame = frame.copy()
+    frame["pareto_nondominated"] = pareto_mask(frame)
+    return frame, feature_map
+
+
 def main() -> None:
     """Write final family-wide Pareto tables, recommendations, and study summary."""
     recommendations: dict[str, Any] = {
@@ -206,13 +223,84 @@ def main() -> None:
             )
         report.append("")
 
+        if family == "us_fixed_income":
+            rate_frame, rate_feature_map = load_rate_challenge()
+            rate_pareto = rate_frame.loc[rate_frame["pareto_nondominated"]].copy()
+            rate_selected = [
+                selected_row(
+                    rate_frame,
+                    "USFI-RATE-REAL-RATE-NO-LAG",
+                    "balanced_no_lag_challenger",
+                    rate_feature_map,
+                ),
+                selected_row(
+                    rate_frame,
+                    "USFI-RATE-BALANCED-NO-LAG",
+                    "no_lag_calibration_anchor",
+                    rate_feature_map,
+                ),
+            ]
+            recommendations["families"][family]["rate_aware_lag_challenge"] = {
+                "training_panel": ["2021-03-31", "2026-04-30"],
+                "scored_panel": ["2024-05-31", "2026-04-30"],
+                "configurations_evaluated": len(rate_frame),
+                "valid_fits": len(rate_frame) * 3,
+                "pareto_no_lag_count": int(
+                    rate_pareto["configuration"].str.endswith("-NO-LAG").sum()
+                ),
+                "pareto_count": len(rate_pareto),
+                "promotions": rate_selected,
+            }
+            report.extend(
+                [
+                    "### Rate-aware lag challenge",
+                    "",
+                    "A subsequent cached-only challenge added 10 bond-specific rate-state variables and evaluated",
+                    "22 explicitly paired with-lag/no-lag configurations (66 fits) on the same 24 scored dates.",
+                    "The rate source limits training to 62 complete months from 2021-03 through 2026-04, so its",
+                    "raw objectives remain separate from the 2013-history front above.",
+                    "",
+                    rate_pareto[
+                        [
+                            "configuration",
+                            "mean_ic",
+                            "mean_gaussian_nll",
+                            "sharpe",
+                            "cumulative_return_diagnostic_only",
+                            "rmse_diagnostic_only",
+                        ]
+                    ].to_markdown(index=False, floatfmt=".6f"),
+                    "",
+                    "Five of the six rate-aware Pareto points omit `lag_y_excess_lead`.",
+                    "",
+                ]
+            )
+            for item in rate_selected:
+                report.append(
+                    f"- **{item['role']} — {item['configuration']}**: IC `{item['mean_ic']:.6f}`, "
+                    f"NLL `{item['mean_gaussian_nll']:.6f}`, Sharpe `{item['sharpe']:.6f}`; "
+                    f"inputs: `{', '.join(item['input_columns'])}`."
+                )
+            report.extend(
+                [
+                    "",
+                    "The real-rate no-lag model beat its exact with-lag pair on IC and Sharpe in all three seeds",
+                    "and on NLL in two of three seeds. The balanced no-lag model beat its exact with-lag pair on",
+                    "NLL and Sharpe in all three seeds, with only a `0.005556` aggregate IC reduction. The prior",
+                    "lag requirement was therefore conditional on the original feature/training regime, not a",
+                    "stable U.S. fixed-income property. See `US_FIXED_INCOME_RATE_NO_LAG_RESULTS.md` for details.",
+                    "",
+                ]
+            )
+
     report.extend(
         [
             "## Findings and recommendation",
             "",
-            "- U.S. fixed income favored local time-series features. Credit/inflation and broader macro additions",
-            "  were noise at this screening budget. Removing `mom36m` opened the useful region; removing",
-            "  `cs_mom_rank` and adding `ret_autocorr` produced the best Sharpe-oriented balance.",
+            "- The long-history U.S. fixed-income search favored local time-series features. Generic credit/inflation",
+            "  and broad macro bundles were noise at this budget. The paired rate-aware challenge later showed that",
+            "  `lag_y_excess_lead` is not generally required: sparse no-lag local and real-rate models occupied five",
+            "  of six Pareto positions.",
             "- International fixed income required macro context, but the broad model was over-specified. The final",
             "  primary removes `hy_spread_chg_1m`, `copper_ret`, `lag_y_excess_lead`, `cpi_mom`, and",
             "  `gold_crude_ratio` while retaining `oil_ret`; it dominates the former 21-input primary.",
@@ -227,6 +315,9 @@ def main() -> None:
             "- Every reported configuration passed exact universe, date, seed, input-column, and model-control checks.",
             "- The search is conditional on the cached 2013-08 through 2026-04 data and the 24 scored months from",
             "  2024-05 through 2026-04. It is evidence-directed rather than exhaustive over every feature subset.",
+            "- The rate-aware challenge uses the same scored months but a 2021-03 through 2026-04 complete training",
+            "  panel. Its paired comparisons are valid, but its raw metrics are not pooled into the long-history",
+            "  front.",
             "- The next confirmation should preserve a common date panel and use the production optimization budget",
             "  before any production promotion decision.",
         ]

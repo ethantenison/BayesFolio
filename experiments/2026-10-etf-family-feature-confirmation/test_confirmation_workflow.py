@@ -132,6 +132,8 @@ def test_international_configs_preserve_fixed_contract() -> None:
         "international_fixed_income_sparsity_ablation_config.json": 20,
         "international_fixed_income_sparsity_combination_config.json": 12,
         "international_fixed_income_sparsity_final_config.json": 7,
+        "us_fixed_income_no_lag_block_screen_config.json": 16,
+        "us_fixed_income_rate_no_lag_screen_config.json": 22,
     }
     for name, expected_count in configs.items():
         path = experiment_dir / name
