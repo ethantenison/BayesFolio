@@ -1,0 +1,234 @@
+"""Consolidate all fixed-income search rounds into final Pareto artifacts.
+
+Usage:
+    uv run --locked python \
+      experiments/2026-10-etf-family-feature-confirmation/summarize_fixed_income_search.py
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+from summarize_us_confirmation import hypervolume_3d, is_dominated
+
+EXPERIMENT_DIR = Path(__file__).resolve().parent
+RESULTS_DIR = EXPERIMENT_DIR / "results"
+ROUND_NAMES = ["block_screen", "targeted_ablation", "feature_refinement", "combination_refinement"]
+FAMILIES = {
+    "us_fixed_income": {
+        "title": "U.S. fixed income",
+        "universe": ["BND", "IEF", "LQD", "HYG"],
+        "prefix": "us_fixed_income",
+        "primary": "USFI-COMPACT-NO-CS+RET-AUTOCORR",
+        "challenger": "USFI-COMPACT+VOL-Z",
+        "calibration": "USFI-TREND",
+    },
+    "international_fixed_income": {
+        "title": "International fixed income",
+        "universe": ["BNDX", "VWOB", "HYEM"],
+        "prefix": "international_fixed_income",
+        "primary": "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-COPPER",
+        "challenger": "INTFI-ALL-MACRO-NO-HY-CHANGE-NO-ERP-NO-CPI-MOM-NO-COPPER",
+        "calibration": "INTFI-TREND+MARKET-RISK",
+    },
+}
+OBJECTIVE_COLUMNS = ["mean_ic", "mean_gaussian_nll", "sharpe"]
+
+
+def pareto_mask(frame: pd.DataFrame) -> list[bool]:
+    """Return the three-objective nondominance mask."""
+    view = frame.loc[:, ["configuration", *OBJECTIVE_COLUMNS]]
+    return [not is_dominated(row, view) for _, row in view.iterrows()]
+
+
+def objective_hypervolume(frame: pd.DataFrame) -> float:
+    """Calculate fixed-reference hypervolume in transformed maximization space."""
+    points = [
+        (float(row.mean_ic), -float(row.mean_gaussian_nll), float(row.sharpe))
+        for row in frame.itertuples()
+        if row.mean_ic > 0.0 and row.mean_gaussian_nll < 0.0 and row.sharpe > 0.0
+    ]
+    return hypervolume_3d(points, (0.0, 0.0, 0.0))
+
+
+def load_feature_map(family: str) -> dict[str, list[str]]:
+    """Resolve labels to exact frozen input lists across all family configs."""
+    feature_map: dict[str, list[str]] = {}
+    for path in sorted(EXPERIMENT_DIR.glob("*fixed_income*_config.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if payload.get("family") != family:
+            continue
+        for item in [*payload.get("comparison_configurations", []), *payload["configurations"]]:
+            label = str(item["label"])
+            columns = [str(value) for value in item["expected_input_columns"]]
+            previous = feature_map.setdefault(label, columns)
+            if previous != columns:
+                raise ValueError(f"Conflicting input definitions for {label}.")
+    return feature_map
+
+
+def load_family(family: str, prefix: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Load, validate, and deduplicate all configuration aggregates for a family."""
+    frames: list[pd.DataFrame] = []
+    cumulative: list[pd.DataFrame] = []
+    progression: list[dict[str, Any]] = []
+    for round_name in ROUND_NAMES:
+        path = RESULTS_DIR / f"{prefix}_{round_name}_configuration_aggregates.csv"
+        frame = pd.read_csv(path)
+        frame.insert(1, "observed_in_round", round_name)
+        frames.append(frame)
+        cumulative.append(frame)
+        current = pd.concat(cumulative, ignore_index=True)
+        current = current.drop_duplicates(subset="configuration", keep="last")
+        progression.append(
+            {
+                "round": round_name,
+                "unique_configurations": len(current),
+                "hypervolume": objective_hypervolume(current),
+            }
+        )
+
+    combined = pd.concat(frames, ignore_index=True)
+    metric_columns = [*OBJECTIVE_COLUMNS, "cumulative_return_diagnostic_only", "rmse_diagnostic_only"]
+    for configuration, group in combined.groupby("configuration", sort=False):
+        if len(group) > 1 and not (group[metric_columns].nunique(dropna=False) == 1).all():
+            raise ValueError(f"Repeated aggregate changed across rounds: {configuration}.")
+    round_membership = combined.groupby("configuration", sort=False)["observed_in_round"].agg(",".join)
+    combined = combined.drop_duplicates(subset="configuration", keep="last").copy()
+    combined["observed_in_round"] = combined["configuration"].map(round_membership)
+    combined["pareto_nondominated"] = pareto_mask(combined)
+    if not bool(combined["validation_passed"].all()):
+        raise ValueError(f"{family} contains an invalid aggregate.")
+    return combined, pd.DataFrame(progression)
+
+
+def selected_row(frame: pd.DataFrame, label: str, role: str, feature_map: dict[str, list[str]]) -> dict[str, Any]:
+    """Return a serialized recommendation with exact inputs and metrics."""
+    row = frame.loc[frame["configuration"] == label].iloc[0]
+    return {
+        "role": role,
+        "configuration": label,
+        "input_columns": feature_map[label],
+        "mean_ic": float(row["mean_ic"]),
+        "mean_gaussian_nll": float(row["mean_gaussian_nll"]),
+        "sharpe": float(row["sharpe"]),
+        "cumulative_return_diagnostic_only": float(row["cumulative_return_diagnostic_only"]),
+        "rmse_diagnostic_only": float(row["rmse_diagnostic_only"]),
+    }
+
+
+def main() -> None:
+    """Write final family-wide Pareto tables, recommendations, and study summary."""
+    recommendations: dict[str, Any] = {
+        "schema": "bayesfolio.fixed_income_feature_search_recommendations.v1",
+        "objectives": {"maximize": ["mean_ic", "sharpe"], "minimize": ["mean_gaussian_nll"]},
+        "diagnostic_only": ["cumulative_return", "rmse"],
+        "turnover_excluded": True,
+        "promotion_stage": "longer-history/full-budget confirmation",
+        "families": {},
+    }
+    report = [
+        "# Fixed-Income ETF Feature Search",
+        "",
+        "This report consolidates the U.S. and international fixed-income searches across block screening,",
+        "targeted ablations, feature-level add/remove tests, and final combination refinement.",
+        "",
+        "The Pareto objectives are higher mean IC, lower mean Gaussian NLL, and higher conventional annualized",
+        "Sharpe. Cumulative return and RMSE are recorded only; turnover is excluded. All results use cached data,",
+        "seeds `27,127,227`, 24 common monthly scored windows, rank 2, maxiter 15, 256 scenarios, and `t_index`.",
+        "",
+    ]
+
+    for family, metadata in FAMILIES.items():
+        frame, progression = load_family(family, str(metadata["prefix"]))
+        feature_map = load_feature_map(family)
+        pareto = frame.loc[frame["pareto_nondominated"]].copy()
+        selected = [
+            selected_row(frame, str(metadata["primary"]), "primary", feature_map),
+            selected_row(frame, str(metadata["challenger"]), "challenger", feature_map),
+            selected_row(frame, str(metadata["calibration"]), "calibration_anchor", feature_map),
+        ]
+        recommendations["families"][family] = {
+            "universe": metadata["universe"],
+            "configurations_evaluated": len(frame),
+            "valid_fits": len(frame) * 3,
+            "final_hypervolume": objective_hypervolume(frame),
+            "promotions": selected,
+        }
+        frame.to_csv(RESULTS_DIR / f"{metadata['prefix']}_all_configurations.csv", index=False)
+        pareto.to_csv(RESULTS_DIR / f"{metadata['prefix']}_final_pareto.csv", index=False)
+        progression.to_csv(RESULTS_DIR / f"{metadata['prefix']}_hypervolume_progression.csv", index=False)
+
+        report.extend(
+            [
+                f"## {metadata['title']}",
+                "",
+                f"Universe: `{', '.join(metadata['universe'])}`. Evaluated `{len(frame)}` unique configurations "
+                f"and `{len(frame) * 3}` valid fits.",
+                "",
+                "### Final Pareto front",
+                "",
+                pareto[
+                    [
+                        "configuration",
+                        "mean_ic",
+                        "mean_gaussian_nll",
+                        "sharpe",
+                        "cumulative_return_diagnostic_only",
+                        "rmse_diagnostic_only",
+                    ]
+                ].to_markdown(index=False, floatfmt=".6f"),
+                "",
+                "### Hypervolume progression",
+                "",
+                progression.to_markdown(index=False, floatfmt=".9f"),
+                "",
+                "### Promotion set",
+                "",
+            ]
+        )
+        for item in selected:
+            report.append(
+                f"- **{item['role']} — {item['configuration']}**: IC `{item['mean_ic']:.6f}`, "
+                f"NLL `{item['mean_gaussian_nll']:.6f}`, Sharpe `{item['sharpe']:.6f}`; "
+                f"inputs: `{', '.join(item['input_columns'])}`."
+            )
+        report.append("")
+
+    report.extend(
+        [
+            "## Findings and recommendation",
+            "",
+            "- U.S. fixed income favored local time-series features. Credit/inflation and broader macro additions",
+            "  were noise at this screening budget. Removing `mom36m` opened the useful region; removing",
+            "  `cs_mom_rank` and adding `ret_autocorr` produced the best Sharpe-oriented balance.",
+            "- International fixed income required macro context. The broad macro model became materially better",
+            "  after removing `hy_spread_chg_1m` and `copper_ret`; also removing `erp` and `cpi_mom` maximized IC",
+            "  while retaining a strong Sharpe and slightly better NLL.",
+            "- `INTFI-TREND+COMMODITY-RET` remains mathematically nondominated only because it has the best NLL;",
+            "  its negative IC means it contributes no hypervolume above the fixed zero reference and is not promoted.",
+            "- Promote the primary and challenger for each family to longer-history/full-budget confirmation.",
+            "  Keep the calibration anchor in that confirmation so selection remains genuinely multi-objective.",
+            "  Do not replace production inputs from this screen alone.",
+            "",
+            "## Validation and limitations",
+            "",
+            "- Every reported configuration passed exact universe, date, seed, input-column, and model-control checks.",
+            "- The search is conditional on the cached 2013-08 through 2026-04 data and the 24 scored months from",
+            "  2024-05 through 2026-04. It is evidence-directed rather than exhaustive over every feature subset.",
+            "- The next confirmation should preserve a common date panel and use the production optimization budget",
+            "  before any production promotion decision.",
+        ]
+    )
+
+    (RESULTS_DIR / "fixed_income_final_recommendations.json").write_text(
+        json.dumps(recommendations, indent=2) + "\n", encoding="utf-8"
+    )
+    (RESULTS_DIR / "FIXED_INCOME_FEATURE_SELECTION_SUMMARY.md").write_text("\n".join(report) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

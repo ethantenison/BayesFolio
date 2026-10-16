@@ -1,0 +1,64 @@
+{
+  "all_passed": true,
+  "date_hash_sha256": "094ad6740466edb33fbbfd9c354092c1d8f87ad1a8076d380148f0bb2e01bf33",
+  "date_max": "2026-04-30",
+  "date_min": "2024-05-31",
+  "diagnostic_only": [
+    "cumulative_return",
+    "rmse"
+  ],
+  "expected_runs": [
+    "usfi_trend_s27",
+    "usfi_trend_credit_inflation_s27",
+    "usfi_trend_hy_level_s27",
+    "usfi_trend_hy_change_s27",
+    "usfi_trend_hy_z_s27",
+    "usfi_trend_inflation_s27",
+    "usfi_trend_hy_change_z_s27",
+    "usfi_trend_no_lag_s27",
+    "usfi_trend_no_mom36_s27",
+    "usfi_trend_s127",
+    "usfi_trend_credit_inflation_s127",
+    "usfi_trend_hy_level_s127",
+    "usfi_trend_hy_change_s127",
+    "usfi_trend_hy_z_s127",
+    "usfi_trend_inflation_s127",
+    "usfi_trend_hy_change_z_s127",
+    "usfi_trend_no_lag_s127",
+    "usfi_trend_no_mom36_s127",
+    "usfi_trend_s227",
+    "usfi_trend_credit_inflation_s227",
+    "usfi_trend_hy_level_s227",
+    "usfi_trend_hy_change_s227",
+    "usfi_trend_hy_z_s227",
+    "usfi_trend_inflation_s227",
+    "usfi_trend_hy_change_z_s227",
+    "usfi_trend_no_lag_s227",
+    "usfi_trend_no_mom36_s227"
+  ],
+  "failures": [],
+  "family": "us_fixed_income",
+  "n_dates": 24,
+  "pareto_objectives": {
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ]
+  },
+  "phase": "targeted_ablation",
+  "schema": "bayesfolio.etf_family_experiment_validation.v1",
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "sharpe_definition": {
+    "formula": "mean(monthly_excess_return) / sample_std(monthly_excess_return) * sqrt(12)",
+    "periods_per_year": 12.0,
+    "standard_deviation_ddof": 1
+  },
+  "turnover_excluded": true
+}

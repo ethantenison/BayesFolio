@@ -1,4 +1,4 @@
-"""Run a frozen international ETF confirmation or targeted-ablation phase.
+"""Run a frozen ETF-family confirmation, block-screen, or ablation phase.
 
 Usage:
     uv run --locked python \
@@ -27,7 +27,15 @@ from summarize_us_confirmation import parse_seed_list
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 DEFAULT_CONFIG = EXPERIMENT_DIR / "international_confirmation_config.json"
-EXPECTED_TICKERS = ["VEA", "VWO", "VSS", "EWX"]
+EXPECTED_TICKERS_BY_FAMILY = {
+    "international_equity": ["VEA", "VWO", "VSS", "EWX"],
+    "us_fixed_income": ["BND", "IEF", "LQD", "HYG"],
+    "international_fixed_income": ["BNDX", "VWOB", "HYEM"],
+}
+SUPPORTED_SCHEMAS = {
+    "bayesfolio.international_equity_experiment.v1",
+    "bayesfolio.etf_family_experiment.v1",
+}
 MAX_WORKERS = 15
 
 
@@ -91,12 +99,16 @@ def argument_value(arguments: list[str], flag: str) -> str | None:
 
 def validate_config(config: dict[str, Any], config_path: Path) -> dict[str, Path]:
     """Validate immutable experiment decisions and resolve configured paths."""
-    if config.get("schema") != "bayesfolio.international_equity_experiment.v1":
-        raise ValueError("Unsupported international experiment schema.")
-    if config.get("phase") not in {"confirmation", "targeted_ablation"}:
-        raise ValueError("Phase must be confirmation or targeted_ablation.")
-    if config.get("tickers") != EXPECTED_TICKERS:
-        raise ValueError(f"Task universe must be exactly {EXPECTED_TICKERS}.")
+    if config.get("schema") not in SUPPORTED_SCHEMAS:
+        raise ValueError("Unsupported ETF-family experiment schema.")
+    if config.get("phase") not in {"confirmation", "block_screen", "targeted_ablation", "refinement"}:
+        raise ValueError("Unsupported ETF-family experiment phase.")
+    family = str(config.get("family"))
+    expected_tickers = EXPECTED_TICKERS_BY_FAMILY.get(family)
+    if expected_tickers is None:
+        raise ValueError(f"Unsupported ETF family: {family!r}.")
+    if config.get("tickers") != expected_tickers:
+        raise ValueError(f"Task universe for {family} must be exactly {expected_tickers}.")
     configurations = config.get("configurations", [])
     comparisons = config.get("comparison_configurations", [])
     identifiers = [item.get("id") for item in [*configurations, *comparisons]]
@@ -179,7 +191,7 @@ def validate_config(config: dict[str, Any], config_path: Path) -> dict[str, Path
         raise ValueError("Feature artifact hash does not match its manifest.")
     if feature_manifest["approved_scored_dates"] != expected_dates:
         raise ValueError("Scored dates do not match the feature manifest.")
-    if feature_manifest["tickers"] != EXPECTED_TICKERS or len(expected_dates) != 24:
+    if feature_manifest["tickers"] != expected_tickers or len(expected_dates) != 24:
         raise ValueError("Feature manifest does not match the frozen universe and 24-date panel.")
     return paths
 
@@ -243,7 +255,7 @@ def snapshot_execution(
         shutil.copy2(source, destination)
         source_hashes[str(relative)] = sha256_file(source)
     manifest = {
-        "schema": "bayesfolio.international_equity_execution.v1",
+        "schema": "bayesfolio.etf_family_execution.v1",
         "created_at": datetime.now(UTC).isoformat(),
         "mode": mode,
         "workers": workers,
@@ -443,13 +455,14 @@ def main() -> None:
         )
         return
 
-    execution_id = args.execution_id or f"international_{config['phase']}_{datetime.now(UTC):%Y%m%dT%H%M%SZ}"
+    execution_id = args.execution_id or f"{config['family']}_{config['phase']}_{datetime.now(UTC):%Y%m%dT%H%M%SZ}"
     execution_dir = paths["snapshot_root"] / execution_id
     execution_dir.mkdir(parents=True, exist_ok=False)
     manifest = snapshot_execution(execution_dir, config, paths, seeds, mode, workers, commands)
-    (paths["snapshot_root"] / f"LATEST_{config['phase'].upper()}").write_text(execution_id + "\n", encoding="utf-8")
+    latest_name = f"LATEST_{config['family'].upper()}_{config['phase'].upper()}"
+    (paths["snapshot_root"] / latest_name).write_text(execution_id + "\n", encoding="utf-8")
     status = {
-        "schema": "bayesfolio.international_equity_status.v1",
+        "schema": "bayesfolio.etf_family_status.v1",
         "execution_id": execution_id,
         "phase": config["phase"],
         "state": "preflighting",

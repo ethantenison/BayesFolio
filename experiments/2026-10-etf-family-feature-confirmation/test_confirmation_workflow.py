@@ -121,6 +121,14 @@ def test_international_configs_preserve_fixed_contract() -> None:
         "international_ratio_only_config.json": 1,
         "international_oil_backward_selection_config.json": 7,
         "international_oil_interaction_refinement_config.json": 6,
+        "us_fixed_income_block_screen_config.json": 7,
+        "international_fixed_income_block_screen_config.json": 7,
+        "us_fixed_income_targeted_ablation_config.json": 7,
+        "international_fixed_income_targeted_ablation_config.json": 8,
+        "us_fixed_income_feature_refinement_config.json": 10,
+        "international_fixed_income_feature_refinement_config.json": 21,
+        "us_fixed_income_combination_refinement_config.json": 7,
+        "international_fixed_income_combination_refinement_config.json": 12,
     }
     for name, expected_count in configs.items():
         path = experiment_dir / name

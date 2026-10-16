@@ -1,0 +1,397 @@
+{
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "phase": "refinement",
+  "family": "us_fixed_income",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "feature_path": "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_fixed_income_cached_inputs_20261016.parquet",
+  "feature_manifest": "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_fixed_income_cached_inputs_20261016.manifest.json",
+  "scored_date_file": "experiments/2026-10-etf-family-feature-confirmation/artifacts/us_fixed_income_scored_dates_24.txt",
+  "output_root": "experiments/2026-10-etf-family-feature-confirmation/runs",
+  "snapshot_root": "experiments/2026-10-etf-family-feature-confirmation/executions",
+  "results_prefix": "us_fixed_income_feature_refinement",
+  "tickers": [
+    "BND",
+    "IEF",
+    "LQD",
+    "HYG"
+  ],
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "selection": {
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "turnover_excluded": true
+  },
+  "hypervolume": {
+    "reference_point": {
+      "mean_ic": 0.0,
+      "mean_gaussian_nll": 0.0,
+      "sharpe": 0.0
+    },
+    "objective_transform": {
+      "mean_ic": "maximize",
+      "mean_gaussian_nll": "negate_then_maximize",
+      "sharpe": "maximize"
+    },
+    "use_configuration_means_across_seeds": true,
+    "fixed_for_subsequent_rounds": true
+  },
+  "fixed_decisions": {
+    "include_t_index": true,
+    "cached_data_only": true,
+    "production_budget_reference_excluded": true
+  },
+  "configurations": [
+    {
+      "id": "usfi_compact_no_lag_y_excess_lead",
+      "label": "USFI-COMPACT-NO-LAG-Y-EXCESS-LEAD",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,mom12m,cs_mom_rank,ma_signal",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_no_chmom",
+      "label": "USFI-COMPACT-NO-CHMOM",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m,cs_mom_rank,ma_signal",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_no_mom12m",
+      "label": "USFI-COMPACT-NO-MOM12M",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "cs_mom_rank",
+        "ma_signal"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,cs_mom_rank,ma_signal",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_no_cs_mom_rank",
+      "label": "USFI-COMPACT-NO-CS-MOM-RANK",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "ma_signal"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,ma_signal",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_no_ma_signal",
+      "label": "USFI-COMPACT-NO-MA-SIGNAL",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,cs_mom_rank",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_add_baspread",
+      "label": "USFI-COMPACT+BASPREAD",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal",
+        "baspread"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,cs_mom_rank,ma_signal,baspread",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_add_ret_kurt",
+      "label": "USFI-COMPACT+RET-KURT",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal",
+        "ret_kurt"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,cs_mom_rank,ma_signal,ret_kurt",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_add_max_dd_6m",
+      "label": "USFI-COMPACT+MAX-DD-6M",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal",
+        "max_dd_6m"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,cs_mom_rank,ma_signal,max_dd_6m",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_add_ret_autocorr",
+      "label": "USFI-COMPACT+RET-AUTOCORR",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal",
+        "ret_autocorr"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,cs_mom_rank,ma_signal,ret_autocorr",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_compact_add_vol_z",
+      "label": "USFI-COMPACT+VOL-Z",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal",
+        "vol_z"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,cs_mom_rank,ma_signal,vol_z",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    }
+  ],
+  "comparison_configurations": [
+    {
+      "id": "usfi_trend_no_mom36",
+      "label": "USFI-TREND-NO-MOM36",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "cs_mom_rank",
+        "ma_signal"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,cs_mom_rank,ma_signal",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    },
+    {
+      "id": "usfi_trend",
+      "label": "USFI-TREND",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "mom36m",
+        "cs_mom_rank",
+        "ma_signal"
+      ],
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,chmom,mom12m,mom36m,cs_mom_rank,ma_signal",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ]
+    }
+  ]
+}

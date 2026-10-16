@@ -1,0 +1,5 @@
+round,unique_configurations,hypervolume
+block_screen,7,0.17364466269165127
+targeted_ablation,14,0.24233050854424681
+feature_refinement,24,0.27693666314271065
+combination_refinement,31,0.280640675564635

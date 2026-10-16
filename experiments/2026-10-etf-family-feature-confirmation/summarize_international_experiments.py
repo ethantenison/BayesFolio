@@ -1,4 +1,4 @@
-"""Validate and summarize international confirmation or ablation runs.
+"""Validate and summarize ETF-family confirmation, screen, or ablation runs.
 
 Usage:
     uv run --locked python \
@@ -185,7 +185,7 @@ def write_markdown(
     """Write the human-readable phase report."""
     phase_name = str(config["phase"]).replace("_", " ").title()
     lines = [
-        f"# International {phase_name} Results",
+        f"# {str(config['family']).replace('_', ' ').title()} {phase_name} Results",
         "",
         f"Seeds: `{','.join(str(seed) for seed in validation['seeds'])}`.",
         "",
@@ -210,7 +210,7 @@ def write_markdown(
         f"- Common date hash: `{validation['date_hash_sha256']}`",
         f"- All requested runs passed: `{validation['all_passed']}`",
         f"- Failures: `{validation['failures']}`",
-        "- VEA, VWO, VSS, and EWX form the exact task universe; t_index is present throughout.",
+        f"- {', '.join(config['tickers'])} form the exact task universe; t_index is present throughout.",
         "- Rank 2, maxiter 15, 256 scenarios, and the 24-date panel are fixed.",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -250,7 +250,7 @@ def main() -> None:
     pareto = aggregates.loc[aggregates["pareto_nondominated"]].copy()
     hypervolume = calculate_hypervolume(aggregates, config)
     if any("turnover" in column.lower() for column in [*run_objectives.columns, *aggregates.columns]):
-        raise AssertionError("Turnover must not appear in international evaluation outputs.")
+        raise AssertionError("Turnover must not appear in ETF-family evaluation outputs.")
 
     prefix = str(config["results_prefix"])
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -261,7 +261,8 @@ def main() -> None:
         json.dumps(hypervolume, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     validation = {
-        "schema": "bayesfolio.international_equity_experiment_validation.v1",
+        "schema": "bayesfolio.etf_family_experiment_validation.v1",
+        "family": config["family"],
         "phase": config["phase"],
         "seeds": seeds,
         "expected_runs": expected_runs,
@@ -286,7 +287,7 @@ def main() -> None:
     summary_name = f"{prefix.upper()}_RESULTS.md"
     write_markdown(RESULTS_DIR / summary_name, config, aggregates, pareto, validation, hypervolume)
     if failures:
-        raise ValueError(f"International experiment validation failed: {failures}")
+        raise ValueError(f"ETF-family experiment validation failed: {failures}")
     print(aggregates.to_string(index=False))
 
 
