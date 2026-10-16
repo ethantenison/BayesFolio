@@ -1,9 +1,9 @@
 # ETF Family Feature Confirmation Status
 
 Milestone: the U.S. follow-up batch and both international equity stages are
-complete. The international workflow produced 27 new validated fits: 12 for
+complete. The international workflow produced 30 new validated fits: 12 for
 the four-way confirmation, 12 for targeted macro ablations, and three for the
-oil-only follow-up.
+oil-only follow-up plus three for the gold/crude-ratio-only follow-up.
 
 ## Summary
 
@@ -18,6 +18,8 @@ oil-only follow-up.
   gives up IC and Sharpe, so it joins rather than replaces the Pareto frontier.
 - Adding `oil_ret` alone raises IC materially and Sharpe slightly, but worsens
   NLL. It therefore creates a distinct ranking-oriented Pareto point.
+- Adding `gold_crude_ratio` alone is dominated by `I-BREADTH` on all three
+  objectives. The paired block's NLL gain is therefore a joint-model effect.
 - Return and RMSE are recorded only. Turnover is absent from the evaluation and
   selection outputs.
 
@@ -54,9 +56,12 @@ gives up the paired block's small calibration advantage. All three
 configurations are nondominated, with fixed-reference hypervolume
 `0.49314030242413337`.
 
-Because this is a nonlinear GP, the comparison does not prove that the ratio
-alone caused the paired result. A ratio-only run would be needed to distinguish
-its main effect from an interaction.
+The completed ratio-only follow-up produced IC `0.091667`, NLL `-1.782716`,
+and Sharpe `1.278213`. `I-BREADTH` is better on all three objectives, so the
+ratio-only candidate is dominated. Because neither oil-only nor ratio-only
+reproduces the paired block's NLL improvement, that calibration gain appears
+only in their joint specification. This is consistent with an interaction or
+joint regularization effect rather than a useful standalone ratio effect.
 
 The preceding U.S. result remains unchanged: `all_match_redundancy_pruned` is
 the only promoted follow-up candidate, expanding the U.S. frontier by
@@ -81,7 +86,7 @@ Use `I-BREADTH` as the international equity default candidate for subsequent
 confirmation or integration work. Preserve `I-BREADTH+COMMODITIES` as a
 calibration-oriented alternative and `I-BREADTH+OIL` as a ranking-oriented
 alternative; neither is an automatic replacement. Do not rerun the three
-dominated macro blocks unchanged.
+dominated macro blocks or the ratio-only candidate unchanged.
 
 The next family-level work is the deferred sequence from the plan: investment-
 grade bonds/Treasuries, high-yield and emerging-market debt, REITs, then
@@ -118,16 +123,19 @@ and execution snapshots remain ignored local artifacts.
   experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
   --config experiments/2026-10-etf-family-feature-confirmation/international_oil_only_config.json \
   --seeds 27,127,227
+.venv/bin/python \
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_ratio_only_config.json \
+  --seeds 27,127,227
 ```
 
-Expected result: 27/27 newly executed international runs and all reused
+Expected result: 30/30 newly executed international runs and all reused
 `I-BREADTH` comparison runs validate; the confirmation frontier is
 `I-BREADTH`, and the oil follow-up frontier contains `I-BREADTH`,
-`I-BREADTH+COMMODITIES`, and `I-BREADTH+OIL`.
+`I-BREADTH+COMMODITIES`, and `I-BREADTH+OIL`. The ratio-only candidate is
+dominated.
 
 ## Open Questions
 
 No question blocks this milestone. A later decision is still needed on whether
-the Pareto alternatives merit a separate holdout confirmation. A ratio-only
-ablation would be the clean next diagnostic if attribution within the original
-commodities block matters.
+the three Pareto alternatives merit a separate holdout confirmation.

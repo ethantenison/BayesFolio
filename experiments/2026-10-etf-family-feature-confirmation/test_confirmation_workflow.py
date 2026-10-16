@@ -117,6 +117,7 @@ def test_international_configs_preserve_fixed_contract() -> None:
         "international_confirmation_config.json": 4,
         "international_targeted_ablation_config.json": 4,
         "international_oil_only_config.json": 1,
+        "international_ratio_only_config.json": 1,
     }
     for name, expected_count in configs.items():
         path = experiment_dir / name

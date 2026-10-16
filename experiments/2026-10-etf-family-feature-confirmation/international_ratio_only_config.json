@@ -1,0 +1,61 @@
+{
+  "schema": "bayesfolio.international_equity_experiment.v1",
+  "phase": "targeted_ablation",
+  "family": "international_equity",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "feature_path": "experiments/2026-10-etf-family-feature-confirmation/artifacts/international_confirmation_cached_inputs_20261015.parquet",
+  "feature_manifest": "experiments/2026-10-etf-family-feature-confirmation/artifacts/international_confirmation_cached_inputs_20261015.manifest.json",
+  "scored_date_file": "experiments/2026-10-etf-family-feature-confirmation/artifacts/international_scored_dates_24.txt",
+  "output_root": "experiments/2026-10-etf-family-feature-confirmation/runs",
+  "snapshot_root": "experiments/2026-10-etf-family-feature-confirmation/executions",
+  "results_prefix": "international_ratio_only",
+  "tickers": ["VEA", "VWO", "VSS", "EWX"],
+  "default_seeds": [27, 127, 227],
+  "common_args": [
+    "--mtgp-rank", "2", "--maxiter", "15", "--posterior-scenarios", "256",
+    "--resume-scenarios", "--gp-experiment", "signed_lkj_eta_2", "--upperlng", "0.35",
+    "--nea", "3", "--gp-riskfolio-rm", "CVaR", "--gp-riskfolio-obj", "MaxRet"
+  ],
+  "configurations": [
+    {
+      "id": "intl_a_ratio_only",
+      "label": "I-BREADTH+GOLD-CRUDE-RATIO",
+      "expected_input_columns": ["t_index", "mom6m", "mom12m_skip1m", "cs_mom_rank", "trend_slope", "spy_ret", "erp", "rsp_spy_roc_1p", "pct_above_50dma", "spy_flow_z_12p", "gold_crude_ratio"],
+      "args": ["--feature-set", "momentum_plus_macro_market", "--custom-etf-cols", "mom6m,mom12m_skip1m,cs_mom_rank,trend_slope", "--custom-macro-cols", "spy_ret,erp,rsp_spy_roc_1p,pct_above_50dma,spy_flow_z_12p,gold_crude_ratio", "--covar-grouping-proposal", "default", "--macro-component-proposal", "default", "--time-modulation-mode", "neither"]
+    }
+  ],
+  "comparison_configurations": [
+    {
+      "id": "intl_i_breadth",
+      "label": "I-BREADTH",
+      "expected_input_columns": ["t_index", "mom6m", "mom12m_skip1m", "cs_mom_rank", "trend_slope", "spy_ret", "erp", "rsp_spy_roc_1p", "pct_above_50dma", "spy_flow_z_12p"],
+      "args": ["--feature-set", "momentum_plus_macro_market", "--custom-etf-cols", "mom6m,mom12m_skip1m,cs_mom_rank,trend_slope", "--custom-macro-cols", "spy_ret,erp,rsp_spy_roc_1p,pct_above_50dma,spy_flow_z_12p", "--covar-grouping-proposal", "default", "--macro-component-proposal", "default", "--time-modulation-mode", "neither"]
+    },
+    {
+      "id": "intl_a_oil_only",
+      "label": "I-BREADTH+OIL",
+      "expected_input_columns": ["t_index", "mom6m", "mom12m_skip1m", "cs_mom_rank", "trend_slope", "spy_ret", "erp", "rsp_spy_roc_1p", "pct_above_50dma", "spy_flow_z_12p", "oil_ret"],
+      "args": ["--feature-set", "momentum_plus_macro_market", "--custom-etf-cols", "mom6m,mom12m_skip1m,cs_mom_rank,trend_slope", "--custom-macro-cols", "spy_ret,erp,rsp_spy_roc_1p,pct_above_50dma,spy_flow_z_12p,oil_ret", "--covar-grouping-proposal", "default", "--macro-component-proposal", "default", "--time-modulation-mode", "neither"]
+    },
+    {
+      "id": "intl_a_commodities",
+      "label": "I-BREADTH+COMMODITIES",
+      "expected_input_columns": ["t_index", "mom6m", "mom12m_skip1m", "cs_mom_rank", "trend_slope", "spy_ret", "erp", "rsp_spy_roc_1p", "pct_above_50dma", "spy_flow_z_12p", "oil_ret", "gold_crude_ratio"],
+      "args": ["--feature-set", "momentum_plus_macro_market", "--custom-etf-cols", "mom6m,mom12m_skip1m,cs_mom_rank,trend_slope", "--custom-macro-cols", "spy_ret,erp,rsp_spy_roc_1p,pct_above_50dma,spy_flow_z_12p,oil_ret,gold_crude_ratio", "--covar-grouping-proposal", "default", "--macro-component-proposal", "default", "--time-modulation-mode", "neither"]
+    }
+  ],
+  "selection": {
+    "maximize": ["mean_ic", "sharpe"],
+    "minimize": ["mean_gaussian_nll"],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "diagnostic_only": ["cumulative_return", "rmse"],
+    "turnover_excluded": true
+  },
+  "hypervolume": {
+    "reference_point": {"mean_ic": 0.0, "mean_gaussian_nll": 0.0, "sharpe": 0.0},
+    "objective_transform": {"mean_ic": "maximize", "mean_gaussian_nll": "negate_then_maximize", "sharpe": "maximize"},
+    "use_configuration_means_across_seeds": true,
+    "fixed_for_subsequent_rounds": true
+  },
+  "fixed_decisions": {"include_t_index": true, "cached_data_only": true, "production_budget_reference_excluded": true}
+}

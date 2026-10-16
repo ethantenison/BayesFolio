@@ -35,7 +35,9 @@ nondominated because it slightly improves NLL while materially reducing IC and
 Sharpe; it is retained as a calibration-oriented research alternative. A
 subsequent oil-only run materially improves IC and slightly improves Sharpe but
 worsens NLL, creating a separate ranking-oriented Pareto point. See `STATUS.md`
-and the international result reports for the full metrics.
+and the international result reports for the full metrics. The ratio-only
+follow-up is dominated by `I-BREADTH`; the paired block's NLL gain appears only
+when oil and the ratio are included jointly.
 
 ## One-command U.S. orchestration
 
