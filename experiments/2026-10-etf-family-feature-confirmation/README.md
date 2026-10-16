@@ -32,8 +32,10 @@ uv run --locked python \
 The completed results select the corrected momentum-plus-breadth/flow model as
 the primary international candidate. The oil plus gold/crude block is also
 nondominated because it slightly improves NLL while materially reducing IC and
-Sharpe; it is retained as a calibration-oriented research alternative. See
-`STATUS.md` and the two international result reports for the full metrics.
+Sharpe; it is retained as a calibration-oriented research alternative. A
+subsequent oil-only run materially improves IC and slightly improves Sharpe but
+worsens NLL, creating a separate ranking-oriented Pareto point. See `STATUS.md`
+and the international result reports for the full metrics.
 
 ## One-command U.S. orchestration
 

@@ -1,8 +1,9 @@
 # ETF Family Feature Confirmation Status
 
 Milestone: the U.S. follow-up batch and both international equity stages are
-complete. The international workflow produced 24 new validated fits: 12 for
-the four-way confirmation and 12 for targeted macro ablations.
+complete. The international workflow produced 27 new validated fits: 12 for
+the four-way confirmation, 12 for targeted macro ablations, and three for the
+oil-only follow-up.
 
 ## Summary
 
@@ -15,6 +16,8 @@ the four-way confirmation and 12 for targeted macro ablations.
 - Adding FX, breakeven inflation, or credit to `I-BREADTH` is dominated by the
   unchanged baseline. Adding oil and gold/crude improves mean NLL slightly but
   gives up IC and Sharpe, so it joins rather than replaces the Pareto frontier.
+- Adding `oil_ret` alone raises IC materially and Sharpe slightly, but worsens
+  NLL. It therefore creates a distinct ranking-oriented Pareto point.
 - Return and RMSE are recorded only. Turnover is absent from the evaluation and
   selection outputs.
 
@@ -43,6 +46,18 @@ frontier has hypervolume `0.3398777952385972`, an increase of only
 `0.00019728440927077`. This is a calibration-versus-ranking/portfolio tradeoff,
 not evidence that the commodities block is an overall winner.
 
+The oil-only follow-up produced IC `0.200000`, NLL `-1.781851`, and Sharpe
+`1.342357`. Relative to `I-BREADTH`, oil alone improves IC by `0.063889` and
+Sharpe by `0.001847`, while worsening NLL by `0.079837`. Relative to the paired
+oil plus gold/crude block, oil alone improves IC and Sharpe substantially but
+gives up the paired block's small calibration advantage. All three
+configurations are nondominated, with fixed-reference hypervolume
+`0.49314030242413337`.
+
+Because this is a nonlinear GP, the comparison does not prove that the ratio
+alone caused the paired result. A ratio-only run would be needed to distinguish
+its main effect from an interaction.
+
 The preceding U.S. result remains unchanged: `all_match_redundancy_pruned` is
 the only promoted follow-up candidate, expanding the U.S. frontier by
 `0.000409496683654087`.
@@ -54,7 +69,9 @@ momentum-plus-breadth/flow feature set as the primary compact model. The broad
 all-input model adds noise and is dominated. FX, inflation, and credit should
 not be added in the tested forms. The oil/gold block should be retained only as
 an explicit calibration-oriented Pareto alternative pending a later selection
-policy or holdout test.
+policy or holdout test. Oil alone is the strongest tested international model
+for IC and narrowly the strongest for Sharpe, but its worse NLL prevents it
+from replacing the better-calibrated `I-BREADTH` configuration outright.
 
 No production model or deployment configuration was changed.
 
@@ -62,7 +79,8 @@ No production model or deployment configuration was changed.
 
 Use `I-BREADTH` as the international equity default candidate for subsequent
 confirmation or integration work. Preserve `I-BREADTH+COMMODITIES` as a
-research alternative, not an automatic replacement. Do not rerun the three
+calibration-oriented alternative and `I-BREADTH+OIL` as a ranking-oriented
+alternative; neither is an automatic replacement. Do not rerun the three
 dominated macro blocks unchanged.
 
 The next family-level work is the deferred sequence from the plan: investment-
@@ -96,15 +114,20 @@ and execution snapshots remain ignored local artifacts.
   experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
   --config experiments/2026-10-etf-family-feature-confirmation/international_targeted_ablation_config.json \
   --seeds 27,127,227
+.venv/bin/python \
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_oil_only_config.json \
+  --seeds 27,127,227
 ```
 
-Expected result: 24/24 newly executed international runs and all three reused
+Expected result: 27/27 newly executed international runs and all reused
 `I-BREADTH` comparison runs validate; the confirmation frontier is
-`I-BREADTH`, and the targeted frontier is `I-BREADTH` plus
-`I-BREADTH+COMMODITIES`.
+`I-BREADTH`, and the oil follow-up frontier contains `I-BREADTH`,
+`I-BREADTH+COMMODITIES`, and `I-BREADTH+OIL`.
 
 ## Open Questions
 
 No question blocks this milestone. A later decision is still needed on whether
-the small NLL-only commodities tradeoff merits a separate holdout confirmation
-or should remain research-only.
+the Pareto alternatives merit a separate holdout confirmation. A ratio-only
+ablation would be the clean next diagnostic if attribution within the original
+commodities block matters.

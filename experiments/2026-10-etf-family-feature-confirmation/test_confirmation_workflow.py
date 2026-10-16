@@ -113,11 +113,16 @@ def test_next_batch_promotion_requires_frontier_and_hypervolume_gain() -> None:
 def test_international_configs_preserve_fixed_contract() -> None:
     """Both phases must retain the exact universe, objectives, and time input."""
     experiment_dir = Path(__file__).resolve().parent
-    for name in ["international_confirmation_config.json", "international_targeted_ablation_config.json"]:
+    configs = {
+        "international_confirmation_config.json": 4,
+        "international_targeted_ablation_config.json": 4,
+        "international_oil_only_config.json": 1,
+    }
+    for name, expected_count in configs.items():
         path = experiment_dir / name
         config = json.loads(path.read_text(encoding="utf-8"))
         paths = validate_international_config(config, path)
-        assert len(config["configurations"]) == 4
+        assert len(config["configurations"]) == expected_count
         assert paths["feature"].exists()
         assert all(item["expected_input_columns"][0] == "t_index" for item in config["configurations"])
 
