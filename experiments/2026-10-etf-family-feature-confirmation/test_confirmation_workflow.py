@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 from orchestrate_international_experiments import validate_config as validate_international_config
+from orchestrate_international_experiments import validate_worker_count
 from prepare_next_experiment_turn import validate_step3_results
 from summarize_international_experiments import validate_run_manifest
 from summarize_next_experiment_batch import add_promotion_results, objective_hypervolume
@@ -118,6 +119,7 @@ def test_international_configs_preserve_fixed_contract() -> None:
         "international_targeted_ablation_config.json": 4,
         "international_oil_only_config.json": 1,
         "international_ratio_only_config.json": 1,
+        "international_oil_backward_selection_config.json": 7,
     }
     for name, expected_count in configs.items():
         path = experiment_dir / name
@@ -126,6 +128,15 @@ def test_international_configs_preserve_fixed_contract() -> None:
         assert len(config["configurations"]) == expected_count
         assert paths["feature"].exists()
         assert all(item["expected_input_columns"][0] == "t_index" for item in config["configurations"])
+
+
+def test_international_worker_count_is_bounded() -> None:
+    """Fit-level parallelism must stay within the approved Mac Studio cap."""
+    assert validate_worker_count(15) == 15
+    with pytest.raises(ValueError, match="between 1 and 15"):
+        validate_worker_count(0)
+    with pytest.raises(ValueError, match="between 1 and 15"):
+        validate_worker_count(16)
 
 
 def test_international_manifest_validator_checks_exact_inputs() -> None:

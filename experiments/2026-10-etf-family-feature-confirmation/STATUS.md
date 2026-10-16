@@ -1,9 +1,10 @@
 # ETF Family Feature Confirmation Status
 
 Milestone: the U.S. follow-up batch and both international equity stages are
-complete. The international workflow produced 30 new validated fits: 12 for
+complete. The international workflow produced 51 new validated fits: 12 for
 the four-way confirmation, 12 for targeted macro ablations, and three for the
-oil-only follow-up plus three for the gold/crude-ratio-only follow-up.
+oil-only follow-up, three for the gold/crude-ratio-only follow-up, plus 21 for
+the oil-centered backward-selection and FX batch.
 
 ## Summary
 
@@ -20,6 +21,11 @@ oil-only follow-up plus three for the gold/crude-ratio-only follow-up.
   NLL. It therefore creates a distinct ranking-oriented Pareto point.
 - Adding `gold_crude_ratio` alone is dominated by `I-BREADTH` on all three
   objectives. The paired block's NLL gain is therefore a joint-model effect.
+- Removing `erp` from `I-BREADTH+OIL` improves IC and NLL relative to oil-only
+  while giving up little Sharpe. Removing `spy_ret` instead produces the best
+  aggregate Sharpe and another IC gain, with materially worse NLL.
+- The DXY and EM-FX additions are dominated, as are the oil candidates that
+  remove `rsp_spy_roc_1p` or `pct_above_50dma`.
 - Return and RMSE are recorded only. Turnover is absent from the evaluation and
   selection outputs.
 
@@ -63,6 +69,24 @@ reproduces the paired block's NLL improvement, that calibration gain appears
 only in their joint specification. This is consistent with an interaction or
 joint regularization effect rather than a useful standalone ratio effect.
 
+The oil-centered backward-selection and FX batch produced:
+
+- `I-BREADTH+OIL DROP SPY-FLOW`: IC `0.188889`, NLL `-1.865049`, Sharpe `1.299568`;
+- `I-BREADTH+OIL DROP ERP`: IC `0.241667`, NLL `-1.841202`, Sharpe `1.333582`;
+- `I-BREADTH+OIL DROP RSP-SPY`: IC `0.002778`, NLL `-1.589168`, Sharpe `1.209956`;
+- `I-BREADTH+OIL DROP PCT-ABOVE`: IC `0.172222`, NLL `-1.775647`, Sharpe `1.275120`;
+- `I-BREADTH+OIL DROP SPY-RET`: IC `0.219444`, NLL `-1.692986`, Sharpe `1.353966`;
+- `I-BREADTH+EM-FX`: IC `0.055556`, NLL `-1.831303`, Sharpe `1.252026`;
+- `I-BREADTH+DXY`: IC `0.136111`, NLL `-1.786251`, Sharpe `1.248828`.
+
+The expanded frontier hypervolume is `0.6072236686688807`, up
+`0.1140833662447475` from the prior three-point frontier. Considered alone
+against that prior frontier, dropping `erp` adds `0.10736477108342524` of
+hypervolume, dropping `spy_ret` adds `0.04850206342543795`, and dropping
+`spy_flow_z_12p` adds `0.006187686575504336`. The other four candidates add
+none. The final nondominated set has six points: the prior three plus those
+three backward eliminations.
+
 The preceding U.S. result remains unchanged: `all_match_redundancy_pruned` is
 the only promoted follow-up candidate, expanding the U.S. frontier by
 `0.000409496683654087`.
@@ -74,19 +98,23 @@ momentum-plus-breadth/flow feature set as the primary compact model. The broad
 all-input model adds noise and is dominated. FX, inflation, and credit should
 not be added in the tested forms. The oil/gold block should be retained only as
 an explicit calibration-oriented Pareto alternative pending a later selection
-policy or holdout test. Oil alone is the strongest tested international model
-for IC and narrowly the strongest for Sharpe, but its worse NLL prevents it
-from replacing the better-calibrated `I-BREADTH` configuration outright.
+policy or holdout test. Oil alone is no longer the strongest tested
+international model for IC or Sharpe. The drop-ERP specification is the
+strongest aggregate IC model and the drop-SPY-return specification is the
+strongest aggregate Sharpe model, but their tradeoffs prevent either from
+dominating the better-calibrated alternatives.
 
 No production model or deployment configuration was changed.
 
 ## Proposed Fix
 
 Use `I-BREADTH` as the international equity default candidate for subsequent
-confirmation or integration work. Preserve `I-BREADTH+COMMODITIES` as a
-calibration-oriented alternative and `I-BREADTH+OIL` as a ranking-oriented
-alternative; neither is an automatic replacement. Do not rerun the three
-dominated macro blocks or the ratio-only candidate unchanged.
+confirmation or integration work. Preserve the six nondominated
+specifications pending later holdout discipline. For the next hypothesis
+round, center exploitation around the drop-ERP and drop-SPY-return oil
+specifications; retain `rsp_spy_roc_1p` and `pct_above_50dma`, and do not retry
+DXY, EM-FX, the three dominated macro blocks, or the ratio-only candidate
+unchanged.
 
 The next family-level work is the deferred sequence from the plan: investment-
 grade bonds/Treasuries, high-yield and emerging-market debt, REITs, then
@@ -127,15 +155,20 @@ and execution snapshots remain ignored local artifacts.
   experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
   --config experiments/2026-10-etf-family-feature-confirmation/international_ratio_only_config.json \
   --seeds 27,127,227
+.venv/bin/python \
+  experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_oil_backward_selection_config.json \
+  --seeds 27,127,227
 ```
 
-Expected result: 30/30 newly executed international runs and all reused
+Expected result: 51/51 newly executed international runs and all reused
 `I-BREADTH` comparison runs validate; the confirmation frontier is
 `I-BREADTH`, and the oil follow-up frontier contains `I-BREADTH`,
 `I-BREADTH+COMMODITIES`, and `I-BREADTH+OIL`. The ratio-only candidate is
-dominated.
+dominated. The expanded oil-centered frontier contains those three plus the
+drop-SPY-flow, drop-ERP, and drop-SPY-return configurations.
 
 ## Open Questions
 
-No question blocks this milestone. A later decision is still needed on whether
-the three Pareto alternatives merit a separate holdout confirmation.
+No question blocks this milestone. A later decision is still needed on which
+of the six Pareto alternatives merit a separate holdout confirmation.

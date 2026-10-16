@@ -29,6 +29,20 @@ uv run --locked python \
   --execute --seeds 27,127,227
 ```
 
+Run the oil-centered backward-selection and FX follow-up batch with bounded
+fit-level parallelism:
+
+```bash
+uv run --locked python \
+  experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py \
+  --config experiments/2026-10-etf-family-feature-confirmation/international_oil_backward_selection_config.json \
+  --execute --seeds 27,127,227 --workers 15
+```
+
+When independent fits run concurrently, this configuration fixes both
+`--scenario-workers` and `--torch-num-threads` at one to avoid nested CPU
+oversubscription. The controller accepts at most 15 fit workers.
+
 The completed results select the corrected momentum-plus-breadth/flow model as
 the primary international candidate. The oil plus gold/crude block is also
 nondominated because it slightly improves NLL while materially reducing IC and
@@ -37,7 +51,11 @@ subsequent oil-only run materially improves IC and slightly improves Sharpe but
 worsens NLL, creating a separate ranking-oriented Pareto point. See `STATUS.md`
 and the international result reports for the full metrics. The ratio-only
 follow-up is dominated by `I-BREADTH`; the paired block's NLL gain appears only
-when oil and the ratio are included jointly.
+when oil and the ratio are included jointly. The oil-centered follow-up added
+two especially useful frontier points: dropping `erp` from `I-BREADTH+OIL`
+improves IC and NLL with a small Sharpe tradeoff, while dropping `spy_ret`
+improves IC and Sharpe with a larger NLL tradeoff. DXY and EM-FX additions are
+dominated in the tested forms.
 
 ## One-command U.S. orchestration
 

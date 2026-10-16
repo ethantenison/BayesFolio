@@ -16,6 +16,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 DEFAULT_CONFIG = EXPERIMENT_DIR / "international_confirmation_config.json"
 EXPECTED_TICKERS = ["VEA", "VWO", "VSS", "EWX"]
+MAX_WORKERS = 15
 
 
 def parse_args() -> argparse.Namespace:
@@ -38,7 +40,20 @@ def parse_args() -> argparse.Namespace:
     mode.add_argument("--execute", action="store_true")
     mode.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--execution-id", default=None)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help=f"Number of independent GP fits to run concurrently (1-{MAX_WORKERS}).",
+    )
     return parser.parse_args()
+
+
+def validate_worker_count(workers: int) -> int:
+    """Return a safe independent-fit worker count or raise a clear error."""
+    if not 1 <= workers <= MAX_WORKERS:
+        raise ValueError(f"--workers must be between 1 and {MAX_WORKERS}.")
+    return workers
 
 
 def resolve_repo_path(raw: str | Path) -> Path:
@@ -207,6 +222,7 @@ def snapshot_execution(
     paths: dict[str, Path],
     seeds: list[int],
     mode: str,
+    workers: int,
     commands: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """Snapshot execution-critical code, config, hashes, and resolved commands."""
@@ -230,6 +246,7 @@ def snapshot_execution(
         "schema": "bayesfolio.international_equity_execution.v1",
         "created_at": datetime.now(UTC).isoformat(),
         "mode": mode,
+        "workers": workers,
         "phase": config["phase"],
         "seeds": seeds,
         "git_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True).strip(),
@@ -282,6 +299,21 @@ def run_streamed(command: list[str], log_path: Path) -> int:
         return process.wait()
 
 
+def run_logged(command: list[str], log_path: Path) -> int:
+    """Run one concurrent fit with its combined output isolated in a log."""
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open("w", encoding="utf-8") as handle:
+        result = subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            stdout=handle,
+            stderr=subprocess.STDOUT,
+            text=True,
+            check=False,
+        )
+    return result.returncode
+
+
 def preflight_all(config: dict[str, Any], paths: dict[str, Path], seed: int, execution_dir: Path) -> dict[str, Any]:
     """Run one deterministic preflight for every configuration executed in this phase."""
     expected_dates = read_dates(paths["dates"])
@@ -326,9 +358,11 @@ def execute_runs(
     execution_dir: Path,
     manifest: dict[str, Any],
     status: dict[str, Any],
+    workers: int,
 ) -> None:
-    """Execute or reuse every configured run and checkpoint each transition."""
+    """Execute or reuse configured runs with bounded fit-level parallelism."""
     status_path = execution_dir / "status.json"
+    pending: list[tuple[dict[str, Any], int, str]] = []
     for configuration in config["configurations"]:
         for seed in seeds:
             verify_execution_inputs(manifest, paths)
@@ -340,26 +374,44 @@ def execute_runs(
                 print(f"Reusing validated run {run_id}")
                 continue
             run_status.update({"state": "running", "started_at": datetime.now(UTC).isoformat()})
-            write_json_atomic(status_path, status)
-            returncode = run_streamed(
+            pending.append((configuration, seed, run_id))
+    write_json_atomic(status_path, status)
+
+    failures: list[str] = []
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="international-fit") as executor:
+        futures = {
+            executor.submit(
+                run_logged,
                 build_command(config, paths, configuration, seed=seed, preflight=False),
                 execution_dir / "logs" / f"run_{run_id}.log",
-            )
+            ): (configuration, seed, run_id)
+            for configuration, seed, run_id in pending
+        }
+        for future in as_completed(futures):
+            configuration, seed, run_id = futures[future]
+            returncode = future.result()
+            run_status = status["runs"][run_id]
             if returncode != 0:
-                run_status.update({"state": "failed", "returncode": returncode})
-                write_json_atomic(status_path, status)
-                raise RuntimeError(f"Run {run_id} failed with exit code {returncode}.")
-            if not existing_run_is_valid(config, paths, configuration, seed):
-                run_status["state"] = "validation_failed"
-                write_json_atomic(status_path, status)
-                raise ValueError(f"Run {run_id} failed validation.")
-            run_status.update({"state": "completed", "returncode": 0, "finished_at": datetime.now(UTC).isoformat()})
+                run_status.update(
+                    {"state": "failed", "returncode": returncode, "finished_at": datetime.now(UTC).isoformat()}
+                )
+                failures.append(f"{run_id}: exit code {returncode}")
+            elif not existing_run_is_valid(config, paths, configuration, seed):
+                run_status.update({"state": "validation_failed", "finished_at": datetime.now(UTC).isoformat()})
+                failures.append(f"{run_id}: output validation failed")
+            else:
+                run_status.update({"state": "completed", "returncode": 0, "finished_at": datetime.now(UTC).isoformat()})
+                print(f"Completed and validated run {run_id}", flush=True)
             write_json_atomic(status_path, status)
+
+    if failures:
+        raise RuntimeError(f"One or more runs failed: {failures}")
 
 
 def main() -> None:
     """Validate, preflight, execute, checkpoint, and summarize one phase."""
     args = parse_args()
+    workers = validate_worker_count(args.workers)
     config_path = args.config.resolve()
     config = json.loads(config_path.read_text(encoding="utf-8"))
     paths = validate_config(config, config_path)
@@ -383,6 +435,7 @@ def main() -> None:
                     "phase": config["phase"],
                     "seeds": seeds,
                     "run_count": len(commands),
+                    "workers": workers,
                     "commands": [{**item, "command_display": shlex.join(item["command"])} for item in commands],
                 },
                 indent=2,
@@ -393,7 +446,7 @@ def main() -> None:
     execution_id = args.execution_id or f"international_{config['phase']}_{datetime.now(UTC):%Y%m%dT%H%M%SZ}"
     execution_dir = paths["snapshot_root"] / execution_id
     execution_dir.mkdir(parents=True, exist_ok=False)
-    manifest = snapshot_execution(execution_dir, config, paths, seeds, mode, commands)
+    manifest = snapshot_execution(execution_dir, config, paths, seeds, mode, workers, commands)
     (paths["snapshot_root"] / f"LATEST_{config['phase'].upper()}").write_text(execution_id + "\n", encoding="utf-8")
     status = {
         "schema": "bayesfolio.international_equity_status.v1",
@@ -402,6 +455,7 @@ def main() -> None:
         "state": "preflighting",
         "mode": mode,
         "seeds": seeds,
+        "workers": workers,
         "runs": {
             item["run_id"]: {
                 "configuration": item["configuration"],
@@ -423,7 +477,7 @@ def main() -> None:
             return
         status["state"] = "running"
         write_json_atomic(status_path, status)
-        execute_runs(config, paths, seeds, execution_dir, manifest, status)
+        execute_runs(config, paths, seeds, execution_dir, manifest, status, workers)
         verify_execution_inputs(manifest, paths)
         summary_command = [
             sys.executable,
