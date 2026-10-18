@@ -39,6 +39,18 @@ Universe: `BND, IEF, LQD, HYG`. Evaluated `31` unique configurations and `93` va
 - **challenger — USFI-COMPACT+VOL-Z**: IC `0.230556`, NLL `-2.632968`, Sharpe `0.427207`; inputs: `t_index, lag_y_excess_lead, chmom, mom12m, cs_mom_rank, ma_signal, vol_z`.
 - **calibration_anchor — USFI-TREND**: IC `0.147222`, NLL `-2.673565`, Sharpe `0.429514`; inputs: `t_index, lag_y_excess_lead, chmom, mom12m, mom36m, cs_mom_rank, ma_signal`.
 
+### October 18 matched-history follow-up
+
+All eight original Pareto designs were rerun with and without lag under both 2013-start and
+2021-start training (96 new fits, plus 24 audited cached rate-model fits). Every scored date
+and shared cached feature value matched. The original incumbent metrics reproduced.
+With 2013-start history, lag improved NLL and Sharpe in all eight designs; no no-lag variant
+reached the front. With 2021-start history, several local-only no-lag variants improved.
+Retain lag for the current long-history incumbent. Its value depends on training history;
+richer rate inputs alone do not explain the earlier reversal. Full evidence and exact inputs:
+`US_FIXED_INCOME_LAG_MATCHED_HISTORY_RESULTS.md` and
+`us_fixed_income_lag_matched_recommendations.json`.
+
 ### Rate-aware lag challenge
 
 A subsequent cached-only challenge added 10 bond-specific rate-state variables and evaluated
@@ -108,8 +120,8 @@ Universe: `BNDX, VWOB, HYEM`. Evaluated `87` unique configurations and `261` val
 
 - The long-history U.S. fixed-income search favored local time-series features. Generic credit/inflation
   and broad macro bundles were noise at this budget. The paired rate-aware challenge later showed that
-  `lag_y_excess_lead` is not generally required: sparse no-lag local and real-rate models occupied five
-  of six Pareto positions.
+  no-lag models occupied five of six positions in the 2021-start screen. The October 18 matched
+  challenge confirmed that this does not extend to the 2013-start policy; retain lag there.
 - International fixed income required macro context, but the broad model was over-specified. The final
   primary removes `hy_spread_chg_1m`, `copper_ret`, `lag_y_excess_lead`, `cpi_mom`, and
   `gold_crude_ratio` while retaining `oil_ret`; it dominates the former 21-input primary.

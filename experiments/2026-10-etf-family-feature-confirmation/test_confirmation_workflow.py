@@ -13,6 +13,7 @@ from prepare_next_experiment_turn import validate_step3_results
 from summarize_international_experiments import validate_run_manifest
 from summarize_next_experiment_batch import add_promotion_results, objective_hypervolume
 from summarize_us_confirmation import hypervolume_3d
+from summarize_us_fixed_income_lag_history import expected_training_history, validate_training_history
 from validate_next_experiment_plan import validate_candidate
 
 
@@ -134,6 +135,8 @@ def test_international_configs_preserve_fixed_contract() -> None:
         "international_fixed_income_sparsity_final_config.json": 7,
         "us_fixed_income_no_lag_block_screen_config.json": 16,
         "us_fixed_income_rate_no_lag_screen_config.json": 22,
+        "us_fixed_income_lag_matched_long_config.json": 16,
+        "us_fixed_income_lag_matched_recent_config.json": 16,
     }
     for name, expected_count in configs.items():
         path = experiment_dir / name
@@ -197,3 +200,31 @@ def test_international_manifest_validator_checks_exact_inputs() -> None:
         "I-MOM", configuration, manifest, ["2026-05-29"], ["VEA", "VWO", "VSS", "EWX"], expected_seed=27
     )
     assert failures == ["I-MOM: input_columns"]
+
+    configuration["expected_feature_sha256"] = "expected-digest"
+    configuration["expected_training_start"] = "2021-03-31"
+    manifest["feature_sha256"] = "different-digest"
+    manifest["data"]["date_min"] = "2013-08-30"
+    failures = validate_run_manifest(
+        "I-MOM", configuration, manifest, ["2026-05-29"], ["VEA", "VWO", "VSS", "EWX"], expected_seed=27
+    )
+    assert failures == ["I-MOM: input_columns", "I-MOM: feature_sha256", "I-MOM: training_start"]
+
+
+def test_matched_training_history_excludes_current_date_and_rejects_extra_rows() -> None:
+    """A superficially identical start date must not conceal different training rows."""
+    panel = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2021-03-31", "2021-03-31", "2021-04-30", "2021-04-30"]),
+            "asset_id": ["BND", "IEF", "BND", "IEF"],
+            "y_excess_lead": [0.01, 0.02, 0.03, 0.04],
+        }
+    )
+    expected = expected_training_history(panel, ["2021-04-30"])
+    assert expected["train_rows"].tolist() == [2]
+    assert expected["train_date_max"].tolist() == ["2021-03-31"]
+    validate_training_history(expected.copy(), expected)
+    changed = expected.copy()
+    changed.loc[0, "train_rows"] = 4
+    with pytest.raises(ValueError, match="training dates or row counts"):
+        validate_training_history(changed, expected)

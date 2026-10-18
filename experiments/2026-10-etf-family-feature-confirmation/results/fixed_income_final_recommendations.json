@@ -81,6 +81,11 @@
           "rmse_diagnostic_only": 0.015502980398389
         }
       ],
+      "latest_matched_history_followup": {
+        "report": "US_FIXED_INCOME_LAG_MATCHED_HISTORY_RESULTS.md",
+        "recommendations": "us_fixed_income_lag_matched_recommendations.json",
+        "current_long_history_recommendation": "retain lag_y_excess_lead"
+      },
       "rate_aware_lag_challenge": {
         "training_panel": [
           "2021-03-31",

@@ -1,0 +1,977 @@
+{
+  "all_passed": true,
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "scored_dates": [
+    "2024-05-31",
+    "2026-04-30"
+  ],
+  "shared_cached_feature_values_exact": true,
+  "long_incumbent_metrics_reproduced": true,
+  "runs_audited": 120,
+  "runs": [
+    {
+      "run_id": "usfi_lagmatched_long_trend_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_trend_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_trend_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_trend_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_trend_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_trend_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_cs_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_cs_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_cs_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_cs_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_cs_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_cs_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_autocorr_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_autocorr_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_autocorr_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_autocorr_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_autocorr_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_autocorr_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_vol_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_vol_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_vol_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_vol_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_vol_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_vol_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_autocorr_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_autocorr_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_autocorr_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_autocorr_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_autocorr_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_no_mom12_autocorr_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_balanced_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_balanced_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_balanced_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_balanced_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_balanced_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_balanced_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_minimal_no_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_minimal_no_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_minimal_no_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_minimal_with_lag_s27",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_minimal_with_lag_s127",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_long_minimal_with_lag_s227",
+      "feature_sha256": "326852cd889ade6cf6e89356564f0ff1e3bf495e9769d4ecfa2f4bbe58afbe42",
+      "training_history_sha256": "135cfc1efedd656b9247f5b3c501b22b4b4c54f10e4660da569ffc95ab779c56",
+      "history_start": "2013-08-30",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_trend_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_trend_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_trend_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_trend_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_trend_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_trend_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_cs_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_cs_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_cs_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_cs_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_cs_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_cs_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_autocorr_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_autocorr_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_autocorr_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_autocorr_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_autocorr_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_autocorr_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_vol_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_vol_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_vol_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_vol_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_vol_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_vol_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_autocorr_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_autocorr_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_autocorr_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_autocorr_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_autocorr_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_no_mom12_autocorr_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_balanced_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_balanced_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_balanced_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_balanced_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_balanced_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_balanced_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_minimal_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_minimal_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_minimal_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_minimal_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_minimal_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_lagmatched_recent_minimal_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_duration_curve_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_duration_curve_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_duration_curve_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_duration_curve_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_duration_curve_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_duration_curve_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_real_rate_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_real_rate_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_real_rate_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_real_rate_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_real_rate_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_real_rate_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_breakeven_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_breakeven_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_breakeven_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_breakeven_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_breakeven_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_breakeven_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_curve_rate_vol_no_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_curve_rate_vol_no_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_curve_rate_vol_no_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_curve_rate_vol_with_lag_s27",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_curve_rate_vol_with_lag_s127",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    },
+    {
+      "run_id": "usfi_rate_curve_rate_vol_with_lag_s227",
+      "feature_sha256": "bbcbdf1be53fd8bea769048052bf43707d38c801f1f6c52ea92d597648e19daf",
+      "training_history_sha256": "969b28e2109ad6648fd09e32fb7516d6a51827e2c7428727032b03b6b8b7ff12",
+      "history_start": "2021-03-31",
+      "n_windows": 24,
+      "passed": true
+    }
+  ]
+}

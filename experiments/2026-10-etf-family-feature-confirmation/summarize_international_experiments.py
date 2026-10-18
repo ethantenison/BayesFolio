@@ -89,6 +89,12 @@ def validate_run_manifest(
         "kernel_composition": modeling["kernel_composition_proposal"]["name"] == expected_kernel,
     }
     failures.extend(f"{label}: {name}" for name, passed in checks.items() if not passed)
+    if "expected_feature_sha256" in configuration:
+        if manifest.get("feature_sha256") != configuration["expected_feature_sha256"]:
+            failures.append(f"{label}: feature_sha256")
+    if "expected_training_start" in configuration:
+        if data.get("date_min") != configuration["expected_training_start"]:
+            failures.append(f"{label}: training_start")
     return failures
 
 

@@ -643,6 +643,55 @@ def main() -> None:
     us_rate["comparison_configurations"] = []
     write_config("us_fixed_income_rate_no_lag_screen_config.json", us_rate)
 
+    history_designs = [
+        ("trend", TREND),
+        ("no_mom12", ["lag_y_excess_lead", "chmom", "cs_mom_rank", "ma_signal"]),
+        ("no_cs", ["lag_y_excess_lead", "chmom", "mom12m", "ma_signal"]),
+        ("autocorr", [*us_compact, "ret_autocorr"]),
+        ("vol", [*us_compact, "vol_z"]),
+        ("no_mom12_autocorr", ["lag_y_excess_lead", "chmom", "cs_mom_rank", "ma_signal", "ret_autocorr"]),
+        ("balanced", ["lag_y_excess_lead", "chmom", "mom12m", "ma_signal", "ret_autocorr"]),
+        ("minimal", ["lag_y_excess_lead", "chmom", "ma_signal"]),
+    ]
+    for history in ("long", "recent"):
+        matched = base_config("us_fixed_income", "refinement", f"us_fixed_income_lag_matched_{history}")
+        if history == "recent":
+            for key in ("feature_path", "feature_manifest", "scored_date_file"):
+                matched[key] = us_rate[key]
+        matched["history_start"] = "2013-08-30" if history == "long" else "2021-03-31"
+        matched["study"] = "All eight original Pareto designs, paired with and without lag at each history start."
+        manifest_path = EXPERIMENT_DIR.parents[1] / matched["feature_manifest"]
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        matched["configurations"] = []
+        for identifier, local_with_lag in history_designs:
+            for include_lag, suffix in ((False, "no_lag"), (True, "with_lag")):
+                local = local_with_lag if include_lag else [c for c in local_with_lag if c != "lag_y_excess_lead"]
+                candidate = configuration(
+                    f"usfi_lagmatched_{history}_{identifier}_{suffix}",
+                    f"USFI-MATCH-{history.upper()}-{identifier.upper()}-{suffix.upper()}",
+                    local,
+                    [],
+                )
+                candidate["design"] = identifier
+                candidate["include_lag"] = include_lag
+                candidate["expected_feature_sha256"] = manifest["artifact_sha256"]
+                candidate["expected_training_start"] = matched["history_start"]
+                matched["configurations"].append(candidate)
+        matched["comparison_configurations"] = []
+        if history == "recent":
+            rate_ids = {"real_rate", "duration_curve", "breakeven", "curve_rate_vol"}
+            matched["comparison_configurations"] = [
+                item
+                for item in us_rate["configurations"]
+                if any(
+                    item["id"] == f"usfi_rate_{name}_{suffix}" for name in rate_ids for suffix in ("no_lag", "with_lag")
+                )
+            ]
+            for item in matched["comparison_configurations"]:
+                item["expected_feature_sha256"] = manifest["artifact_sha256"]
+                item["expected_training_start"] = matched["history_start"]
+        write_config(f"us_fixed_income_lag_matched_{history}_config.json", matched)
+
 
 if __name__ == "__main__":
     main()

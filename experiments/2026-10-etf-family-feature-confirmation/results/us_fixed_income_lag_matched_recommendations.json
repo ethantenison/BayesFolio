@@ -1,0 +1,54 @@
+{
+  "default_training_policy": "expanding from 2013-08-30",
+  "recommendation": "retain lag_y_excess_lead for the current long-history U.S. fixed-income incumbent",
+  "lag_effect_depends_on_training_history": true,
+  "production_changed": false,
+  "candidates": [
+    {
+      "role": "retain_current_incumbent",
+      "configuration": "USFI-MATCH-LONG-BALANCED-WITH_LAG",
+      "training_start": "2013-08-30",
+      "input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "chmom",
+        "mom12m",
+        "ma_signal",
+        "ret_autocorr"
+      ],
+      "mean_ic": 0.2111111111111111,
+      "mean_gaussian_nll": -2.6579383935231617,
+      "sharpe": 0.4586055650024451
+    },
+    {
+      "role": "recent_policy_challenger",
+      "configuration": "USFI-MATCH-RECENT-BALANCED-NO_LAG",
+      "training_start": "2021-03-31",
+      "input_columns": [
+        "t_index",
+        "chmom",
+        "mom12m",
+        "ma_signal",
+        "ret_autocorr"
+      ],
+      "mean_ic": 0.1083333333333333,
+      "mean_gaussian_nll": -2.663281405783248,
+      "sharpe": 0.4327552745189921
+    },
+    {
+      "role": "recent_policy_calibration_challenger",
+      "configuration": "USFI-MATCH-RECENT-NO_MOM12_AUTOCORR-NO_LAG",
+      "training_start": "2021-03-31",
+      "input_columns": [
+        "t_index",
+        "chmom",
+        "cs_mom_rank",
+        "ma_signal",
+        "ret_autocorr"
+      ],
+      "mean_ic": 0.111111111111111,
+      "mean_gaussian_nll": -2.687470165916256,
+      "sharpe": 0.3737598465925897
+    }
+  ]
+}

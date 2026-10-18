@@ -1,5 +1,11 @@
 # U.S. Fixed-Income Rate-Aware Lag Challenge
 
+October 18 update: the matched-history follow-up reproduced every original incumbent result. With
+2013-start training, lag improved NLL and Sharpe in all eight original Pareto designs; all no-lag variants
+were dominated. With 2021-start training, removing lag helped several local-only designs too. Therefore
+the lag effect depends on training history; richer rate inputs alone do not explain it. Retain lag for
+the current long-history policy. See `US_FIXED_INCOME_LAG_MATCHED_HISTORY_RESULTS.md` for the matched study.
+
 ## Summary
 
 - Universe: `BND, IEF, LQD, HYG`.
