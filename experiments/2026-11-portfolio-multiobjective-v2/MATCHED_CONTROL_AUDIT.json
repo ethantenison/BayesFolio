@@ -1,0 +1,1093 @@
+{
+  "exploratory_nonpromotable_ids": [
+    "policy_0d56a78c87035f36be22",
+    "policy_1affa21990ff01f57bcb",
+    "policy_2b7a84181ea5ce06176d",
+    "policy_2c5fb6f0158943b6ab6b",
+    "policy_329b3d45d0849b705cca",
+    "policy_3e02214058e238b80246",
+    "policy_46b52d04f5edd929eb10",
+    "policy_4b5b64e3c979466ca81c",
+    "policy_5b0db842b269e109ff90",
+    "policy_70d4ba30f7843f4a249e",
+    "policy_79303812fa3b6871f029",
+    "policy_af6de5609f6ba9f4033d",
+    "policy_d6a8a16baede754ad613",
+    "policy_df302cf9346c3722a18b",
+    "policy_e1c857f95d37efb18548",
+    "policy_eda192c237b66268dd93"
+  ],
+  "interpretation": "Conservative post-registration metadata-only design restriction. Preserve all unclosed leaves, but do not promote or use them for rank attribution. Round4 promised full pair coverage; its16 unclosed exposure/covariance leaves are a documented coverage limitation, not erased or called complete rank experiments. Exact pairs are required for rank finalists.",
+  "pairs": {
+    "policy_002618751704fbbcb7dd": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f70a71c6c84156680784"
+    },
+    "policy_00d6355cc2169a3fa050": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_956f4a61b6de944de481"
+    },
+    "policy_013f81944bf3893d17ab": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6452d10f317afda32953"
+    },
+    "policy_01d29c534a636a50e487": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_cb4babb8581fe3d07ca7"
+    },
+    "policy_029d1bad4157e3e46a7c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_43b74c83090aa497cf0e"
+    },
+    "policy_03b02b91337c92edd31f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3e87a4814f6e35fbbfa3"
+    },
+    "policy_03d34b0752914e4556fa": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_87884c01c87dcdace8a6"
+    },
+    "policy_041134612475c47783ba": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_30bae96bc614dd2efeb2"
+    },
+    "policy_06dac46323e141a3ed75": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a0bc700dc1f42b39967e"
+    },
+    "policy_06f1fe85730484e7c3a7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e8ffa37daf87dc625aef"
+    },
+    "policy_0705d21793254a9abc87": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e42e3b0fa9dd1281eb06"
+    },
+    "policy_074c8dc54ba4251dbf6f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_afcd2257f65016fe94f1"
+    },
+    "policy_0819c296f15466fd6531": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_4d90fd0cf1f3451236be"
+    },
+    "policy_08c8f6cbadb67a368386": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_96d3248c54d5ac35e3be"
+    },
+    "policy_08eaa36a6ac8bfd3dad7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_92cfa8f45fdbcca3df09"
+    },
+    "policy_09d6c003c9c27d0764df": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f2d6818145d7c8291dfb"
+    },
+    "policy_0a1c535e66e6c63ba81a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_476575437b8fea800a73"
+    },
+    "policy_0bb8438abfb1cbe6118c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_df1b970c6617b839881f"
+    },
+    "policy_0c4b7682aea5175dfdb1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_aa65b5543bbc2d8a08d6"
+    },
+    "policy_0c4e37745feedd99bf3a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_37fc231d9619fe42852f"
+    },
+    "policy_0d311107751d3d562747": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5cad23fa851a7a44a8c4"
+    },
+    "policy_0d56a78c87035f36be22": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_11b93827d20c6699041f"
+    },
+    "policy_0db23aabd7583db011f9": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_80466e488d88b5f7485f"
+    },
+    "policy_0e29380129460a09bb2b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_daba9d340106d6505cf7"
+    },
+    "policy_0e3c531a655fa0d06d24": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_09afc533367c140b5e2e"
+    },
+    "policy_1062f9b1bc893c27f628": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e405050bd0fd524e3b98"
+    },
+    "policy_10e7d50f3d27e31ec7a7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_75878e66f11c8eb6b6fa"
+    },
+    "policy_118f62827bdb2232f640": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f937c6231bf2bbc22521"
+    },
+    "policy_14bbeb67ab1545469140": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2f601b5e14f367321ea1"
+    },
+    "policy_162ab4d1105b4f5d39ad": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_02c9e72341e604c3322f"
+    },
+    "policy_163fa3359357d7de5dc0": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b71ce3fe84ee69f58247"
+    },
+    "policy_16698f69f7b13a72655b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c401d07801e937a47645"
+    },
+    "policy_167c189335dfeb227d53": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6ae938b853fae5b51429"
+    },
+    "policy_1735ec2092cc51290bf1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6ee39b6ba70ef3ea02be"
+    },
+    "policy_19033c0da0f6a3b649a8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_269c851205829f549e8e"
+    },
+    "policy_19fdbc04b2c3cd162d94": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_91b4b9ebe70878b95ef8"
+    },
+    "policy_1ab062274891b13311df": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_98a4660baec01855710d"
+    },
+    "policy_1ae6ec48cbdb63d2eea1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_56a0b06b63cc63c2913b"
+    },
+    "policy_1affa21990ff01f57bcb": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_2896c0fdcd557e2fb2eb"
+    },
+    "policy_1cafd3cc72ac161e11e0": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3371c22aa00dcf39392a"
+    },
+    "policy_1e7c9aa60b20f8b0b35e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3ac12c108e84fa929cfb"
+    },
+    "policy_1ed1acfc291baf25e5b9": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_bb3824e913748170c4c1"
+    },
+    "policy_1f64db85634336085322": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_49ce7d077ffeb3e7daf3"
+    },
+    "policy_1fb5878ba67e80284512": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b92df6c84e0bdad0912c"
+    },
+    "policy_208b8e5704eb6a7993e5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_7f1f0c3b2e0c2bb7d367"
+    },
+    "policy_210d1da6bbc824459950": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e7c90168070cf2f6c31c"
+    },
+    "policy_2152be3a208f5d61cafc": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5b2b39a15de089bc85a0"
+    },
+    "policy_22cc80df9f293cd675d4": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_af60d8be2e3e6cd5954a"
+    },
+    "policy_2465c4eb0196b6c13f4b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5b2b39a15de089bc85a0"
+    },
+    "policy_255d336b02c6899d5963": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b18ffe1728a2b33144ab"
+    },
+    "policy_278611690f037fbd4bbf": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_30caf335b5a4d01d4196"
+    },
+    "policy_2786cf5e4d9e3e4d9216": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_0b28503dccda8400d55d"
+    },
+    "policy_28152ac827039fd54b05": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_84b829ae9c12303cfa93"
+    },
+    "policy_28b3eb6bc38754b5d671": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_adab054e624e69040ac0"
+    },
+    "policy_28dbf0cb88fd8f14b03e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_98850bc86699bba228a1"
+    },
+    "policy_2a13723b0055895ea2c7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c7ada4c7a9ea25b06919"
+    },
+    "policy_2ae719d9200dadfc2d32": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_aab38a7b5b225582d96f"
+    },
+    "policy_2b7a84181ea5ce06176d": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_bc92326c1ab0478a4cb9"
+    },
+    "policy_2c5fb6f0158943b6ab6b": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_d9712327596ca7216d4f"
+    },
+    "policy_2cdab01caee991a0e1b3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f58c3c22e4381481e3fb"
+    },
+    "policy_2e2441edcf72ab91239f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_15c919d265a8f718a584"
+    },
+    "policy_2e50fd3f0e0697da967d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_839c5a2fdb102584f824"
+    },
+    "policy_2e53a2168d6172e5d8a1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d25fdfa2d79ba7dc9085"
+    },
+    "policy_2f35baf81078b9f77a42": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b337ff2e5ce2a7523b69"
+    },
+    "policy_2f93a30eaa71d16d9f5a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2f11d71e47e3d674be02"
+    },
+    "policy_30e114980adaae14daf8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_03ce4e7881d6aca76e0b"
+    },
+    "policy_329b3d45d0849b705cca": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_20af538f5241b1eb3dde"
+    },
+    "policy_32c21c6fb6ee3e4f2359": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c2c3567a523b84f82dfc"
+    },
+    "policy_357617310c38e0433d73": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_fc3f076da80aa5a46527"
+    },
+    "policy_37939785d3f81536cfa5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a7c1a82b589a6581c146"
+    },
+    "policy_38d028eb484fd8148a87": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ce3d965e9a0a28ded016"
+    },
+    "policy_39104343ad5470fc5995": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_bbe0c55a01d87caca10e"
+    },
+    "policy_3b5fd010649c4e8ff3f7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a294caf13770bc95af63"
+    },
+    "policy_3b76e0f86f7ebb56fd49": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_01b53fb89e8d72acdcfe"
+    },
+    "policy_3c2b282fc8c83a41d702": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_29155134ad4dcdb7a118"
+    },
+    "policy_3c39b434036780f0477a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_97d0c11b13a82031323f"
+    },
+    "policy_3c912a380998cccfdd48": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b33b9af694a33257aed8"
+    },
+    "policy_3e02214058e238b80246": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_a0a8517f4705d5cb7550"
+    },
+    "policy_3f8ba9852a413a3d432e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e6ffcf07b00ce7279720"
+    },
+    "policy_3fd4ba7e3b5f6058d560": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_312020ba20b38156a786"
+    },
+    "policy_45373c08b97e7b71d3c3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2eecc7f57a89836d296c"
+    },
+    "policy_46b52d04f5edd929eb10": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_93178d07d8179cffbef2"
+    },
+    "policy_4b1274aca1f98686c48e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_21330892b980b1aedc0c"
+    },
+    "policy_4b3de77787c1432beacd": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d394455c2b27972ec577"
+    },
+    "policy_4b5b64e3c979466ca81c": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_1b0e3f5d182f30d0d695"
+    },
+    "policy_4b6666adaa1c5e6aada3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a743a2a66b85834f9d48"
+    },
+    "policy_4cc1c80068f81c168d86": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b57bb37747fa2017b938"
+    },
+    "policy_4e184f5ed20920bd9f34": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ea04e826b739707c1005"
+    },
+    "policy_50cca6638e24e3011bf8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_1ec300cc49792f2bf138"
+    },
+    "policy_511e29f47a563b7aca92": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d487aaef4afbd50645c1"
+    },
+    "policy_5374174631a296251aec": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6c796cbf351801855ada"
+    },
+    "policy_53e3f848054a3e988be5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6049229b5fe59c1431db"
+    },
+    "policy_554fe9c0bdd1edd7d07b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_59518bb7e5d5db7bdb51"
+    },
+    "policy_5558521ae3141c003212": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ee77631f06a22acd2296"
+    },
+    "policy_56848f6ac14b9fb93e8c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e0d4fb2bda611c15de80"
+    },
+    "policy_56b3610ec78905cdb12d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_73922e75456f4f3f9313"
+    },
+    "policy_579fcc5615079da506b6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_45108f9213ac4fd332e6"
+    },
+    "policy_584a0c84b7c6a7de3cfc": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f3b3ecb96770d72701e9"
+    },
+    "policy_58bdae9ef3cd1a049406": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_9ec3f9dca3ccfe11c39c"
+    },
+    "policy_59d7c77931b7c8d3c4bd": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_12326f36f5506765c662"
+    },
+    "policy_5af38ff41983e2f65fbb": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_4393ef1369ae4ea42656"
+    },
+    "policy_5b0db842b269e109ff90": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_c79d718ba6e213e9d25d"
+    },
+    "policy_5c9980b5b2ec3190fcf4": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c5f34924606d3b69f1bf"
+    },
+    "policy_5db6ac7a663e849c7815": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_13be0f7e1d2e59e0b336"
+    },
+    "policy_5ee45704df6560f728c5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_31727a31c1a7bcc10676"
+    },
+    "policy_60daba17c9d400a4f774": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_56b35af8dab11b952598"
+    },
+    "policy_61bb921ef309430e5e1a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_9a770691e4f9e3afc19b"
+    },
+    "policy_61ce0bef0cf5368da98f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f7fc12ac1be39533da69"
+    },
+    "policy_61da911704e955364eae": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_291365840761d5affe17"
+    },
+    "policy_623114dcd781e890699a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_206bca9bdeba73abff47"
+    },
+    "policy_62c0b41d9428193a57b8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e07fba1dc7d380d98326"
+    },
+    "policy_635ae85717660ae66121": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6586de1cf181e46cfd2f"
+    },
+    "policy_63b3b88081759914e135": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_0929b25e099ffc4f77e5"
+    },
+    "policy_6431a9ac3363b5d6a9d8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3738698793010ec159b9"
+    },
+    "policy_656e66abf3a0b0e882ef": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_1276b02a41d679d3c6ae"
+    },
+    "policy_67b1fb2b1df9d09022a4": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2ce5384b0309b555ef60"
+    },
+    "policy_693fa9443322b14992eb": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5db7b35a46be599f5a00"
+    },
+    "policy_6a62ba0e505893bace50": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_18694ab987ce81671200"
+    },
+    "policy_6cdb475fbf2c9dc8a915": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_59e8716e27613ac25f88"
+    },
+    "policy_6cf803156d58ea071ed6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_7672e51a485c7575583c"
+    },
+    "policy_6cf9032be7bd7f25ae7b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_18aadcbc438c8484ba19"
+    },
+    "policy_6da8bbc446e653889bce": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c181e6b37f98b4dac398"
+    },
+    "policy_6ed9688a048c3cdf5dea": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_8a184656bfe1783006eb"
+    },
+    "policy_6f015f6ff17f21b68143": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_80b91ce4580b8ffe9b91"
+    },
+    "policy_702b5f526ff0472c1925": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_453632aa7dc21ba6ab4f"
+    },
+    "policy_70d4ba30f7843f4a249e": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_bc2011b5ae3f896f6938"
+    },
+    "policy_715af51c6982e44743b1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_bb06f0daf1de188ba88d"
+    },
+    "policy_71d40a8c1442d51baac7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_cd350df5f50e08414765"
+    },
+    "policy_725115691fe3e1bc74e5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5b5f6ec1a1a1f525c30e"
+    },
+    "policy_7642e7ce781d3fc803ef": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c4893253e6b08c2791a0"
+    },
+    "policy_77586eccac0ac791dea6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_502ecc40baa4a88d6fd7"
+    },
+    "policy_79303812fa3b6871f029": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_9a9ebd4292607bfe7a72"
+    },
+    "policy_7b5c1a219b4a7ecd38a5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_4679934f81312daaa7ec"
+    },
+    "policy_7c22e5170199e58fa46d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6141e97bbd5f06bf5e5c"
+    },
+    "policy_7c5c634c59f517fd3e5c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_776235aa097661af65a9"
+    },
+    "policy_7c6c8a07993519825020": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d38bd58e02116fa4c449"
+    },
+    "policy_7dd58e8c12734863812d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_eacadecb0a60d86f8b30"
+    },
+    "policy_7f43a5a7dc0acccebc82": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3a8903b0b216b8894b11"
+    },
+    "policy_8079d156a48987958aa6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_eee44617f6a699b9eb0f"
+    },
+    "policy_81c2881209d44b5bbb7c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a534aa78a901134f7cfd"
+    },
+    "policy_8426190e0a903f800551": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_878e1998a13cdba72d8c"
+    },
+    "policy_84465236d05a3ad657b7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5d347e9fb474f581d048"
+    },
+    "policy_849124c298692a01cec1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3b14197a0cd031fc342f"
+    },
+    "policy_849eef3b42d0acbf7066": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_00ca98f9aad030211e7d"
+    },
+    "policy_8531a9d984349454a037": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d87bf77a24ab045287dd"
+    },
+    "policy_871655ff23947691fe8e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_761e0423ebda539c3046"
+    },
+    "policy_87679739942200a110e2": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_18eff141e0676b7346ed"
+    },
+    "policy_881e20549140edb57179": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_36fead18c275e848060f"
+    },
+    "policy_889c649233dd4b7498e3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ab62ade66b3efec6e892"
+    },
+    "policy_8983a3b04c234a27ad56": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_1ffd5437d1f753f29737"
+    },
+    "policy_8ab0785dc8a0f7aca086": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_64932ec434bf9b74202e"
+    },
+    "policy_8b425a5f515c94f583f5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3c99d221fd8b502950cd"
+    },
+    "policy_8c5963127f5c723920d2": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5f90df5ba45502a326ea"
+    },
+    "policy_8cb28f09eca3f00e1b49": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_687f62174f47732d8ae3"
+    },
+    "policy_8d3d9df74b8819b13bb7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c55ebf8e15b6edc3584f"
+    },
+    "policy_8e485e867644608fb739": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a2e3aff95633e68c3c01"
+    },
+    "policy_8edaa7643f42b72b773d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_675bc1ea6ab9743f6391"
+    },
+    "policy_91ec9b251ae5d03ab910": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_09720344243e7b1a9e38"
+    },
+    "policy_92263fe0d59ea132113c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e08df528827a38107911"
+    },
+    "policy_924f208d889c2121cecf": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_632ef63ea1275bae17d0"
+    },
+    "policy_92f2999b0160f9b26204": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_402e7f5ecaa842961c5f"
+    },
+    "policy_934a3f608cb2a443b6d1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_1b7d7234c163236207e2"
+    },
+    "policy_93d42a9609aba499f7fa": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_626116cc7f4555f219e7"
+    },
+    "policy_950f06ff63ccd090f6ad": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_cf92c4734a388990ae5a"
+    },
+    "policy_9614b2b1a37b5039b56b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_7936e34efca8d9df9bd6"
+    },
+    "policy_98304676332641c7981d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2215c7163e9ed6fc9adb"
+    },
+    "policy_98b4e024b26a7f290e16": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_eaeefcce56b0e063faa8"
+    },
+    "policy_99041d332a712c5cfd67": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b096a11878633c70e296"
+    },
+    "policy_9a6a322ba8ebfd88ed7e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_29e32887d4b54deef5e5"
+    },
+    "policy_9b3ec37e495a21b4169b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d531411cdb8a4a939b25"
+    },
+    "policy_9bd9de82361a29fb86ff": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_90c25f882bc0a21113f6"
+    },
+    "policy_9d295b4b01e946f84c7f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_1952bc869e15ec4b8a0c"
+    },
+    "policy_9f25396bb78f5968b30b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5285da436461bb2dcc94"
+    },
+    "policy_9f49945ff0daf1c467ec": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b83f749c15e40160af19"
+    },
+    "policy_a2bceaf8c17824d97ce6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2170696d65e4ba23ad5c"
+    },
+    "policy_a48293a02ee9a3e36d19": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f0c10cc4de8d5c8c5050"
+    },
+    "policy_a6645bb6a0d84627e1e6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_99384b303d8ce758f1a9"
+    },
+    "policy_a6cd0e5cfbbfb6d1fedc": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_360dc0c30376853090d3"
+    },
+    "policy_a7c6a3105f4ff85efaaf": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ce900ba110904fe42176"
+    },
+    "policy_a87d435e1b5d253a916a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_11606569407eea7ad706"
+    },
+    "policy_ab190c9a5c827309a6da": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e2ab98b928c0a35549b1"
+    },
+    "policy_ab954a384ab6823bf240": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b837c82740adc0f7cea0"
+    },
+    "policy_ad001f70594716c14912": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_80892bb9197708fefbc5"
+    },
+    "policy_ade107db0ce97df064f3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2bd53b0af6c1aaada476"
+    },
+    "policy_ae33772fc493287f576d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_80a04ae9c4d24f23a64f"
+    },
+    "policy_af6de5609f6ba9f4033d": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_f3511efcc57be94123ac"
+    },
+    "policy_b0538f981d40ff266fac": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_922bf3149087066399f1"
+    },
+    "policy_b1467cb7d47df5e47b0e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_77644f421a6f4b05952f"
+    },
+    "policy_b1f1fead770e22ffabff": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5a73ee173fbb58ee8420"
+    },
+    "policy_b527a9eef368c26c10a5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_9fccf8907f49b4bd2e7a"
+    },
+    "policy_b6039f65885d6a22c3f3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_bd2460303d0a155c588a"
+    },
+    "policy_b747539bb02b81586edc": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e16e48bf68fe579a5e91"
+    },
+    "policy_b7d94805b59d56d223f5": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d7e713ccb88e5c8f98b4"
+    },
+    "policy_b981b9b60a000d26c55f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_be82ac01730df07be2aa"
+    },
+    "policy_b9ff1a7557c3a6779e0f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ea04e826b739707c1005"
+    },
+    "policy_ba01741a2c7a5baa72d6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_11606569407eea7ad706"
+    },
+    "policy_ba2c66e956510f4e5b67": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ea252168a1c8f9b0c21e"
+    },
+    "policy_bd54b460370262731917": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_416ba974b38d7092f20f"
+    },
+    "policy_be6f2c1049983b6620db": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6a4ec32aaf6c1be0a90f"
+    },
+    "policy_bed57eee92ec3625346e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_4afe066f781fadc4b19e"
+    },
+    "policy_bef838d68ea7f8e09e3f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_af62c6bc1e4b80bb4ffe"
+    },
+    "policy_c3a8354ddf8f74139319": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_724cbc82e14508958709"
+    },
+    "policy_c3c234ff2019fd3bd4fa": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6a4f59c38ac16245f836"
+    },
+    "policy_c3d94969ec13dce3b50e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2df2c88fb9b464006694"
+    },
+    "policy_c5d3691ac762ae22952f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_026abb26042af3ff89f7"
+    },
+    "policy_c672956fbf31b861a8d0": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_5735284b4cd110cb48f3"
+    },
+    "policy_c67a8bb640ba706a9868": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_86fdbc76701b1c742c53"
+    },
+    "policy_c7140a0d7ae1e9361077": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_82d48581da94b2ecc3e6"
+    },
+    "policy_c71c285ea7738d9dcc8d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3ceb309d07d5028bde0c"
+    },
+    "policy_c7a3fbab0dd9daa91a35": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_be82ac01730df07be2aa"
+    },
+    "policy_c86660af69dea5ab951c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3c347f61842185c32b10"
+    },
+    "policy_c9adf8818e75d359c01a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_14a90a15e981f82c29fc"
+    },
+    "policy_caac9b446f152b79150e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3f6dcc93292508a9ae9d"
+    },
+    "policy_cc651683a7159092a528": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_9a5e7bb140b21edae14e"
+    },
+    "policy_ccf434c7e88cc4f2fc50": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_8652d15cb6e19075729a"
+    },
+    "policy_cefa6f140988d0dd3846": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a410a3a5e087ee4fffbb"
+    },
+    "policy_cfbd7134a2711ad53f05": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_1d92f5f1a155d1c5c29a"
+    },
+    "policy_d07cfb3c24227e63d5cc": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f2676d082d6078dd8fe2"
+    },
+    "policy_d16636eab3450d7b5b15": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_7514a459e23f763b2239"
+    },
+    "policy_d1a3c781743598c56fd8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_8dfd2ba0e674b910fb17"
+    },
+    "policy_d6a8a16baede754ad613": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_da13d2c288756a6bc04d"
+    },
+    "policy_d73b6e2d5e052ddc893a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_d0ddcceceba8729468ae"
+    },
+    "policy_d74c6cfb84c94f0eda1c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_35e0aefab9bb4ba2c428"
+    },
+    "policy_d756bb99e9b6a2c82aa7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_cc56ef996cf5c484e10b"
+    },
+    "policy_d936f3ceb73e6f387d01": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_20d6398df21c86c255c2"
+    },
+    "policy_da7f960083bb663cf63a": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_493fc1f51c9208440f80"
+    },
+    "policy_db57dc4f4b49c35bc12e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_00ddec49abf5faf9b90d"
+    },
+    "policy_db685a92539e0a7bb9aa": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_8652d15cb6e19075729a"
+    },
+    "policy_db84ee95020934ec51c7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_402a106b07762394368f"
+    },
+    "policy_dbd1ff3359ca106f6c8f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6d5e8c909c878fea817e"
+    },
+    "policy_dbfbabaf599a8a8c4ea4": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_962ea8b4f1af9c541c33"
+    },
+    "policy_dc86ae5e2dd7376bd1b1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b89be5eb2c23693d5b16"
+    },
+    "policy_dcf3cf44489a8f96cf14": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3cc443be569655ecf1f3"
+    },
+    "policy_ddbe67895c847e9c4c36": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_aa5cfd891975b051eba0"
+    },
+    "policy_df302cf9346c3722a18b": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_6268a3627cdfbd53ae11"
+    },
+    "policy_dfbffd74dbc02ed8c8c8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_9b8ea21080b9f41d5240"
+    },
+    "policy_e046e70f8d211489a2b6": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_7b6954e489e113f735b1"
+    },
+    "policy_e0c3b4a35b6411e7cbee": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ee257d8be92512f0294d"
+    },
+    "policy_e1c857f95d37efb18548": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_ad4403e80cfae157ff6f"
+    },
+    "policy_e2b167cadea8779d2786": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_00353c20f03ad0db88dc"
+    },
+    "policy_e485731d863fb075f7e1": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_9ec7586068f0e01fd03b"
+    },
+    "policy_e5fd489c6e3ef2405cc3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_0ff4aa03986778a14e3c"
+    },
+    "policy_e60739bfd758db4eca3e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_bd3523cba0b8dd4276a9"
+    },
+    "policy_e69150d677c46673e506": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_f646cb3a7921f40a77b4"
+    },
+    "policy_e6a1a8e846932df4fa2f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6f8c00a7d3baa8f13788"
+    },
+    "policy_e76cb0c50f90d30461b4": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_c440d49f340f7f6685bc"
+    },
+    "policy_e76fef7cd233e51a9794": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2183ebecc37b4b3328fb"
+    },
+    "policy_e90a107d8ced801e8b12": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_1ecb16e803d529c446d5"
+    },
+    "policy_e9bb4943fb010c15317c": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_6b6e4e960c88ceef1516"
+    },
+    "policy_e9d313af4af51e19bdbf": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_cc5b485b22913ff54cdf"
+    },
+    "policy_ece429468e5f0481bee0": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_ec2d4bc98d92febb6faf"
+    },
+    "policy_ed5c91d2a636e701046e": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_bc619a4a1ed77c342f85"
+    },
+    "policy_eda192c237b66268dd93": {
+      "exact_counterpart_scored": false,
+      "rank2_id": "policy_a29cee2469de8014583b"
+    },
+    "policy_ee0f87ec9ed28dd3c6d3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_533ade7dfba5ec2bb13f"
+    },
+    "policy_eea3b73d9420c2110212": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_248f0e9a712aca756463"
+    },
+    "policy_f01ea8bd29a82bbf638b": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_4f7af743af6ac47fd554"
+    },
+    "policy_f3af1f32323b9c53dc44": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_3d133cc6d5d69738ca68"
+    },
+    "policy_f44e1b87e470dd9bb1e7": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_77972d9573684e667125"
+    },
+    "policy_f4ab0a0fe438ba293de8": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_b8dcb999aeee638a1a82"
+    },
+    "policy_f6c2d6a5a36abb4247c0": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_8a0ecb3e3770a7e96ba1"
+    },
+    "policy_f960f6bbc91616c527f3": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_a0ffc86a19df35069348"
+    },
+    "policy_f9f5445c3c3d9f9401df": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_8538a8740233d5bcb7f3"
+    },
+    "policy_fb957674c08db720ea7d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_2b40485ab50a7c2ebe2d"
+    },
+    "policy_fbe42543bc4d9b434751": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_73922e75456f4f3f9313"
+    },
+    "policy_fe08feaf3f31e9c1f02f": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_00b2e24d1396dc382fcf"
+    },
+    "policy_fe5382b9cd5fb07c219d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_8849002341d571683113"
+    },
+    "policy_ffda294836ec0b34898d": {
+      "exact_counterpart_scored": true,
+      "rank2_id": "policy_e88e9221e7d2bdd5631c"
+    }
+  },
+  "rank1_policies": 267,
+  "registered_before_confirmation": true
+}

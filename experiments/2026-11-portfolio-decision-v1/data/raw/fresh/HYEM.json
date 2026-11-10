@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:11.107058+00:00",
+  "rows": 64,
+  "sha256": "2ea132c554215da7636283d9cbf78989126944bce794e277d2fe252137d796a5",
+  "symbol": "HYEM"
+}

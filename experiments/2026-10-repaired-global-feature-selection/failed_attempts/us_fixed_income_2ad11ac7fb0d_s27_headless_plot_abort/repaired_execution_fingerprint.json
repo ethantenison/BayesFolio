@@ -1,0 +1,27 @@
+{
+  "code_hashes": {
+    "bayesfolio/engine/forecast/gp/extra_model_info.py": "cae674e75c81ebcab503678cd89cf1b3ea809aaae9db8c8083d29863312b6963",
+    "bayesfolio/engine/forecast/gp/feature_catalog.py": "2801d948e7bd5342a517657660f0747d9ea0f30ccb7b0fe40563c43c86d86120",
+    "bayesfolio/engine/forecast/gp/kernels.py": "c82f71e78b8eabd73a833e692ac76dc3541892b52b63aabe653bbc81fa0e55cc",
+    "bayesfolio/engine/forecast/gp/multitask_builder.py": "803e09f22d49ec23d4ee387cd871328e30075fc2dcdcd053fe01558e818b48cc",
+    "bayesfolio/engine/forecast/gp/planner_compiler.py": "80ed4bb8a713ce4857758a90e0c0a5c77a4b13f7ea2fb075f90d3aa0eefe413e",
+    "bayesfolio/engine/forecast/gp/reporting.py": "9e4c43330d44807ccbeb7899d63625c5a15bdb2875918f62f7eb3328d0cc070d",
+    "bayesfolio/engine/forecast/gp/time_varying_kernel.py": "9b5302bf7967f3cb2e945652e1a634d6791385ab51df05d22a3daea0e352da41",
+    "bayesfolio/engine/forecast/gp/workflow.py": "1e1490c82799a69cbac2c55cb47d830725121ed799e610570f96abd4b9d6f7e0",
+    "experiments/2026-06-portfolio-optimization/run_monthly_optimization_walkforward.py": "5288fac624d1681cc47d5a11fd3e8759e0c2c3d676426f7fa8bc51a4083b0bf9",
+    "experiments/2026-06-task-covariance/run_outputscale_floor_prior.py": "49be9702464a29db92949ed1f08ef968b42b4c540282cc0bdbf32207a00b73cf",
+    "experiments/2026-06-task-covariance/run_outputscale_structure_ablation.py": "dfbf1bb223cb2f2c8ef344d110d3cd1cf27efba0cb7f6e3b4f501e79e3ef38c8",
+    "experiments/2026-06-task-covariance/run_task_covariance_rollforward.py": "85c25492e9f5c878210b18b4d9ea253b0e20f2a3a66c7bd0b1abbb1da48aa3a6",
+    "experiments/2026-06-task-covariance/run_time_modulation_ablation.py": "608090d47c3a3b01a37941cee666c77b9c1acf21dcffed382d49620357eab059",
+    "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py": "35290317ded538f8adc672e9e967ab95dc0d43580e19ebdb6589ef81018d766e",
+    "experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py": "a1bb2806cc275c29869cc51a48d026262fb872736a96a5b3048944f27fb3d988",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py": "7db00e00d678bc59bdee89c2ea99785a51bac341848dd9a03707317ce17443f4",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_us_confirmation.py": "8ada7ccdf64f0db6dd772ef8bf3bb174757efc354fc3e519d37f797925a5fd37",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_us_pilots.py": "1633194983f1143d03cf3efe38fde1f12e7291913576f16badc1add84cedc749",
+    "experiments/2026-10-repaired-global-feature-selection/run_study.py": "04dedac4e2c36a7a4b5ecebbbbf985928ca22619449359d9b132cae9c48a3bcf",
+    "experiments/2026-10-repaired-global-feature-selection/study.json": "e38375a2d8a8213060c682ad78c6a069e89818f8438409be67783ba4da44dc97",
+    "uv.lock": "64cb2fe285b144d212bb589b5cb6826abd680f60031a9e9874e91980def99457"
+  },
+  "signature": "e90cd7e9c4d6c8593a373eb336c41863564bd8a1afaf06660b05ae95a8f5b1a0",
+  "state": "pending_or_running"
+}

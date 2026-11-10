@@ -1,0 +1,897 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,cs_mom_rank,ma_signal,mom12m,mom36m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_cacbbd05e688",
+      "category": "exploitation_conditional_lag_ablation",
+      "etf_columns": [
+        "chmom",
+        "cs_mom_rank",
+        "ma_signal",
+        "mom12m",
+        "mom36m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "cs_mom_rank",
+        "ma_signal",
+        "mom12m",
+        "mom36m",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "Genuine HY state plus the richer local trend basis may make recent excess-return lag unnecessary in the strongest repaired-data Sharpe model; test the exact pair under the same 84-month history.",
+      "hypothesis_name": "credit_sharpe_parent_without_lag",
+      "id": "us_fixed_income_0f309a3be154",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_0f309a3be154",
+      "macro_columns": [
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_cacbbd05e688"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,cs_mom_rank,lag_y_excess_lead,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_cacbbd05e688",
+      "category": "exploitation_local_ablation",
+      "etf_columns": [
+        "chmom",
+        "cs_mom_rank",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "cs_mom_rank",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "Annual momentum and acceleration may substitute for long-horizon momentum once the HY z-score is present, reducing the compact credit model by one input.",
+      "hypothesis_name": "credit_sharpe_parent_without_long_momentum",
+      "id": "us_fixed_income_e6c66c10f20f",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_e6c66c10f20f",
+      "macro_columns": [
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_cacbbd05e688"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,lag_y_excess_lead,ma_signal,mom12m,mom36m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_cacbbd05e688",
+      "category": "exploitation_local_ablation",
+      "etf_columns": [
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "mom36m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "mom36m",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "The common-universe rank may add less information than local trend and repaired credit state in this fixed-income context; do not infer a shared core rank from equity inclusion alone.",
+      "hypothesis_name": "credit_sharpe_parent_without_global_rank",
+      "id": "us_fixed_income_f081d2651e89",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_f081d2651e89",
+      "macro_columns": [
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_cacbbd05e688"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_cacbbd05e688",
+      "category": "exploration_shared_representation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "A four-input local basis shared with both equity families may combine with the useful HY z-score as a compact five-input fixed-income hypothesis. This changes the representation as a whole; the separate exact lag-removal test, not this transfer, determines conditional lag evidence.",
+      "hypothesis_name": "credit_parent_with_shared_equity_local_basis",
+      "id": "us_fixed_income_df7179f43dbc",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_df7179f43dbc",
+      "macro_columns": [
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_cacbbd05e688"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_2a1e5cf172bf",
+      "category": "exploitation_rate_pruning",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "The trailing TIPS-return proxy and nominal yield may preserve the no-lag model's useful rate state without noisy one-month SCHP return.",
+      "hypothesis_name": "no_lag_rate_parent_without_one_month_tips_return",
+      "id": "us_fixed_income_a96aca07ab89",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_a96aca07ab89",
+      "macro_columns": [
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_2a1e5cf172bf"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "schp_ret,y10_nominal",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_2a1e5cf172bf",
+      "category": "exploitation_rate_pruning",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "schp_ret",
+        "y10_nominal"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "The one-month SCHP return and nominal yield may be sufficient without the trailing three-month proxy; the reciprocal test identifies their conditional complementarity.",
+      "hypothesis_name": "no_lag_rate_parent_without_three_month_tips_proxy",
+      "id": "us_fixed_income_408c8fb664f6",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_408c8fb664f6",
+      "macro_columns": [
+        "schp_ret",
+        "y10_nominal"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_2a1e5cf172bf"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "schp_ret,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_2a1e5cf172bf",
+      "category": "exploitation_rate_ablation",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "schp_ret",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "The TIPS-return representations may carry the useful state without a Treasury-level input, or this removal may establish why a nominal yield belongs in a shared feature core.",
+      "hypothesis_name": "no_lag_rate_parent_without_nominal_yield",
+      "id": "us_fixed_income_71e68626a46e",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_71e68626a46e",
+      "macro_columns": [
+        "schp_ret",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_2a1e5cf172bf"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "schp_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_2a1e5cf172bf",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "Rate/TIPS context may substitute for the local autocorrelation signal while preserving the no-lag model's ranking advantage.",
+      "hypothesis_name": "no_lag_rate_parent_without_return_autocorrelation",
+      "id": "us_fixed_income_982e0458d34f",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_982e0458d34f",
+      "macro_columns": [
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_2a1e5cf172bf"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "hy_spread_z_12p,schp_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_2a1e5cf172bf",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "hy_spread_z_12p",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "Combine the credit information from the best-Sharpe model with the high-IC no-lag rate model, testing whether their advantages can coexist without restoring recent-return lag.",
+      "hypothesis_name": "no_lag_rate_parent_plus_hy_zscore",
+      "id": "us_fixed_income_be1385fc1c2f",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_be1385fc1c2f",
+      "macro_columns": [
+        "hy_spread_z_12p",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_2a1e5cf172bf"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m,ret_autocorr,vol_1m",
+        "--custom-macro-cols",
+        "schp_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_2a1e5cf172bf",
+      "category": "exploration_uncertainty_information",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "vol_1m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "vol_1m",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "Task-specific realized volatility may address the no-lag rate model's density weakness without importing a broad risk block or simply shrinking predictive intervals.",
+      "hypothesis_name": "no_lag_rate_parent_plus_local_realized_volatility",
+      "id": "us_fixed_income_37d53e9ed186",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_37d53e9ed186",
+      "macro_columns": [
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_2a1e5cf172bf"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,lag_y_excess_lead,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "breakeven_proxy,schp_ret,tbill3m,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_e449a29b091f",
+      "category": "exploitation_exact_definition_redundancy",
+      "etf_columns": [
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "breakeven_proxy",
+        "schp_ret",
+        "tbill3m",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "The repaired tnote10y and y10_nominal columns are bitwise-identical; remove one explicit axis while measuring the finite-budget GP geometry and prior effects rather than assuming output invariance.",
+      "hypothesis_name": "density_anchor_without_duplicate_nominal_yield_name",
+      "id": "us_fixed_income_a0a64f885cee",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_a0a64f885cee",
+      "macro_columns": [
+        "breakeven_proxy",
+        "schp_ret",
+        "tbill3m",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_e449a29b091f"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,lag_y_excess_lead,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "breakeven_proxy,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_e449a29b091f",
+      "category": "exploitation_representation_simplification",
+      "etf_columns": [
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "breakeven_proxy",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Evaluate all three objectives, seed dispersion and coverage; count removed/added inputs explicitly without treating count or narrow intervals as an extra objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated or otherwise noncompetitive outcome does not support the stated conditional simplification or transfer. A new nondominated tradeoff remains reportable rather than being rejected by a hidden NLL/Sharpe guardrail.",
+      "hypothesis": "After removing the duplicate yield name, tnote10y and term_spread algebraically contain the bill-rate information; test a two-input representation reduction without claiming a nonlinear GP is automatically invariant.",
+      "hypothesis_name": "density_anchor_with_minimal_equivalent_curve_basis",
+      "id": "us_fixed_income_ba63874f87e3",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_ba63874f87e3",
+      "macro_columns": [
+        "breakeven_proxy",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json",
+        "base_configuration=us_fixed_income_e449a29b091f"
+      ]
+    }
+  ],
+  "cross_version_equality_audit": "experiments/2026-10-repaired-global-feature-selection/results/feature_pool_extension_audit.json",
+  "dataset_version": "v2",
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json"
+  ],
+  "evidence_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/conditional_feature_pairs.csv": "5b6f18d8a89271f3fdf0299fec9c5ee4d8eea34f92246b5e36f48b660672ab92",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/configuration_aggregates.csv": "479fa559043036066d6bcc4397b5fc346d584efe5ec152e9c6e647fc7a019cdd",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/exact_inputs.json": "e243cf4577573215f1f10e78225beca62710ee95e5a981d5d2e0975b69b7acb4",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/family_diagnostics_by_seed.csv": "effc5a00ba6aa51ae2486da824783fac92c02759c7a3e659e4eb36abd79dbca7",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/feature_definition_redundancy_audit.json": "5cb80f7cb26855cb9afae2f5762257b65d3e382146872ae7f4876ea856dabc51",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/hypervolume.json": "bae728abf9692a9848c2f984b750e19c8b1712714c5c219feb84b1beeafa373b",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round1/objectives_by_seed.csv": "4ef9d167625143ab10032f2b6307265b1aefbe98385be42ec7cc19df0ac8f3cb"
+  },
+  "family": "us_fixed_income",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_fixed_income.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_fixed_income.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/runs",
+  "phase": "refinement",
+  "planning_method": "Hosted Codex hypothesis generation",
+  "proposal_path": "experiments/2026-10-repaired-global-feature-selection/planning/us_fixed_income_round1.json",
+  "proposal_sha256": "930287a4a97ccce9843392623a67b180b7eaa6b5f355538f65f13c51a601dd1c",
+  "results_prefix": "10_us_fixed_income_round1",
+  "round_index": 1,
+  "round_interpretation": "All 69 historical masks have complete matched three-seed results. Sixteen points are nondominated. The seven-input trend/lag/HY-z model has the highest Sharpe (0.535004), IC 0.150000 and NLL -2.590394. The seven-input no-lag rate/TIPS model has higher IC 0.261111 and similar Sharpe 0.532632 but worse NLL -2.438584. Density anchors retain lag and broader rate inputs, including duplicate Treasury-level names. The novelty gate showed that replacing the credit parent's HY z-score with the absolute level was already tested and was worse on all three aggregate objectives, so that repeat was replaced with a shared-local-basis experiment. This round tests lag and local pruning in the credit model, individual TIPS/rate removals in the no-lag model, a bridge combining their macro information, local volatility, and exact-definition redundancy in the density anchor. No conclusion that lag must be kept or removed is imposed.",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/executions",
+  "study_stage": "family_refinement",
+  "tickers": [
+    "BND",
+    "IEF",
+    "LQD",
+    "HYG"
+  ]
+}

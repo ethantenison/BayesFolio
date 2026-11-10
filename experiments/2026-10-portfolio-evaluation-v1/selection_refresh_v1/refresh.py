@@ -1,0 +1,750 @@
+"""Rescore old configurations, refit a shortlist, and compare matched architectures.
+
+Usage from repository root:
+  PYTHONPATH=experiments/2026-10-portfolio-evaluation-v1 \
+    .venv/bin/python experiments/2026-10-portfolio-evaluation-v1/selection_refresh_v1/refresh.py --execute
+Use --screen-only for cached screening; --verify-only verifies completion without
+fits. Outputs are isolated under this script's outputs/ directory. No downloads,
+production changes, old artifact writes, fallback weights, or automatic promotion.
+"""
+
+# Numerical-thread environment must be established before importing NumPy in
+# both the parent process and spawn-imported children.
+# ruff: noqa: E402
+
+from __future__ import annotations
+
+import argparse
+import copy
+import fcntl
+import hashlib
+import json
+import multiprocessing
+import os
+import shlex
+import sys
+import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from pathlib import Path
+
+for _name in [
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+]:
+    os.environ[_name] = "1"
+
+import numpy as np
+import pandas as pd
+import refresh_workers
+from metrics import (
+    calibration_summary,
+    gaussian_scores,
+    paired_block_bootstrap,
+    project_portfolios,
+    rank_ic,
+)
+from refresh_math import (
+    CommonAllocator,
+    _aggregate,
+    _density,
+    _failed_portfolio,
+    _forecast,
+    _portfolio,
+    _ranking,
+    _shortlist,
+)
+from scipy.stats import rankdata
+
+from artifacts import Reader, aligned_matrix, load_context, verify_legacy_audit
+
+HERE = Path(__file__).resolve().parent
+FRAMEWORK = HERE.parent
+REPO = HERE.parents[2]
+LEGACY = REPO / "experiments/2026-10-repaired-global-feature-selection"
+PARALLEL = FRAMEWORK / "parallel_pipeline_v1"
+BASELINE_ROOT = PARALLEL / "outputs/baseline_parallel_v1"
+ROOT = HERE / "outputs"
+BASELINE = "global_e6c41f2020fd"
+SEEDS = [27, 127, 227]
+
+
+def _save(path: Path, value: object, *, immutable: bool = False) -> None:
+    payload = (json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n").encode()
+    if immutable and path.exists():
+        if path.read_bytes() != payload:
+            raise ValueError(f"Conflicting immutable artifact: {path}")
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp = path.with_suffix(path.suffix + ".tmp")
+    temp.write_bytes(payload)
+    temp.replace(path)
+
+
+def _hashes(paths: list[Path]) -> dict[str, str]:
+    return {str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+
+
+def _verify(hashes: dict) -> None:
+    for name, expected in hashes.items():
+        if hashlib.sha256(Path(name).read_bytes()).hexdigest() != expected:
+            raise ValueError(f"Frozen input/output changed: {name}")
+
+
+def _status(stage: str, **kwargs) -> None:
+    payload = {"stage": stage, **kwargs}
+    _save(ROOT / "status.json", payload)
+    print(json.dumps(payload), flush=True)
+
+
+def _workers(peak: int = 0) -> int:
+    ceiling = max(1, min(14, (os.cpu_count() or 16) - 2))
+    return min(ceiling, max(1, int(48 * 1024**3 / (1.25 * peak)))) if peak else ceiling
+
+
+def _catalog(reader: Reader, context: dict) -> list[dict]:
+    candidates = []
+    checked = set()
+    feature_hashes = {}
+    for family in [*context["families"], "joint"]:
+        folder = LEGACY / ("followup/results/all_joint" if family == "joint" else f"results/cumulative/{family}")
+        registry = reader.read(folder / "configuration_aggregates.csv")
+        masks = reader.read(folder / "exact_inputs.json")
+        tickers = context["assets"] if family == "joint" else context["families"][family]
+        indices = [context["assets"].index(a) for a in tickers]
+        for item in registry.to_dict("records"):
+            identifier = item["configuration"]
+            roots = [
+                p
+                for p in [LEGACY / "runs", LEGACY / "followup/runs"]
+                if (p / f"{identifier}_s27/manifest.json").is_file()
+            ]
+            if len(roots) != 1:
+                raise ValueError(f"Expected one unambiguous saved run location: {identifier}")
+            old_root = roots[0]
+            means, deviations = [], []
+            for seed in SEEDS:
+                run = old_root / f"{identifier}_s{seed}"
+                manifest = reader.read(run / "manifest.json")
+                fingerprint = reader.read(run / "repaired_execution_fingerprint.json")
+                if fingerprint["state"] != "completed":
+                    raise ValueError(f"Unfinished source run: {run}")
+                for name, digest in fingerprint["code_hashes"].items():
+                    if (name, digest) not in checked:
+                        path = REPO / name
+                        if _hashes([path])[str(path)] != digest:
+                            raise ValueError(f"Old run source hash no longer matches: {name}")
+                        reader.hashes[str(path)] = digest
+                        checked.add((name, digest))
+                model = manifest["modeling"]
+                if (
+                    model["rank"],
+                    model["maxiter"],
+                    model["seed"],
+                    model["experiment"],
+                    model["time_modulation_mode"],
+                    model["torch_num_threads"],
+                    model["scenario_workers"],
+                ) != (2, 15, seed, "signed_lkj_eta_2", "neither", 1, 1):
+                    raise ValueError(f"Incomparable fitting controls: {run}")
+                if (
+                    manifest["data"]["training_universe"] != tickers
+                    or manifest["portfolio_construction_dates"] != context["dates"]
+                    or manifest["us_equity_first_round_wrapper"]["input_columns"] != masks[identifier]
+                    or "t_index" not in masks[identifier]
+                ):
+                    raise ValueError(f"Task/date/input registration mismatch: {run}")
+                feature = Path(manifest["feature_path"])
+                if str(feature) not in feature_hashes:
+                    feature_hashes.update(_hashes([feature]))
+                    reader.hashes.update(_hashes([feature]))
+                if manifest["feature_sha256"] != feature_hashes[str(feature)]:
+                    raise ValueError(f"Frozen dataset mismatch: {run}")
+                history = reader.read(run / "window_training_history.csv").set_index("date").reindex(context["dates"])
+                if (
+                    not np.array_equal(history.unique_train_dates, np.arange(84, 108))
+                    or not np.array_equal(history.train_rows, np.arange(84, 108) * len(tickers))
+                    or not (pd.to_datetime(history.train_date_max) < pd.to_datetime(history.index)).all()
+                ):
+                    raise ValueError(f"Expanding training history mismatch: {run}")
+                predictions = reader.read(run / "gp_window_predictions.csv")
+                actual = aligned_matrix(predictions, "y_true", context["dates"], tickers)
+                if not np.allclose(actual, context["actual"][:, indices], rtol=0, atol=1e-12):
+                    raise ValueError(f"Target mismatch: {run}")
+                means.append(aligned_matrix(predictions, "y_pred", context["dates"], tickers))
+                deviations.append(aligned_matrix(predictions, "y_std", context["dates"], tickers))
+            command = [sys.executable, *shlex.split(manifest["command"])]
+            for flag, value in [
+                ("--seed", "27"),
+                ("--output-root", str(ROOT / "runs")),
+                ("--run-id", f"{identifier}_s27"),
+            ]:
+                command[command.index(flag) + 1] = value
+            candidates.append(
+                {
+                    "configuration": identifier,
+                    "family": family,
+                    "tickers": tickers,
+                    "inputs": masks[identifier],
+                    "eligible": not (family == "joint" and "hy_spread_chg_1p" in masks[identifier]),
+                    "mean": np.asarray(means),
+                    "std": np.asarray(deviations),
+                    "config": {
+                        "command": command,
+                        "tickers": tickers,
+                        "inputs": masks[identifier],
+                        "dates": context["dates"],
+                        "old_run_root": str(old_root),
+                    },
+                }
+            )
+        _status("catalog", family=family, configurations=len(candidates))
+    return candidates
+
+
+def _screen(reader: Reader, context: dict, candidates: list[dict]) -> tuple[list[dict], list[dict]]:
+    anchor = np.zeros((3, 24, 15))
+    anchors = {}
+    for family, tickers in context["families"].items():
+        indices = [context["assets"].index(a) for a in tickers]
+        eligible = [c for c in candidates if c["family"] == family]
+        best = min(
+            eligible,
+            key=lambda c: (
+                -np.mean([rank_ic(context["actual"][:, indices], m).mean() for m in c["mean"]]),
+                len(c["inputs"]),
+                c["configuration"],
+            ),
+        )
+        anchor[:, :, indices] = best["mean"]
+        anchors[family] = best["configuration"]
+    policy = {
+        "schema": "selection_refresh_v1",
+        "rank": 2,
+        "maxiter": 15,
+        "seeds": SEEDS,
+        "initial_training_months": 84,
+        "forecast_origins": context["dates"],
+        "assets": context["assets"],
+        "anchors": anchors,
+        "workers": _workers(),
+        "source_sha256": reader.hashes,
+        "shortlist_rule": {
+            "per_family": 4,
+            "joint_including_reused_baseline": 4,
+            "roles": [
+                "highest_mean_IC",
+                "highest_common_allocator_Sharpe",
+                "lowest_marginal_NLL",
+                "fewest_inputs_among_top_five_IC",
+            ],
+            "joint_ranking": "equal_family_average_IC",
+            "duplicate_fill": "next_best_IC_then_fewer_inputs_then_ID",
+        },
+        "portfolio_screen": "15_assets_common_training_LedoitWolf_rank_objective_cap35_NEa3_EQ_variance_budget",
+        "family_screen": "conditional_replacement_against_frozen_other_family_anchors",
+        "joint_HY_change_excluded": True,
+        "turnover_objective": False,
+        "fallback": False,
+        "failed_allocations": "explicit_unavailable_no_Sharpe_slot_no_weights_replacement",
+        "evaluation_status": "exploratory_reused_months_not_holdout",
+    }
+    _save(ROOT / "screen_contract.json", policy, immutable=True)
+    signature = hashlib.sha256((ROOT / "screen_contract.json").read_bytes()).hexdigest()
+    results, pending = [], []
+    for candidate in candidates:
+        stamp = ROOT / "screen" / f"{candidate['configuration']}.json"
+        if stamp.exists():
+            saved = json.loads(stamp.read_text())
+            if saved["signature"] != signature:
+                raise ValueError("Screen checkpoint signature mismatch")
+            results.append(saved["result"])
+        else:
+            pending.append(candidate)
+    started = time.perf_counter()
+    if pending:
+        with ProcessPoolExecutor(
+            max_workers=_workers(),
+            mp_context=multiprocessing.get_context("spawn"),
+            initializer=refresh_workers.initialize_screen,
+            initargs=(context, anchor),
+        ) as pool:
+            jobs = {pool.submit(refresh_workers.screen_job, c): c for c in pending}
+            for future in as_completed(jobs):
+                result = future.result()
+                _save(
+                    ROOT / "screen" / f"{result['configuration']}.json",
+                    {"signature": signature, "result": result},
+                    immutable=True,
+                )
+                results.append(result)
+                if len(results) % 25 == 0 or len(results) == len(candidates):
+                    _status(
+                        "cached_screen",
+                        completed=len(results),
+                        total=len(candidates),
+                        elapsed_seconds=time.perf_counter() - started,
+                    )
+    rows = [_aggregate(row) for row in sorted(results, key=lambda r: r["configuration"])]
+    pd.DataFrame(rows).to_csv(ROOT / "cached_configuration_metrics.csv", index=False)
+    shortlist = _shortlist(rows, BASELINE)
+    _save(
+        ROOT / "shortlist.json",
+        {
+            "selected": shortlist,
+            "anchors": anchors,
+            "configuration_count": len(candidates),
+            "eligible_count": sum(c["eligible"] for c in candidates),
+        },
+        immutable=True,
+    )
+    reader.verify()
+    return shortlist, rows
+
+
+def _configs(shortlist: list[dict], candidates: list[dict], context: dict) -> dict:
+    lookup = {c["configuration"]: c for c in candidates}
+    configs = {row["configuration"]: lookup[row["configuration"]]["config"] for row in shortlist if not row["reuse"]}
+    baseline = lookup[BASELINE]["config"]
+    groups = {f"common_{name}": tickers for name, tickers in context["families"].items()}
+    groups["common_us_region"] = context["families"]["us_equity"] + context["families"]["us_fixed_income"]
+    groups["common_international_region"] = (
+        context["families"]["international_equity"] + context["families"]["international_fixed_income"]
+    )
+    for name, tickers in groups.items():
+        config = copy.deepcopy(baseline)
+        config.pop("old_run_root", None)
+        config["tickers"] = tickers
+        command = config["command"]
+        for flag, value in [("--tickers", ",".join(tickers)), ("--run-id", f"{name}_s27")]:
+            command[command.index(flag) + 1] = value
+        configs[name] = config
+    return configs
+
+
+def _fit_stage(pool: ProcessPoolExecutor, jobs: list[dict], signature: str) -> list[dict]:
+    completed, pending = [], []
+    for job in jobs:
+        stamp = ROOT / "checkpoints" / f"{job['component']}_s{job['seed']}_{job['date']}.json"
+        if stamp.exists():
+            saved = json.loads(stamp.read_text())
+            if saved["signature"] != signature:
+                raise ValueError("Fit checkpoint belongs to a different contract")
+            _verify(saved["artifact_sha256"])
+            completed.append(saved["result"])
+        else:
+            pending.append(job)
+    futures = {pool.submit(refresh_workers.fit_job, job): job for job in pending}
+    for future in as_completed(futures):
+        job = futures[future]
+        try:
+            result = future.result()
+        except BaseException:
+            for task in futures:
+                task.cancel()
+            raise
+        _save(
+            ROOT / "checkpoints" / f"{job['component']}_s{job['seed']}_{job['date']}.json",
+            {
+                "signature": signature,
+                "result": result,
+                "artifact_sha256": _hashes([Path(p) for p in result["paths"].values()]),
+            },
+            immutable=True,
+        )
+        completed.append(result)
+        _status(
+            "independent_month_fits",
+            completed_checkpoints=len(list((ROOT / "checkpoints").glob("*.json"))),
+            last_component=job["component"],
+            seed=job["seed"],
+            date=job["date"],
+        )
+    return completed
+
+
+def _load_component(name: str, seed: int, config: dict, context: dict) -> dict:
+    if name == BASELINE:
+        with np.load(BASELINE_ROOT / f"analytic/s{seed}.npz", allow_pickle=False) as values:
+            result = {key: values[key].copy() for key in values.files}
+        result["std"] = np.sqrt(np.diagonal(result["covariance"], axis1=-2, axis2=-1))
+    else:
+        months = []
+        for date in context["dates"]:
+            with np.load(
+                ROOT / f"runs/{name}_s{seed}/analytic_months/covariance_{date}.npz", allow_pickle=False
+            ) as values:
+                if values["date"].item() != date or values["assets"].tolist() != config["tickers"]:
+                    raise ValueError("Exact component covariance metadata differs")
+                months.append({key: values[key].copy() for key in ["mean", "std", "covariance"]})
+        result = {key: np.stack([row[key] for row in months]) for key in months[0]}
+        result.update(dates=np.array(context["dates"]), assets=np.array(config["tickers"]))
+    if result["dates"].tolist() != context["dates"] or result["assets"].tolist() != config["tickers"]:
+        raise ValueError("Component axes differ from frozen registration")
+    if not np.allclose(
+        np.diagonal(result["covariance"], axis1=-2, axis2=-1), result["std"] ** 2, rtol=1e-8, atol=1e-12
+    ):
+        raise ValueError("Observed covariance diagonal differs from raw predictive variance")
+    return result
+
+
+def _evaluation(configs: dict, candidates: list[dict], shortlist: list[dict], context: dict) -> dict:
+    all_configs = {**configs, BASELINE: next(c["config"] for c in candidates if c["configuration"] == BASELINE)}
+    panel = {
+        (name, seed): _load_component(name, seed, config, context)
+        for name, config in all_configs.items()
+        for seed in SEEDS
+    }
+    # Retain convenient complete seed arrays as well as independent monthly artifacts.
+    for (name, seed), values in panel.items():
+        folder = ROOT / "analytic" / name
+        folder.mkdir(parents=True, exist_ok=True)
+        np.savez(folder / f"s{seed}.npz", **values)
+    density_rows, etf_rows, subset_rows = [], [], []
+    for (name, seed), values in panel.items():
+        indices = [context["assets"].index(a) for a in all_configs[name]["tickers"]]
+        actual = context["actual"][:, indices]
+        baseline_values = panel[BASELINE, seed]
+        baseline_covariance = baseline_values["covariance"][:, indices][:, :, indices]
+        for label, mean, cov in [
+            (name, values["mean"], values["covariance"]),
+            (f"{BASELINE}_same_subset", baseline_values["mean"][:, indices], baseline_covariance),
+        ]:
+            density_rows.append(
+                {
+                    "configuration": name,
+                    "forecast_source": label,
+                    "seed": seed,
+                    "assets": all_configs[name]["tickers"],
+                    **_density(actual, mean, cov),
+                }
+            )
+        marginal = gaussian_scores(actual, values["mean"], values["std"])
+        for index, asset in enumerate(all_configs[name]["tickers"]):
+            etf_rows.append(
+                {
+                    "configuration": name,
+                    "seed": seed,
+                    "asset": asset,
+                    **calibration_summary({key: value[:, index] for key, value in marginal.items()}),
+                }
+            )
+        for family, tickers in context["families"].items():
+            if not set(tickers).issubset(all_configs[name]["tickers"]):
+                continue
+            local = [all_configs[name]["tickers"].index(a) for a in tickers]
+            global_indices = [context["assets"].index(a) for a in tickers]
+            subset_rows.append(
+                {
+                    "configuration": name,
+                    "family": family,
+                    "seed": seed,
+                    **_forecast(
+                        context["actual"][:, global_indices],
+                        values["mean"][:, local],
+                        values["std"][:, local],
+                        context["baseline_mean"][:, global_indices],
+                    ),
+                    **_density(
+                        context["actual"][:, global_indices],
+                        values["mean"][:, local],
+                        values["covariance"][:, local][:, :, local],
+                    ),
+                }
+            )
+    _save(ROOT / "exact_density_comparisons.json", density_rows)
+    _save(ROOT / "matched_family_metrics.json", subset_rows)
+    pd.DataFrame(etf_rows).to_csv(ROOT / "exact_etf_calibration.csv", index=False)
+    screens = pd.read_csv(ROOT / "cached_configuration_metrics.csv")
+    selected_families = {
+        family: [r["configuration"] for r in shortlist if r["family"] == family] for family in context["families"]
+    }
+    sets = {
+        "common_input_family_assembly": [f"common_{name}" for name in context["families"]],
+        "common_input_regional_assembly": ["common_us_region", "common_international_region"],
+    }
+    for role, key, descending in [
+        ("ranking", "mean_ic", True),
+        ("portfolio", "conventional_sharpe", True),
+        ("nll", "mean_marginal_nll", False),
+    ]:
+        sets[f"family_specific_{role}_assembly"] = []
+        for family, names in selected_families.items():
+            rows = screens[screens.configuration.isin(names)].sort_values(
+                [key, "configuration"], ascending=[not descending, True]
+            )
+            sets[f"family_specific_{role}_assembly"].append(rows.iloc[0].configuration)
+    for row in shortlist:
+        if row["family"] == "joint":
+            sets[row["configuration"]] = [row["configuration"]]
+    allocator = CommonAllocator(context["historical_covariance"])
+    no_cap = CommonAllocator(context["historical_covariance"], cap=1.0)
+    architecture_rows = []
+    for label, names in sets.items():
+        for seed in SEEDS:
+            mean, std = np.zeros((24, 15)), np.zeros((24, 15))
+            seen = set()
+            for name in names:
+                assets = all_configs[name]["tickers"]
+                if seen.intersection(assets):
+                    raise ValueError("Overlapping architecture components")
+                seen.update(assets)
+                indices = [context["assets"].index(a) for a in assets]
+                mean[:, indices], std[:, indices] = panel[name, seed]["mean"], panel[name, seed]["std"]
+            if seen != set(context["assets"]):
+                raise ValueError("Incomplete architecture; no missing-task substitution")
+            ranking = _ranking(context["actual"], mean)
+            per_family = {
+                family: _ranking(
+                    context["actual"][:, [context["assets"].index(a) for a in tickers]],
+                    mean[:, [context["assets"].index(a) for a in tickers]],
+                )
+                for family, tickers in context["families"].items()
+            }
+            ranks = rankdata(mean, axis=1)
+            allocations = {
+                "linear_rank": ranks / ranks.sum(axis=1, keepdims=True),
+                **{key: np.broadcast_to(value, mean.shape) for key, value in context["fixed_probes"].items()},
+            }
+            failed = {}
+            for policy, solver in [("risk_rank_cap35", allocator), ("risk_rank_no_cap", no_cap)]:
+                try:
+                    allocations[policy] = solver.solve(mean)
+                except RuntimeError as error:
+                    failed[policy] = _failed_portfolio(error)
+            distributions = []
+            # A common historical-covariance control is not a GP covariance forecast.
+            covariances = [(context["historical_covariance"], "common_training_ledoit_wolf_not_gp")]
+            if len(names) == 1 and len(all_configs[names[0]]["tickers"]) == 15:
+                covariances.append((panel[names[0], seed]["covariance"], "exact_observed_GP"))
+            for covariance, source in covariances:
+                for policy, weights in allocations.items():
+                    scores = project_portfolios(context["actual"], mean, covariance, weights[:, None, :])
+                    distributions.append(
+                        {
+                            "portfolio": policy,
+                            "covariance_source": source,
+                            "role": "fixed_reference"
+                            if policy in context["fixed_probes"]
+                            else "adaptive_decision_diagnostic",
+                            **calibration_summary({key: value[:, 0] for key, value in scores.items()}),
+                        }
+                    )
+            architecture_rows.append(
+                {
+                    "architecture": label,
+                    "components": names,
+                    "seed": seed,
+                    "all_asset_ranking": ranking,
+                    "per_family_ranking": per_family,
+                    "equal_family_mean_ic": float(np.mean([r["mean_ic"] for r in per_family.values()])),
+                    "mean_marginal_nll": float(gaussian_scores(context["actual"], mean, std)["nll"].mean()),
+                    "portfolios": {
+                        **{policy: _portfolio(context, weights) for policy, weights in allocations.items()},
+                        **failed,
+                    },
+                    "portfolio_distributions": distributions,
+                    "gp_cross_family_covariance": "available" if len(names) == 1 else "unavailable_not_block_assembled",
+                }
+            )
+    _save(ROOT / "architecture_results.json", architecture_rows)
+    summary = []
+    for label in sets:
+        rows = [r for r in architecture_rows if r["architecture"] == label]
+        summary.append(
+            {
+                "architecture": label,
+                "seeds": len(rows),
+                "all_asset_ic": float(np.mean([r["all_asset_ranking"]["mean_ic"] for r in rows])),
+                "equal_family_ic": float(np.mean([r["equal_family_mean_ic"] for r in rows])),
+                "marginal_nll": float(np.mean([r["mean_marginal_nll"] for r in rows])),
+                **{
+                    f"{p}_sharpe": float(np.mean([r["portfolios"][p]["conventional_sharpe"] for r in rows]))
+                    if all(r["portfolios"][p]["status"] == "solved" for r in rows)
+                    else None
+                    for p in ["risk_rank_cap35", "risk_rank_no_cap", "linear_rank", "equal_weight", "fixed_60_40"]
+                },
+            }
+        )
+    pd.DataFrame(summary).to_csv(ROOT / "architecture_summary.csv", index=False)
+    comparisons = []
+    base_rows = [r for r in architecture_rows if r["architecture"] == BASELINE]
+    for label in sets:
+        if label == BASELINE:
+            continue
+        rows = [r for r in architecture_rows if r["architecture"] == label]
+        for policy in ["risk_rank_cap35", "risk_rank_no_cap", "linear_rank"]:
+            if not all(r["portfolios"][policy]["status"] == "solved" for r in rows + base_rows):
+                comparisons.append(
+                    {
+                        "architecture": label,
+                        "baseline": BASELINE,
+                        "portfolio": policy,
+                        "status": "unavailable_incomplete_strict_allocations_no_fallback",
+                    }
+                )
+                continue
+            left = np.array([r["portfolios"][policy]["arithmetic_excess"] for r in rows]).T
+            right = np.array([r["portfolios"][policy]["arithmetic_excess"] for r in base_rows]).T
+            comparisons.append(
+                {
+                    "architecture": label,
+                    "baseline": BASELINE,
+                    "portfolio": policy,
+                    **paired_block_bootstrap(left, right),
+                }
+            )
+    _save(ROOT / "paired_exploratory_comparisons.json", comparisons)
+    return {
+        "architectures": len(sets),
+        "exact_components_including_reused_baseline": len(all_configs),
+        "seed_runs": len(panel),
+        "automatic_promotion": False,
+        "evaluation_status": "exploratory_reused_months_not_holdout",
+    }
+
+
+def _execute(screen_only: bool) -> None:
+    reader = Reader()
+    verify_legacy_audit(reader, LEGACY)
+    context = load_context(reader, LEGACY)
+    # Verify and seal the completed baseline rather than refitting its 72 months.
+    old_seal = reader.read(BASELINE_ROOT / "COMPLETED.json")
+    old_contract = reader.read(BASELINE_ROOT / "contract.json")
+    if (
+        not old_seal["passed"]
+        or hashlib.sha256((BASELINE_ROOT / "contract.json").read_bytes()).hexdigest() != old_seal["signature"]
+    ):
+        raise ValueError("Completed baseline seal invalid")
+    _verify(old_contract["source_sha256"])
+    _verify(old_seal["artifact_sha256"])
+    reader.hashes.update(old_contract["source_sha256"])
+    reader.hashes.update(old_seal["artifact_sha256"])
+    for path in [
+        *HERE.glob("*.py"),
+        *FRAMEWORK.glob("*.py"),
+        *PARALLEL.glob("*.py"),
+        LEGACY / "ranking_architecture_worker.py",
+        FRAMEWORK / "specification.json",
+    ]:
+        reader.read(path)
+    candidates = _catalog(reader, context)
+    shortlist, _ = _screen(reader, context, candidates)
+    if screen_only:
+        _status("screen_complete", selected=len(shortlist), fresh_fits_launched=False)
+        return
+    configs = _configs(shortlist, candidates, context)
+    contract = {
+        "screen_signature": hashlib.sha256((ROOT / "screen_contract.json").read_bytes()).hexdigest(),
+        "configs": configs,
+        "source_sha256": reader.hashes,
+        "rank": 2,
+        "maxiter": 15,
+        "required_fits": len(configs) * 72,
+        "reused_baseline_fits": 72,
+        "thread_count_per_worker": 1,
+        "worker_ceiling": _workers(),
+        "memory_budget_gib": 48,
+        "parity_absolute_tolerance": 1e-8,
+        "fallback_weights": False,
+        "evaluation_status": "exploratory_reused_months_not_holdout",
+    }
+    _save(ROOT / "fit_contract.json", contract, immutable=True)
+    signature = hashlib.sha256((ROOT / "fit_contract.json").read_bytes()).hexdigest()
+    jobs = [
+        {"component": name, "seed": seed, "date": date, "index": index, "run": str(ROOT / f"runs/{name}_s{seed}")}
+        for name in configs
+        for seed in SEEDS
+        for index, date in enumerate(context["dates"])
+    ]
+    smoke_jobs = [job for job in jobs if job["seed"] == 27 and job["index"] == 0]
+    started = time.perf_counter()
+    initargs = (configs, str(LEGACY), str(PARALLEL))
+    with ProcessPoolExecutor(
+        max_workers=min(4, _workers()),
+        mp_context=multiprocessing.get_context("spawn"),
+        initializer=refresh_workers.initialize_fit,
+        initargs=initargs,
+    ) as pool:
+        smokes = _fit_stage(pool, smoke_jobs, signature)
+    peak = max(r["peak_rss_bytes"] for r in smokes)
+    count = _workers(peak)
+    _save(
+        ROOT / "smoke_gate.json",
+        {
+            "passed": True,
+            "components": len(smokes),
+            "workers_after_memory_gate": count,
+            "peak_rss_bytes": peak,
+            "signature": signature,
+        },
+        immutable=True,
+    )
+    _verify(contract["source_sha256"])
+    with ProcessPoolExecutor(
+        max_workers=count,
+        mp_context=multiprocessing.get_context("spawn"),
+        initializer=refresh_workers.initialize_fit,
+        initargs=initargs,
+    ) as pool:
+        fits = _fit_stage(pool, jobs, signature)
+    _verify(contract["source_sha256"])
+    _status("batch_evaluation", completed_fits=len(fits), workers=count)
+    evaluated = _evaluation(configs, candidates, shortlist, context)
+    _verify(contract["source_sha256"])
+    _save(
+        ROOT / "timing.json",
+        {
+            "workers": count,
+            "fit_and_evaluation_seconds_this_invocation": time.perf_counter() - started,
+            "fresh_monthly_fits": len(fits),
+            "max_old_replay_difference": max(r["old_replay_max_abs"] or 0 for r in fits),
+            "max_legacy_dense_difference": max(r["legacy_vs_dense_max_abs"] for r in fits),
+            "peak_worker_rss_bytes": max(r["peak_rss_bytes"] for r in fits),
+        },
+        immutable=True,
+    )
+    artifacts = [
+        p
+        for p in ROOT.rglob("*")
+        if p.is_file() and p.name not in {"status.json", "COMPLETED.json", "run.lock", "run.log"}
+    ]
+    _save(
+        ROOT / "COMPLETED.json",
+        {"passed": True, "signature": signature, "artifact_sha256": _hashes(artifacts), **evaluated},
+        immutable=True,
+    )
+    _status("completed", **evaluated)
+
+
+def _main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--screen-only", action="store_true")
+    parser.add_argument("--verify-only", action="store_true")
+    args = parser.parse_args()
+    if not (args.execute or args.screen_only or args.verify_only):
+        parser.error("Choose --execute, --screen-only, or --verify-only")
+    ROOT.mkdir(parents=True, exist_ok=True)
+    with (ROOT / "run.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if args.verify_only or (ROOT / "COMPLETED.json").exists():
+            seal = json.loads((ROOT / "COMPLETED.json").read_text())
+            contract = json.loads((ROOT / "fit_contract.json").read_text())
+            if hashlib.sha256((ROOT / "fit_contract.json").read_bytes()).hexdigest() != seal["signature"]:
+                raise ValueError("Completed contract signature differs")
+            _verify(contract["source_sha256"])
+            _verify(seal["artifact_sha256"])
+            print("Verified: inputs, source seals, monthly fits, exact covariance and batch evaluation", flush=True)
+        else:
+            try:
+                _execute(args.screen_only)
+            except BaseException as error:
+                _status("failed", error=str(error), fallback_used=False)
+                raise
+
+
+if __name__ == "__main__":
+    _main()

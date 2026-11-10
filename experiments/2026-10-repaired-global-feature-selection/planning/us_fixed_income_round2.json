@@ -1,0 +1,31 @@
+{
+  "family": "us_fixed_income",
+  "round_index": 2,
+  "study_stage": "family_refinement",
+  "round_interpretation": "Round one increased hypervolume by 19.78%. Removing rank improved IC/Sharpe in the credit model; removing autocorrelation improved all objectives in the no-lag rate model. Credit and volatility additions improved different objectives, while deleting the genuine nominal/TIPS rate state was harmful. A smaller equivalent curve basis improved the density model. Round two tests lag in the new contexts, combines local pruning and credit/rate bridges, and explores oil without forcing lag removal.",
+  "default_expected_tradeoff": "Retain full IC/NLL/conventional-Sharpe tradeoffs, paired seed effects and calibration diagnostics. Input count is a simplification descriptor, not a fourth objective.",
+  "default_falsification": "A dominated outcome does not support the conditional feature change. Lag may help one representation and hurt another; neither inclusion frequency nor a single pooled result establishes universal relevance.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/us_fixed_income_round1.json"
+  ],
+  "candidates": [
+    {"name":"rank_free_credit_without_lag","category":"conditional_lag_ablation","base_configuration":"us_fixed_income_f081d2651e89","etf_drop":["lag_y_excess_lead"],"hypothesis":"The rank-free credit front may preserve its IC/Sharpe gains without lag; this is a matched test on identical training dates."},
+    {"name":"rank_free_credit_without_long_momentum","category":"exploitation_combined_pruning","base_configuration":"us_fixed_income_f081d2651e89","etf_drop":["mom36m"],"hypothesis":"The individually useful rank and long-momentum removals may combine."},
+    {"name":"rank_free_credit_without_acceleration","category":"exploration_local_pruning","base_configuration":"us_fixed_income_f081d2651e89","etf_drop":["chmom"],"hypothesis":"Annual/long momentum plus lag may suffice without acceleration in the compact credit context."},
+    {"name":"rank_free_credit_without_lag_or_long_momentum","category":"exploration_interaction","base_configuration":"us_fixed_income_f081d2651e89","etf_drop":["lag_y_excess_lead","mom36m"],"hypothesis":"A more aggressive joint removal may reveal whether lag and long momentum substitute for one another."},
+    {"name":"pruned_no_lag_rate_plus_credit_zscore","category":"frontier_bridge","base_configuration":"us_fixed_income_982e0458d34f","macro_add":["hy_spread_z_12p"],"hypothesis":"Autocorrelation removal may retain the density benefit of HY state with less Sharpe cost than the earlier rate/credit bridge."},
+    {"name":"pruned_no_lag_rate_plus_local_volatility","category":"frontier_bridge","base_configuration":"us_fixed_income_982e0458d34f","etf_add":["vol_1m"],"hypothesis":"The simpler rate basis may preserve the volatility branch's higher IC while improving its other objectives."},
+    {"name":"pruned_rate_plus_lag","category":"conditional_lag_addition","base_configuration":"us_fixed_income_982e0458d34f","etf_add":["lag_y_excess_lead"],"hypothesis":"Directly test lag against the best reduced no-lag rate model, without changing start dates or macro context."},
+    {"name":"pruned_no_lag_rate_without_acceleration","category":"exploitation_local_pruning","base_configuration":"us_fixed_income_982e0458d34f","etf_drop":["chmom"],"hypothesis":"The genuine rate/TIPS block might substitute for the local momentum-acceleration axis."},
+    {"name":"pruned_no_lag_rate_without_ma_signal","category":"exploitation_local_pruning","base_configuration":"us_fixed_income_982e0458d34f","etf_drop":["ma_signal"],"hypothesis":"Annual momentum plus acceleration may retain the no-lag rate model's forecasting information without the moving-average signal."},
+    {"name":"reduced_curve_density_without_lag","category":"conditional_lag_ablation","base_configuration":"us_fixed_income_ba63874f87e3","etf_drop":["lag_y_excess_lead"],"hypothesis":"Removing duplicate/reconstructible rate axes may alter lag's conditional density contribution."},
+    {"name":"reduced_curve_density_without_autocorrelation","category":"exploitation_local_pruning","base_configuration":"us_fixed_income_ba63874f87e3","etf_drop":["ret_autocorr"],"hypothesis":"The autocorrelation simplification found in the no-lag model may transfer to the lagged density anchor."},
+    {"name":"pruned_no_lag_rate_plus_oil","category":"exploration_cross_family_transfer","base_configuration":"us_fixed_income_982e0458d34f","macro_add":["oil_ret"],"hypothesis":"Oil may add inflation/risk information not represented by nominal and TIPS-return state; test it alone, without the gold/oil ratio."}
+  ]
+}

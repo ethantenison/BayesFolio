@@ -1,0 +1,118 @@
+{
+  "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/outputs/stress/static_a7ac525c2e632acd.npz",
+  "assumptions": [
+    "Historical prices are dividend/split-adjusted total-return proxies from the sealed October31 vintage.",
+    "The same November target is reset monthly throughout history; no historical GP forecasts are used.",
+    "Static historical sensitivity is gross of fees/taxes; November2 execution at October30 closes is not assumed.",
+    "Shock2: HYG/HYEM receive-15%; BND/IEF/LQD/BNDX/VWOB receive-5%. Scenario buckets are not ratings.",
+    "No probability, crash-protection guarantee, currency hedging or recovery path is inferred from these shocks."
+  ],
+  "audit": {
+    "common_first_price_month": "2013-06",
+    "common_last_price_month": "2026-10",
+    "historical_months": 160,
+    "no_interior_months_dropped": true,
+    "source_sha256": {
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/BND.parquet": "dab41ceb2bc84e1ac8fd9437623a914e8a66e82fd8c390d40d30bfdd8c0b5f95",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/BNDX.parquet": "ea624ca6e58900720dcca3f9b0af387bad8262689c1dadea4006cf99c7e42174",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/EWX.parquet": "0a0683154ec7df3d7496bb983278a48c5a51f7688aa8560aadf8653bb833161b",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/HYEM.parquet": "d4cfbfb4d030a13d3ab1bff38ca118d7a7fa7419a219dc4ad8593a2285f1eda3",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/HYG.parquet": "5e032285b4144925d160d8b9eb921e978408d74ab52e3a0d8525775ac9a8449d",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/IEF.parquet": "0ffd211392dbec6112c94c22b1753e53c5682e7133a1df9eb95c966374001f02",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/IWM.parquet": "06fc9ca8ee212bd5349fcdc7cfc015ef7b288923b4a8f931fa7007bc8541e6c8",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/LQD.parquet": "923aa0edf4594d4fceb898ff4d14ec93f3ed9c77f55d12dbe534cf157c67f079",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/SPY.parquet": "25095c269b1f918127a8e8b1e9ca54e0d041512c2f5b4cdfa6852b61384bd03f",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VEA.parquet": "0705d83933f064cd315c464b17672c9f880a229f61e6e6627552b8541f19a8c3",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VSS.parquet": "febb95e226b5b155e05ef17e32b88bc62c24483a1a5b2760fd417f519c00a95f",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VTV.parquet": "31f2e35b715cb1fa4fa29c6d959d0aac4b3e9edc3c1f339236009f73a0aeb833",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VWO.parquet": "d30b609a238a352a0d0280c02e7d2a1056698097b0b3488fc6a93b558fa08786",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VWOB.parquet": "8df45fc9978b2fc157924e54b9a6845f44ba20d84e6243ae009c9ed518393b54"
+    }
+  },
+  "code_sha256": "78cd505f7aed931f745266a08aca2686b41b933250e0d470fc0e00605007c5ab",
+  "fixed_weights": {
+    "BND": -4.7715503312900195e-11,
+    "BNDX": 4.7305295952583223e-11,
+    "EWX": 0.4520624826209816,
+    "HYEM": 0.07478686334723297,
+    "HYG": 1.5191797842145084e-10,
+    "IEF": -7.532024468738572e-11,
+    "IWM": 0.14432000861149638,
+    "LQD": 4.685133093189948e-11,
+    "MGK": 0.0,
+    "SPY": 8.565071139577706e-09,
+    "VEA": 0.039618780118246585,
+    "VSS": 0.09215748296870149,
+    "VTV": 1.661370969858745e-10,
+    "VWO": 0.19705437324262637,
+    "VWOB": 2.3646762276011446e-10
+  },
+  "historical_first_return_month": "2013-07",
+  "historical_last_return_month": "2026-10",
+  "historical_months": 160,
+  "hypothetical_shocks": {
+    "equity20_FI5": {
+      "asset_returns": {
+        "BND": -0.05,
+        "BNDX": -0.05,
+        "EWX": -0.2,
+        "HYEM": -0.05,
+        "HYG": -0.05,
+        "IEF": -0.05,
+        "IWM": -0.2,
+        "LQD": -0.05,
+        "SPY": -0.2,
+        "VEA": -0.2,
+        "VSS": -0.2,
+        "VTV": -0.2,
+        "VWO": -0.2,
+        "VWOB": -0.05
+      },
+      "portfolio_return": -0.18878197044398912
+    },
+    "equity30_HY15_otherFI5": {
+      "asset_returns": {
+        "BND": -0.05,
+        "BNDX": -0.05,
+        "EWX": -0.3,
+        "HYEM": -0.15,
+        "HYG": -0.15,
+        "IEF": -0.05,
+        "IWM": -0.3,
+        "LQD": -0.05,
+        "SPY": -0.3,
+        "VEA": -0.3,
+        "VSS": -0.3,
+        "VTV": -0.3,
+        "VWO": -0.3,
+        "VWOB": -0.05
+      },
+      "portfolio_return": -0.2887819704232302
+    }
+  },
+  "march2020": {
+    "available": true,
+    "return": -0.19347198948311922
+  },
+  "static_path_max_drawdown": -0.3002518276013716,
+  "worst_windows": {
+    "1": {
+      "end_month": "2020-03",
+      "months": 1,
+      "return": -0.19347198948311917,
+      "start_month": "2020-03"
+    },
+    "12": {
+      "end_month": "2022-10",
+      "months": 12,
+      "return": -0.2262319039658638,
+      "start_month": "2021-11"
+    },
+    "3": {
+      "end_month": "2020-03",
+      "months": 3,
+      "return": -0.267904376466093,
+      "start_month": "2020-01"
+    }
+  }
+}

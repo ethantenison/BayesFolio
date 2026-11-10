@@ -1,0 +1,5 @@
+{
+  "error": "Strict allocator failed: optimal_inaccurate; no fallback",
+  "fallback_used": false,
+  "stage": "failed"
+}

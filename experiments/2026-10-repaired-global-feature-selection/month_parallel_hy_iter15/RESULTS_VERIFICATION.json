@@ -1,0 +1,13 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/SPY_hy_iter15_vs36.png": "08a5e17ccc1475ee6631a51b5c17ab383cf55ec741a4e80d6acd4a59e4364b85",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/comparison.json": "64a3e0527afda1edf92b45ecb3e7d63174deabb53dd57850e4cccebc76db4837",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/completed.json": "ba046ae07057cb61de764355b1c9f06a7dcdc8577c8439a0235d42c07aa5d793",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/etf_metrics_by_seed.csv": "7358302e414a43f4f4b4833ed6bf16c8065deb6a9a2e405db623f695f9a03307",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/objectives_by_seed.csv": "569bfad4f873153586c31509bf31948003dec3af357d237f964fb204b787afcd"
+  },
+  "independent_reconstruction": true,
+  "new_fit_windows": 72,
+  "passed": true,
+  "seed_runs": 3
+}

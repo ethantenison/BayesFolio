@@ -1,0 +1,13 @@
+{
+  "CAGR_scale": 0.02,
+  "aspiration_CAGR": 0.11510412641221122,
+  "aspiration_drawdown_loss": 0.09467996887355114,
+  "drawdown_scale": 0.02,
+  "hypervolume_reference_CAGR": -0.004895873587788785,
+  "hypervolume_reference_drawdown_loss": 0.21467996887355115,
+  "not_a_personal_loss_limit_or_return_forecast": true,
+  "reference_CAGR": 0.09510412641221122,
+  "reference_drawdown_loss": 0.11467996887355114,
+  "source_control": "policy_c5f34924606d3b69f1bf",
+  "source_panel": "development41 Jun2022-Oct2025"
+}

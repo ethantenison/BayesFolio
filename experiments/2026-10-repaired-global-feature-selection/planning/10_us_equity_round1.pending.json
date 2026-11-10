@@ -1,0 +1,897 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_local_ablation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "Skip-month annual momentum, rank and slope may preserve useful local trend information without six-month momentum; this is an untested exact removal from the new compact front.",
+      "hypothesis_name": "compact_without_mom6m",
+      "id": "us_equity_0fe495c66f9e",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_0fe495c66f9e",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_local_ablation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "Six-month momentum and the remaining local features may substitute for the reconstructed annual skip-month predictor in this macro context; do not assume its selected presence proves necessity.",
+      "hypothesis_name": "compact_without_skip_month_momentum",
+      "id": "us_equity_1ee67d8f4013",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_1ee67d8f4013",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_local_ablation",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "The fixed 15-task momentum rank may be redundant with local momentum and macro state for a four-task U.S. equity model; test rather than infer a universally needed rank input.",
+      "hypothesis_name": "compact_without_cross_sectional_rank",
+      "id": "us_equity_5fba6b4b201b",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_5fba6b4b201b",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_local_ablation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "Dimensionless momentum may suffice without the absolute-price slope, reducing representation complexity while retaining the credit/inflation state.",
+      "hypothesis_name": "compact_without_trend_slope",
+      "id": "us_equity_fd58ef4445a1",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_fd58ef4445a1",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_macro_ablation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "Credit-spread state and the yield curve may make the annual CPI signal unnecessary for the compact parent's ranking advantage; this must be checked on repaired, nonzero inflation values.",
+      "hypothesis_name": "compact_without_cpi_year_change",
+      "id": "us_equity_0d4f4d5f8c96",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_0d4f4d5f8c96",
+      "macro_columns": [
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_macro_ablation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "The HY z-score may carry enough credit information without the one-month HY change; the new genuine historical observations make this a meaningful conditional credit test.",
+      "hypothesis_name": "compact_without_hy_change",
+      "id": "us_equity_a4c0679af605",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_a4c0679af605",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_macro_ablation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "The HY change may substitute for the standardized spread state; comparing this with the reciprocal removal will identify whether the two credit representations are complementary.",
+      "hypothesis_name": "compact_without_hy_zscore",
+      "id": "us_equity_38ae0afec701",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_38ae0afec701",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploitation_macro_ablation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "The CPI and credit signals may provide the relevant macro regime without the Treasury curve spread, or its removal may establish a broadly useful curve input.",
+      "hypothesis_name": "compact_without_curve_spread",
+      "id": "us_equity_867ae082cead",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_867ae082cead",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploration_conditional_lag",
+      "etf_columns": [
+        "cs_mom_rank",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "Lagged realized excess return could have different value in the new compact credit model than in the weak local-only pair; test its conditional value without requiring its removal.",
+      "hypothesis_name": "compact_plus_recent_return_lag",
+      "id": "us_equity_e7028305d052",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_e7028305d052",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope,vol_1m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploration_uncertainty_information",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "vol_1m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "vol_1m",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "A single task-level realized-volatility input may recover the larger volatility model's small density advantage without importing its entire extra feature block.",
+      "hypothesis_name": "compact_plus_local_realized_volatility",
+      "id": "us_equity_27c180061051",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_27c180061051",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "Oil return might transfer useful commodity information from international equity contexts into the compact U.S. credit model without adding a gold/oil ratio or a broad commodity bundle.",
+      "hypothesis_name": "compact_plus_oil_return",
+      "id": "us_equity_7ebdf64a59ff",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_7ebdf64a59ff",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_c10464d00ae6",
+      "category": "exploration_shared_representation",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate IC, Gaussian NLL, conventional Sharpe, seed dispersion, and coverage. Input count is reported, not a fourth objective; narrower forecasts alone are not a benefit.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result with no competitive simplification does not support this hypothesis. A new nondominated tradeoff remains evidence even if it differs from the expected direction.",
+      "hypothesis": "An alternative four-input local basis may preserve the compact macro model's advantage and offer a shared representation across equity and fixed-income tasks; this is not inferred from inclusion frequency.",
+      "hypothesis_name": "compact_macro_with_transferable_local_basis",
+      "id": "us_equity_a9609614fc7e",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_a9609614fc7e",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json",
+        "base_configuration=us_equity_c10464d00ae6"
+      ]
+    }
+  ],
+  "cross_version_equality_audit": "experiments/2026-10-repaired-global-feature-selection/results/feature_pool_extension_audit.json",
+  "dataset_version": "v2",
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json"
+  ],
+  "evidence_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/conditional_feature_pairs.csv": "6ecb6a0b99be50d2d9ee11138c0efbe9517338cdf9d6a50e1aac7e7d9f183a04",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/configuration_aggregates.csv": "03b7a23579903ff6e70bc1bb541cd7b10883487a1208184ab11c7e4c5dd1f014",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/exact_inputs.json": "41448dc35f8ba2c1604a25ad211505708a5e929382667d4f835d749ced1a4173",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/family_diagnostics_by_seed.csv": "de2ff86e38852b63ba55d34c4141b3e0a87a000acda47aa6198b389b45245d80",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/hypervolume.json": "1e85a2dab2b3a988054738867413559a217c93e97eb6f77dd060dfeb7f341c64",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round1/objectives_by_seed.csv": "1e71c489120a246cd44ac3f26fa9a0575018359978e48e43339900177b11b5d1"
+  },
+  "family": "us_equity",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_equity.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_equity.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/runs",
+  "phase": "refinement",
+  "planning_method": "Hosted Codex hypothesis generation",
+  "proposal_path": "experiments/2026-10-repaired-global-feature-selection/planning/us_equity_round1.json",
+  "proposal_sha256": "dfb9f64c3208c8914294ada8c82e99ac2102396bf9f81df6c41404c8d026c0b6",
+  "results_prefix": "10_us_equity_round1",
+  "round_index": 1,
+  "round_interpretation": "All 11 audited historical masks have complete three-seed evidence. The compact four-local plus four-credit/inflation/curve model has IC 0.263889, NLL -1.753270, and conventional Sharpe 1.435086; the two larger frontier points offer only small aggregate NLL improvements at much lower IC/Sharpe. Only one exact one-feature pair exists in the historical U.S. panel. Therefore the first round tests each of the compact parent's eight non-time inputs individually, then explores lag, task-specific volatility, oil return, and a transferable alternative local basis. Retain all Pareto tradeoffs rather than declaring the compact parent a universal winner or treating NLL as a veto.",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/executions",
+  "study_stage": "family_refinement",
+  "tickers": [
+    "SPY",
+    "MGK",
+    "VTV",
+    "IWM"
+  ]
+}

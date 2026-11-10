@@ -1,0 +1,135 @@
+{
+  "actual_workers": 14,
+  "added_seed_wins": {
+    "mean_gaussian_nll": 2,
+    "mean_ic": 0,
+    "sharpe": 2
+  },
+  "all_primary_portfolios_solved": true,
+  "baseline_timing": {
+    "fit_wall_seconds": 1018.1641864590056,
+    "fits_per_minute": 4.242930617137688,
+    "fresh_gp_jobs": 72,
+    "fresh_portfolio_jobs": 72,
+    "is_cold_replay": true,
+    "parity": {
+      "max_absolute_differences": {
+        "predictions": 0.0,
+        "returns": 0.0,
+        "scenarios": 0.0,
+        "weights": 0.0
+      },
+      "passed": true,
+      "strict_primary_portfolio_policy": true,
+      "tolerances": {
+        "predictions": 1e-08,
+        "returns": 1e-08,
+        "scenarios": 1e-08,
+        "weights": 1e-06
+      },
+      "windows_checked": 72
+    },
+    "phase": "baseline",
+    "portfolio_wall_seconds": 0.4414165409980342,
+    "sum_fit_job_seconds": 13299.71832804005,
+    "total_wall_seconds": 1019.859699749999,
+    "worker_peak_rss_bytes": 3029762048,
+    "workers": 14
+  },
+  "completed": true,
+  "estimated_historical_speedup": 1.8017777694368327,
+  "exact_inputs": {
+    "baseline": [
+      "t_index",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "trend_slope",
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_z_12p",
+      "oil_ret",
+      "spy_ret",
+      "term_spread",
+      "vix_ts_z_12p"
+    ],
+    "plus_hy_change": [
+      "t_index",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "trend_slope",
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_chg_1p",
+      "hy_spread_z_12p",
+      "oil_ret",
+      "spy_ret",
+      "term_spread",
+      "vix_ts_z_12p"
+    ]
+  },
+  "hy_timing": {
+    "fit_wall_seconds": 1020.0454616250063,
+    "fits_per_minute": 4.235105358067009,
+    "fresh_gp_jobs": 72,
+    "fresh_portfolio_jobs": 72,
+    "is_cold_replay": true,
+    "parity": null,
+    "phase": "plus_hy_change",
+    "portfolio_wall_seconds": 0.440248333994532,
+    "sum_fit_job_seconds": 13324.935354292029,
+    "total_wall_seconds": 1021.4374592499953,
+    "worker_peak_rss_bytes": 3029254144,
+    "workers": 14
+  },
+  "interpretation_boundary": "Adaptive reused-date research; no untouched confirmation or promotion",
+  "maxiter": 36,
+  "means": {
+    "baseline": {
+      "cumulative_return_diagnostic_only": 0.3954557418130525,
+      "mean_gaussian_nll": -2.237612100992285,
+      "mean_ic": 0.21785714285714283,
+      "rmse_diagnostic_only": 0.03199452490468484,
+      "sharpe": 1.1752891247536557
+    },
+    "plus_hy_change": {
+      "cumulative_return_diagnostic_only": 0.40605699851503557,
+      "mean_gaussian_nll": -2.23671504093397,
+      "mean_ic": 0.1893849206349206,
+      "rmse_diagnostic_only": 0.031957294205410706,
+      "sharpe": 1.2010986275284694
+    }
+  },
+  "new_fit_jobs": 144,
+  "new_seed_runs": 6,
+  "paired_mean_deltas_added_minus_base": {
+    "cumulative_return_diagnostic_only": 0.010601256701983086,
+    "mean_gaussian_nll": 0.0008970600583153576,
+    "mean_ic": -0.028472222222222232,
+    "rmse_diagnostic_only": -3.723069927413086e-05,
+    "sharpe": 0.025809502774813826
+  },
+  "parity_smoke_extra_fit_jobs": 1,
+  "previous_weights_reuse_disabled": true,
+  "rank": 5,
+  "runtime_observation": {
+    "baseline_completed_jobs_at_nearby_status_check": 14,
+    "caveat": "Point-in-time observation, not an average, peak, speedup measurement or strict CPU affinity reservation",
+    "fit_workers": 14,
+    "source": "Read-only native ps snapshot captured during the baseline fit stage",
+    "summed_cpu_percent": 1383.3,
+    "summed_rss_gib": 24.2008
+  },
+  "scope": "New experiment runner only; protected original/production code and results unchanged.",
+  "serial_timing": {
+    "method": "Approximate original end-to-end interval from immutable contract/status mtimes",
+    "seconds": 1837.560534954071
+  }
+}

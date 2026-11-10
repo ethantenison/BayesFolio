@@ -1,0 +1,102 @@
+{
+  "schema": "bayesfolio.gp_tuning.complements.v1",
+  "status": "preregistered_before_new_fits",
+  "rank": 2,
+  "maxiter": 15,
+  "t_index_retained": true,
+  "fit_count": 504,
+  "fit_count_formula": "6 components * 3 seeds * 28 forecast origins",
+  "components": [
+    {
+      "modelname": "broad_roll48_r2_i15",
+      "source_family": "broad",
+      "rank": 2,
+      "maxiter": 15,
+      "rolling_months": 48,
+      "custom_etf_cols": null,
+      "custom_macro_cols": null,
+      "rationale": "Keep the broad14 mechanisms but discard distant observations. Tests whether a four-year local relationship supplies useful corrections to the expanding broad/compact ensemble."
+    },
+    {
+      "modelname": "broad_roll60_r2_i15",
+      "source_family": "broad",
+      "rank": 2,
+      "maxiter": 15,
+      "rolling_months": 60,
+      "custom_etf_cols": null,
+      "custom_macro_cols": null,
+      "rationale": "Intermediate five-year recency alternative. Paired with broad48, it distinguishes an isolated window result from a broader recency effect without changing features or rank."
+    },
+    {
+      "modelname": "compact_roll48_r2_i15",
+      "source_family": "compact",
+      "rank": 2,
+      "maxiter": 15,
+      "rolling_months": 48,
+      "custom_etf_cols": null,
+      "custom_macro_cols": null,
+      "rationale": "Tests whether a compact model responds to recent changes differently from the broad model, rather than assuming recency benefits both representations equally."
+    },
+    {
+      "modelname": "compact_roll60_r2_i15",
+      "source_family": "compact",
+      "rank": 2,
+      "maxiter": 15,
+      "rolling_months": 60,
+      "custom_etf_cols": null,
+      "custom_macro_cols": null,
+      "rationale": "Five-year compact counterpart enables a matched feature-by-window comparison and a less aggressive local-history complement."
+    },
+    {
+      "modelname": "compact_rates8_expand_r2_i15",
+      "source_family": "compact",
+      "rank": 2,
+      "maxiter": 15,
+      "rolling_months": null,
+      "custom_etf_cols": ["mom12m_skip1m", "mom6m"],
+      "custom_macro_cols": [
+        "cpi_chg_12p", "hy_spread_z_12p", "schp_ret", "term_spread",
+        "y10_nominal", "y10_real_proxy"
+      ],
+      "rationale": "Adds distinct nominal-yield and TIPS-return/trailing-price state to compact5. Prior exact ablations in the U.S. fixed-income oil/rate context found these axes useful; neither current component contains them. This is a conditional complement hypothesis, not a claim of universal feature importance."
+    },
+    {
+      "modelname": "market_state8_expand_r2_i15",
+      "source_family": "broad",
+      "rank": 2,
+      "maxiter": 15,
+      "rolling_months": null,
+      "custom_etf_cols": ["mom12m_skip1m", "mom6m", "trend_slope"],
+      "custom_macro_cols": ["dxy", "em_fx_ret", "oil_ret", "spy_ret", "vix_ts_z_12p"],
+      "rationale": "A local momentum plus fast market/FX/oil/risk representation omits broad14's lag, inflation, credit, curve, dealer and gold/oil-ratio axes. Prior family evidence supports conditional oil/FX/risk value and warns that lag/credit relevance differs by context. The gold/oil omission is explicitly speculative and may worsen international predictions; only incremental ensemble evidence can justify it."
+    }
+  ],
+  "static_ensemble_grid": {
+    "third_model_mean_fraction": [0.125, 0.25, 0.5],
+    "third_model_covariance_fraction": [0, "match_mean_fraction", 0.5],
+    "base_model": "approved_two_model_sharpe_leader_rank2_maxiter15",
+    "mean_formula": "mu = (1 - gamma) * mu_reference + gamma * mu_third",
+    "covariance_formula": "Sigma = (1 - beta) * Sigma_reference + beta * Sigma_third",
+    "weights_constant_across_all_months": true,
+    "weights_constant_across_all_seeds": true,
+    "third_fraction_constant_across_all_etfs": true,
+    "moment_mixture_between_mean_term": false,
+    "covariance_cross_model_error_correlation_assumed_known": false
+  },
+  "selection": {
+    "tuning_origin_count": 16,
+    "tuning_origins": "2024-05-31 through 2025-08-29",
+    "temporal_check_origin_count": 12,
+    "temporal_check_origins": "2025-09-30 through 2026-08-31",
+    "objectives_all_maximized": ["conventional_sharpe", "compounded_total_return", "cross_sectional_rank_IC"],
+    "untouched_holdout_claim": false,
+    "automatic_baseline_promotion": false
+  },
+  "source_evidence": [
+    "experiments/2026-10-portfolio-evaluation-v1/CURRENT_BASELINES.json",
+    "experiments/2026-10-portfolio-evaluation-v1/approved_scope_v1/outputs/contract.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/CROSS_FAMILY_SYNTHESIS.md",
+    "experiments/2026-10-repaired-global-feature-selection/plans/05_global_round0.json",
+    "experiments/2026-10-monthly-data-extension-v1/outputs/dataset/global.parquet"
+  ]
+}

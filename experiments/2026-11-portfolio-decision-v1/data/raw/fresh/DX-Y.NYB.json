@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:14.201696+00:00",
+  "rows": 64,
+  "sha256": "9195c240e0154ade7f3d3ec27fb081edecc12731c78b6e2214b87072fcd44118",
+  "symbol": "DX-Y.NYB"
+}

@@ -1,0 +1,66 @@
+{
+  "production_promotion": false,
+  "shared_research_lead": "global_33e57e1c2370",
+  "selection_policy": "Preserve the full three-objective Pareto fronts. Highlight the highest mean Sharpe joint point as an IC/Sharpe-oriented research lead, with a smaller no-lag parent, highest-IC and best-NLL alternatives. No weighted score, turnover, width, input count, return or RMSE changes front membership.",
+  "selected_configurations": {
+    "us_equity": {
+      "highest_sharpe": "us_equity_5fba6b4b201b",
+      "highest_ic": "us_equity_8b0e1b779842",
+      "best_nll": "us_equity_e7028305d052",
+      "compact_balanced_alternative": "us_equity_d0a35b28f60b"
+    },
+    "international_equity": {
+      "highest_ic_and_sharpe": "international_equity_f7933f4054ed",
+      "compact_higher_ic_density_alternative": "international_equity_9b13070209b1",
+      "compact_higher_sharpe_density_alternative": "international_equity_66ef3bfb80d7",
+      "best_nll": "international_equity_3c896548ff79"
+    },
+    "us_fixed_income": {
+      "highest_sharpe": "us_fixed_income_c2fef69db5f6",
+      "highest_ic": "us_fixed_income_78c395992b67",
+      "best_nll": "us_fixed_income_3199c073b636",
+      "no_lag_oil_rate_alternative": "us_fixed_income_89293fc088d7"
+    },
+    "international_fixed_income": {
+      "highest_sharpe": "international_fixed_income_12f65dc2d4e4",
+      "highest_ic": "international_fixed_income_ade5ca6498cf",
+      "best_nll": "international_fixed_income_373dc9719ca5"
+    },
+    "global": {
+      "highest_sharpe_shared_research_lead": "global_33e57e1c2370",
+      "compact_no_lag_alternative": "global_9e7175a3ef4a",
+      "highest_ic_credit_alternative": "global_fdb5fb8b385f",
+      "best_nll_dealer_free_alternative": "global_da43a19fc3dd"
+    }
+  },
+  "rationale": {
+    "global": "The thirteen-input lead improves every aggregate objective versus the all-input control in every seed and is the highest mean Sharpe point. It is not a universal winner: the twelve-input no-lag model has higher IC, the fourteen-input credit model has the highest IC, and the dealer-free twelve-input model has better NLL. The full seven-point frontier remains available.",
+    "us_equity": "The seven-input Sharpe model is a concise research lead with improved density versus all inputs. The six-input highest-IC credit representation costs NLL; nine inputs preserve the best-density tradeoff. Do not choose solely from input count.",
+    "international_equity": "The broad sixteen-input model leads IC and Sharpe, but ten-input risk/oil alternatives materially improve density. The twelve-input NLL extremum differs only slightly in density from the compact alternatives. Ratio effects reverse across tested contexts.",
+    "us_fixed_income": "Lagged five-input and oil/rate eight-input models lead Sharpe and IC respectively. Lag-free seven-input models preserve better density; the seven-input no-lag oil/rate model is another tradeoff. Lag is neither universally harmful nor required.",
+    "international_fixed_income": "Eleven-input density/IC alternatives are competitive with the twelve-input Sharpe leader. Three-target allocation caps compress Sharpe differences, so small differences are weak prediction evidence. Annual momentum remains useful in the tested final branch."
+  },
+  "unresolved_family_exceptions": [
+    "International fixed-income within-family IC falls from 0.222222 in the joint control to 0.090278 in the primary shared lead, despite better family NLL. None of the four highlighted joint finalists resolves that ranking gap.",
+    "U.S. fixed-income standalone nominal/TIPS information and lag interactions do not automatically transfer to a compact shared model. Its small joint capital allocation also means global Sharpe does not validate debt performance.",
+    "No input is proven individually useful in every family. Direct joint removals of several retained local, CPI, curve, FX and normalized-slope axes remain untested in the final context.",
+    "Oil and gold/oil-ratio effects are conditional. Broad joint removals were harmful, but the final lead was not individually ablated along every retained dimension."
+  ],
+  "uncertainty_interpretation": "Improved NLL and coverage do not require smaller predictive spreads. The primary lead is slightly wider than the joint control. Total predictive spread, three-seed optimization dispersion, and economic performance uncertainty from twenty-four dependent months are distinct.",
+  "stop_reason": "All four family searches and the global search reached their authorized three-round caps. All rounds improved their fronts; no convergence or exhaustive optimum is claimed.",
+  "future_work_not_executed": [
+    "Design a separately authorized study for the international-debt ranking gap and nominal/TIPS exceptions, including an explicit decision on family-aware selection constraints if desired.",
+    "Test remaining shared inputs through direct matched global removals or coherent substitutions rather than taking the intersection of finalists as a validated core.",
+    "Consider calibrated acquisition/optimizer selection and a new formal holdout only in a later program, as requested.",
+    "Validate transfer to production model controls, point-in-time data availability and any additional targets before a separate production-promotion decision."
+  ],
+  "evidence": [
+    "planning/GLOBAL_ROUND3_INTERPRETATION.md",
+    "results/cumulative/global/conditional_feature_pairs.csv",
+    "results/component_synthesis/conditional_feature_evidence.csv",
+    "results/component_synthesis/feature_family_matrix.csv",
+    "results/joint_objective_audit.json",
+    "results/model_contract_audit.json",
+    "results/execution_coverage_audit.json"
+  ]
+}

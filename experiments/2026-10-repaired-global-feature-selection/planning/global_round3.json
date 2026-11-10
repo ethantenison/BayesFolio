@@ -1,0 +1,31 @@
+{
+  "family": "global",
+  "round_index": 3,
+  "study_stage": "global_refinement",
+  "round_interpretation": "All second-round masks completed all three seeds, and independent arithmetic passed all 57 joint seed runs. Hypervolume increased 10.62%. Rank-free plus lag produces a stronger-density/Sharpe point with a small IC cost; deleting annual momentum or VIX level produces distinct thirteen-input fronts. Oil removal is worse in every objective and seed, and trend removal is dominated. HY-level addition creates a very small new ranking/density tradeoff, with different family effects from the earlier ten-input context. No global model improves every family's ranking. This final capped round combines the promising risk/local/lag changes and tests unresolved dealer/normalized-credit contributions and a credit/risk bridge. It ends at the three-round budget, not a convergence claim.",
+  "default_expected_tradeoff": "Evaluate the unchanged IC/NLL/actual conventional joint Sharpe objectives, all three seeds and within-family forecast/calibration/exposure diagnostics. Input count and interval width are not hidden objectives. Small empirical front differences may be optimization or sample variability.",
+  "default_falsification": "A dominated result does not support the stated conditional combination or removal; neither block success nor failure proves each feature universally useful or harmful. Report mixed family effects, all tradeoffs and untested inputs. Stop new launches after this round regardless of whether it improves.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/global_round2.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/joint_objective_audit.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/model_contract_audit.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/conditional_feature_evidence.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/frontier_monthly_diagnostics.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/GLOBAL_ROUND2_INTERPRETATION.md",
+    "experiments/2026-10-repaired-global-feature-selection/GOAL_CONTRACT.md"
+  ],
+  "candidates": [
+    {"name":"no_vix_front_without_unskipped_annual_momentum","category":"frontier_bridge_combined_successful_removals","base_configuration":"global_a8a6b8394d6e","etf_drop":["mom12m"],"hypothesis":"Combine VIX-level and annual-momentum removals to test whether the thirteen-input Sharpe and IC/density branches can yield a competitive twelve-input mask. Their separate tradeoffs need not add, so retain all other features unchanged."},
+    {"name":"lagged_density_front_without_vix_level","category":"frontier_bridge_risk_lag_interaction","base_configuration":"global_52d9b7e07091","macro_drop":["vix"],"hypothesis":"The successful VIX-level removal may combine with the rank-free lagged density/Sharpe branch. This fourteen-input mask is also exactly the no-VIX thirteen-input mask plus lag, enabling a matched lag comparison in the new risk context."},
+    {"name":"lagged_density_front_without_vix_or_unskipped_annual_momentum","category":"exploration_temporal_representation_substitution","base_configuration":"global_52d9b7e07091","macro_drop":["vix"],"etf_drop":["mom12m"],"hypothesis":"Recent excess-return lag may substitute for unskipped annual momentum after VIX removal. Compare this thirteen-input mask with both the new twelve-input no-annual/no-VIX mask and the new fourteen-input lag/no-VIX mask to isolate lag and annual-momentum effects in matched contexts."},
+    {"name":"no_vix_front_without_dealer_proxy","category":"exploration_conditional_risk_pruning","base_configuration":"global_a8a6b8394d6e","macro_drop":["dealer_gamma_proxy"],"hypothesis":"Dealer proxy alone failed to explain the international block gain in the ten-input core. It may be redundant here or may supply necessary risk-level state after VIX removal. Test the exact twelve-input reduction without assuming either interpretation."},
+    {"name":"no_vix_front_without_normalized_credit_state","category":"exploration_shared_credit_importance","base_configuration":"global_a8a6b8394d6e","macro_drop":["hy_spread_z_12p"],"hypothesis":"HY z-score was important in compact U.S. equity but dispensable in a competitive foreign-debt context. Test whether the shared no-VIX model needs this normalized credit axis, or whether its other macro/task-sharing information supports a smaller twelve-input tradeoff."},
+    {"name":"absolute_credit_front_without_vix_level","category":"frontier_bridge_credit_risk_representation","base_configuration":"global_d062f4d835aa","macro_drop":["vix"],"hypothesis":"Combine absolute-credit addition with VIX removal to test whether the credit branch's ranking information can coexist with the higher-Sharpe risk representation. This fourteen-input mask is exactly the no-VIX thirteen-input mask plus HY level; evaluate its new density/family tradeoffs rather than declaring credit universally needed."}
+  ]
+}

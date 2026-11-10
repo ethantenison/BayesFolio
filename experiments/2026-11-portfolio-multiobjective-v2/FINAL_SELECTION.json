@@ -1,0 +1,191 @@
+{
+  "best_full_control": "policy_c5f34924606d3b69f1bf",
+  "best_latest_control": "policy_56a0b06b63cc63c2913b",
+  "eligible_Pareto_ids": [
+    "policy_1ecb16e803d529c446d5",
+    "policy_269c851205829f549e8e",
+    "policy_87884c01c87dcdace8a6",
+    "policy_b71ce3fe84ee69f58247"
+  ],
+  "eligible_challengers": [
+    "policy_b71ce3fe84ee69f58247",
+    "policy_1ecb16e803d529c446d5",
+    "policy_269c851205829f549e8e",
+    "policy_ffda294836ec0b34898d",
+    "policy_e88e9221e7d2bdd5631c",
+    "policy_91b4b9ebe70878b95ef8",
+    "policy_87884c01c87dcdace8a6"
+  ],
+  "finalist_gates": {
+    "policy_1ecb16e803d529c446d5": {
+      "distance": 0.0,
+      "eligible": true,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": true,
+        "development_eligible_before_unlock": true,
+        "latest12_distance_within_best_control_plus0p50": true,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    },
+    "policy_269c851205829f549e8e": {
+      "distance": 0.0,
+      "eligible": true,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": true,
+        "development_eligible_before_unlock": true,
+        "latest12_distance_within_best_control_plus0p50": true,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    },
+    "policy_56a0b06b63cc63c2913b": {
+      "distance": 2.4574589805603133,
+      "eligible": true,
+      "fallback_control": true,
+      "gates": {
+        "raw_path_and_live_feasible": true,
+        "unchanged_control": true
+      }
+    },
+    "policy_87884c01c87dcdace8a6": {
+      "distance": 0.0,
+      "eligible": true,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": true,
+        "development_eligible_before_unlock": true,
+        "latest12_distance_within_best_control_plus0p50": true,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    },
+    "policy_91b4b9ebe70878b95ef8": {
+      "distance": 0.5587734675018601,
+      "eligible": true,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": true,
+        "development_eligible_before_unlock": true,
+        "latest12_distance_within_best_control_plus0p50": true,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    },
+    "policy_b71ce3fe84ee69f58247": {
+      "distance": 0.0,
+      "eligible": true,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": true,
+        "development_eligible_before_unlock": true,
+        "latest12_distance_within_best_control_plus0p50": true,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    },
+    "policy_bffebed65d9d74291d0a": {
+      "distance": 2.6708468816439837,
+      "eligible": false,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": false,
+        "development_eligible_before_unlock": false,
+        "latest12_distance_within_best_control_plus0p50": false,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    },
+    "policy_c5f34924606d3b69f1bf": {
+      "distance": 1.0949539263419932,
+      "eligible": true,
+      "fallback_control": true,
+      "gates": {
+        "raw_path_and_live_feasible": true,
+        "unchanged_control": true
+      }
+    },
+    "policy_e88e9221e7d2bdd5631c": {
+      "distance": 0.17795484421383387,
+      "eligible": true,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": true,
+        "development_eligible_before_unlock": true,
+        "latest12_distance_within_best_control_plus0p50": true,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    },
+    "policy_ffda294836ec0b34898d": {
+      "distance": 0.17795482912540891,
+      "eligible": true,
+      "gates": {
+        "November_registered_constraints_feasible": true,
+        "all53_complete_raw_path": true,
+        "all53_distance_gain_at_least_0p05": true,
+        "development_eligible_before_unlock": true,
+        "latest12_distance_within_best_control_plus0p50": true,
+        "latest12_drawdown_loss_within_best_control_plus3pp": true
+      }
+    }
+  },
+  "incumbent_retained": false,
+  "no_search_or_retuning_after_confirmation": true,
+  "passed": true,
+  "selected_at_utc": "2026-10-31T14:49:52.200213+00:00",
+  "selected_id": "policy_b71ce3fe84ee69f58247",
+  "selected_policy": {
+    "MGK_weight": 0,
+    "allocator": "hard_rank",
+    "control": false,
+    "covariance_experts": [
+      "broad_r2_i15_exp",
+      "compact_r2_i15_exp",
+      "broad_roll48_r2_i15"
+    ],
+    "covariance_fractions": [
+      0.5,
+      0.5,
+      0.0,
+      0.0
+    ],
+    "equity_cap": null,
+    "id": "policy_b71ce3fe84ee69f58247",
+    "label": "R4_matched_jointfine1_6_compact_r2_i15_exp",
+    "minimum_effective_assets": 3,
+    "prediction_experts": [
+      "broad_r2_i15_exp",
+      "compact_r2_i15_exp",
+      "broad_roll48_r2_i15"
+    ],
+    "prediction_fractions": [
+      [
+        0.0018204964564563554,
+        0.9821254615676466,
+        0.016054041975896945
+      ],
+      [
+        0.9117157109795467,
+        0.08382048738602009,
+        0.004463801634433231
+      ],
+      [
+        0.0006328768610914506,
+        0.05493000444784679,
+        0.9444371186910618
+      ],
+      [
+        0.007567351310208336,
+        0.005874874252571778,
+        0.9865577744372199
+      ]
+    ],
+    "risk_multiplier": 1.0,
+    "seed_pooling": "equal_moments_before_one_solve"
+  },
+  "shortlist_sha256": "397244bab5505bfc445fe8bb7f7ef4b405da355257e642bb4921e6217fde7f75",
+  "weights_appearance_not_a_selection_input": true
+}

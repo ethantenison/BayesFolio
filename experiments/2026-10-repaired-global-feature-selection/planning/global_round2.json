@@ -1,0 +1,33 @@
+{
+  "family": "global",
+  "round_index": 2,
+  "study_stage": "global_refinement",
+  "round_interpretation": "First adaptive global round completed six novel masks and all three seeds. All 39 joint seed runs pass independent objective/allocation arithmetic verification. Rank removal and lag addition to the original fifteen-input front each improve all three aggregate objectives, yielding fourteen- and sixteen-input fronts and 6.71% hypervolume gain. Ratio removal worsens every objective in every seed; annual-momentum removal trades negligible density gain against small IC/Sharpe losses. HY-level addition to the ten-input core raises pooled IC but worsens density and does not restore U.S.-equity ordering; dealer proxy alone fails to reproduce the richer block benefit. Two restored historical macro-only family masks are now complete and dominated, so family fronts remain unchanged. This round tests whether successful rank/lag changes combine, smaller local/risk representations, an oil-versus-ratio distinction, and a conditional credit bridge on the stronger front.",
+  "default_expected_tradeoff": "Evaluate the same pooled IC, Gaussian NLL and actual conventional joint Sharpe; retain paired seed dispersion, within-family outcomes, allocations and coverage/sharpness. Input count and raw interval width are reporting preferences/diagnostics, never hidden objectives.",
+  "default_falsification": "A dominated outcome does not support the proposed conditional simplification or transfer. Family deterioration and failed mechanisms remain explicit even when pooled metrics improve. Reused score dates remain adaptive research rather than untouched confirmation.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/global_round1.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/joint_objective_audit.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/model_contract_audit.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/conditional_feature_evidence.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/frontier_monthly_diagnostics.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/HISTORICAL_MACRO_ONLY_SCOPE_CORRECTION.md",
+    "experiments/2026-10-repaired-global-feature-selection/results/MODEL_CONTRACT_AUDIT.md",
+    "experiments/2026-10-repaired-global-feature-selection/planning/GLOBAL_ROUND1_INTERPRETATION.md",
+    "experiments/2026-10-repaired-global-feature-selection/GOAL_CONTRACT.md"
+  ],
+  "candidates": [
+    {"name":"lagged_density_front_without_global_rank","category":"frontier_bridge_successful_change_combination","base_configuration":"global_43cd2137e85f","etf_drop":["cs_mom_rank"],"hypothesis":"Combine the separately successful rank removal and lag addition. This fifteen-input mask is also exactly the fourteen-input ranking/Sharpe front plus lag, enabling two matched conditional comparisons to distinguish additive gains from interaction."},
+    {"name":"rank_free_front_without_unskipped_annual_momentum","category":"exploration_local_representation_interaction","base_configuration":"global_15b18df4a34b","etf_drop":["mom12m"],"hypothesis":"The small annual-momentum removal tradeoff may change when global rank is absent. Test whether corrected skip/intermediate momentum suffice in a thirteen-input shared mask, without presuming fixed-income annual momentum transfers unchanged."},
+    {"name":"rank_free_front_without_trend_slope","category":"exploitation_local_pruning","base_configuration":"global_15b18df4a34b","etf_drop":["trend_slope"],"hypothesis":"The remaining trend axis may add little beyond the three momentum representations in the stronger rank-free shared context. Retain all macro information so a new tradeoff can be attributed to this exact local removal."},
+    {"name":"rank_free_front_without_vix_level","category":"exploration_risk_representation","base_configuration":"global_15b18df4a34b","macro_drop":["vix"],"hypothesis":"Normalized VIX term structure and dealer state may substitute for absolute VIX level in the shared GP. This tests an unresolved axis of the initial international-exception block rather than importing whole-block importance."},
+    {"name":"rank_free_front_without_oil_return","category":"exploration_commodity_representation","base_configuration":"global_15b18df4a34b","macro_drop":["oil_ret"],"hypothesis":"Oil return may or may not be needed once gold/oil ratio and risk/FX state are retained. The reciprocal ratio-removal result was harmful in every seed; do not infer the oil effect from it or from the separate-family oil results."},
+    {"name":"rank_free_front_plus_absolute_credit_level","category":"frontier_bridge_conditional_credit_transfer","base_configuration":"global_15b18df4a34b","macro_add":["hy_spread"],"hypothesis":"HY level raised pooled IC and U.S.-FI IC on the ten-input branch while costing NLL and hurting U.S.-equity ranking. Test whether the stronger rank-free risk representation can preserve its joint ranking benefit with a different density/Sharpe tradeoff; do not repeat the falsified claim that HY level already restored U.S. equity."}
+  ]
+}

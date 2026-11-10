@@ -1,0 +1,893 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploitation_combined_pruning",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "The successful trend simplification may combine with the higher-IC credit-level representation.",
+      "hypothesis_name": "credit_level_front_without_trend",
+      "id": "us_equity_8b0e1b779842",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_8b0e1b779842",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploration_local_interaction",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Changing credit representation may alter intermediate momentum's value; keep corrected skip momentum.",
+      "hypothesis_name": "credit_level_front_without_six_month_momentum",
+      "id": "us_equity_c6a5b4f1daf1",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_c6a5b4f1daf1",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploration_credit_representation",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Test absolute-credit-only against absolute-plus-normalized credit state rather than assuming every repaired credit transform is required.",
+      "hypothesis_name": "credit_level_front_without_credit_zscore",
+      "id": "us_equity_7cac77648247",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_7cac77648247",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploration_credit_complementarity",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Level/change/normalized state may combine the old parent's density and new parent's ranking advantages, at the cost of one axis.",
+      "hypothesis_name": "credit_level_front_plus_credit_change",
+      "id": "us_equity_4570e1c57a92",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_4570e1c57a92",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,hy_spread,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploration_inflation_complementarity",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Monthly CPI may add density information when annual CPI is retained rather than replaced.",
+      "hypothesis_name": "credit_level_front_plus_monthly_inflation",
+      "id": "us_equity_ca4082b16bd0",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_ca4082b16bd0",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_z_12p,term_spread,y10_nominal",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploration_rate_complementarity",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread",
+        "y10_nominal"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Yield level may complement the useful curve, although replacing the curve was harmful.",
+      "hypothesis_name": "credit_level_front_plus_nominal_yield",
+      "id": "us_equity_aae6f553c357",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_aae6f553c357",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread",
+        "y10_nominal"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploration_shared_local_representation",
+      "etf_columns": [
+        "mom12m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "A single annual-momentum substitution may retain information while making the local basis more compatible with fixed income; whole-basis transfer previously failed.",
+      "hypothesis_name": "credit_level_front_with_unskipped_annual_momentum",
+      "id": "us_equity_0e55a9175696",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_0e55a9175696",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "exploration_local_interaction",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Repaired absolute credit state may change rank's conditional value and restore ranking information without the prior density cost.",
+      "hypothesis_name": "credit_level_front_plus_rank",
+      "id": "us_equity_4ef9518f3269",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_4ef9518f3269",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_23a11358aeee",
+      "category": "conditional_lag_addition",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Lag remains eligible in the changed credit context despite failing in the rank-free change/z-score model.",
+      "hypothesis_name": "credit_level_front_plus_lag",
+      "id": "us_equity_40972e83592a",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_40972e83592a",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_23a11358aeee"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_d0a35b28f60b",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "mom12m_skip1m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "A single corrected skip-momentum axis plus compact macro state may offer a smaller competitive model.",
+      "hypothesis_name": "six_input_front_without_six_month_momentum",
+      "id": "us_equity_583291afb2cb",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_583291afb2cb",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_d0a35b28f60b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_d0a35b28f60b",
+      "category": "exploration_macro_interaction",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Trend removal may alter credit-change dependence; preserve normalized credit and curve state.",
+      "hypothesis_name": "six_input_front_without_credit_change",
+      "id": "us_equity_86c90676a157",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_86c90676a157",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_d0a35b28f60b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_d0a35b28f60b",
+      "category": "exploration_cross_family_transfer",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+      "hypothesis": "Oil might replace information lost by trend removal without importing a large commodity/risk block; no ratio is added.",
+      "hypothesis_name": "six_input_front_plus_oil",
+      "id": "us_equity_b3964012e6b1",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_b3964012e6b1",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json",
+        "base_configuration=us_equity_d0a35b28f60b"
+      ]
+    }
+  ],
+  "cross_version_equality_audit": "experiments/2026-10-repaired-global-feature-selection/results/feature_pool_extension_audit.json",
+  "dataset_version": "v2",
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json"
+  ],
+  "evidence_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/conditional_feature_pairs.csv": "aae9fdd95e82e3fe4a21d6f8636b7af6aef9a96d32f22e55bf6d6599ae90cc99",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/configuration_aggregates.csv": "a6910282ce5ff65b99892ea8625e5532291df34a2129fc404d375cd6cec5a715",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/exact_inputs.json": "6bc0dde0908100f0a2a4b00bc9748daed5510b30d0fdf6078622bfd0a7a625d0",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/family_diagnostics_by_seed.csv": "d86bc75b463e2e17c301cbf63354047a9b0326c2fe3d41efb6a779f5aa347ef2",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/hypervolume.json": "8b91f26544b51e57fbd6ed73efb056173c251df7dc7cc31716e2afe4773acd94",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/objectives_by_seed.csv": "3daf64ee335fb8333cc3e425dafb7dd91b0eb662c55f9b474eaefb14eadbc8d3",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round3/us_equity_round2.json": "7e28075f285edb383e92e9deee9d3c26e77369cf86bb7b25071bd82a7c93545c"
+  },
+  "family": "us_equity",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_equity.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_equity.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/runs",
+  "phase": "refinement",
+  "planning_method": "Hosted Codex hypothesis generation",
+  "proposal_path": "experiments/2026-10-repaired-global-feature-selection/planning/us_equity_round3.json",
+  "proposal_sha256": "120b0909b9584281f6da0c6c1092717596de7905a004b6c6b1e0cbb587c36fcf",
+  "results_prefix": "10_us_equity_round3",
+  "round_index": 3,
+  "round_interpretation": "Round two increased hypervolume by 17.89%. Replacing HY change with HY level on the rank-free parent raised IC by 0.075 in all three seeds and nearly retained Sharpe, but worsened NLL by 0.125351. Trend removal yielded a six-input frontier point. Replacing annual CPI with monthly CPI created a density-edge tradeoff with much worse IC/Sharpe. Replacing curve with yield level and adding lag/volatility/flow were not competitive in that context. The final family round prunes and bridges the high-IC credit-level branch and six-input branch; it does not force a lag-free or single-credit representation.",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/executions",
+  "study_stage": "family_refinement",
+  "tickers": [
+    "SPY",
+    "MGK",
+    "VTV",
+    "IWM"
+  ]
+}

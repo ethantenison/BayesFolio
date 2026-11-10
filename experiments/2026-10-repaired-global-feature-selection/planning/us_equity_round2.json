@@ -1,0 +1,31 @@
+{
+  "family": "us_equity",
+  "round_index": 2,
+  "study_stage": "family_refinement",
+  "round_interpretation": "Round one increased fixed-reference hypervolume by 6.65%. Removing rank created a seven-input front with higher Sharpe and lower NLL but lower IC. Adding lag to the ranked parent improved density while hurting ranking and Sharpe. HY-z and curve removal were strongly harmful in the original compact context. Round two uses the rank-free front to test local simplification, conditional lag rescue, alternative credit/inflation/curve representations, and small volatility/flow transfers. These are conditional hypotheses, not an imposed universal core.",
+  "default_expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+  "default_falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/us_equity_round1.json"
+  ],
+  "candidates": [
+    {"name":"rank_free_without_six_month_momentum","category":"exploitation_local_pruning","base_configuration":"us_equity_5fba6b4b201b","etf_drop":["mom6m"],"hypothesis":"Rank removal may change the incremental value of six-month momentum; test the interaction instead of transferring the ranked-parent ablation."},
+    {"name":"rank_free_without_trend_slope","category":"exploitation_local_pruning","base_configuration":"us_equity_5fba6b4b201b","etf_drop":["trend_slope"],"hypothesis":"The two momentum horizons may suffice when global rank is absent."},
+    {"name":"rank_free_without_skip_momentum","category":"exploitation_local_pruning","base_configuration":"us_equity_5fba6b4b201b","etf_drop":["mom12m_skip1m"],"hypothesis":"Re-test corrected skip momentum in the rank-free context; a failure establishes context-specific need, not a universal rule."},
+    {"name":"rank_free_plus_lag","category":"conditional_lag_bridge","base_configuration":"us_equity_5fba6b4b201b","etf_add":["lag_y_excess_lead"],"hypothesis":"Lag's density benefit may coexist with the rank-free parent's stronger Sharpe rather than reproducing its ranked-parent ranking loss."},
+    {"name":"rank_free_without_credit_change","category":"exploitation_macro_pruning","base_configuration":"us_equity_5fba6b4b201b","macro_drop":["hy_spread_chg_1p"],"hypothesis":"The normalized credit state may suffice after rank removal, although the same removal was harmful in the ranked context."},
+    {"name":"rank_free_credit_level_instead_of_change","category":"exploration_credit_representation","base_configuration":"us_equity_5fba6b4b201b","macro_drop":["hy_spread_chg_1p"],"macro_add":["hy_spread"],"hypothesis":"Level plus normalized state may represent repaired credit conditions better than change plus normalized state."},
+    {"name":"rank_free_credit_level_instead_of_zscore","category":"exploration_credit_representation","base_configuration":"us_equity_5fba6b4b201b","macro_drop":["hy_spread_z_12p"],"macro_add":["hy_spread"],"hypothesis":"Distinguish the need for genuine credit information from dependence on its rolling z-score representation."},
+    {"name":"rank_free_monthly_instead_of_annual_inflation","category":"exploration_inflation_representation","base_configuration":"us_equity_5fba6b4b201b","macro_drop":["cpi_chg_12p"],"macro_add":["cpi_chg_1p"],"hypothesis":"Monthly inflation may preserve useful macro state with a more responsive signal; latest-vintage/staleness caveats remain unchanged."},
+    {"name":"rank_free_nominal_yield_instead_of_curve","category":"exploration_rate_representation","base_configuration":"us_equity_5fba6b4b201b","macro_drop":["term_spread"],"macro_add":["y10_nominal"],"hypothesis":"Separate yield-level information from curve shape rather than inferring a universal curve feature from one context."},
+    {"name":"rank_free_without_six_month_momentum_plus_lag","category":"exploration_local_substitution","base_configuration":"us_equity_5fba6b4b201b","etf_drop":["mom6m"],"etf_add":["lag_y_excess_lead"],"hypothesis":"Recent-return lag could replace one intermediate momentum horizon rather than simply increasing model dimension."},
+    {"name":"rank_free_plus_local_volatility","category":"exploration_uncertainty_information","base_configuration":"us_equity_5fba6b4b201b","etf_add":["vol_1m"],"hypothesis":"Task-local volatility may be more useful after rank removal, despite not improving the ranked parent's frontier."},
+    {"name":"rank_free_plus_market_flow","category":"exploration_cross_family_transfer","base_configuration":"us_equity_5fba6b4b201b","macro_add":["spy_flow_z_12p"],"hypothesis":"A single market-activity signal may complement compact credit/curve state without importing a large risk block."}
+  ]
+}

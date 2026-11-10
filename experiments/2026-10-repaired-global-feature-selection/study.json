@@ -1,0 +1,31 @@
+{
+  "schema": "bayesfolio.repaired_global_selection.v1",
+  "dataset_version": "v1",
+  "families": {
+    "us_equity": ["SPY", "MGK", "VTV", "IWM"],
+    "international_equity": ["VEA", "VWO", "VSS", "EWX"],
+    "us_fixed_income": ["BND", "IEF", "LQD", "HYG"],
+    "international_fixed_income": ["BNDX", "VWOB", "HYEM"]
+  },
+  "training_start": "2017-05-31",
+  "first_score": "2024-05-31",
+  "last_score": "2026-04-30",
+  "initial_training_months": 84,
+  "scored_months": 24,
+  "seeds": [27, 127, 227],
+  "family_rounds": 3,
+  "max_new_family_configurations_per_round": 12,
+  "global_rounds": 3,
+  "max_new_global_configurations_per_round": 6,
+  "max_workers_total": 15,
+  "torch_threads_per_worker": 1,
+  "scenario_workers_per_worker": 1,
+  "screening": {"rank": 2, "maxiter": 15, "scenarios": 256, "gp_experiment": "signed_lkj_eta_2"},
+  "objectives": {"maximize": ["mean_ic", "sharpe"], "minimize": ["mean_gaussian_nll"]},
+  "hypervolume_reference": {"mean_ic": 0.0, "mean_gaussian_nll": 0.0, "sharpe": 0.0},
+  "diagnostic_only": ["cumulative_return", "rmse", "coverage", "sharpness"],
+  "include_t_index": true,
+  "turnover_excluded": true,
+  "production_changes_allowed": false,
+  "adaptive_evaluation_not_untouched_holdout": true
+}

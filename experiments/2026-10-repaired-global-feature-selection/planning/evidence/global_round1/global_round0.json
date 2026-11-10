@@ -1,0 +1,113 @@
+{
+  "after_configurations": 7,
+  "before_configurations": 1,
+  "competitive_simplification": false,
+  "equal_objective_simplifications": [],
+  "family": "global",
+  "frontier_improved": true,
+  "hypervolume_after": 0.8222583816990987,
+  "hypervolume_before": 0.2627314213689023,
+  "hypervolume_delta": 0.5595269603301964,
+  "hypothesis_comparisons": [
+    {
+      "base_configuration": "global_c55e49933d10",
+      "category": "shared_core_hypothesis",
+      "configuration": "global_b48732adb186",
+      "delta_ic": 0.09573412698412698,
+      "delta_nll": -0.0968793794962175,
+      "delta_sharpe": 0.16048818172513366,
+      "hypothesis_name": "shared_mechanism_core_10",
+      "input_count_change": -17,
+      "on_cumulative_front": true,
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 3,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "base_configuration": "global_c55e49933d10",
+      "category": "family_union_hypothesis",
+      "configuration": "global_3745593ecc26",
+      "delta_ic": -0.012301587301587286,
+      "delta_nll": 0.03461087784524697,
+      "delta_sharpe": 0.0506617137475139,
+      "hypothesis_name": "literal_selected_family_union_29",
+      "input_count_change": 2,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 0,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "base_configuration": "global_c55e49933d10",
+      "category": "reduced_union_hypothesis",
+      "configuration": "global_9d4dc5c2a19f",
+      "delta_ic": 0.07341269841269844,
+      "delta_nll": -0.016221909317431393,
+      "delta_sharpe": 0.16908888423050702,
+      "hypothesis_name": "evidence_reduced_union_22",
+      "input_count_change": -5,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 2,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "base_configuration": "global_c55e49933d10",
+      "category": "fixed_income_exception_hypothesis",
+      "configuration": "global_2b66b7fc9390",
+      "delta_ic": 0.005505952380952403,
+      "delta_nll": 0.0475661850478278,
+      "delta_sharpe": 0.16058037154697105,
+      "hypothesis_name": "shared_core_plus_fixed_income_exceptions_14",
+      "input_count_change": -13,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 2,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 3
+    },
+    {
+      "base_configuration": "global_c55e49933d10",
+      "category": "international_exception_hypothesis",
+      "configuration": "global_389a69848aa0",
+      "delta_ic": 0.14965277777777777,
+      "delta_nll": -0.07728979832779714,
+      "delta_sharpe": 0.29715874198491204,
+      "hypothesis_name": "shared_core_plus_international_risk_exceptions_15",
+      "input_count_change": -12,
+      "on_cumulative_front": true,
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 3,
+      "seed_sharpe_wins": 3
+    },
+    {
+      "base_configuration": "global_c55e49933d10",
+      "category": "matched_global_lag_contrast",
+      "configuration": "global_1b4304ffe9c1",
+      "delta_ic": 0.012896825396825412,
+      "delta_nll": -0.016837918801305918,
+      "delta_sharpe": 0.17120017116394845,
+      "hypothesis_name": "shared_core_plus_fixed_income_exceptions_and_lag_15",
+      "input_count_change": -12,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 2,
+      "seed_nll_wins": 3,
+      "seed_sharpe_wins": 3
+    }
+  ],
+  "interpretation_boundary": "Seed repeats measure optimization variability on the same reused dates, not independent economic samples or an untouched holdout.",
+  "new_configurations": 6,
+  "new_frontier_points": [
+    "global_b48732adb186",
+    "global_389a69848aa0"
+  ],
+  "plan_sha256": "9fd5174ee33f44749ddfc4042180cbcdc2717a8a36fad551537d2ccebaa1e4e1",
+  "round_index": 0,
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "stalled": false,
+  "study_stage": "global_initial",
+  "two_consecutive_stalled_rounds": false
+}

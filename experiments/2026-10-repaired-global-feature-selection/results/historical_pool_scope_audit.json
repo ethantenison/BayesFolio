@@ -1,0 +1,1095 @@
+{
+  "new_v2_masks": {
+    "international_equity": 68,
+    "international_fixed_income": 0,
+    "us_equity": 2,
+    "us_fixed_income": 0
+  },
+  "original_v1_plans_unchanged": true,
+  "records": [
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_compact_pruned_12w_gpmaxret/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_liquidity_12w_gpmaxret/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_liquidity_plus_volatility_12w_gpmaxret/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_momentum_plus_macro_plus_liquidity_12w_gpmaxret/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_momentum_plus_macro_plus_liquidity_volatility_12w_gpmaxret/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "us_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_momentum_plus_macro_plus_volatility_12w_gpmaxret/manifest.json",
+      "manifest_sha256": "aa0438f1c728679a893295c7327dd3528b9e29159e21741f6ae42280c3253778",
+      "repaired_mask_id": "us_equity_93c2f9ca9122"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "us_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_volatility_regime_12w_gpmaxret/manifest.json",
+      "manifest_sha256": "505e0e1f06e7e1658756c37e2da1bb9e3cb7286d10f123ba9777b6b8d0598d72",
+      "repaired_mask_id": "us_equity_a2712097d01c"
+    },
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/broad_kernel_search_20260706T0056Z/full_runs/full_c070_space_filling/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "us_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/broad_kernel_search_20260706T0056Z/full_runs/full_c088_novel_or_sensitivity/manifest.json",
+      "manifest_sha256": "e12c38080eb16d7e323185af4c972eb2e18b9a80e57381c779d4c3d2c3920e6b",
+      "repaired_mask_id": "us_equity_93c2f9ca9122"
+    },
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_block_screen_20260707T1725Z/full_runs/full_b007_compact_pruned/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d004_60d239ff/manifest.json",
+      "manifest_sha256": "dd2a0f78d62cc003375132b72e495c7c288cb686e1db2f43e59f8b988c005dd1",
+      "repaired_mask_id": "international_equity_bd6826dea466"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d010_7d7d07a8/manifest.json",
+      "manifest_sha256": "e7364cc5fccfbaf1a6ba1546f6011355f590db9677ab80de164ffdef3cf135fa",
+      "repaired_mask_id": "international_equity_56e06610e247"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d015_1ab8b445/manifest.json",
+      "manifest_sha256": "1c1adcca8315ef9464a4470b20bae288629a280e6364d4dae6c9f3e4416adbdf",
+      "repaired_mask_id": "international_equity_d761551f5d77"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d019_205aaf4b/manifest.json",
+      "manifest_sha256": "127e0b6e375c8b3b73deb73a1d6d721a4cbd3b9b171b073652e5f1e9d4e0b4a4",
+      "repaired_mask_id": "international_equity_d53294235e20"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d022_4f2a3dc3/manifest.json",
+      "manifest_sha256": "4f81c202ec60303032dd66b6f2b9aaaac2bab5fa446aa417c7b9edb7b33b3b7c",
+      "repaired_mask_id": "international_equity_765cfe89ff10"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d025_4dcd7094/manifest.json",
+      "manifest_sha256": "7c3eab2f6d41aed8a3b907dab09779b39a6a039cdc3c879bfd46b7a675d5cb7e",
+      "repaired_mask_id": "international_equity_879f731a5c7a"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d026_afcf2f37/manifest.json",
+      "manifest_sha256": "9c1200a9246e55d06bc2f4a9a5664d9fca42c22a12290acf4c2a8939daa090b4",
+      "repaired_mask_id": "international_equity_978f89a05fb4"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d030_4989cf3a/manifest.json",
+      "manifest_sha256": "fdd4941c3c0bdee27814129a7462625a317c124586ac9426cff1e2e0e71ae082",
+      "repaired_mask_id": "international_equity_b2d43c7eda13"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d034_b430cdab/manifest.json",
+      "manifest_sha256": "76cd8748c7121119e2670ad9330657f65898785ecdc83256d756d91f9739fa36",
+      "repaired_mask_id": "international_equity_3145dfc2df98"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d037_8c7c8511/manifest.json",
+      "manifest_sha256": "99368e71a2441b29be298823fd59bdb23ec94c0b11f1c2402fd9e1d4a332f4ff",
+      "repaired_mask_id": "international_equity_537e3741090e"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d040_fcdbffb6/manifest.json",
+      "manifest_sha256": "e8a01e53dfb527d4a831aea19da4469186d7c0a50475a4c7e08631b0072b8ee1",
+      "repaired_mask_id": "international_equity_879f731a5c7a"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d041_dc64177f/manifest.json",
+      "manifest_sha256": "59b9157046fbebc603121892eee378e11285ddc51acf3c32df7c86a5c07f5cfd",
+      "repaired_mask_id": "international_equity_445615d849b5"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d044_713a237a/manifest.json",
+      "manifest_sha256": "4c49d7b00dead32b5ed35cb8dc2d4cdc4974497a8a45088e3b0bb706a8d99731",
+      "repaired_mask_id": "international_equity_9a6c2fcb3b13"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d047_987d754e/manifest.json",
+      "manifest_sha256": "05e351179307bd364e609e46e98f3c157f71c113e46ba7a5488309744d7528c5",
+      "repaired_mask_id": "international_equity_72a6657427f6"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d050_cf09014e/manifest.json",
+      "manifest_sha256": "8e20718078f19fce42b42b430598356d2c51aff6da7d3efbbd636463ec9a3d5a",
+      "repaired_mask_id": "international_equity_6d1b0bf368a9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d051_6967ec6b/manifest.json",
+      "manifest_sha256": "5bc9e0391b6fe8804d5fe4c5eda65b83bb086283c3a65f036d40212ec52a7fbb",
+      "repaired_mask_id": "international_equity_e3af18a23fa4"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d053_44ee06f1/manifest.json",
+      "manifest_sha256": "30af91b8b5f876d9c91c76c2599f2615d11888ce4fcb16010bec6e6370405212",
+      "repaired_mask_id": "international_equity_4d3594a236cd"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d056_b7eda913/manifest.json",
+      "manifest_sha256": "efd2729ad9adc300b1ece21ff3a09f07603d9ea149919ffef61a5c0e61ff12cf",
+      "repaired_mask_id": "international_equity_b9da3958f317"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d057_7a60fc51/manifest.json",
+      "manifest_sha256": "4048044e6df6cce9d32aacb9718bcfef1cb6aca9455f92f31e9f0d890b2d17a3",
+      "repaired_mask_id": "international_equity_87be1bc171ef"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d059_2973db90/manifest.json",
+      "manifest_sha256": "0d0b10ea11a8dfe5d98194039d507cc5a0dff1cb88aa0d1ebbf7494a2bef8816",
+      "repaired_mask_id": "international_equity_a6c90fc7f1b3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d060_87c205b7/manifest.json",
+      "manifest_sha256": "187550310f0648c17fef024eaeb9a8ca7100eb754fdac01e9d16464ba789cc52",
+      "repaired_mask_id": "international_equity_1fcbfb90c670"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d062_5f5e513c/manifest.json",
+      "manifest_sha256": "144b0cd4678405dfede63b43bec7bb045003214b638a85c1c73195547c821bf3",
+      "repaired_mask_id": "international_equity_5842b851fb66"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d064_97dc0034/manifest.json",
+      "manifest_sha256": "bef4b67ee2573e74f641a3fc052051869eff691248e2098a227e58b9c1fc7afa",
+      "repaired_mask_id": "international_equity_58c744274e03"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d067_4e0e4eab/manifest.json",
+      "manifest_sha256": "b98a18fa7c6a873c4cbfd392982d46140b0a297a1a38bb53630fda7810d05e4a",
+      "repaired_mask_id": "international_equity_edd465f0c917"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d070_a0d2b422/manifest.json",
+      "manifest_sha256": "136399c41f97aa4e822bcd92d697f15b7801ecfcb85571747fdaf5b77fdb5906",
+      "repaired_mask_id": "international_equity_6d1b0bf368a9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d071_c72d9077/manifest.json",
+      "manifest_sha256": "52ea17484f2e938e433f7741a414cc5eee2c5105eb6b6793ab3aa9fa22388f6f",
+      "repaired_mask_id": "international_equity_db95bddbff27"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d073_3ff07b6e/manifest.json",
+      "manifest_sha256": "47561d9cf377b394159a46b42745f06d58986203346c1abe9f3a440861d27f0f",
+      "repaired_mask_id": "international_equity_6c14afdad848"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d076_493234a0/manifest.json",
+      "manifest_sha256": "06e70bf18841b0e59bbd30ab53fb58d7232f434ecb6bb440e67eb2a7e3f9fed6",
+      "repaired_mask_id": "international_equity_b9da3958f317"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d077_4a26a67f/manifest.json",
+      "manifest_sha256": "e881edfe923946f191be5503366f56ca6a2cccacd100bf8486b76bf8ff4a716b",
+      "repaired_mask_id": "international_equity_99b17bab90b9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d079_30f941cb/manifest.json",
+      "manifest_sha256": "88f76bdd67e860530b49172f6bb1d93b17c832fd5c5917cb178e0747b13363e8",
+      "repaired_mask_id": "international_equity_a6c90fc7f1b3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d080_adbce8bb/manifest.json",
+      "manifest_sha256": "1e532750bd455b912aecb917d3617ee3c7bb5318bda72d7f8135f6bce1bc296d",
+      "repaired_mask_id": "international_equity_26c409133867"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d082_a754a228/manifest.json",
+      "manifest_sha256": "7f0525ec73c366181a08c93789353f32144c16efd4058aa1f63a2e7133e668e6",
+      "repaired_mask_id": "international_equity_5842b851fb66"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d083_a160fbc6/manifest.json",
+      "manifest_sha256": "4ccf5fd4e1b5a1feffa937de340027579e0f884fc4c78a8cf22e5325980c6d44",
+      "repaired_mask_id": "international_equity_0c6425966cdb"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d086_02c492a8/manifest.json",
+      "manifest_sha256": "05d7f92c1e4a92258b38a8d05c9f0c3f73a669b6ecdf43e02271f4c32ef532eb",
+      "repaired_mask_id": "international_equity_cd1db2f42ade"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d087_efab50d2/manifest.json",
+      "manifest_sha256": "438bc913831cc381f8081104301df8794dbd1a350dd41aea920d527d031adfbe",
+      "repaired_mask_id": "international_equity_0a381c8cbe10"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d089_60f20d65/manifest.json",
+      "manifest_sha256": "c9f201a2263772c97fbe832f6bfb739c268072090ab9130f580850725a42a8da",
+      "repaired_mask_id": "international_equity_ad94642b7548"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d090_ece7dd9a/manifest.json",
+      "manifest_sha256": "04eda146ebc230c51388abb7a42dad24e2fc27cc7e3f74bb046c2b675171a2c7",
+      "repaired_mask_id": "international_equity_e5cc779a41cd"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d092_83480039/manifest.json",
+      "manifest_sha256": "af868d8f059d1c34ce3ed64476b423929511785e7dc3f10e4e25908e8d6bf2b5",
+      "repaired_mask_id": "international_equity_b75decf5d36f"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d093_752eb00f/manifest.json",
+      "manifest_sha256": "7421914b9874c7fbfc62a835a2b7e3fb4a9cc71ff048f8503476814ab57b0ad8",
+      "repaired_mask_id": "international_equity_49ea66582ffd"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d094_72592149/manifest.json",
+      "manifest_sha256": "dd99eb7fce5ab34f0fa0768bd408c5cb6a6581762cdd1103b4d37e7b08417753",
+      "repaired_mask_id": "international_equity_ac0e913dc4f8"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d096_ea87f994/manifest.json",
+      "manifest_sha256": "c5638717ed174e613e843f727b5a14661810ba7b4f92d4fc4cfcf94b11dfbbb2",
+      "repaired_mask_id": "international_equity_cd62e139e6cc"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d097_cbb23d57/manifest.json",
+      "manifest_sha256": "f3c7e3886b961ca1240c35a3e9d6e5d38c5a68082361791c9a4d935f4925f1be",
+      "repaired_mask_id": "international_equity_f9a6a23d2438"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d098_601c97b4/manifest.json",
+      "manifest_sha256": "564a3b6d811bdee35015236fce6cf61c09066b81441b77bb39ff3555f51f68d5",
+      "repaired_mask_id": "international_equity_3b66df1e9c54"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r001_83a4927a/manifest.json",
+      "manifest_sha256": "6cbd4b438dd84495a2cdc9e3a3b765147689c2f377cbb80fbe84cd547002f2ef",
+      "repaired_mask_id": "international_equity_704614d6c005"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r002_7db53220/manifest.json",
+      "manifest_sha256": "13e1d4959af3045736755b1456bcb394f969218a5424a4fee7f5277facfdc6cf",
+      "repaired_mask_id": "international_equity_b48c79ec62b3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r003_40172a8f/manifest.json",
+      "manifest_sha256": "543900a1f035e1eb98e270aa143a16c3a0ec2a0b8cf1f0100d5d9b5852f4623c",
+      "repaired_mask_id": "international_equity_fbc7ba27c2ab"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r005_e439fed7/manifest.json",
+      "manifest_sha256": "7a43313869a851b5527cc1edf38a4ee34d1e0261a03d2181264f19dcdeeea54d",
+      "repaired_mask_id": "international_equity_a9834c67839a"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r006_f2f5ae92/manifest.json",
+      "manifest_sha256": "a3a771331a6a88168d6d6d85ac9d9f21fb27c932eff0f5f76476e46c4431be63",
+      "repaired_mask_id": "international_equity_e5fec55642ed"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r007_d8f5e0c6/manifest.json",
+      "manifest_sha256": "2a5441fe08eb8d267494ab1c4d506679882e693d318f0877ae79ab1633f19e61",
+      "repaired_mask_id": "international_equity_3fe8f57c2bd3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r008_c89e49ab/manifest.json",
+      "manifest_sha256": "3c0e04a4429dba951a8761639cc481aaa6720185aae34a833bd72dbf36fad870",
+      "repaired_mask_id": "international_equity_5c260e348897"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r009_d1bcf9f2/manifest.json",
+      "manifest_sha256": "0967ff5c00e88e6e58e92da2383e5a11295c6ded9d53f2d7f35c5328fe7f5080",
+      "repaired_mask_id": "international_equity_44d622fb0594"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r010_cb979b1a/manifest.json",
+      "manifest_sha256": "d091420d5736da2ae6a8be973d5e4facaf0f30e31d8e368dbc11a94741c87ec3",
+      "repaired_mask_id": "international_equity_bd47daa1f213"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r011_d31784a7/manifest.json",
+      "manifest_sha256": "5f9139fab49b932d00f222aff846d0ff2a8a88316bf0859117199ce6880de1b8",
+      "repaired_mask_id": "international_equity_b1eff337e5d0"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r012_14651b90/manifest.json",
+      "manifest_sha256": "61a24a7fd29bffd9645c8ec1222eb9139219b041613bcc13a6386b9eba113b77",
+      "repaired_mask_id": "international_equity_cc3fe964afba"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r013_e2c2aecb/manifest.json",
+      "manifest_sha256": "bf3386cea4e5b0e57c5a745aaa6b3c48b95791741ad3ea18b4b5c88c50631bc6",
+      "repaired_mask_id": "international_equity_56c81eb575bb"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r014_190593fa/manifest.json",
+      "manifest_sha256": "82fab1ec0491bf8d95bbcfb8b2af81728b0c3f380455427daf278e6043359436",
+      "repaired_mask_id": "international_equity_dfbaf66f4591"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r015_57575cbf/manifest.json",
+      "manifest_sha256": "b3a26f49c021d25ea9eeeab195bfbc381f48737adceeea5e039f5ab959421f9e",
+      "repaired_mask_id": "international_equity_009ed342fcdf"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r016_63fc79e9/manifest.json",
+      "manifest_sha256": "864c281c32df92f1ee5a41e89571806ea65521889127f4022011f7be68283f7a",
+      "repaired_mask_id": "international_equity_64db9392eae5"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r017_68d8e39e/manifest.json",
+      "manifest_sha256": "389b74bda69ae90d55aa965a65016a8ace304d5ba7ccb4b0701727cba8ad992c",
+      "repaired_mask_id": "international_equity_3e3c21533df7"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r018_aabbdb57/manifest.json",
+      "manifest_sha256": "eb74e5829a8b8017215ff13a9d3f92b12aaf63b7995af2a7bd760f576eb6be81",
+      "repaired_mask_id": "international_equity_5c606e4a5dfa"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r019_c9931d2a/manifest.json",
+      "manifest_sha256": "221171f3472a1fdbbad6e851401e7203094b12b927a0fc95f6363de7f3365831",
+      "repaired_mask_id": "international_equity_5a2852c1a712"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r020_e9ed07c8/manifest.json",
+      "manifest_sha256": "2b8a39596c335ed6bde0b351a7607ef4f35fb09015cf0bf7b3c6bb17c55ee46b",
+      "repaired_mask_id": "international_equity_bcb6a389d406"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r021_df6a8e59/manifest.json",
+      "manifest_sha256": "93b3d9a86d80b4044ccb68ce67426c4dec9ec37800bb546821e301506c150300",
+      "repaired_mask_id": "international_equity_c57d7263d1a7"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r022_3f8fe6e6/manifest.json",
+      "manifest_sha256": "47a227a22d6a60e28c4c84374e40415b30a9a8d195f0392284267e7d7c2e041c",
+      "repaired_mask_id": "international_equity_152f5664eaa9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r023_665fc869/manifest.json",
+      "manifest_sha256": "e7ae08beba7da37a6fbf596045ee856ac95343c8d2312b9384bba49e9b7db565",
+      "repaired_mask_id": "international_equity_81c3ea437ac9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r024_06a5f797/manifest.json",
+      "manifest_sha256": "d0be699b932ea2cc3e2e068665eccb3553901f92e08ebed01030938027a69978",
+      "repaired_mask_id": "international_equity_709ca6f0517e"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r025_b3f6bc26/manifest.json",
+      "manifest_sha256": "01847956f91277a8526e324a7e3387c73cc8fc583c07b16886316e5acc73befe",
+      "repaired_mask_id": "international_equity_519a1d90246d"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r026_346370ce/manifest.json",
+      "manifest_sha256": "4a4bce9e04ed2b4510e116e55b7fcaa414c8466b8054046d1dc45ed85b20b574",
+      "repaired_mask_id": "international_equity_35e36e2a82e5"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r027_b21e4e74/manifest.json",
+      "manifest_sha256": "ddb6cfc18e5edef79b073d1ac9a5874a9d6b1ae73fbe77497c2e8a35d9addd7b",
+      "repaired_mask_id": "international_equity_549aa2596a49"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r028_92a354ed/manifest.json",
+      "manifest_sha256": "90c264750cd964ab8c27d523cfb5264556ef5aece63037dccce408bbc59fc4f6",
+      "repaired_mask_id": "international_equity_ce9e801815c0"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r029_bfa470ef/manifest.json",
+      "manifest_sha256": "424006e0b306d4a359d71deb69d31ee17e4946f9fe6db8f0159968d1c37f25aa",
+      "repaired_mask_id": "international_equity_6996010efbd6"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r030_1df97a3b/manifest.json",
+      "manifest_sha256": "9740ed92b0c7723664e2c24d190bc9e851c563345087235a19ecfd1d58191e90",
+      "repaired_mask_id": "international_equity_5f9171b1462d"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r031_8db658b8/manifest.json",
+      "manifest_sha256": "4634fc222d44b8c53ca08610727cca623f129ae343974ad94edde9a3877ce377",
+      "repaired_mask_id": "international_equity_9818f9452b2d"
+    },
+    {
+      "disposition": "still_quarantined",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_block_screen_20260707T1725Z/full_runs/full_b007_compact_pruned/manifest.json",
+      "reason": "quarantined: predictors not validated in frozen v1 pool: dolvol_log, ill_log, turnover"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d004_60d239ff/manifest.json",
+      "manifest_sha256": "dd2a0f78d62cc003375132b72e495c7c288cb686e1db2f43e59f8b988c005dd1",
+      "repaired_mask_id": "international_equity_bd6826dea466"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d010_7d7d07a8/manifest.json",
+      "manifest_sha256": "e7364cc5fccfbaf1a6ba1546f6011355f590db9677ab80de164ffdef3cf135fa",
+      "repaired_mask_id": "international_equity_56e06610e247"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d015_1ab8b445/manifest.json",
+      "manifest_sha256": "1c1adcca8315ef9464a4470b20bae288629a280e6364d4dae6c9f3e4416adbdf",
+      "repaired_mask_id": "international_equity_d761551f5d77"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d019_205aaf4b/manifest.json",
+      "manifest_sha256": "127e0b6e375c8b3b73deb73a1d6d721a4cbd3b9b171b073652e5f1e9d4e0b4a4",
+      "repaired_mask_id": "international_equity_d53294235e20"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d022_4f2a3dc3/manifest.json",
+      "manifest_sha256": "4f81c202ec60303032dd66b6f2b9aaaac2bab5fa446aa417c7b9edb7b33b3b7c",
+      "repaired_mask_id": "international_equity_765cfe89ff10"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d025_4dcd7094/manifest.json",
+      "manifest_sha256": "7c3eab2f6d41aed8a3b907dab09779b39a6a039cdc3c879bfd46b7a675d5cb7e",
+      "repaired_mask_id": "international_equity_879f731a5c7a"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d026_afcf2f37/manifest.json",
+      "manifest_sha256": "9c1200a9246e55d06bc2f4a9a5664d9fca42c22a12290acf4c2a8939daa090b4",
+      "repaired_mask_id": "international_equity_978f89a05fb4"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d030_4989cf3a/manifest.json",
+      "manifest_sha256": "fdd4941c3c0bdee27814129a7462625a317c124586ac9426cff1e2e0e71ae082",
+      "repaired_mask_id": "international_equity_b2d43c7eda13"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d034_b430cdab/manifest.json",
+      "manifest_sha256": "76cd8748c7121119e2670ad9330657f65898785ecdc83256d756d91f9739fa36",
+      "repaired_mask_id": "international_equity_3145dfc2df98"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d037_8c7c8511/manifest.json",
+      "manifest_sha256": "99368e71a2441b29be298823fd59bdb23ec94c0b11f1c2402fd9e1d4a332f4ff",
+      "repaired_mask_id": "international_equity_537e3741090e"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d040_fcdbffb6/manifest.json",
+      "manifest_sha256": "e8a01e53dfb527d4a831aea19da4469186d7c0a50475a4c7e08631b0072b8ee1",
+      "repaired_mask_id": "international_equity_879f731a5c7a"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d041_dc64177f/manifest.json",
+      "manifest_sha256": "59b9157046fbebc603121892eee378e11285ddc51acf3c32df7c86a5c07f5cfd",
+      "repaired_mask_id": "international_equity_445615d849b5"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d044_713a237a/manifest.json",
+      "manifest_sha256": "4c49d7b00dead32b5ed35cb8dc2d4cdc4974497a8a45088e3b0bb706a8d99731",
+      "repaired_mask_id": "international_equity_9a6c2fcb3b13"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d047_987d754e/manifest.json",
+      "manifest_sha256": "05e351179307bd364e609e46e98f3c157f71c113e46ba7a5488309744d7528c5",
+      "repaired_mask_id": "international_equity_72a6657427f6"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d050_cf09014e/manifest.json",
+      "manifest_sha256": "8e20718078f19fce42b42b430598356d2c51aff6da7d3efbbd636463ec9a3d5a",
+      "repaired_mask_id": "international_equity_6d1b0bf368a9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d051_6967ec6b/manifest.json",
+      "manifest_sha256": "5bc9e0391b6fe8804d5fe4c5eda65b83bb086283c3a65f036d40212ec52a7fbb",
+      "repaired_mask_id": "international_equity_e3af18a23fa4"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d053_44ee06f1/manifest.json",
+      "manifest_sha256": "30af91b8b5f876d9c91c76c2599f2615d11888ce4fcb16010bec6e6370405212",
+      "repaired_mask_id": "international_equity_4d3594a236cd"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d056_b7eda913/manifest.json",
+      "manifest_sha256": "efd2729ad9adc300b1ece21ff3a09f07603d9ea149919ffef61a5c0e61ff12cf",
+      "repaired_mask_id": "international_equity_b9da3958f317"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d057_7a60fc51/manifest.json",
+      "manifest_sha256": "4048044e6df6cce9d32aacb9718bcfef1cb6aca9455f92f31e9f0d890b2d17a3",
+      "repaired_mask_id": "international_equity_87be1bc171ef"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d059_2973db90/manifest.json",
+      "manifest_sha256": "0d0b10ea11a8dfe5d98194039d507cc5a0dff1cb88aa0d1ebbf7494a2bef8816",
+      "repaired_mask_id": "international_equity_a6c90fc7f1b3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d060_87c205b7/manifest.json",
+      "manifest_sha256": "187550310f0648c17fef024eaeb9a8ca7100eb754fdac01e9d16464ba789cc52",
+      "repaired_mask_id": "international_equity_1fcbfb90c670"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d062_5f5e513c/manifest.json",
+      "manifest_sha256": "144b0cd4678405dfede63b43bec7bb045003214b638a85c1c73195547c821bf3",
+      "repaired_mask_id": "international_equity_5842b851fb66"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d064_97dc0034/manifest.json",
+      "manifest_sha256": "bef4b67ee2573e74f641a3fc052051869eff691248e2098a227e58b9c1fc7afa",
+      "repaired_mask_id": "international_equity_58c744274e03"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d067_4e0e4eab/manifest.json",
+      "manifest_sha256": "b98a18fa7c6a873c4cbfd392982d46140b0a297a1a38bb53630fda7810d05e4a",
+      "repaired_mask_id": "international_equity_edd465f0c917"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d070_a0d2b422/manifest.json",
+      "manifest_sha256": "136399c41f97aa4e822bcd92d697f15b7801ecfcb85571747fdaf5b77fdb5906",
+      "repaired_mask_id": "international_equity_6d1b0bf368a9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d071_c72d9077/manifest.json",
+      "manifest_sha256": "52ea17484f2e938e433f7741a414cc5eee2c5105eb6b6793ab3aa9fa22388f6f",
+      "repaired_mask_id": "international_equity_db95bddbff27"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d073_3ff07b6e/manifest.json",
+      "manifest_sha256": "47561d9cf377b394159a46b42745f06d58986203346c1abe9f3a440861d27f0f",
+      "repaired_mask_id": "international_equity_6c14afdad848"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d076_493234a0/manifest.json",
+      "manifest_sha256": "06e70bf18841b0e59bbd30ab53fb58d7232f434ecb6bb440e67eb2a7e3f9fed6",
+      "repaired_mask_id": "international_equity_b9da3958f317"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d077_4a26a67f/manifest.json",
+      "manifest_sha256": "e881edfe923946f191be5503366f56ca6a2cccacd100bf8486b76bf8ff4a716b",
+      "repaired_mask_id": "international_equity_99b17bab90b9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d079_30f941cb/manifest.json",
+      "manifest_sha256": "88f76bdd67e860530b49172f6bb1d93b17c832fd5c5917cb178e0747b13363e8",
+      "repaired_mask_id": "international_equity_a6c90fc7f1b3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d080_adbce8bb/manifest.json",
+      "manifest_sha256": "1e532750bd455b912aecb917d3617ee3c7bb5318bda72d7f8135f6bce1bc296d",
+      "repaired_mask_id": "international_equity_26c409133867"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d082_a754a228/manifest.json",
+      "manifest_sha256": "7f0525ec73c366181a08c93789353f32144c16efd4058aa1f63a2e7133e668e6",
+      "repaired_mask_id": "international_equity_5842b851fb66"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d083_a160fbc6/manifest.json",
+      "manifest_sha256": "4ccf5fd4e1b5a1feffa937de340027579e0f884fc4c78a8cf22e5325980c6d44",
+      "repaired_mask_id": "international_equity_0c6425966cdb"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d086_02c492a8/manifest.json",
+      "manifest_sha256": "05d7f92c1e4a92258b38a8d05c9f0c3f73a669b6ecdf43e02271f4c32ef532eb",
+      "repaired_mask_id": "international_equity_cd1db2f42ade"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d087_efab50d2/manifest.json",
+      "manifest_sha256": "438bc913831cc381f8081104301df8794dbd1a350dd41aea920d527d031adfbe",
+      "repaired_mask_id": "international_equity_0a381c8cbe10"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d089_60f20d65/manifest.json",
+      "manifest_sha256": "c9f201a2263772c97fbe832f6bfb739c268072090ab9130f580850725a42a8da",
+      "repaired_mask_id": "international_equity_ad94642b7548"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d090_ece7dd9a/manifest.json",
+      "manifest_sha256": "04eda146ebc230c51388abb7a42dad24e2fc27cc7e3f74bb046c2b675171a2c7",
+      "repaired_mask_id": "international_equity_e5cc779a41cd"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d092_83480039/manifest.json",
+      "manifest_sha256": "af868d8f059d1c34ce3ed64476b423929511785e7dc3f10e4e25908e8d6bf2b5",
+      "repaired_mask_id": "international_equity_b75decf5d36f"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d093_752eb00f/manifest.json",
+      "manifest_sha256": "7421914b9874c7fbfc62a835a2b7e3fb4a9cc71ff048f8503476814ab57b0ad8",
+      "repaired_mask_id": "international_equity_49ea66582ffd"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d094_72592149/manifest.json",
+      "manifest_sha256": "dd99eb7fce5ab34f0fa0768bd408c5cb6a6581762cdd1103b4d37e7b08417753",
+      "repaired_mask_id": "international_equity_ac0e913dc4f8"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d096_ea87f994/manifest.json",
+      "manifest_sha256": "c5638717ed174e613e843f727b5a14661810ba7b4f92d4fc4cfcf94b11dfbbb2",
+      "repaired_mask_id": "international_equity_cd62e139e6cc"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d097_cbb23d57/manifest.json",
+      "manifest_sha256": "f3c7e3886b961ca1240c35a3e9d6e5d38c5a68082361791c9a4d935f4925f1be",
+      "repaired_mask_id": "international_equity_f9a6a23d2438"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d098_601c97b4/manifest.json",
+      "manifest_sha256": "564a3b6d811bdee35015236fce6cf61c09066b81441b77bb39ff3555f51f68d5",
+      "repaired_mask_id": "international_equity_3b66df1e9c54"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r001_83a4927a/manifest.json",
+      "manifest_sha256": "6cbd4b438dd84495a2cdc9e3a3b765147689c2f377cbb80fbe84cd547002f2ef",
+      "repaired_mask_id": "international_equity_704614d6c005"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r002_7db53220/manifest.json",
+      "manifest_sha256": "13e1d4959af3045736755b1456bcb394f969218a5424a4fee7f5277facfdc6cf",
+      "repaired_mask_id": "international_equity_b48c79ec62b3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r003_40172a8f/manifest.json",
+      "manifest_sha256": "543900a1f035e1eb98e270aa143a16c3a0ec2a0b8cf1f0100d5d9b5852f4623c",
+      "repaired_mask_id": "international_equity_fbc7ba27c2ab"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r005_e439fed7/manifest.json",
+      "manifest_sha256": "7a43313869a851b5527cc1edf38a4ee34d1e0261a03d2181264f19dcdeeea54d",
+      "repaired_mask_id": "international_equity_a9834c67839a"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r006_f2f5ae92/manifest.json",
+      "manifest_sha256": "a3a771331a6a88168d6d6d85ac9d9f21fb27c932eff0f5f76476e46c4431be63",
+      "repaired_mask_id": "international_equity_e5fec55642ed"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r007_d8f5e0c6/manifest.json",
+      "manifest_sha256": "2a5441fe08eb8d267494ab1c4d506679882e693d318f0877ae79ab1633f19e61",
+      "repaired_mask_id": "international_equity_3fe8f57c2bd3"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r008_c89e49ab/manifest.json",
+      "manifest_sha256": "3c0e04a4429dba951a8761639cc481aaa6720185aae34a833bd72dbf36fad870",
+      "repaired_mask_id": "international_equity_5c260e348897"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r009_d1bcf9f2/manifest.json",
+      "manifest_sha256": "0967ff5c00e88e6e58e92da2383e5a11295c6ded9d53f2d7f35c5328fe7f5080",
+      "repaired_mask_id": "international_equity_44d622fb0594"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r010_cb979b1a/manifest.json",
+      "manifest_sha256": "d091420d5736da2ae6a8be973d5e4facaf0f30e31d8e368dbc11a94741c87ec3",
+      "repaired_mask_id": "international_equity_bd47daa1f213"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r011_d31784a7/manifest.json",
+      "manifest_sha256": "5f9139fab49b932d00f222aff846d0ff2a8a88316bf0859117199ce6880de1b8",
+      "repaired_mask_id": "international_equity_b1eff337e5d0"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r012_14651b90/manifest.json",
+      "manifest_sha256": "61a24a7fd29bffd9645c8ec1222eb9139219b041613bcc13a6386b9eba113b77",
+      "repaired_mask_id": "international_equity_cc3fe964afba"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r013_e2c2aecb/manifest.json",
+      "manifest_sha256": "bf3386cea4e5b0e57c5a745aaa6b3c48b95791741ad3ea18b4b5c88c50631bc6",
+      "repaired_mask_id": "international_equity_56c81eb575bb"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r014_190593fa/manifest.json",
+      "manifest_sha256": "82fab1ec0491bf8d95bbcfb8b2af81728b0c3f380455427daf278e6043359436",
+      "repaired_mask_id": "international_equity_dfbaf66f4591"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r015_57575cbf/manifest.json",
+      "manifest_sha256": "b3a26f49c021d25ea9eeeab195bfbc381f48737adceeea5e039f5ab959421f9e",
+      "repaired_mask_id": "international_equity_009ed342fcdf"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r016_63fc79e9/manifest.json",
+      "manifest_sha256": "864c281c32df92f1ee5a41e89571806ea65521889127f4022011f7be68283f7a",
+      "repaired_mask_id": "international_equity_64db9392eae5"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r017_68d8e39e/manifest.json",
+      "manifest_sha256": "389b74bda69ae90d55aa965a65016a8ace304d5ba7ccb4b0701727cba8ad992c",
+      "repaired_mask_id": "international_equity_3e3c21533df7"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r018_aabbdb57/manifest.json",
+      "manifest_sha256": "eb74e5829a8b8017215ff13a9d3f92b12aaf63b7995af2a7bd760f576eb6be81",
+      "repaired_mask_id": "international_equity_5c606e4a5dfa"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r019_c9931d2a/manifest.json",
+      "manifest_sha256": "221171f3472a1fdbbad6e851401e7203094b12b927a0fc95f6363de7f3365831",
+      "repaired_mask_id": "international_equity_5a2852c1a712"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r020_e9ed07c8/manifest.json",
+      "manifest_sha256": "2b8a39596c335ed6bde0b351a7607ef4f35fb09015cf0bf7b3c6bb17c55ee46b",
+      "repaired_mask_id": "international_equity_bcb6a389d406"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r021_df6a8e59/manifest.json",
+      "manifest_sha256": "93b3d9a86d80b4044ccb68ce67426c4dec9ec37800bb546821e301506c150300",
+      "repaired_mask_id": "international_equity_c57d7263d1a7"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r022_3f8fe6e6/manifest.json",
+      "manifest_sha256": "47a227a22d6a60e28c4c84374e40415b30a9a8d195f0392284267e7d7c2e041c",
+      "repaired_mask_id": "international_equity_152f5664eaa9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r023_665fc869/manifest.json",
+      "manifest_sha256": "e7ae08beba7da37a6fbf596045ee856ac95343c8d2312b9384bba49e9b7db565",
+      "repaired_mask_id": "international_equity_81c3ea437ac9"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r024_06a5f797/manifest.json",
+      "manifest_sha256": "d0be699b932ea2cc3e2e068665eccb3553901f92e08ebed01030938027a69978",
+      "repaired_mask_id": "international_equity_709ca6f0517e"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r025_b3f6bc26/manifest.json",
+      "manifest_sha256": "01847956f91277a8526e324a7e3387c73cc8fc583c07b16886316e5acc73befe",
+      "repaired_mask_id": "international_equity_519a1d90246d"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r026_346370ce/manifest.json",
+      "manifest_sha256": "4a4bce9e04ed2b4510e116e55b7fcaa414c8466b8054046d1dc45ed85b20b574",
+      "repaired_mask_id": "international_equity_35e36e2a82e5"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r027_b21e4e74/manifest.json",
+      "manifest_sha256": "ddb6cfc18e5edef79b073d1ac9a5874a9d6b1ae73fbe77497c2e8a35d9addd7b",
+      "repaired_mask_id": "international_equity_549aa2596a49"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r028_92a354ed/manifest.json",
+      "manifest_sha256": "90c264750cd964ab8c27d523cfb5264556ef5aece63037dccce408bbc59fc4f6",
+      "repaired_mask_id": "international_equity_ce9e801815c0"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r029_bfa470ef/manifest.json",
+      "manifest_sha256": "424006e0b306d4a359d71deb69d31ee17e4946f9fe6db8f0159968d1c37f25aa",
+      "repaired_mask_id": "international_equity_6996010efbd6"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r030_1df97a3b/manifest.json",
+      "manifest_sha256": "9740ed92b0c7723664e2c24d190bc9e851c563345087235a19ecfd1d58191e90",
+      "repaired_mask_id": "international_equity_5f9171b1462d"
+    },
+    {
+      "disposition": "new_v2_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r031_8db658b8/manifest.json",
+      "manifest_sha256": "4634fc222d44b8c53ca08610727cca623f129ae343974ad94edde9a3877ce377",
+      "repaired_mask_id": "international_equity_9818f9452b2d"
+    }
+  ],
+  "shared_value_equality_required": true
+}

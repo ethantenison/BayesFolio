@@ -1,0 +1,30 @@
+{
+  "fit_wall_seconds": 1018.1641864590056,
+  "fits_per_minute": 4.242930617137688,
+  "fresh_gp_jobs": 72,
+  "fresh_portfolio_jobs": 72,
+  "is_cold_replay": true,
+  "parity": {
+    "max_absolute_differences": {
+      "predictions": 0.0,
+      "returns": 0.0,
+      "scenarios": 0.0,
+      "weights": 0.0
+    },
+    "passed": true,
+    "strict_primary_portfolio_policy": true,
+    "tolerances": {
+      "predictions": 1e-08,
+      "returns": 1e-08,
+      "scenarios": 1e-08,
+      "weights": 1e-06
+    },
+    "windows_checked": 72
+  },
+  "phase": "baseline",
+  "portfolio_wall_seconds": 0.4414165409980342,
+  "sum_fit_job_seconds": 13299.71832804005,
+  "total_wall_seconds": 1019.859699749999,
+  "worker_peak_rss_bytes": 3029762048,
+  "workers": 14
+}

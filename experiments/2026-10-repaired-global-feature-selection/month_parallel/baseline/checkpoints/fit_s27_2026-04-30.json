@@ -1,0 +1,44 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/gp_scenarios_2026-04-30.csv": "384d5d10a09221b958bd38641d05f69cba30bea8270273f52fd62e57b0b2c56c",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/scenario_cache/gp_predictions_2026-04-30.csv": "7d16ce1e0067c4d8021b340a5d91ce206a40b7ac8d96716a9e2a353a7cf9398f",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/scenario_cache/model_diagnostics_2026-04-30.csv": "1b38f34cbb50efc45ff0052a021a2664ff0dec14503e83a9ddd14dc3fd2df4ee",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/scenario_cache/task_covariance_diagnostics_2026-04-30.csv": "79efc1b7de357dc9a7ac583ee821139a0f6709bc101f97371109bd74d7cf687a"
+  },
+  "result": {
+    "date": "2026-04-30",
+    "fit_seed": 13129,
+    "input_columns": [
+      "t_index",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "trend_slope",
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_z_12p",
+      "oil_ret",
+      "spy_ret",
+      "term_spread",
+      "vix_ts_z_12p"
+    ],
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/scenario_cache/model_diagnostics_2026-04-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/scenario_cache/gp_predictions_2026-04-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/gp_scenarios_2026-04-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s27/scenario_cache/task_covariance_diagnostics_2026-04-30.csv"
+    },
+    "peak_rss_bytes": 2887024640,
+    "pid": 7275,
+    "seconds": 259.2724861250026,
+    "seed": 27,
+    "status": "fit",
+    "train_dates": 107,
+    "train_rows": 1605,
+    "window_index": 23
+  },
+  "signature": "1e6a905326ba6129b56a5dd9c30780ce5329e2f6331ede0b85d6bd15d083e747"
+}

@@ -1,0 +1,28 @@
+{
+  "campaign": "joint_feature_transfer_followup_v1",
+  "base_configuration": "global_33e57e1c2370",
+  "max_batches": 2,
+  "max_new_configurations_per_batch": 6,
+  "max_workers_total": 15,
+  "seeds": [27, 127, 227],
+  "authorization": "User approved launching the proposed follow-up. Run the first six singleton additions, interpret their results with hosted Codex, then register up to the six proposed follow-up masks. Do not reopen the completed original campaign or introduce other candidates.",
+  "fixed_policy": "Use the original frozen v2 data, 84 initial observation months, 24 expanding score dates, signed LKJ eta2 rank2 GP, maxiter15, 256 scenarios and unchanged portfolio settings. Keep t_index. Optimize IC, Gaussian NLL and conventional Sharpe without a weighted score. Return and RMSE are diagnostic only; turnover excluded. No production change, new optimizer or formal new holdout.",
+  "batches": [
+    [
+      {"name":"add_hy_level","macro_add":["hy_spread"],"hypothesis":"Isolate absolute credit state on the current lagged, annual-momentum-free lead; the existing highest-IC joint alternative also changes temporal inputs."},
+      {"name":"add_hy_change","macro_add":["hy_spread_chg_1p"],"hypothesis":"Test whether the HY-change axis that helped U.S. equity density and Sharpe transfers to the current joint lead alongside normalized credit state."},
+      {"name":"add_spy_proxy","macro_add":["spy_ret"],"hypothesis":"Test transfer of the market proxy that improved international-debt ranking and Sharpe in the final family context, without redefining its saved legacy formula."},
+      {"name":"add_monthly_cpi","macro_add":["cpi_chg_1p"],"hypothesis":"Test monthly inflation information beyond annual CPI; international-debt family results suggest ranking/Sharpe gains with a possible NLL cost."},
+      {"name":"add_schp_return","macro_add":["schp_ret"],"hypothesis":"Test whether the TIPS ETF return axis with strong U.S.-debt matched support transfers when added alone to the strong joint parent."},
+      {"name":"add_nominal_yield","macro_add":["y10_nominal"],"hypothesis":"Test nominal yield-level state beyond the retained term spread, using one Treasury-level name rather than adding identical duplicate columns."}
+    ],
+    [
+      {"name":"add_market_inflation_pair","macro_add":["spy_ret","cpi_chg_1p"],"hypothesis":"Compare the market/monthly-inflation pair with their singleton additions and unchanged parent to test conditional international-debt information and interaction effects."},
+      {"name":"add_nominal_tips_pair","macro_add":["schp_ret","y10_nominal"],"hypothesis":"Compare nominal yield and TIPS-return additions jointly with the singleton controls to test complementarity rather than assuming broad rate-block transfer."},
+      {"name":"remove_intermediate_momentum","etf_drop":["mom6m"],"hypothesis":"Test whether six-month momentum still contributes alongside lag, skip momentum and trend in the final joint representation."},
+      {"name":"annual_for_intermediate_momentum","etf_drop":["mom6m"],"etf_add":["mom12m"],"hypothesis":"Compare annual momentum as a substitute for intermediate momentum, distinct from the already-tested unsuccessful simple annual-momentum addition."},
+      {"name":"ma_for_trend","etf_drop":["trend_slope"],"etf_add":["ma_signal"],"hypothesis":"Test whether the moving-average representation supported in U.S.-debt configurations is a better shared substitute for the current trend axis."},
+      {"name":"remove_dollar_level","macro_drop":["dxy"],"hypothesis":"Test dollar-level redundancy conditional on retained EM-FX return, oil, commodity ratio and the other shared predictors; do not infer universal irrelevance."}
+    ]
+  ]
+}

@@ -1,0 +1,49 @@
+date,strategy,status,fallback_stage,clean_asset_count,clean_observation_count,message
+2024-05-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-05-31,historical_y_ewma2_gerber1_riskfolio,fallback,equal_weight_last_resort,4,84,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2024-06-28,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-06-28,historical_y_ewma2_gerber1_riskfolio,fallback,previous_historical_weights,4,85,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2024-07-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-07-31,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,86,
+2024-08-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-08-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,87,
+2024-09-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-09-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,88,
+2024-10-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-10-31,historical_y_ewma2_gerber1_riskfolio,fallback,previous_historical_weights,4,89,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2024-11-29,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-11-29,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,90,
+2024-12-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2024-12-31,historical_y_ewma2_gerber1_riskfolio,fallback,previous_historical_weights,4,91,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2025-01-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-01-31,historical_y_ewma2_gerber1_riskfolio,fallback,previous_historical_weights,4,92,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2025-02-28,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-02-28,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,93,
+2025-03-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-03-31,historical_y_ewma2_gerber1_riskfolio,fallback,previous_historical_weights,4,94,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2025-04-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-04-30,historical_y_ewma2_gerber1_riskfolio,fallback,previous_historical_weights,4,95,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2025-05-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-05-30,historical_y_ewma2_gerber1_riskfolio,fallback,previous_historical_weights,4,96,primary: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea: RuntimeError: Riskfolio returned empty weights; relaxed_no_nea_cap35: RuntimeError: Riskfolio returned empty weights
+2025-06-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-06-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,97,
+2025-07-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-07-31,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,98,
+2025-08-29,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-08-29,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,99,
+2025-09-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-09-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,100,
+2025-10-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-10-31,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,101,
+2025-11-28,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-11-28,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,102,
+2025-12-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2025-12-31,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,103,
+2026-01-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2026-01-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,104,
+2026-02-27,gp_scenarios_riskfolio,solved,primary,4,256,
+2026-02-27,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,105,
+2026-03-31,gp_scenarios_riskfolio,solved,primary,4,256,
+2026-03-31,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,106,
+2026-04-30,gp_scenarios_riskfolio,solved,primary,4,256,
+2026-04-30,historical_y_ewma2_gerber1_riskfolio,solved,primary,4,107,

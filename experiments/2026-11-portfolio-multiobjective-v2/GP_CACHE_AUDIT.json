@@ -1,0 +1,650 @@
+{
+  "cache_inventory": {
+    "broad_r2_i15_exp": {
+      "all_cached_covariances_spd": true,
+      "cached_complete_origins": 54,
+      "cached_month_seed_cells": 162,
+      "missing_fits": 0,
+      "prior28_bitwise_compatible": true,
+      "required_month_seed_cells": 162,
+      "source_sha256": {
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_r2_i15_exp.npz": "c0bf7025f3bc89bf3f1341aeb0643d1176f621cf612bc7f8ba6ac786a1a1cc02",
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/broad_r2_i15_exp.npz": "86313e09fc64cf4f7b5c182f81dd9529e5533675403cf8c9d1f700dd66371b39",
+        "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_r2_i15_exp.npz": "8462fb7074abf300ac48e351a1d3d59902c19a9a5fbafb481b8d8c062b21b055"
+      }
+    },
+    "broad_roll48_r2_i15": {
+      "all_cached_covariances_spd": true,
+      "cached_complete_origins": 54,
+      "cached_month_seed_cells": 162,
+      "missing_fits": 0,
+      "prior28_bitwise_compatible": true,
+      "required_month_seed_cells": 162,
+      "source_sha256": {
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_roll48_r2_i15.npz": "3305e7c6ea1f6df5da8e7db6fcd98741688e71f13324eafe57a37bf8963382f9",
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/broad_roll48_r2_i15.npz": "e8f3b3693926ab6f8ffef70b0abcfb089dff18507d0354f54487e2bdcc0bfd71",
+        "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_roll48_r2_i15.npz": "02fa50f7d648fc6d62386ad769bb4fa27574ef2c6e07559e93f74b3dbd316bdb"
+      }
+    },
+    "compact_r1_i15_exp": {
+      "all_cached_covariances_spd": true,
+      "cached_complete_origins": 52,
+      "cached_month_seed_cells": 156,
+      "missing_fits": 6,
+      "prior28_bitwise_compatible": true,
+      "required_month_seed_cells": 162,
+      "source_sha256": {
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/compact_r1_i15_exp.npz": "0a71e689c669f9fe1d62db2df0a4bf8b13be2e1576971095c71c04a0f8600c0a",
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/compact_r1_i15_exp.npz": "2efa842e3d0aa9020a3672c9ea24115fde9f421f9655a3db6fe859fab6e9954c"
+      }
+    },
+    "compact_r2_i15_exp": {
+      "all_cached_covariances_spd": true,
+      "cached_complete_origins": 54,
+      "cached_month_seed_cells": 162,
+      "missing_fits": 0,
+      "prior28_bitwise_compatible": true,
+      "required_month_seed_cells": 162,
+      "source_sha256": {
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/compact_r2_i15_exp.npz": "3a4648432c26c18e7c644dcf11dacfbaca4ace7bb700b9afcecdec535dbbbcb3",
+        "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/compact_r2_i15_exp.npz": "8d73e8eba98453573ae78cea294c570efb125dc398ad59bc919ed9af9ef76902",
+        "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/compact_r2_i15_exp.npz": "23ad37fd51ffd7b60a0c17edd5fcb223d1123bda2dfb327357df9994d7e06f82"
+      }
+    }
+  },
+  "confirmation_not_scored": true,
+  "development_origin_end": "2025-09-30",
+  "development_origin_start": "2022-05-31",
+  "development_origins": 41,
+  "diagnostics": {
+    "broad_r2_i15_exp": {
+      "checkpoints": 72,
+      "family_mean_temporal_prediction_std_ratio": {
+        "international_equity": 0.4371671194557308,
+        "international_fixed_income": 0.46700085916860457,
+        "us_equity": 0.40688383640640824,
+        "us_fixed_income": 0.44655804895441154
+      },
+      "lengthscale_to_floor": {
+        "covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 20.65407592194463,
+          "median": 13.344003149536857,
+          "min": 10.178085328251145
+        },
+        "covar_module.kernels.0.kernels.1.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 21.554688373380657,
+          "median": 12.480298089474587,
+          "min": 7.725851192499591
+        },
+        "covar_module.kernels.0.kernels.2.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 13.068136434473143,
+          "median": 7.455190563283544,
+          "min": 2.8061760093788135
+        },
+        "covar_module.kernels.0.kernels.3.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 14.853420280344952,
+          "median": 8.415072432314986,
+          "min": 4.6705566581281985
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 9.074353024792952,
+          "median": 7.374503530231861,
+          "min": 5.025088681595109
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 13.587335329810738,
+          "median": 10.61199757306705,
+          "min": 6.687074729184461
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 17.995820739261674,
+          "median": 14.395399997140185,
+          "min": 11.246690487409909
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 9.439049712179665,
+          "median": 8.046090249231739,
+          "min": 6.904136547750249
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 9.55633524413258,
+          "median": 8.190934895249729,
+          "min": 7.041493092844396
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 8.911131110146348,
+          "median": 8.307164416232464,
+          "min": 7.295931761654012
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 8.938569903746668,
+          "median": 8.349371251416002,
+          "min": 7.626289843437724
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 16.63397674713211,
+          "median": 11.718682304769025,
+          "min": 7.746665808176366
+        }
+      },
+      "optimizer_statuses": {
+        "STOPPED_15": 72
+      },
+      "outputscale": {
+        "covar_module.kernels.0.kernels.0.raw_outputscale": {
+          "max": 0.23722810616715648,
+          "median": 0.11745670282260559,
+          "min": 0.030124452351080085
+        },
+        "covar_module.kernels.0.kernels.1.raw_outputscale": {
+          "max": 0.14056702612596217,
+          "median": 0.04605418277205342,
+          "min": 0.011148422320629946
+        },
+        "covar_module.kernels.0.kernels.2.raw_outputscale": {
+          "max": 0.9675529084659458,
+          "median": 0.618607600983256,
+          "min": 0.34574495286854745
+        },
+        "covar_module.kernels.0.kernels.3.raw_outputscale": {
+          "max": 0.19291952701524628,
+          "median": 0.0927844795588133,
+          "min": 0.020671446015567942
+        },
+        "covar_module.kernels.0.kernels.4.raw_outputscale": {
+          "max": 0.3150254819396987,
+          "median": 0.17013167752481922,
+          "min": 0.0575003422719962
+        },
+        "covar_module.kernels.0.kernels.5.raw_outputscale": {
+          "max": 0.12768218397339606,
+          "median": 0.040313383129835303,
+          "min": 0.009501505616691212
+        },
+        "covar_module.kernels.0.kernels.6.raw_outputscale": {
+          "max": 0.058217268267882365,
+          "median": 0.028296977489290817,
+          "min": 0.009795251636799505
+        },
+        "covar_module.kernels.0.kernels.7.raw_outputscale": {
+          "max": 0.03252012918937264,
+          "median": 0.012312795564226571,
+          "min": 0.004455473405014431
+        }
+      },
+      "temporal_prediction_std_ratio_by_task": {
+        "BND": 0.470649765581569,
+        "BNDX": 0.46968717378656677,
+        "EWX": 0.4394094672257797,
+        "HYEM": 0.4618774979629441,
+        "HYG": 0.40688038985648467,
+        "IEF": 0.466055090620255,
+        "IWM": 0.3956304845056885,
+        "LQD": 0.4426469497593376,
+        "MGK": 0.4482419262240969,
+        "SPY": 0.404602783955558,
+        "VEA": 0.422549898972858,
+        "VSS": 0.4563320723313651,
+        "VTV": 0.37906015094028966,
+        "VWO": 0.43037703929292026,
+        "VWOB": 0.46943790575630284
+      }
+    },
+    "broad_roll48_r2_i15": {
+      "checkpoints": 123,
+      "family_mean_temporal_prediction_std_ratio": {
+        "international_equity": 0.4489348161307312,
+        "international_fixed_income": 0.46082354934317676,
+        "us_equity": 0.4168200869772445,
+        "us_fixed_income": 0.45246321791881516
+      },
+      "lengthscale_to_floor": {
+        "covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 37.95284355191774,
+          "median": 15.66008331536913,
+          "min": 8.778546262390602
+        },
+        "covar_module.kernels.0.kernels.1.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 24.534405510195427,
+          "median": 11.776816189560428,
+          "min": 6.354870172833651
+        },
+        "covar_module.kernels.0.kernels.2.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 14.33396730378719,
+          "median": 7.820282126460704,
+          "min": 2.143131663212479
+        },
+        "covar_module.kernels.0.kernels.3.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 16.242448046221625,
+          "median": 8.340347402484872,
+          "min": 2.103674194529669
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 18.193327478522843,
+          "median": 11.281678507614556,
+          "min": 5.756667090985601
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 14.719689662878276,
+          "median": 10.273808312364167,
+          "min": 6.9178651595914085
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 22.25436658561119,
+          "median": 15.659989597537908,
+          "min": 9.508116298492393
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 9.93205917493876,
+          "median": 8.154388895562455,
+          "min": 6.614124896122205
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 9.885631830367958,
+          "median": 8.23917226463164,
+          "min": 6.816048252711905
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 9.16766108720233,
+          "median": 8.28347703947509,
+          "min": 7.403784795039024
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 9.200639605450627,
+          "median": 8.333905123028671,
+          "min": 7.583468592893778
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 15.852363906173691,
+          "median": 11.605420036452328,
+          "min": 8.697295420617476
+        }
+      },
+      "optimizer_statuses": {
+        "STOPPED_15": 123
+      },
+      "outputscale": {
+        "covar_module.kernels.0.kernels.0.raw_outputscale": {
+          "max": 0.29390569822195656,
+          "median": 0.09774903339664277,
+          "min": 0.009037527812972948
+        },
+        "covar_module.kernels.0.kernels.1.raw_outputscale": {
+          "max": 0.2096267426889628,
+          "median": 0.05146810558450417,
+          "min": 0.008933477035929345
+        },
+        "covar_module.kernels.0.kernels.2.raw_outputscale": {
+          "max": 1.011119801072546,
+          "median": 0.5436594956394756,
+          "min": 0.20958893730982744
+        },
+        "covar_module.kernels.0.kernels.3.raw_outputscale": {
+          "max": 0.3680753937887609,
+          "median": 0.14378962375054916,
+          "min": 0.017795423534824155
+        },
+        "covar_module.kernels.0.kernels.4.raw_outputscale": {
+          "max": 0.3004255260519017,
+          "median": 0.1258335697312697,
+          "min": 0.030159284713394657
+        },
+        "covar_module.kernels.0.kernels.5.raw_outputscale": {
+          "max": 0.18619315330695746,
+          "median": 0.03785701768505426,
+          "min": 0.002849129501628419
+        },
+        "covar_module.kernels.0.kernels.6.raw_outputscale": {
+          "max": 0.06856948122546701,
+          "median": 0.029933208000724607,
+          "min": 0.0059896799187936205
+        },
+        "covar_module.kernels.0.kernels.7.raw_outputscale": {
+          "max": 0.03629356639923482,
+          "median": 0.011395978380734856,
+          "min": 0.0030374975632054975
+        }
+      },
+      "temporal_prediction_std_ratio_by_task": {
+        "BND": 0.4821519830848091,
+        "BNDX": 0.46510263721494216,
+        "EWX": 0.4498584597315396,
+        "HYEM": 0.4468793585977501,
+        "HYG": 0.4089113828556744,
+        "IEF": 0.46445047561965724,
+        "IWM": 0.3948322407805534,
+        "LQD": 0.45433903011511984,
+        "MGK": 0.45480312800116923,
+        "SPY": 0.4087161380845578,
+        "VEA": 0.4391692058118685,
+        "VSS": 0.46181987867210483,
+        "VTV": 0.4089288410426976,
+        "VWO": 0.44489172030741203,
+        "VWOB": 0.4704886522168381
+      }
+    },
+    "compact_r1_i15_exp": {
+      "checkpoints": 123,
+      "family_mean_temporal_prediction_std_ratio": {
+        "international_equity": 0.6850614251568747,
+        "international_fixed_income": 0.6102480169111812,
+        "us_equity": 0.6697429535045119,
+        "us_fixed_income": 0.6291724313989611
+      },
+      "lengthscale_to_floor": {
+        "covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 26.777436150592678,
+          "median": 16.524006947992127,
+          "min": 10.853335646183831
+        },
+        "covar_module.kernels.0.kernels.1.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 24.854319610244858,
+          "median": 13.255474052829735,
+          "min": 7.578206476775579
+        },
+        "covar_module.kernels.0.kernels.2.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.11382113821138211,
+          "max": 10.54901725253833,
+          "median": 4.13587729117913,
+          "min": 1.262726639891339
+        },
+        "covar_module.kernels.0.kernels.3.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 22.447208648495423,
+          "median": 12.833024176170477,
+          "min": 8.348709335943507
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 10.721644614223328,
+          "median": 7.443672533957131,
+          "min": 5.786841996225973
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 13.508770586136636,
+          "median": 9.109012029767728,
+          "min": 4.90690496971474
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 14.865896267212403,
+          "median": 6.850853686079224,
+          "min": 4.3607684036996845
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 8.352124736560235,
+          "median": 5.359298636119168,
+          "min": 3.000931675933343
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 11.175283540294584,
+          "median": 9.229472241345153,
+          "min": 6.077126979455371
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.016260162601626018,
+          "max": 7.619938595215461,
+          "median": 5.891360700675061,
+          "min": 1.436587497027007
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 12.752235660001103,
+          "median": 9.687530208389239,
+          "min": 3.1745415167143847
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0040650406504065045,
+          "max": 19.526056090906152,
+          "median": 10.118688494974357,
+          "min": 1.55446768580074
+        }
+      },
+      "optimizer_statuses": {
+        "STOPPED_15": 123
+      },
+      "outputscale": {
+        "covar_module.kernels.0.kernels.0.raw_outputscale": {
+          "max": 0.2988956174979962,
+          "median": 0.11583062273901648,
+          "min": 0.024394055876649504
+        },
+        "covar_module.kernels.0.kernels.1.raw_outputscale": {
+          "max": 0.32243155182400773,
+          "median": 0.08549524260451918,
+          "min": 0.016181890286919725
+        },
+        "covar_module.kernels.0.kernels.2.raw_outputscale": {
+          "max": 1.4585463080599474,
+          "median": 1.0892976817254847,
+          "min": 0.23277070133511413
+        },
+        "covar_module.kernels.0.kernels.3.raw_outputscale": {
+          "max": 0.32069827755900937,
+          "median": 0.12789054679657624,
+          "min": 0.022637241475563365
+        },
+        "covar_module.kernels.0.kernels.4.raw_outputscale": {
+          "max": 0.5629721455295718,
+          "median": 0.43417122166206584,
+          "min": 0.24780105618643766
+        },
+        "covar_module.kernels.0.kernels.5.raw_outputscale": {
+          "max": 0.32062851773280016,
+          "median": 0.0861501860628278,
+          "min": 0.01899446669279451
+        },
+        "covar_module.kernels.0.kernels.6.raw_outputscale": {
+          "max": 0.29118587912350175,
+          "median": 0.09105932340366216,
+          "min": 0.016310694523968845
+        },
+        "covar_module.kernels.0.kernels.7.raw_outputscale": {
+          "max": 0.29339579829229756,
+          "median": 0.038176437068722424,
+          "min": 0.007524928349229128
+        }
+      },
+      "temporal_prediction_std_ratio_by_task": {
+        "BND": 0.6284633823739832,
+        "BNDX": 0.5674408123279299,
+        "EWX": 0.7600387697722883,
+        "HYEM": 0.6286245012510823,
+        "HYG": 0.6380969781987217,
+        "IEF": 0.6301631514557677,
+        "IWM": 0.6316185428131885,
+        "LQD": 0.6199662135673716,
+        "MGK": 0.6800419075833577,
+        "SPY": 0.7025917151041515,
+        "VEA": 0.6260942109128455,
+        "VSS": 0.7147020807537801,
+        "VTV": 0.6647196485173492,
+        "VWO": 0.6394106391885852,
+        "VWOB": 0.6346787371545315
+      }
+    },
+    "compact_r2_i15_exp": {
+      "checkpoints": 72,
+      "family_mean_temporal_prediction_std_ratio": {
+        "international_equity": 0.6496106251486126,
+        "international_fixed_income": 0.5644736018568862,
+        "us_equity": 0.6273265109179187,
+        "us_fixed_income": 0.5781247995646845
+      },
+      "lengthscale_to_floor": {
+        "covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 39.212420768975264,
+          "median": 21.370147437249692,
+          "min": 15.705764253188674
+        },
+        "covar_module.kernels.0.kernels.1.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 38.72128166519121,
+          "median": 18.96145273810931,
+          "min": 11.40592281060061
+        },
+        "covar_module.kernels.0.kernels.2.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.3055555555555556,
+          "max": 7.625771042218627,
+          "median": 3.445500656418738,
+          "min": 1.0499905577596966
+        },
+        "covar_module.kernels.0.kernels.3.base_kernel.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 32.632870212340194,
+          "median": 15.701178365229504,
+          "min": 10.507222489948054
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 12.414445781595246,
+          "median": 8.875168985702997,
+          "min": 6.211435108490466
+        },
+        "covar_module.kernels.0.kernels.5.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 17.61279230801043,
+          "median": 12.252594440235132,
+          "min": 7.408354200064818
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 13.590300369538383,
+          "median": 7.288657623501495,
+          "min": 3.886465788094676
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 8.248361916649642,
+          "median": 5.498559821027438,
+          "min": 2.551761009952259
+        },
+        "covar_module.kernels.0.kernels.6.base_kernel.kernels.1.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 12.65797837368125,
+          "median": 9.756782124562122,
+          "min": 6.461566585312208
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.0.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 8.537738903969593,
+          "median": 6.689026920851106,
+          "min": 2.480503838787601
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.0.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 11.763004742413726,
+          "median": 9.856585834116082,
+          "min": 6.585234334327588
+        },
+        "covar_module.kernels.0.kernels.7.base_kernel.kernels.1.raw_lengthscale": {
+          "fraction_within_2x_floor": 0.0,
+          "max": 28.50292450884993,
+          "median": 15.223211544903258,
+          "min": 6.963533663330176
+        }
+      },
+      "optimizer_statuses": {
+        "STOPPED_15": 72
+      },
+      "outputscale": {
+        "covar_module.kernels.0.kernels.0.raw_outputscale": {
+          "max": 0.13019167527564815,
+          "median": 0.051480032662460165,
+          "min": 0.006672528680334772
+        },
+        "covar_module.kernels.0.kernels.1.raw_outputscale": {
+          "max": 0.08589056551309959,
+          "median": 0.021268314447822297,
+          "min": 0.002061487530233177
+        },
+        "covar_module.kernels.0.kernels.2.raw_outputscale": {
+          "max": 1.1246992463791243,
+          "median": 0.7212499494216401,
+          "min": 0.4213333572110429
+        },
+        "covar_module.kernels.0.kernels.3.raw_outputscale": {
+          "max": 0.136820458018153,
+          "median": 0.0494864200691184,
+          "min": 0.005477326172225122
+        },
+        "covar_module.kernels.0.kernels.4.raw_outputscale": {
+          "max": 0.43842407964748514,
+          "median": 0.31320433590417185,
+          "min": 0.13033745992777795
+        },
+        "covar_module.kernels.0.kernels.5.raw_outputscale": {
+          "max": 0.07934543597711544,
+          "median": 0.01914144789580909,
+          "min": 0.0030068160100451685
+        },
+        "covar_module.kernels.0.kernels.6.raw_outputscale": {
+          "max": 0.10716041061517828,
+          "median": 0.03161604998683281,
+          "min": 0.0037260313297383194
+        },
+        "covar_module.kernels.0.kernels.7.raw_outputscale": {
+          "max": 0.04560220360311862,
+          "median": 0.009706665468177712,
+          "min": 0.000988863811473679
+        }
+      },
+      "temporal_prediction_std_ratio_by_task": {
+        "BND": 0.5748073831456593,
+        "BNDX": 0.51244044636039,
+        "EWX": 0.7274262393943906,
+        "HYEM": 0.5913838110655543,
+        "HYG": 0.5793733655178162,
+        "IEF": 0.5820208774082658,
+        "IWM": 0.5932506551268436,
+        "LQD": 0.5762975721869968,
+        "MGK": 0.6328977551954402,
+        "SPY": 0.6600629349528132,
+        "VEA": 0.5903047353898665,
+        "VSS": 0.6732320256242472,
+        "VTV": 0.6230946983965776,
+        "VWO": 0.6074795001859461,
+        "VWOB": 0.5895965481447146
+      }
+    }
+  },
+  "interpretation_limits": [
+    "Predictive temporal amplitude is descriptive; low amplitude alone does not prove harmful shrinkage.",
+    "Parameter raw lengthscales transformed using frozen ADAPTIVE floor0.025*sqrt(d) plus softplus(raw).",
+    "No latest12 policy/outcome scoring or new fits performed."
+  ],
+  "passed": true,
+  "sources": {
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/context52.npz": "516927b71de27998fed394eb69f382bfac277469b770a5b750d9ba0e4b0670a7"
+  }
+}

@@ -1,0 +1,242 @@
+[
+  {
+    "date": "2024-05-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-05-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-05-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-05-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-05-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2024-06-28",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-06-28.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-06-28.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-06-28.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-06-28.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2024-07-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-07-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-07-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-07-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-07-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2024-08-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-08-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-08-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-08-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-08-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2024-09-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-09-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-09-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-09-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-09-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2024-10-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-10-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-10-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-10-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-10-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2024-11-29",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-11-29.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-11-29.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-11-29.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-11-29.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2024-12-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2024-12-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2024-12-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2024-12-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2024-12-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-01-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-01-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-01-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-01-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-01-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-02-28",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-02-28.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-02-28.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-02-28.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-02-28.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-03-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-03-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-03-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-03-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-03-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-04-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-04-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-04-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-04-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-04-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-05-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-05-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-05-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-05-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-05-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-06-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-06-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-06-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-06-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-06-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-07-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-07-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-07-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-07-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-07-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-08-29",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-08-29.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-08-29.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-08-29.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-08-29.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-09-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-09-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-09-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-09-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-09-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-10-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-10-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-10-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-10-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-10-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-11-28",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-11-28.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-11-28.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-11-28.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-11-28.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2025-12-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2025-12-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2025-12-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2025-12-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2025-12-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2026-01-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2026-01-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2026-01-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2026-01-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2026-01-30.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2026-02-27",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2026-02-27.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2026-02-27.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2026-02-27.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2026-02-27.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2026-03-31",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2026-03-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2026-03-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2026-03-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2026-03-31.csv"
+    },
+    "status": "fit"
+  },
+  {
+    "date": "2026-04-30",
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/model_diagnostics_2026-04-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/gp_predictions_2026-04-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/gp_scenarios_2026-04-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27/scenario_cache/task_covariance_diagnostics_2026-04-30.csv"
+    },
+    "status": "fit"
+  }
+]

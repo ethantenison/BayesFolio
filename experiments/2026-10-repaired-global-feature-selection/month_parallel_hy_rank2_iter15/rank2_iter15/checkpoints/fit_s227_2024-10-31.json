@@ -1,0 +1,45 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/gp_scenarios_2024-10-31.csv": "77dabace4771398db9fa38d071353e9492e37d4e3927a1f8e56350645f0295d8",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/scenario_cache/gp_predictions_2024-10-31.csv": "8526c90013fc71d6e09ccd8d82114ca2b2ba0e54aae139df51cda78f3f33518d",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/scenario_cache/model_diagnostics_2024-10-31.csv": "1502681c52caf859459eaa520cbe5fc4749ac52bb8585c00749d37d498628c26",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/scenario_cache/task_covariance_diagnostics_2024-10-31.csv": "c2b9720e7f1b5c969f966b13d1487897185c5f153529c2d9189014c2d0815b5f"
+  },
+  "result": {
+    "date": "2024-10-31",
+    "fit_seed": 13311,
+    "input_columns": [
+      "t_index",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "trend_slope",
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_chg_1p",
+      "hy_spread_z_12p",
+      "oil_ret",
+      "spy_ret",
+      "term_spread",
+      "vix_ts_z_12p"
+    ],
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/scenario_cache/model_diagnostics_2024-10-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/scenario_cache/gp_predictions_2024-10-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/gp_scenarios_2024-10-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/rank2_iter15/runs/s227/scenario_cache/task_covariance_diagnostics_2024-10-31.csv"
+    },
+    "peak_rss_bytes": 2675376128,
+    "pid": 34126,
+    "seconds": 38.484067000012146,
+    "seed": 227,
+    "status": "fit",
+    "train_dates": 89,
+    "train_rows": 1335,
+    "window_index": 5
+  },
+  "signature": "0a37e5cecc1843a94c5d3236da365c766ff6a136eaaef456cac2875f8d572804"
+}

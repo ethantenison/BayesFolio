@@ -1,0 +1,521 @@
+{
+  "all_shared_values_bitwise_equal": true,
+  "base_dataset": "v1",
+  "base_global_sha256": "24b3c84a46921b8f7e7523479b1b28946444857872a6888715af3200f6fa6592",
+  "builder_sha256": "6cbc6b8c02bfd10895e17e94b04d4d96c02666bbb73fbcc5586ef207e88b0840",
+  "coverage": {
+    "constant_columns": [],
+    "dates_per_etf": 108,
+    "feature_audit": {
+      "baspread": {
+        "max": 0.3034162110402694,
+        "min": 0.0045255471297623705,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "breakeven_proxy": {
+        "max": 0.01956183708075036,
+        "min": -0.025090605835451734,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "chmom": {
+        "max": 0.5127589542885809,
+        "min": -0.3899666246416549,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "copper": {
+        "max": 6.004499912261963,
+        "min": 2.240000009536743,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "copper_ret": {
+        "max": 0.14579548309036117,
+        "min": -0.13906561724576783,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "cpi_chg_12p": {
+        "max": 0.08979361103105798,
+        "min": 0.001982013035848551,
+        "unique_values": 107,
+        "zero_count": 0
+      },
+      "cpi_chg_1p": {
+        "max": 0.012561019986405686,
+        "min": -0.007920147553434065,
+        "unique_values": 106,
+        "zero_count": 0
+      },
+      "cpi_mom": {
+        "max": 0.012561019986405686,
+        "min": -0.007920147553434065,
+        "unique_values": 106,
+        "zero_count": 0
+      },
+      "cpi_yoy": {
+        "max": 0.08979361103105798,
+        "min": 0.001982013035848551,
+        "unique_values": 107,
+        "zero_count": 0
+      },
+      "credit_spread": {
+        "max": -0.31883452232489695,
+        "min": -0.6065196977997918,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "credit_spread_chg_1p": {
+        "max": 0.040584307619699445,
+        "min": -0.0404734962862241,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "cs_mom_rank": {
+        "max": 1.0,
+        "min": 0.06666666666666667,
+        "unique_values": 15,
+        "zero_count": 0
+      },
+      "dealer_gamma_proxy": {
+        "max": 0.3739002410468575,
+        "min": -0.18245511325864633,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "dxy": {
+        "max": 112.12000274658203,
+        "min": 89.12999725341797,
+        "unique_values": 105,
+        "zero_count": 0
+      },
+      "em_fx": {
+        "max": 19.469999313354492,
+        "min": 14.292604446411133,
+        "unique_values": 103,
+        "zero_count": 0
+      },
+      "em_fx_ret": {
+        "max": 0.048401359931312234,
+        "min": -0.07008123890647235,
+        "unique_values": 107,
+        "zero_count": 30
+      },
+      "erp": {
+        "max": 0.0161208027662088,
+        "min": -0.06841813791929245,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "gold": {
+        "max": 5247.89990234375,
+        "min": 1191.5,
+        "unique_values": 107,
+        "zero_count": 0
+      },
+      "gold_crude_ratio": {
+        "max": 89.39490114285009,
+        "min": 16.069590831047133,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "hy_spread": {
+        "max": 0.0877,
+        "min": 0.0268,
+        "unique_values": 91,
+        "zero_count": 0
+      },
+      "hy_spread_chg_1m": {
+        "max": 0.0373,
+        "min": -0.012799999999999999,
+        "unique_values": 97,
+        "zero_count": 0
+      },
+      "hy_spread_chg_1p": {
+        "max": 0.0373,
+        "min": -0.012799999999999999,
+        "unique_values": 97,
+        "zero_count": 0
+      },
+      "hy_spread_z_12m": {
+        "max": 3.0576439157528097,
+        "min": -2.158062190824436,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "hy_spread_z_12p": {
+        "max": 3.0576439157528097,
+        "min": -2.158062190824436,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "lag2_y_excess_lead": {
+        "max": 0.18236372922345123,
+        "min": -0.21493792635745035,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "lag_y_excess_lead": {
+        "max": 0.18236372922345123,
+        "min": -0.21493792635745035,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "ma_signal": {
+        "max": 0.10156942433479177,
+        "min": -0.19955875311077986,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "max_dd_3m": {
+        "max": -0.0040795969109459485,
+        "min": -0.5288602705124301,
+        "unique_values": 1344,
+        "zero_count": 0
+      },
+      "max_dd_6m": {
+        "max": -0.006417173984977875,
+        "min": -0.5288602705124301,
+        "unique_values": 1022,
+        "zero_count": 0
+      },
+      "mom12m": {
+        "max": 0.9539259612391062,
+        "min": -0.33979849061306966,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "mom12m_skip1m": {
+        "max": 0.9571432258849712,
+        "min": -0.31070115608217563,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "mom36m": {
+        "max": 1.4886566886595372,
+        "min": -0.22154144149626132,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "mom6m": {
+        "max": 0.532493031490131,
+        "min": -0.3083955338428268,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "move_proxy": {
+        "max": 0.13336648440476173,
+        "min": 0.014706475904946448,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "oil": {
+        "max": 114.66999816894531,
+        "min": 18.84000015258789,
+        "unique_values": 107,
+        "zero_count": 0
+      },
+      "oil_ret": {
+        "max": 0.8837580356172043,
+        "min": -0.5424486079039064,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "pct_above_50dma": {
+        "max": 110.01002880766538,
+        "min": 86.38348221985858,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "ret_autocorr": {
+        "max": 0.5930130241199351,
+        "min": -0.6891730544381253,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "ret_kurt": {
+        "max": 12.840905677406875,
+        "min": -1.0191160046506929,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "rsp_spy": {
+        "max": 0.3772580656783377,
+        "min": 0.2741237764003156,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "rsp_spy_roc_1m": {
+        "max": 0.04380454562569813,
+        "min": -0.06299386321194156,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "rsp_spy_roc_1p": {
+        "max": 0.04380454562569813,
+        "min": -0.06299386321194156,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "schp_ret": {
+        "max": 0.043322881582775113,
+        "min": -0.07021745054663478,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "spy_flow_z_12m": {
+        "max": 1.9567424755688092,
+        "min": -2.4097151141129873,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "spy_flow_z_12p": {
+        "max": 1.9567424755688092,
+        "min": -2.4097151141129873,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "spy_ret": {
+        "max": 0.031014806467705797,
+        "min": -0.03765600059793133,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "t_index": {
+        "max": 107.0,
+        "min": 0.0,
+        "unique_values": 108,
+        "zero_count": 15
+      },
+      "tbill3m": {
+        "max": 0.05320000171661377,
+        "min": 3.0000000260770322e-05,
+        "unique_values": 99,
+        "zero_count": 0
+      },
+      "term_spread": {
+        "max": 0.020790000557899473,
+        "min": -0.01611000061035156,
+        "unique_values": 107,
+        "zero_count": 0
+      },
+      "tnote10y": {
+        "max": 0.04875,
+        "min": 0.005360000133514405,
+        "unique_values": 106,
+        "zero_count": 0
+      },
+      "trend_slope": {
+        "max": 2.24826862285664,
+        "min": -2.559095268744927,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "vix": {
+        "max": 53.540000915527344,
+        "min": 9.510000228881836,
+        "unique_values": 104,
+        "zero_count": 0
+      },
+      "vix3m": {
+        "max": 48.31999969482422,
+        "min": 12.380000114440918,
+        "unique_values": 106,
+        "zero_count": 0
+      },
+      "vix_slope": {
+        "max": 0.27258440518748994,
+        "min": -0.29544084238073776,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "vix_ts_chg_1p": {
+        "max": 0.21499784801527966,
+        "min": -0.2842317046994536,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "vix_ts_z_12m": {
+        "max": 2.2153670902389244,
+        "min": -2.68619298218714,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "vix_ts_z_12p": {
+        "max": 2.2153670902389244,
+        "min": -2.68619298218714,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "vol_1m": {
+        "max": 0.04864761097320624,
+        "min": 0.0006520395627144179,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "vol_accel": {
+        "max": 1531.9463268964682,
+        "min": -0.029373038482811066,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "vol_ratio_1m_3m": {
+        "max": 0.651000136155054,
+        "min": -0.776165563948706,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "vol_z": {
+        "max": 2.665144485534002,
+        "min": -1.2673960777633166,
+        "unique_values": 1620,
+        "zero_count": 0
+      },
+      "y10_nominal": {
+        "max": 0.04875,
+        "min": 0.005360000133514405,
+        "unique_values": 106,
+        "zero_count": 0
+      },
+      "y10_real_proxy": {
+        "max": 0.018362898978017156,
+        "min": -0.027903943818880447,
+        "unique_values": 108,
+        "zero_count": 0
+      },
+      "y_excess_lead": {
+        "max": 0.18236372922345123,
+        "min": -0.21493792635745035,
+        "unique_values": 1620,
+        "zero_count": 0
+      }
+    },
+    "initial_training_months_per_etf": {
+      "BND": 84,
+      "BNDX": 84,
+      "EWX": 84,
+      "HYEM": 84,
+      "HYG": 84,
+      "IEF": 84,
+      "IWM": 84,
+      "LQD": 84,
+      "MGK": 84,
+      "SPY": 84,
+      "VEA": 84,
+      "VSS": 84,
+      "VTV": 84,
+      "VWO": 84,
+      "VWOB": 84
+    },
+    "missing_cells": 0,
+    "nonfinite_cells": 0,
+    "passed": true,
+    "rows": 1620,
+    "scored_months": 24
+  },
+  "cross_version_policy": "V1 runs keep V1 hashes; V2 runs have V2 hashes. Only added input columns differ.",
+  "dataset_version": "v2",
+  "extra_etf_columns": [
+    "vol_1m",
+    "vol_accel",
+    "vol_ratio_1m_3m"
+  ],
+  "extra_macro_columns": [
+    "vix3m",
+    "vix_ts_chg_1p",
+    "dealer_gamma_proxy",
+    "oil",
+    "copper",
+    "gold",
+    "em_fx",
+    "rsp_spy"
+  ],
+  "outputs": [
+    {
+      "path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/scored_dates_24.txt",
+      "sha256": "fcb2051022a7c33b6231c02ff63d29e37008a5339a4a3257ed89fcdd3c13828b"
+    },
+    {
+      "path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_equity.parquet",
+      "sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8"
+    },
+    {
+      "path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/international_equity.parquet",
+      "sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f"
+    },
+    {
+      "path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_fixed_income.parquet",
+      "sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa"
+    },
+    {
+      "path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/international_fixed_income.parquet",
+      "sha256": "50b0adb4f85f394c5b3681e27644f22ab43a14ea024f6d733236eddaac27f830"
+    },
+    {
+      "path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/global.parquet",
+      "sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156"
+    }
+  ],
+  "raw_source_manifest_sha256": "29b056120bc267c96aba4b862c56e5e990990f1f2e3952e967f17e9396255693",
+  "remaining_quarantine": "Turnover-containing historical liquidity blocks remain outside selection policy; ill_log/dolvol_log require a training-only clipping implementation before becoming eligible.",
+  "schema": "bayesfolio.feature_pool_extension.v1",
+  "shared_columns": [
+    "date",
+    "asset_id",
+    "y_excess_lead",
+    "baspread",
+    "ret_kurt",
+    "chmom",
+    "mom6m",
+    "mom12m",
+    "mom12m_skip1m",
+    "mom36m",
+    "cs_mom_rank",
+    "max_dd_3m",
+    "max_dd_6m",
+    "ma_signal",
+    "ret_autocorr",
+    "vol_z",
+    "trend_slope",
+    "hy_spread",
+    "hy_spread_chg_1p",
+    "hy_spread_z_12p",
+    "vix",
+    "vix_slope",
+    "vix_ts_z_12p",
+    "tnote10y",
+    "tbill3m",
+    "y10_nominal",
+    "term_spread",
+    "credit_spread",
+    "credit_spread_chg_1p",
+    "dxy",
+    "spy_ret",
+    "erp",
+    "move_proxy",
+    "rsp_spy_roc_1p",
+    "pct_above_50dma",
+    "spy_flow_z_12p",
+    "schp_ret",
+    "em_fx_ret",
+    "oil_ret",
+    "copper_ret",
+    "gold_crude_ratio",
+    "y10_real_proxy",
+    "breakeven_proxy",
+    "cpi_chg_12p",
+    "cpi_chg_1p",
+    "lag_y_excess_lead",
+    "lag2_y_excess_lead",
+    "hy_spread_chg_1m",
+    "hy_spread_z_12m",
+    "vix_ts_z_12m",
+    "spy_flow_z_12m",
+    "cpi_yoy",
+    "cpi_mom",
+    "rsp_spy_roc_1m",
+    "t_index"
+  ]
+}

@@ -1,0 +1,254 @@
+"""No-cap constraints, covariance policy and full-coverage orchestration tests.
+
+Usage: .venv/bin/pytest -q experiments/2026-10-portfolio-evaluation-v1/full_rerun_v1
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import pytest
+from full_math import NoCapAllocator, _aggregate_results, _score_seed
+from full_rerun import _checkpoint, _jobs, _repair_empty_custom_arguments, _smoke_jobs, _worker_limit
+
+
+def _context() -> dict:
+    rng = np.random.default_rng(27)
+    assets = [f"ETF{i}" for i in range(15)]
+    return {
+        "assets": assets,
+        "dates": [str(i) for i in range(24)],
+        "families": {"a": assets[:4], "b": assets[4:8], "c": assets[8:12], "d": assets[12:]},
+        "actual": rng.normal(0, 0.02, (24, 15)),
+        "baseline_mean": np.zeros((24, 15)),
+        "risk_free": np.full(24, 0.004),
+        "risk_budget": np.full(24, 0.01),
+        "historical_covariance": np.broadcast_to(np.eye(15) * 0.0001, (24, 15, 15)),
+        "fixed_probes": {
+            "equal_weight": np.ones(15) / 15,
+            "fixed_60_40": np.r_[np.full(8, 0.6 / 8), np.full(7, 0.4 / 7)],
+        },
+    }
+
+
+class Equal:
+    """Deterministic test allocator without any GP covariance substitution."""
+
+    def solve(self, mean: np.ndarray) -> np.ndarray:
+        """Return a valid fully invested test allocation.
+
+        Args:
+            mean: Complete monthly forecast panel.
+
+        Returns:
+            Equal weights with the same axes.
+        """
+        return np.ones_like(mean) / 15
+
+
+def test_no_35_percent_constraint_but_diversification_retained() -> None:
+    """A feasible no-cap optimum may exceed 35 percent, never violate NEA three."""
+    covariance = np.broadcast_to(np.eye(15) * 1e-6, (24, 15, 15))
+    allocator = NoCapAllocator(covariance, np.full(24, 0.001))
+    mean = np.tile(np.arange(15), (24, 1)).astype(float)
+    weights = allocator.solve(mean)
+    assert weights.max() > 0.35
+    assert np.max(np.sum(weights**2, axis=1)) <= 1 / 3 + 1e-7
+    np.testing.assert_allclose(weights.sum(axis=1), 1, atol=1e-7, rtol=0)
+    np.testing.assert_allclose(weights, allocator.solve(mean), atol=1e-10, rtol=0)
+
+
+def test_absolute_risk_budget_not_rescaled_to_each_GP() -> None:
+    """A GP declaring uniformly excessive risk must fail, not widen its budget."""
+    covariance = np.broadcast_to(np.eye(15), (24, 15, 15))
+    allocator = NoCapAllocator(covariance, np.full(24, 1e-6))
+    with pytest.raises(RuntimeError, match="no fallback"):
+        allocator.solve(np.tile(np.arange(15), (24, 1)).astype(float))
+
+
+@pytest.mark.parametrize("bad", ["asymmetric", "indefinite", "nonfinite"])
+def test_invalid_covariance_not_repaired(bad: str) -> None:
+    """Do not clip eigenvalues, diagonalize covariance, or invent missing values."""
+    covariance = np.broadcast_to(np.eye(15), (24, 15, 15)).copy()
+    if bad == "asymmetric":
+        covariance[0, 0, 1] = 0.1
+    elif bad == "indefinite":
+        covariance[0, 0, 0] = -1
+    else:
+        covariance[0, 0, 0] = np.nan
+    with pytest.raises((ValueError, np.linalg.LinAlgError)):
+        NoCapAllocator(covariance, np.ones(24))
+
+
+def test_family_does_not_fabricate_full_GP_covariance() -> None:
+    """Family scores retain own exact density and label cross-family risk missing."""
+    context = _context()
+    candidate = {"configuration": "a", "family": "a", "tickers": context["assets"][:4], "inputs": ["t_index"]}
+    values = {
+        "mean": context["actual"][:, :4] * 0.5,
+        "std": np.full((24, 4), 0.02),
+        "covariance": np.broadcast_to(np.eye(4) * 0.0004, (24, 4, 4)),
+    }
+    result = _score_seed(values, candidate, context, context["actual"] * 0.5, Equal())
+    assert result["ETF_position_cap"] is None
+    assert result["portfolios"]["gp_risk_no_cap"]["status"].startswith("not_applicable")
+    assert result["joint_distribution"]["equal_weight_reference"]["months"] == 24
+    assert all(row["covariance_source"] != "exact_observed_GP" for row in result["portfolio_distributions"])
+    aggregate = _aggregate_results(candidate, [result] * 3)
+    assert aggregate["gp_risk_no_cap_conventional_sharpe"] is None
+    assert aggregate["historical_risk_no_cap_complete_seeds"] == 3
+
+
+def test_joint_has_both_same_universe_covariance_policies() -> None:
+    """Changing covariance does not change the assets, objective, or risk budget."""
+    context = _context()
+    candidate = {"configuration": "joint", "family": "joint", "tickers": context["assets"], "inputs": ["t_index"]}
+    values = {
+        "mean": context["actual"] * 0.5,
+        "std": np.full((24, 15), 0.02),
+        "covariance": np.broadcast_to(np.eye(15) * 0.0004, (24, 15, 15)),
+    }
+    result = _score_seed(values, candidate, context, context["actual"] * 0.5, Equal())
+    for policy in ["historical_risk_no_cap", "gp_risk_no_cap"]:
+        assert result["portfolios"][policy]["status"] == "solved"
+        assert np.asarray(result["portfolios"][policy]["weights"]).shape == (24, 15)
+    assert {row["covariance_source"] for row in result["portfolio_distributions"]} == {
+        "exact_observed_GP",
+        "common_training_LedoitWolf_not_GP",
+    }
+
+
+def test_failed_portfolio_preserves_forecast_metrics() -> None:
+    """Never average only successful months/seeds or copy prior weights."""
+
+    class Failed:
+        def solve(self, mean):
+            raise RuntimeError("Month index 5: infeasible; no fallback")
+
+    context = _context()
+    candidate = {"configuration": "a", "family": "a", "tickers": context["assets"][:4], "inputs": ["t_index"]}
+    values = {
+        "mean": context["actual"][:, :4] * 0.5,
+        "std": np.full((24, 4), 0.02),
+        "covariance": np.broadcast_to(np.eye(4) * 0.0004, (24, 4, 4)),
+    }
+    result = _score_seed(values, candidate, context, context["actual"] * 0.5, Failed())
+    assert result["portfolios"]["historical_risk_no_cap"]["weights"] is None
+    assert result["forecast"]["mean_ic"] == pytest.approx(1)
+    aggregate = _aggregate_results(candidate, [result] * 3)
+    assert aggregate["historical_risk_no_cap_conventional_sharpe"] is None
+
+
+def test_full_job_grid_and_representative_last_month_smoke() -> None:
+    """Generate every original month/seed without a shortlist or month reindexing."""
+    candidates = [
+        {"configuration": "family", "family": "a", "inputs": ["t_index"]},
+        {"configuration": "joint", "family": "joint", "inputs": ["t_index", "x"]},
+    ]
+    contract = {
+        "candidates": candidates,
+        "family_counts": {"a": 1, "joint": 1},
+        "configs": {
+            "family": {"tickers": ["a", "b", "c"], "dates": [str(i) for i in range(24)]},
+            "joint": {"tickers": [str(i) for i in range(15)], "dates": [str(i) for i in range(24)]},
+        },
+    }
+    jobs = _jobs(contract)
+    assert len(jobs) == 144
+    assert len({(j["component"], j["seed"], j["index"]) for j in jobs}) == 144
+    assert jobs[0]["component"] == "joint"
+    smokes = _smoke_jobs(contract, jobs)
+    assert any(j["component"] == "joint" and j["index"] == 23 for j in smokes)
+    assert all(j["seed"] == 27 for j in smokes)
+    assert _checkpoint(jobs[0]).parent.name == "joint"
+
+
+def test_cpu_and_memory_guard(monkeypatch) -> None:
+    """One global pool respects cores minus two and previous measured peak RSS."""
+    import full_rerun
+
+    monkeypatch.setattr(full_rerun.os, "cpu_count", lambda: 16)
+    assert _worker_limit(3162357760) == 13
+    assert _worker_limit(1024**3) == 14
+
+
+def test_replay_preserves_intentionally_empty_input_groups() -> None:
+    """Empty macro/ETF masks are real arguments, not omitted flags/default inputs."""
+    command = [
+        "python",
+        "wrapper.py",
+        "--custom-etf-cols",
+        "--custom-macro-cols",
+        "--covar-grouping-proposal",
+        "default",
+    ]
+    _repair_empty_custom_arguments(command)
+    assert command == [
+        "python",
+        "wrapper.py",
+        "--custom-etf-cols",
+        "",
+        "--custom-macro-cols",
+        "",
+        "--covar-grouping-proposal",
+        "default",
+    ]
+    _repair_empty_custom_arguments(command)
+    assert command.count("") == 2
+    command = ["python", "wrapper.py", "--custom-etf-cols", "mom6m", "--custom-macro-cols"]
+    _repair_empty_custom_arguments(command)
+    assert command[-1] == ""
+    assert command[3] == "mom6m"
+
+
+def test_complete_worker_roundtrip_all_months_and_seeds(tmp_path, monkeypatch) -> None:
+    """Export and rescore all 72 synthetic months without modifying source inputs."""
+    import full_workers
+
+    context = _context()
+    context["dates"] = pd.date_range("2024-05-31", periods=24, freq="BME").strftime("%Y-%m-%d").tolist()
+    candidate = {"configuration": "a", "family": "a", "tickers": context["assets"][:4], "inputs": ["t_index"]}
+    source_hashes = {}
+    for seed in [27, 127, 227]:
+        folder = tmp_path / f"runs/a_s{seed}/analytic_months"
+        folder.mkdir(parents=True)
+        for index, date in enumerate(context["dates"]):
+            path = folder / f"covariance_{date}.npz"
+            np.savez(
+                path,
+                date=np.array(date),
+                assets=np.array(candidate["tickers"]),
+                mean=context["actual"][index, :4] * 0.5,
+                std=np.full(4, 0.02),
+                covariance=np.eye(4) * 0.0004,
+                likelihood_noise_diagonal=np.full(4, 0.0001),
+            )
+            frame = pd.DataFrame(
+                {"date": date, "asset_id": candidate["tickers"], "y_true": context["actual"][index, :4]}
+            )
+            frame.to_csv(folder / f"predictions_{date}.csv", index=False)
+        for path in folder.iterdir():
+            source_hashes[path] = hashlib.sha256(path.read_bytes()).hexdigest()
+    monkeypatch.setattr(
+        full_workers,
+        "STATE",
+        {"context": context, "anchor": np.stack([context["actual"] * 0.5] * 3), "allocator": Equal()},
+    )
+    result = full_workers.evaluate_job({"root": str(tmp_path), "candidate": candidate})
+    assert result["summary"]["seed_count"] == 3
+    assert len(result["artifact_sha256"]) == 4
+    for path, digest in source_hashes.items():
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == digest
+    for name, digest in result["artifact_sha256"].items():
+        assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest
+    saved = json.loads((tmp_path / "evaluation/a.json").read_text())
+    assert saved["summary"]["ETF_position_cap"] is None
+    assert len(saved["seeds"]) == 3
+    for seed in [27, 127, 227]:
+        with np.load(tmp_path / f"analytic/a/s{seed}.npz", allow_pickle=False) as values:
+            assert values["covariance"].shape == (24, 4, 4)
+            assert bool(values["observation_noise"])

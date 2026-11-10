@@ -1,0 +1,230 @@
+{
+  "audit_tail_price_anchoring_scales": {
+    "BND": 1.0,
+    "BNDX": 1.0,
+    "EWX": 1.0,
+    "HYEM": 0.9999999017959267,
+    "HYG": 1.0,
+    "IEF": 1.0000000819814792,
+    "IWM": 1.0,
+    "LQD": 1.0000001435895933,
+    "MGK": 1.0,
+    "SPY": 1.0,
+    "VEA": 1.0,
+    "VSS": 1.0,
+    "VTV": 0.9999999255005895,
+    "VWO": 1.0,
+    "VWOB": 1.0,
+    "^IRX": 1.0
+  },
+  "by_asset": [
+    {
+      "asset_id": "SPY",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.049483680225941296,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 6.247257350322499e-07,
+      "max_abs_difference_basis_points": 0.006247257350322499,
+      "median_abs_decimal_difference": 1.3386298169937305e-07
+    },
+    {
+      "asset_id": "MGK",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.08330425522325613,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 6.35369795443097e-07,
+      "max_abs_difference_basis_points": 0.00635369795443097,
+      "median_abs_decimal_difference": 1.0508608372372663e-07
+    },
+    {
+      "asset_id": "VTV",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.021460706456660983,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 5.127653857073255e-07,
+      "max_abs_difference_basis_points": 0.0051276538570732555,
+      "median_abs_decimal_difference": 9.595500322090444e-08
+    },
+    {
+      "asset_id": "IWM",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.04170613218364383,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 9.566500129842836e-07,
+      "max_abs_difference_basis_points": 0.009566500129842836,
+      "median_abs_decimal_difference": 1.585620764688045e-07
+    },
+    {
+      "asset_id": "VEA",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.040054637719175945,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 6.091689854770266e-07,
+      "max_abs_difference_basis_points": 0.006091689854770266,
+      "median_abs_decimal_difference": 1.542541459009783e-07
+    },
+    {
+      "asset_id": "VWO",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.01308772991328433,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 4.7162109284570874e-07,
+      "max_abs_difference_basis_points": 0.0047162109284570874,
+      "median_abs_decimal_difference": 1.0307222891858814e-07
+    },
+    {
+      "asset_id": "VSS",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.015367325844026558,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 4.839765792574724e-07,
+      "max_abs_difference_basis_points": 0.004839765792574724,
+      "median_abs_decimal_difference": 1.1390871784699996e-07
+    },
+    {
+      "asset_id": "EWX",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.018358370848438943,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 3.955899527952056e-07,
+      "max_abs_difference_basis_points": 0.003955899527952056,
+      "median_abs_decimal_difference": 8.899686121388584e-08
+    },
+    {
+      "asset_id": "BND",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": -0.0002358938375711661,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 1.9025803177363798e-06,
+      "max_abs_difference_basis_points": 0.019025803177363798,
+      "median_abs_decimal_difference": 2.3035479634891942e-07
+    },
+    {
+      "asset_id": "IEF",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": -0.0031746097815373853,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 1.0318560331734616e-06,
+      "max_abs_difference_basis_points": 0.010318560331734616,
+      "median_abs_decimal_difference": 2.3622115258303822e-07
+    },
+    {
+      "asset_id": "LQD",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.005612909513656561,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 1.0172812328068659e-06,
+      "max_abs_difference_basis_points": 0.010172812328068659,
+      "median_abs_decimal_difference": 1.6190792972992085e-07
+    },
+    {
+      "asset_id": "HYG",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.001366523612472914,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 1.0751696506439146e-06,
+      "max_abs_difference_basis_points": 0.010751696506439146,
+      "median_abs_decimal_difference": 2.765034665119792e-07
+    },
+    {
+      "asset_id": "BNDX",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.005188960233089901,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 1.0977154737412675e-06,
+      "max_abs_difference_basis_points": 0.010977154737412675,
+      "median_abs_decimal_difference": 2.1027321367439455e-07
+    },
+    {
+      "asset_id": "VWOB",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.006564233792803131,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 1.1800337424983098e-06,
+      "max_abs_difference_basis_points": 0.011800337424983098,
+      "median_abs_decimal_difference": 2.101252874475712e-07
+    },
+    {
+      "asset_id": "HYEM",
+      "final_forward_endpoint": "2026-05-29",
+      "final_preserved_target": 0.006587282170426478,
+      "final_score_observation_date": "2026-04-30",
+      "final_target_independently_rebuilt_from_daily_sources": true,
+      "final_target_prices_available_in_frozen_monthly_cache": true,
+      "independently_rebuilt_observations": 108,
+      "max_abs_decimal_difference": 1.1146448322119085e-06,
+      "max_abs_difference_basis_points": 0.011146448322119085,
+      "median_abs_decimal_difference": 2.4443101898086184e-07
+    }
+  ],
+  "decision_time_policy": "A window t trains on rows dated before t; its last training outcome ends at t. The forecast target is the return from t to the next month end; predictors are lagged one month.",
+  "forward_tail_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/target_audit_v1/sources.json",
+  "independent_reconstruction_total": 1620,
+  "initial_training_forward_outcome_endpoints": [
+    "2017-06-30",
+    "2024-05-31"
+  ],
+  "initial_training_observation_dates": [
+    "2017-05-31",
+    "2024-04-30"
+  ],
+  "labels_unchanged": true,
+  "limitation": "Latest adjusted-price vintage, not a point-in-time vendor-vintage replication. All preserved labels were independently checked.",
+  "passed": true,
+  "remaining_cache_only_forward_targets": 0,
+  "returns_unit": "decimal excess returns; no second risk-free subtraction",
+  "schema": "bayesfolio.target_alignment_audit.v1",
+  "score_observation_dates": [
+    "2024-05-31",
+    "2026-04-30"
+  ],
+  "scored_forward_outcome_endpoints": [
+    "2024-06-28",
+    "2026-05-29"
+  ],
+  "source_code": "bayesfolio/engine/features/asset_prices.py:compute_excess_future_return_calendar",
+  "source_definition": "exp(log(P[t+1]/P[t]) - integrated daily risk-free continuous rate) - 1",
+  "source_tolerance_decimal": 2e-06
+}

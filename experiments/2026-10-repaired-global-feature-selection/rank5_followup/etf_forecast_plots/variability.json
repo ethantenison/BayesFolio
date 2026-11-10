@@ -1,0 +1,150 @@
+{
+  "configuration": "global_e6c41f2020fd_rank5",
+  "selection": "14-input SPY-proxy joint model + t_index | Rank 5 vs rank 2",
+  "inputs": [
+    "t_index",
+    "lag_y_excess_lead",
+    "mom12m_skip1m",
+    "mom6m",
+    "trend_slope",
+    "cpi_chg_12p",
+    "dealer_gamma_proxy",
+    "dxy",
+    "em_fx_ret",
+    "gold_crude_ratio",
+    "hy_spread_z_12p",
+    "oil_ret",
+    "spy_ret",
+    "term_spread",
+    "vix_ts_z_12p"
+  ],
+  "source_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/rank5_followup/runs/global_e6c41f2020fd_rank5_s27/gp_window_predictions.csv": "37d640a849776d81dd14045661a15f7b75f858dd7398678cd6c37f2032d09bd9",
+    "experiments/2026-10-repaired-global-feature-selection/rank5_followup/runs/global_e6c41f2020fd_rank5_s127/gp_window_predictions.csv": "7adb6146228028d0227b73956311bc01173e64cc401369450992f5bca2403d80",
+    "experiments/2026-10-repaired-global-feature-selection/rank5_followup/runs/global_e6c41f2020fd_rank5_s227/gp_window_predictions.csv": "74ca8bff1883c00b695a995994e47d83bd95bc22ad8b86e5946dad1753dcd1df"
+  },
+  "x_axis": "Saved forecast-origin date, not following-month realization date",
+  "units": "Source decimals; chart axes percent",
+  "diagnostics": [
+    {
+      "etf": "SPY",
+      "seed": 27,
+      "months": 24,
+      "actual_time_sd_decimal": 0.035873182192584376,
+      "predicted_time_sd_decimal": 0.010855664270833332,
+      "predicted_to_actual_time_sd": 0.3026122470137983,
+      "predicted_min_decimal": -0.0010517257748712,
+      "predicted_max_decimal": 0.0356070507176699
+    },
+    {
+      "etf": "SPY",
+      "seed": 127,
+      "months": 24,
+      "actual_time_sd_decimal": 0.035873182192584376,
+      "predicted_time_sd_decimal": 0.011220283637218265,
+      "predicted_to_actual_time_sd": 0.31277636806744447,
+      "predicted_min_decimal": -0.0015076826656577,
+      "predicted_max_decimal": 0.0398993289265212
+    },
+    {
+      "etf": "SPY",
+      "seed": 227,
+      "months": 24,
+      "actual_time_sd_decimal": 0.035873182192584376,
+      "predicted_time_sd_decimal": 0.01120230090742503,
+      "predicted_to_actual_time_sd": 0.31227508190619185,
+      "predicted_min_decimal": -0.0001321579683995,
+      "predicted_max_decimal": 0.0404658018574641
+    },
+    {
+      "etf": "IWM",
+      "seed": 27,
+      "months": 24,
+      "actual_time_sd_decimal": 0.05388774302598039,
+      "predicted_time_sd_decimal": 0.01674508983020418,
+      "predicted_to_actual_time_sd": 0.31074023312000704,
+      "predicted_min_decimal": -0.0239133670584748,
+      "predicted_max_decimal": 0.0454240046702723
+    },
+    {
+      "etf": "IWM",
+      "seed": 127,
+      "months": 24,
+      "actual_time_sd_decimal": 0.05388774302598039,
+      "predicted_time_sd_decimal": 0.016784275907331014,
+      "predicted_to_actual_time_sd": 0.31146741290016483,
+      "predicted_min_decimal": -0.0226850805897264,
+      "predicted_max_decimal": 0.0480802024140246
+    },
+    {
+      "etf": "IWM",
+      "seed": 227,
+      "months": 24,
+      "actual_time_sd_decimal": 0.05388774302598039,
+      "predicted_time_sd_decimal": 0.01675026908344285,
+      "predicted_to_actual_time_sd": 0.31083634501758967,
+      "predicted_min_decimal": -0.0203745084848764,
+      "predicted_max_decimal": 0.0510268453014574
+    },
+    {
+      "etf": "VEA",
+      "seed": 27,
+      "months": 24,
+      "actual_time_sd_decimal": 0.037520618414328084,
+      "predicted_time_sd_decimal": 0.014486564603395828,
+      "predicted_to_actual_time_sd": 0.38609610437187813,
+      "predicted_min_decimal": -0.0063406403813548,
+      "predicted_max_decimal": 0.0365056838029254
+    },
+    {
+      "etf": "VEA",
+      "seed": 127,
+      "months": 24,
+      "actual_time_sd_decimal": 0.037520618414328084,
+      "predicted_time_sd_decimal": 0.014245316314991738,
+      "predicted_to_actual_time_sd": 0.3796663519157735,
+      "predicted_min_decimal": -0.0079572688367494,
+      "predicted_max_decimal": 0.0374337098748061
+    },
+    {
+      "etf": "VEA",
+      "seed": 227,
+      "months": 24,
+      "actual_time_sd_decimal": 0.037520618414328084,
+      "predicted_time_sd_decimal": 0.013859102024840062,
+      "predicted_to_actual_time_sd": 0.36937296373419193,
+      "predicted_min_decimal": -0.0064099239453375,
+      "predicted_max_decimal": 0.0353392369800256
+    },
+    {
+      "etf": "HYG",
+      "seed": 27,
+      "months": 24,
+      "actual_time_sd_decimal": 0.00957267427734552,
+      "predicted_time_sd_decimal": 0.006070200669215415,
+      "predicted_to_actual_time_sd": 0.634117540547788,
+      "predicted_min_decimal": -0.0100975101323248,
+      "predicted_max_decimal": 0.017270121427512
+    },
+    {
+      "etf": "HYG",
+      "seed": 127,
+      "months": 24,
+      "actual_time_sd_decimal": 0.00957267427734552,
+      "predicted_time_sd_decimal": 0.006243859179182217,
+      "predicted_to_actual_time_sd": 0.6522586059319699,
+      "predicted_min_decimal": -0.0098016578312314,
+      "predicted_max_decimal": 0.0160472814976444
+    },
+    {
+      "etf": "HYG",
+      "seed": 227,
+      "months": 24,
+      "actual_time_sd_decimal": 0.00957267427734552,
+      "predicted_time_sd_decimal": 0.006052097796339416,
+      "predicted_to_actual_time_sd": 0.6322264417438894,
+      "predicted_min_decimal": -0.0079309818151903,
+      "predicted_max_decimal": 0.0163790236636722
+    }
+  ]
+}

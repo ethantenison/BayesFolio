@@ -1,0 +1,2811 @@
+{
+  "CSV": {
+    "absolute_objective_difference": 1.5629797456284678e-10,
+    "csv": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/NOVEMBER_WEIGHTS.csv",
+    "csv_rows": 15,
+    "csv_sha256": "5b20f49cbf1d82ab474a9919d3fe1db1ce907ed4ff226f63ef4b8f8f792b5bde",
+    "independent_conic": {
+      "attempts": [
+        {
+          "iterations": 12,
+          "options": {
+            "max_iter": 500,
+            "max_step_fraction": 0.9,
+            "static_regularization_constant": 1e-12,
+            "static_regularization_enable": true,
+            "tol_feas": 1e-09,
+            "tol_gap_abs": 1e-09,
+            "tol_gap_rel": 1e-09
+          },
+          "status": "optimal"
+        }
+      ],
+      "raw_checks": {
+        "MGK_weight": 0.0,
+        "effective_assets": 3.575588584388823,
+        "eligible_assets": [
+          "SPY",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "eligible_score_ranks": [
+          9.0,
+          7.0,
+          13.0,
+          10.0,
+          12.0,
+          11.0,
+          14.0,
+          2.0,
+          1.0,
+          4.0,
+          5.0,
+          3.0,
+          6.0,
+          8.0
+        ],
+        "equity_cap": null,
+        "equity_weight": 0.9252146110308539,
+        "maximum_weight": 0.45206186868652226,
+        "minimum_effective_assets": 3.0,
+        "minimum_weight": -1.1144919205874228e-10,
+        "position_cap": null,
+        "predicted_variance": 0.0008223728987327968,
+        "rank_objective": 0.8984216005295471,
+        "raw_weights_changed": false,
+        "sum_squared_weights": 0.27967423443682643,
+        "variance_ceiling": 0.0008223728980994785,
+        "variance_to_ceiling": 1.0000000007701109,
+        "weight_sum": 1.0
+      },
+      "solver_status": "optimal",
+      "weights": [
+        9.853982943617758e-09,
+        0.0,
+        1.855754959055066e-10,
+        0.14431993556097794,
+        0.039621077674568406,
+        0.19705423490554466,
+        0.09215748416368227,
+        0.45206186868652226,
+        -7.502238319074983e-11,
+        -1.1144919205874228e-10,
+        6.755546474189999e-11,
+        1.9530112469319471e-10,
+        4.9067698498897424e-11,
+        3.0777714367885354e-10,
+        0.0747853885359162
+      ]
+    },
+    "maximum_absolute_weight_difference": 2.2975563219035378e-06,
+    "metadata_checked": {},
+    "no_postsolve_repairs": true,
+    "passed": true,
+    "raw_checks": {
+      "MGK_weight": 0.0,
+      "effective_assets": 3.575580031473299,
+      "eligible_assets": [
+        "SPY",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "eligible_score_ranks": [
+        9.0,
+        7.0,
+        13.0,
+        10.0,
+        12.0,
+        11.0,
+        14.0,
+        2.0,
+        1.0,
+        4.0,
+        5.0,
+        3.0,
+        6.0,
+        8.0
+      ],
+      "equity_cap": null,
+      "equity_weight": 0.9252131362932603,
+      "maximum_weight": 0.4520624826209815,
+      "minimum_effective_assets": 3.0,
+      "minimum_weight": -7.532024468738572e-11,
+      "position_cap": null,
+      "predicted_variance": 0.0008223728991704154,
+      "rank_objective": 0.8984216006858451,
+      "raw_weights_changed": false,
+      "sum_squared_weights": 0.27967490342761403,
+      "variance_ceiling": 0.0008223728980994785,
+      "variance_to_ceiling": 1.000000001302252,
+      "weight_sum": 0.9999999999999998
+    },
+    "raw_serialized_maximum_difference": 1.1102230246251565e-16,
+    "supplied_analytic_certificate": null,
+    "supplied_numerical_attempts": [
+      {
+        "iterations": 11,
+        "max_step_fraction": 0.95,
+        "raw_checks": {
+          "concentration_binding": false,
+          "effective_assets": 3.575580031473296,
+          "equity_binding": false,
+          "equity_cap": null,
+          "equity_weight": 0.9252131362932606,
+          "minimum_weight": -7.532024468738572e-11,
+          "passed": true,
+          "predicted_variance": 0.000822372899170416,
+          "sum_squared_weights": 0.27967490342761425,
+          "variance_binding": true,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_ratio": 1.000000001302253,
+          "weight_sum": 1.0000000000000002
+        },
+        "static_regularization_constant": 1e-10,
+        "status": "optimal"
+      }
+    ],
+    "supplied_status": "optimal",
+    "weight_parity_absolute_tolerance": 5e-06
+  },
+  "GP_specs": {
+    "broad_r2_i15_exp": {
+      "GP_tasks": [
+        "SPY",
+        "MGK",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "compact_rank1_permitted": false,
+      "inputs": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "spy_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "maxiter": 15,
+      "passed": true,
+      "rank": 2,
+      "registered_spec_sha256": "2d39c529256710343182976b4cb820882c0b24970f0688e884f6d07a8ed183b6",
+      "rolling_months": null
+    },
+    "broad_roll48_r2_i15": {
+      "GP_tasks": [
+        "SPY",
+        "MGK",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "compact_rank1_permitted": false,
+      "inputs": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "spy_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "maxiter": 15,
+      "passed": true,
+      "rank": 2,
+      "registered_spec_sha256": "7d5e5d4843bed37475bb1667526b40b103cb759c2f3d65bd64623946e8f0affc",
+      "rolling_months": 48
+    },
+    "compact_r1_i15_exp": {
+      "GP_tasks": [
+        "SPY",
+        "MGK",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "compact_rank1_permitted": true,
+      "inputs": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "maxiter": 15,
+      "passed": true,
+      "rank": 1,
+      "registered_spec_sha256": "84f4607b1670dfde08439c0d9cc4776304fa56fbcb03a0fa3b27d590a4eae6a9",
+      "rolling_months": null
+    },
+    "compact_r2_i15_exp": {
+      "GP_tasks": [
+        "SPY",
+        "MGK",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "compact_rank1_permitted": true,
+      "inputs": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "maxiter": 15,
+      "passed": true,
+      "rank": 2,
+      "registered_spec_sha256": "6b6152ba5ca743fedc4e9e422479130bd2496b3e7982c12c910c17afffc8a6d8",
+      "rolling_months": null
+    }
+  },
+  "Pylance": "unavailable; no editor diagnostics pass claimed",
+  "all15_rows_including_MGK_zero": true,
+  "budget_limits_passed": true,
+  "code_checks": {
+    "AST_docstrings": {
+      "missing": [],
+      "public_symbols": 70
+    },
+    "Pylance": "unavailable; no passed editor check claimed",
+    "checks": [
+      {
+        "command": [
+          "uv",
+          "run",
+          "--locked",
+          "--no-sync",
+          "ruff",
+          "check",
+          "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "All checks passed!\n"
+      },
+      {
+        "command": [
+          "uv",
+          "run",
+          "--locked",
+          "--no-sync",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2"
+        ],
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "........................................................................ [ 60%]\n...............................................                          [100%]\n=============================== warnings summary ===============================\nexperiments/2026-11-portfolio-multiobjective-v2/test_v2_experts.py::test_actual_task_prior_telemetry_does_not_query_distribution_variance\nexperiments/2026-11-portfolio-multiobjective-v2/test_v2_experts.py::test_actual_task_prior_telemetry_does_not_query_distribution_variance\n  /Users/et/Documents/BayesFolio/.venv/lib/python3.13/site-packages/torch/jit/_script.py:1480: DeprecationWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n119 passed, 2 warnings in 1.71s\n"
+      }
+    ],
+    "passed": true,
+    "scope": "isolated experiment only; no production package/public API changes"
+  },
+  "data_availability": {
+    "GP_tasks": [
+      "SPY",
+      "MGK",
+      "VTV",
+      "IWM",
+      "VEA",
+      "VWO",
+      "VSS",
+      "EWX",
+      "BND",
+      "IEF",
+      "LQD",
+      "HYG",
+      "BNDX",
+      "VWOB",
+      "HYEM"
+    ],
+    "allocatable_assets": [
+      "SPY",
+      "VTV",
+      "IWM",
+      "VEA",
+      "VWO",
+      "VSS",
+      "EWX",
+      "BND",
+      "IEF",
+      "LQD",
+      "HYG",
+      "BNDX",
+      "VWOB",
+      "HYEM"
+    ],
+    "as_of_date": "2026-10-31",
+    "expanding_training_months": 113,
+    "forecast_month": "2026-11",
+    "inputs_checked": [
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_z_12p",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "oil_ret",
+      "spy_ret",
+      "t_index",
+      "term_spread",
+      "trend_slope",
+      "vix_ts_z_12p"
+    ],
+    "last_training_origin": "2026-09-30",
+    "last_training_target_available_on": "2026-10-30",
+    "market_origin": "2026-10-30",
+    "passed": true,
+    "row_timing_only_not_macro_vintage_certification": true,
+    "unknown_live_targets": 15
+  },
+  "deterministic_reproduction": {
+    "CSV": {
+      "absolute_objective_difference": 1.5629797456284678e-10,
+      "csv": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/NOVEMBER_WEIGHTS.csv",
+      "csv_rows": 15,
+      "csv_sha256": "5b20f49cbf1d82ab474a9919d3fe1db1ce907ed4ff226f63ef4b8f8f792b5bde",
+      "independent_conic": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 3.575588584388823,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            9.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.9252146110308539,
+          "maximum_weight": 0.45206186868652226,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": -1.1144919205874228e-10,
+          "position_cap": null,
+          "predicted_variance": 0.0008223728987327968,
+          "rank_objective": 0.8984216005295471,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.27967423443682643,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_to_ceiling": 1.0000000007701109,
+          "weight_sum": 1.0
+        },
+        "solver_status": "optimal",
+        "weights": [
+          9.853982943617758e-09,
+          0.0,
+          1.855754959055066e-10,
+          0.14431993556097794,
+          0.039621077674568406,
+          0.19705423490554466,
+          0.09215748416368227,
+          0.45206186868652226,
+          -7.502238319074983e-11,
+          -1.1144919205874228e-10,
+          6.755546474189999e-11,
+          1.9530112469319471e-10,
+          4.9067698498897424e-11,
+          3.0777714367885354e-10,
+          0.0747853885359162
+        ]
+      },
+      "maximum_absolute_weight_difference": 2.2975563219035378e-06,
+      "metadata_checked": {},
+      "no_postsolve_repairs": true,
+      "passed": true,
+      "raw_checks": {
+        "MGK_weight": 0.0,
+        "effective_assets": 3.575580031473299,
+        "eligible_assets": [
+          "SPY",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "eligible_score_ranks": [
+          9.0,
+          7.0,
+          13.0,
+          10.0,
+          12.0,
+          11.0,
+          14.0,
+          2.0,
+          1.0,
+          4.0,
+          5.0,
+          3.0,
+          6.0,
+          8.0
+        ],
+        "equity_cap": null,
+        "equity_weight": 0.9252131362932603,
+        "maximum_weight": 0.4520624826209815,
+        "minimum_effective_assets": 3.0,
+        "minimum_weight": -7.532024468738572e-11,
+        "position_cap": null,
+        "predicted_variance": 0.0008223728991704154,
+        "rank_objective": 0.8984216006858451,
+        "raw_weights_changed": false,
+        "sum_squared_weights": 0.27967490342761403,
+        "variance_ceiling": 0.0008223728980994785,
+        "variance_to_ceiling": 1.000000001302252,
+        "weight_sum": 0.9999999999999998
+      },
+      "raw_serialized_maximum_difference": 1.1102230246251565e-16,
+      "supplied_analytic_certificate": null,
+      "supplied_numerical_attempts": [
+        {
+          "iterations": 11,
+          "max_step_fraction": 0.95,
+          "raw_checks": {
+            "concentration_binding": false,
+            "effective_assets": 3.575580031473296,
+            "equity_binding": false,
+            "equity_cap": null,
+            "equity_weight": 0.9252131362932606,
+            "minimum_weight": -7.532024468738572e-11,
+            "passed": true,
+            "predicted_variance": 0.000822372899170416,
+            "sum_squared_weights": 0.27967490342761425,
+            "variance_binding": true,
+            "variance_ceiling": 0.0008223728980994785,
+            "variance_ratio": 1.000000001302253,
+            "weight_sum": 1.0000000000000002
+          },
+          "static_regularization_constant": 1e-10,
+          "status": "optimal"
+        }
+      ],
+      "supplied_status": "optimal",
+      "weight_parity_absolute_tolerance": 5e-06
+    },
+    "finalists": [
+      {
+        "id": "policy_c5f34924606d3b69f1bf",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_56a0b06b63cc63c2913b",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_b71ce3fe84ee69f58247",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_1ecb16e803d529c446d5",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_269c851205829f549e8e",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_bffebed65d9d74291d0a",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_ffda294836ec0b34898d",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_e88e9221e7d2bdd5631c",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_91b4b9ebe70878b95ef8",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      },
+      {
+        "id": "policy_87884c01c87dcdace8a6",
+        "maximum_weight_difference": 0.0,
+        "months": 53
+      }
+    ],
+    "fit_attempts_launched": 0,
+    "historical_maximum_weight_difference": 0.0,
+    "live_maximum_weight_difference": 0.0,
+    "new_policies_scored": 0,
+    "passed": true,
+    "protected_inputs_unchanged": true,
+    "trades_executed": false
+  },
+  "exact_delivered_reproduction_tolerance": 1e-12,
+  "external_final_audit": {
+    "CSV": {
+      "absolute_objective_difference": 1.562978635405443e-10,
+      "csv": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/NOVEMBER_WEIGHTS.csv",
+      "csv_rows": 15,
+      "csv_sha256": "5b20f49cbf1d82ab474a9919d3fe1db1ce907ed4ff226f63ef4b8f8f792b5bde",
+      "independent_conic": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 3.575588584390203,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            9.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.9252146110310436,
+          "maximum_weight": 0.4520618686863914,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": -1.1144879587789728e-10,
+          "position_cap": null,
+          "predicted_variance": 0.0008223728987327948,
+          "rank_objective": 0.8984216005295472,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.27967423443671846,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_to_ceiling": 1.0000000007701084,
+          "weight_sum": 1.0
+        },
+        "solver_status": "optimal",
+        "weights": [
+          9.853949348128649e-09,
+          0.0,
+          1.8557487713263544e-10,
+          0.14431993556098685,
+          0.03962107767483354,
+          0.19705423490554458,
+          0.09215748416376301,
+          0.4520618686863914,
+          -7.502211117477423e-11,
+          -1.1144879587789728e-10,
+          6.755525076561795e-11,
+          1.9530047527937837e-10,
+          4.9067547538911256e-11,
+          3.077761108783219e-10,
+          0.07478538853572801
+        ]
+      },
+      "maximum_absolute_weight_difference": 2.297556587038674e-06,
+      "metadata_checked": {
+        "as_of_date": "2026-10-31",
+        "forecast_month": "2026-11",
+        "market_origin": "2026-10-30"
+      },
+      "no_postsolve_repairs": true,
+      "passed": true,
+      "raw_checks": {
+        "MGK_weight": 0.0,
+        "effective_assets": 3.575580031473299,
+        "eligible_assets": [
+          "SPY",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "eligible_score_ranks": [
+          9.0,
+          7.0,
+          13.0,
+          10.0,
+          12.0,
+          11.0,
+          14.0,
+          2.0,
+          1.0,
+          4.0,
+          5.0,
+          3.0,
+          6.0,
+          8.0
+        ],
+        "equity_cap": null,
+        "equity_weight": 0.9252131362932603,
+        "maximum_weight": 0.4520624826209815,
+        "minimum_effective_assets": 3.0,
+        "minimum_weight": -7.532024468738572e-11,
+        "position_cap": null,
+        "predicted_variance": 0.0008223728991704154,
+        "rank_objective": 0.8984216006858451,
+        "raw_weights_changed": false,
+        "sum_squared_weights": 0.27967490342761403,
+        "variance_ceiling": 0.0008223728980994785,
+        "variance_to_ceiling": 1.000000001302252,
+        "weight_sum": 0.9999999999999998
+      },
+      "raw_serialized_maximum_difference": 1.1102230246251565e-16,
+      "supplied_analytic_certificate": null,
+      "supplied_numerical_attempts": [
+        {
+          "iterations": 11,
+          "max_step_fraction": 0.95,
+          "raw_checks": {
+            "concentration_binding": false,
+            "effective_assets": 3.575580031473296,
+            "equity_binding": false,
+            "equity_cap": null,
+            "equity_weight": 0.9252131362932606,
+            "minimum_weight": -7.532024468738572e-11,
+            "passed": true,
+            "predicted_variance": 0.000822372899170416,
+            "sum_squared_weights": 0.27967490342761425,
+            "variance_binding": true,
+            "variance_ceiling": 0.0008223728980994785,
+            "variance_ratio": 1.000000001302253,
+            "weight_sum": 1.0000000000000002
+          },
+          "static_regularization_constant": 1e-10,
+          "status": "optimal"
+        }
+      ],
+      "supplied_status": "optimal",
+      "weight_parity_absolute_tolerance": 5e-06
+    },
+    "GP_specification_checks": {
+      "broad_r2_i15_exp": {
+        "GP_tasks": [
+          "SPY",
+          "MGK",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "compact_rank1_permitted": false,
+        "inputs": [
+          "t_index",
+          "lag_y_excess_lead",
+          "mom12m_skip1m",
+          "mom6m",
+          "trend_slope",
+          "cpi_chg_12p",
+          "dealer_gamma_proxy",
+          "dxy",
+          "em_fx_ret",
+          "gold_crude_ratio",
+          "hy_spread_z_12p",
+          "oil_ret",
+          "spy_ret",
+          "term_spread",
+          "vix_ts_z_12p"
+        ],
+        "maxiter": 15,
+        "passed": true,
+        "rank": 2,
+        "registered_spec_sha256": "2d39c529256710343182976b4cb820882c0b24970f0688e884f6d07a8ed183b6",
+        "rolling_months": null
+      },
+      "broad_roll48_r2_i15": {
+        "GP_tasks": [
+          "SPY",
+          "MGK",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "compact_rank1_permitted": false,
+        "inputs": [
+          "t_index",
+          "lag_y_excess_lead",
+          "mom12m_skip1m",
+          "mom6m",
+          "trend_slope",
+          "cpi_chg_12p",
+          "dealer_gamma_proxy",
+          "dxy",
+          "em_fx_ret",
+          "gold_crude_ratio",
+          "hy_spread_z_12p",
+          "oil_ret",
+          "spy_ret",
+          "term_spread",
+          "vix_ts_z_12p"
+        ],
+        "maxiter": 15,
+        "passed": true,
+        "rank": 2,
+        "registered_spec_sha256": "7d5e5d4843bed37475bb1667526b40b103cb759c2f3d65bd64623946e8f0affc",
+        "rolling_months": 48
+      },
+      "compact_r1_i15_exp": {
+        "GP_tasks": [
+          "SPY",
+          "MGK",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "compact_rank1_permitted": true,
+        "inputs": [
+          "t_index",
+          "mom12m_skip1m",
+          "mom6m",
+          "cpi_chg_12p",
+          "hy_spread_z_12p",
+          "term_spread"
+        ],
+        "maxiter": 15,
+        "passed": true,
+        "rank": 1,
+        "registered_spec_sha256": "84f4607b1670dfde08439c0d9cc4776304fa56fbcb03a0fa3b27d590a4eae6a9",
+        "rolling_months": null
+      },
+      "compact_r2_i15_exp": {
+        "GP_tasks": [
+          "SPY",
+          "MGK",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "compact_rank1_permitted": true,
+        "inputs": [
+          "t_index",
+          "mom12m_skip1m",
+          "mom6m",
+          "cpi_chg_12p",
+          "hy_spread_z_12p",
+          "term_spread"
+        ],
+        "maxiter": 15,
+        "passed": true,
+        "rank": 2,
+        "registered_spec_sha256": "6b6152ba5ca743fedc4e9e422479130bd2496b3e7982c12c910c17afffc8a6d8",
+        "rolling_months": null
+      }
+    },
+    "actual6fit_checks": [
+      {
+        "November_export_target_unknown": false,
+        "actual_rank_factor_shape": [
+          15,
+          1
+        ],
+        "actual_task_means": 15,
+        "all15_training_tasks_required": true,
+        "date": "2026-09-30",
+        "iterations": 15,
+        "live_November_target_used": false,
+        "maxiter": 15,
+        "optimizer_invocations": 1,
+        "passed": true,
+        "rank": 1,
+        "seed": 127,
+        "train_end": "2026-08-31",
+        "train_months": 112,
+        "train_start": "2017-05-31"
+      },
+      {
+        "November_export_target_unknown": true,
+        "actual_rank_factor_shape": [
+          15,
+          1
+        ],
+        "actual_task_means": 15,
+        "all15_training_tasks_required": true,
+        "date": "2026-10-30",
+        "iterations": 15,
+        "live_November_target_used": false,
+        "maxiter": 15,
+        "optimizer_invocations": 1,
+        "passed": true,
+        "rank": 1,
+        "seed": 127,
+        "train_end": "2026-09-30",
+        "train_months": 113,
+        "train_start": "2017-05-31"
+      },
+      {
+        "November_export_target_unknown": false,
+        "actual_rank_factor_shape": [
+          15,
+          1
+        ],
+        "actual_task_means": 15,
+        "all15_training_tasks_required": true,
+        "date": "2026-09-30",
+        "iterations": 15,
+        "live_November_target_used": false,
+        "maxiter": 15,
+        "optimizer_invocations": 1,
+        "passed": true,
+        "rank": 1,
+        "seed": 227,
+        "train_end": "2026-08-31",
+        "train_months": 112,
+        "train_start": "2017-05-31"
+      },
+      {
+        "November_export_target_unknown": true,
+        "actual_rank_factor_shape": [
+          15,
+          1
+        ],
+        "actual_task_means": 15,
+        "all15_training_tasks_required": true,
+        "date": "2026-10-30",
+        "iterations": 15,
+        "live_November_target_used": false,
+        "maxiter": 15,
+        "optimizer_invocations": 1,
+        "passed": true,
+        "rank": 1,
+        "seed": 227,
+        "train_end": "2026-09-30",
+        "train_months": 113,
+        "train_start": "2017-05-31"
+      },
+      {
+        "November_export_target_unknown": false,
+        "actual_rank_factor_shape": [
+          15,
+          1
+        ],
+        "actual_task_means": 15,
+        "all15_training_tasks_required": true,
+        "date": "2026-09-30",
+        "iterations": 15,
+        "live_November_target_used": false,
+        "maxiter": 15,
+        "optimizer_invocations": 1,
+        "passed": true,
+        "rank": 1,
+        "seed": 27,
+        "train_end": "2026-08-31",
+        "train_months": 112,
+        "train_start": "2017-05-31"
+      },
+      {
+        "November_export_target_unknown": true,
+        "actual_rank_factor_shape": [
+          15,
+          1
+        ],
+        "actual_task_means": 15,
+        "all15_training_tasks_required": true,
+        "date": "2026-10-30",
+        "iterations": 15,
+        "live_November_target_used": false,
+        "maxiter": 15,
+        "optimizer_invocations": 1,
+        "passed": true,
+        "rank": 1,
+        "seed": 27,
+        "train_end": "2026-09-30",
+        "train_months": 113,
+        "train_start": "2017-05-31"
+      }
+    ],
+    "all10live_constraints_independently_feasible": {
+      "policy_1ecb16e803d529c446d5": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 3.204208315318416,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            8.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            9.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.8700491528504679,
+          "maximum_weight": 0.485568241143848,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": -3.268107588354146e-10,
+          "position_cap": null,
+          "predicted_variance": 0.0008223728990763572,
+          "rank_objective": 0.9058602141831616,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.3120895714611569,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_to_ceiling": 1.000000001187878,
+          "weight_sum": 1.0000000000000002
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_269c851205829f549e8e": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 4.377320238761598,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            9.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.7364734227995704,
+          "maximum_weight": 0.33910865619534075,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": -2.076877732050772e-11,
+          "position_cap": null,
+          "predicted_variance": 0.0006167796740696788,
+          "rank_objective": 0.8232994237574969,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.22845027218819916,
+          "variance_ceiling": 0.0006167796735746089,
+          "variance_to_ceiling": 1.000000000802669,
+          "weight_sum": 0.9999999999999999
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_56a0b06b63cc63c2913b": {
+        "attempts": [
+          {
+            "iterations": 13,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 6.9999999780002655,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            9.0,
+            8.0,
+            10.0,
+            11.0,
+            13.0,
+            12.0,
+            14.0,
+            3.0,
+            1.0,
+            2.0,
+            6.0,
+            4.0,
+            7.0,
+            5.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.9387930544656141,
+          "maximum_weight": 0.20311986180829023,
+          "minimum_effective_assets": 7.0,
+          "minimum_weight": -5.2791327477775247e-11,
+          "position_cap": null,
+          "predicted_variance": 0.0006579284535252389,
+          "rank_objective": 0.8128665074834616,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.14285714330611704,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_to_ceiling": 0.8000366440160245,
+          "weight_sum": 0.9999999999999999
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_87884c01c87dcdace8a6": {
+        "attempts": [
+          {
+            "iterations": 13,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 3.6537349781650077,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            8.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            9.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.6779973183791402,
+          "maximum_weight": 0.3635003432921919,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": -1.4273693443721742e-10,
+          "position_cap": null,
+          "predicted_variance": 0.0006167796742355806,
+          "rank_objective": 0.8442280391425833,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.27369253817698175,
+          "variance_ceiling": 0.0006167796735746089,
+          "variance_to_ceiling": 1.0000000010716497,
+          "weight_sum": 1.0
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_91b4b9ebe70878b95ef8": {
+        "attempts": [
+          {
+            "iterations": 14,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 4.752008362288786,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            11.0,
+            8.0,
+            10.0,
+            9.0,
+            13.0,
+            12.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            7.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.7888520136881441,
+          "maximum_weight": 0.2972242740420274,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": 0.0,
+          "position_cap": null,
+          "predicted_variance": 0.0006167796740533725,
+          "rank_objective": 0.825697165075434,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.21043734012251486,
+          "variance_ceiling": 0.0006167796735746089,
+          "variance_to_ceiling": 1.0000000007762313,
+          "weight_sum": 0.9999999999999997
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_b71ce3fe84ee69f58247": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 3.575588584390203,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            9.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.9252146110310436,
+          "maximum_weight": 0.4520618686863914,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": -1.1144879587789728e-10,
+          "position_cap": null,
+          "predicted_variance": 0.0008223728987327948,
+          "rank_objective": 0.8984216005295472,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.27967423443671846,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_to_ceiling": 1.0000000007701084,
+          "weight_sum": 1.0
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_bffebed65d9d74291d0a": {
+        "attempts": [
+          {
+            "iterations": 13,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 3.0000000054008997,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            9.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.1975522289839242,
+          "maximum_weight": 0.44527120615039195,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": 0.0,
+          "position_cap": null,
+          "predicted_variance": 0.00041118644930106707,
+          "rank_objective": 0.48320867134502177,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.33333333273323335,
+          "variance_ceiling": 0.00041118644904973925,
+          "variance_to_ceiling": 1.000000000611226,
+          "weight_sum": 1.0
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_c5f34924606d3b69f1bf": {
+        "attempts": [
+          {
+            "iterations": 13,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 6.999999978101587,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            11.0,
+            8.0,
+            10.0,
+            9.0,
+            13.0,
+            12.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            7.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.9387930601498078,
+          "maximum_weight": 0.20311986010992794,
+          "minimum_effective_assets": 7.0,
+          "minimum_weight": -5.1235608612309314e-11,
+          "position_cap": null,
+          "predicted_variance": 0.0006584314602986654,
+          "rank_objective": 0.8128665074805335,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.14285714330404925,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_to_ceiling": 0.8006482969226183,
+          "weight_sum": 1.0
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_e88e9221e7d2bdd5631c": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 4.319931865444914,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            13.0,
+            9.0,
+            7.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.7174298746995709,
+          "maximum_weight": 0.28257012332685266,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": 0.0,
+          "position_cap": null,
+          "predicted_variance": 0.0006167796741557722,
+          "rank_objective": 0.8255490032983953,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.23148513243900642,
+          "variance_ceiling": 0.0006167796735746089,
+          "variance_to_ceiling": 1.0000000009422545,
+          "weight_sum": 1.0
+        },
+        "strict_independent_solver_status": "optimal"
+      },
+      "policy_ffda294836ec0b34898d": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 4.319931865444914,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            13.0,
+            9.0,
+            7.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.7174298746995709,
+          "maximum_weight": 0.28257012332685266,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": 0.0,
+          "position_cap": null,
+          "predicted_variance": 0.0006167796741557722,
+          "rank_objective": 0.8255490032983953,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.23148513243900642,
+          "variance_ceiling": 0.0006167796735746089,
+          "variance_to_ceiling": 1.0000000009422545,
+          "weight_sum": 1.0
+        },
+        "strict_independent_solver_status": "optimal"
+      }
+    },
+    "all_final_selection_gates_recomputed": {
+      "policy_1ecb16e803d529c446d5": {
+        "distance": 0.0,
+        "eligible": true,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": true,
+          "development_eligible_before_unlock": true,
+          "latest12_distance_within_best_control_plus0p50": true,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      },
+      "policy_269c851205829f549e8e": {
+        "distance": 0.0,
+        "eligible": true,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": true,
+          "development_eligible_before_unlock": true,
+          "latest12_distance_within_best_control_plus0p50": true,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      },
+      "policy_56a0b06b63cc63c2913b": {
+        "distance": 2.4574589805603133,
+        "eligible": true,
+        "gates": {
+          "raw_path_and_live_feasible": true,
+          "unchanged_control": true
+        }
+      },
+      "policy_87884c01c87dcdace8a6": {
+        "distance": 0.0,
+        "eligible": true,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": true,
+          "development_eligible_before_unlock": true,
+          "latest12_distance_within_best_control_plus0p50": true,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      },
+      "policy_91b4b9ebe70878b95ef8": {
+        "distance": 0.5587734675018601,
+        "eligible": true,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": true,
+          "development_eligible_before_unlock": true,
+          "latest12_distance_within_best_control_plus0p50": true,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      },
+      "policy_b71ce3fe84ee69f58247": {
+        "distance": 0.0,
+        "eligible": true,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": true,
+          "development_eligible_before_unlock": true,
+          "latest12_distance_within_best_control_plus0p50": true,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      },
+      "policy_bffebed65d9d74291d0a": {
+        "distance": 2.6708468816439837,
+        "eligible": false,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": false,
+          "development_eligible_before_unlock": false,
+          "latest12_distance_within_best_control_plus0p50": false,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      },
+      "policy_c5f34924606d3b69f1bf": {
+        "distance": 1.0949539263419932,
+        "eligible": true,
+        "gates": {
+          "raw_path_and_live_feasible": true,
+          "unchanged_control": true
+        }
+      },
+      "policy_e88e9221e7d2bdd5631c": {
+        "distance": 0.17795484421383942,
+        "eligible": true,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": true,
+          "development_eligible_before_unlock": true,
+          "latest12_distance_within_best_control_plus0p50": true,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      },
+      "policy_ffda294836ec0b34898d": {
+        "distance": 0.17795482912540891,
+        "eligible": true,
+        "gates": {
+          "November_registered_constraints_feasible": true,
+          "all53_complete_raw_path": true,
+          "all53_distance_gain_at_least_0p05": true,
+          "development_eligible_before_unlock": true,
+          "latest12_distance_within_best_control_plus0p50": true,
+          "latest12_drawdown_loss_within_best_control_plus3pp": true
+        }
+      }
+    },
+    "audited_at_utc": "2026-10-31T14:56:29.837017+00:00",
+    "benchmark_ids": [
+      "schwab_aggressive",
+      "momentum_top7"
+    ],
+    "best_full_control_recomputed": "policy_c5f34924606d3b69f1bf",
+    "best_latest_control_recomputed": "policy_56a0b06b63cc63c2913b",
+    "confirmation_case_count": 10,
+    "data_and_target_availability": {
+      "GP_tasks": [
+        "SPY",
+        "MGK",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "allocatable_assets": [
+        "SPY",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "as_of_date": "2026-10-31",
+      "expanding_training_months": 113,
+      "forecast_month": "2026-11",
+      "inputs_checked": [
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "oil_ret",
+        "spy_ret",
+        "t_index",
+        "term_spread",
+        "trend_slope",
+        "vix_ts_z_12p"
+      ],
+      "last_training_origin": "2026-09-30",
+      "last_training_target_available_on": "2026-10-30",
+      "market_origin": "2026-10-30",
+      "passed": true,
+      "row_timing_only_not_macro_vintage_certification": true,
+      "unknown_live_targets": 15
+    },
+    "deterministic_reproduction_tolerance": 1e-12,
+    "deterministic_root_reproduction_maximum_weight_gap": 0.0,
+    "eligible_Pareto_ids_recomputed": [
+      "policy_1ecb16e803d529c446d5",
+      "policy_269c851205829f549e8e",
+      "policy_87884c01c87dcdace8a6",
+      "policy_b71ce3fe84ee69f58247"
+    ],
+    "final_ordering_keys": {
+      "policy_1ecb16e803d529c446d5": [
+        0.0,
+        -3,
+        -0.8337320041990178,
+        -0.12933858594235956,
+        [
+          0,
+          14,
+          0
+        ],
+        "policy_1ecb16e803d529c446d5"
+      ],
+      "policy_269c851205829f549e8e": [
+        0.0,
+        -3,
+        -0.8245624156460825,
+        -0.13315363881401618,
+        [
+          0,
+          14,
+          0
+        ],
+        "policy_269c851205829f549e8e"
+      ],
+      "policy_87884c01c87dcdace8a6": [
+        0.0,
+        -3,
+        -0.8166757646285849,
+        -0.13116317644619532,
+        [
+          0,
+          14,
+          0
+        ],
+        "policy_87884c01c87dcdace8a6"
+      ],
+      "policy_b71ce3fe84ee69f58247": [
+        0.0,
+        -3,
+        -0.8376809351497811,
+        -0.1353099730458221,
+        [
+          0,
+          14,
+          0
+        ],
+        "policy_b71ce3fe84ee69f58247"
+      ]
+    },
+    "finalist53_and12_metric_checks": [
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.10618394478151005,
+          "family_ic": {
+            "international_equity": 0.12075471698113203,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": 0.14150943396226415,
+            "us_fixed_income": 0.16226415094339616
+          },
+          "max_drawdown": -0.11467996887355114,
+          "months": 53,
+          "rank_ic": 0.14534522081691892,
+          "sharpe": 0.5616241323642981,
+          "total_return": 0.5616035923372402
+        },
+        "id": "policy_c5f34924606d3b69f1bf",
+        "latest12": {
+          "cagr": 0.14489272761377192,
+          "family_ic": {
+            "international_equity": 0.18333333333333332,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": 0.08333333333333333,
+            "us_fixed_income": 0.1666666666666667
+          },
+          "max_drawdown": -0.0641689327306042,
+          "months": 12,
+          "rank_ic": 0.28498168498168497,
+          "sharpe": 0.790332635691497,
+          "total_return": 0.14489272761377192
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.09245333445553694,
+          "family_ic": {
+            "international_equity": 0.12452830188679243,
+            "international_fixed_income": -0.04716981132075472,
+            "us_equity": 0.14150943396226415,
+            "us_fixed_income": 0.2075471698113207
+          },
+          "max_drawdown": -0.13829858279226792,
+          "months": 53,
+          "rank_ic": 0.08695832469417375,
+          "sharpe": 0.4412045582263531,
+          "total_return": 0.4777902076730991
+        },
+        "id": "policy_56a0b06b63cc63c2913b",
+        "latest12": {
+          "cagr": 0.12807365900463852,
+          "family_ic": {
+            "international_equity": 0.15,
+            "international_fixed_income": 0.0,
+            "us_equity": 0.08333333333333333,
+            "us_fixed_income": 0.08333333333333337
+          },
+          "max_drawdown": -0.06419957921995167,
+          "months": 12,
+          "rank_ic": 0.1923076923076923,
+          "sharpe": 0.6794155549131577,
+          "total_return": 0.12807365900463852
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.14644201945199353,
+          "family_ic": {
+            "international_equity": 0.1094339622641509,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": 0.2641509433962264,
+            "us_fixed_income": 0.1509433962264151
+          },
+          "max_drawdown": -0.09018923089816011,
+          "months": 53,
+          "rank_ic": 0.1353099730458221,
+          "sharpe": 0.8376809351497811,
+          "total_return": 0.8286829749946563
+        },
+        "id": "policy_b71ce3fe84ee69f58247",
+        "latest12": {
+          "cagr": 0.1950857653327922,
+          "family_ic": {
+            "international_equity": 0.15,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": 0.25,
+            "us_fixed_income": 0.15
+          },
+          "max_drawdown": -0.08057683179181607,
+          "months": 12,
+          "rank_ic": 0.25091575091575097,
+          "sharpe": 0.9870135397616598,
+          "total_return": 0.1950857653327922
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.14579951705285876,
+          "family_ic": {
+            "international_equity": 0.12075471698113203,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": 0.2641509433962264,
+            "us_fixed_income": 0.15849056603773579
+          },
+          "max_drawdown": -0.08860710873969269,
+          "months": 53,
+          "rank_ic": 0.12933858594235956,
+          "sharpe": 0.8337320041990178,
+          "total_return": 0.8241608777555542
+        },
+        "id": "policy_1ecb16e803d529c446d5",
+        "latest12": {
+          "cagr": 0.19599138868989519,
+          "family_ic": {
+            "international_equity": 0.18333333333333332,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": 0.25,
+            "us_fixed_income": 0.1666666666666667
+          },
+          "max_drawdown": -0.08057683179181607,
+          "months": 12,
+          "rank_ic": 0.2366300366300366,
+          "sharpe": 0.993090145471997,
+          "total_return": 0.19599138868989519
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.14046633226101868,
+          "family_ic": {
+            "international_equity": 0.11320754716981128,
+            "international_fixed_income": 0.07547169811320754,
+            "us_equity": 0.2358490566037736,
+            "us_fixed_income": 0.15849056603773579
+          },
+          "max_drawdown": -0.08585096112728241,
+          "months": 53,
+          "rank_ic": 0.13315363881401618,
+          "sharpe": 0.8245624156460825,
+          "total_return": 0.7869575592247522
+        },
+        "id": "policy_269c851205829f549e8e",
+        "latest12": {
+          "cagr": 0.18570068171229703,
+          "family_ic": {
+            "international_equity": 0.15,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": 0.20833333333333334,
+            "us_fixed_income": 0.1666666666666667
+          },
+          "max_drawdown": -0.08057683179181618,
+          "months": 12,
+          "rank_ic": 0.247985347985348,
+          "sharpe": 0.9697066016367728,
+          "total_return": 0.18570068171229703
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.06168718877933155,
+          "family_ic": {
+            "international_equity": 0.12075471698113203,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": 0.2358490566037736,
+            "us_fixed_income": 0.16226415094339616
+          },
+          "max_drawdown": -0.07795128976363375,
+          "months": 53,
+          "rank_ic": 0.13116317644619535,
+          "sharpe": 0.24861975651682683,
+          "total_return": 0.3026214168954169
+        },
+        "id": "policy_bffebed65d9d74291d0a",
+        "latest12": {
+          "cagr": 0.03868709429542738,
+          "family_ic": {
+            "international_equity": 0.18333333333333332,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": 0.20833333333333334,
+            "us_fixed_income": 0.1666666666666667
+          },
+          "max_drawdown": -0.036138956829003366,
+          "months": 12,
+          "rank_ic": 0.24725274725274723,
+          "sharpe": 0.02549763170534958,
+          "total_return": 0.03868709429542738
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.1236494517011053,
+          "family_ic": {
+            "international_equity": 0.12075471698113203,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": -0.03773584905660377,
+            "us_fixed_income": 0.1660377358490566
+          },
+          "max_drawdown": -0.09823906545605932,
+          "months": 53,
+          "rank_ic": 0.12345013477088948,
+          "sharpe": 0.67095303588049,
+          "total_return": 0.6734762834921526
+        },
+        "id": "policy_ffda294836ec0b34898d",
+        "latest12": {
+          "cagr": 0.1586139144069958,
+          "family_ic": {
+            "international_equity": 0.18333333333333332,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": -0.041666666666666664,
+            "us_fixed_income": 0.2166666666666667
+          },
+          "max_drawdown": -0.08057683179181607,
+          "months": 12,
+          "rank_ic": 0.26666666666666666,
+          "sharpe": 0.7749744703964944,
+          "total_return": 0.1586139144069958
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.1228574906174269,
+          "family_ic": {
+            "international_equity": 0.13207547169811318,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": -0.03773584905660377,
+            "us_fixed_income": 0.15471698113207544
+          },
+          "max_drawdown": -0.09823906575782793,
+          "months": 53,
+          "rank_ic": 0.12602114866265812,
+          "sharpe": 0.6649509038361455,
+          "total_return": 0.6682731585938964
+        },
+        "id": "policy_e88e9221e7d2bdd5631c",
+        "latest12": {
+          "cagr": 0.15548333774345635,
+          "family_ic": {
+            "international_equity": 0.18333333333333332,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": -0.041666666666666664,
+            "us_fixed_income": 0.1666666666666667
+          },
+          "max_drawdown": -0.08057683179181596,
+          "months": 12,
+          "rank_ic": 0.26373626373626374,
+          "sharpe": 0.7586043357054462,
+          "total_return": 0.15548333774345635
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.12784519460876065,
+          "family_ic": {
+            "international_equity": 0.12075471698113203,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": 0.14150943396226415,
+            "us_fixed_income": 0.16226415094339616
+          },
+          "max_drawdown": -0.10585543822358834,
+          "months": 53,
+          "rank_ic": 0.14534522081691892,
+          "sharpe": 0.7127862402418023,
+          "total_return": 0.7012517943223118
+        },
+        "id": "policy_91b4b9ebe70878b95ef8",
+        "latest12": {
+          "cagr": 0.1747002344169355,
+          "family_ic": {
+            "international_equity": 0.18333333333333332,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": 0.08333333333333333,
+            "us_fixed_income": 0.1666666666666667
+          },
+          "max_drawdown": -0.08057683179181596,
+          "months": 12,
+          "rank_ic": 0.28498168498168497,
+          "sharpe": 0.8980249890889563,
+          "total_return": 0.1747002344169355
+        },
+        "source_moments_match": true
+      },
+      {
+        "all53_raw_constraints_and_status_passed": true,
+        "full53": {
+          "cagr": 0.1394623391674823,
+          "family_ic": {
+            "international_equity": 0.12075471698113203,
+            "international_fixed_income": 0.05660377358490566,
+            "us_equity": 0.2358490566037736,
+            "us_fixed_income": 0.1509433962264151
+          },
+          "max_drawdown": -0.08490813202892611,
+          "months": 53,
+          "rank_ic": 0.13116317644619532,
+          "sharpe": 0.8166757646285849,
+          "total_return": 0.7800200439611307
+        },
+        "id": "policy_87884c01c87dcdace8a6",
+        "latest12": {
+          "cagr": 0.18332720841238626,
+          "family_ic": {
+            "international_equity": 0.18333333333333332,
+            "international_fixed_income": 0.20833333333333334,
+            "us_equity": 0.20833333333333334,
+            "us_fixed_income": 0.15
+          },
+          "max_drawdown": -0.08057683179181618,
+          "months": 12,
+          "rank_ic": 0.24322344322344322,
+          "sharpe": 0.9548569306926762,
+          "total_return": 0.18332720841238626
+        },
+        "source_moments_match": true
+      }
+    ],
+    "fit_attempts_remaining": 1194,
+    "fit_attempts_used": 6,
+    "frozen_shortlist_sha256": "397244bab5505bfc445fe8bb7f7ef4b405da355257e642bb4921e6217fde7f75",
+    "historical_risk_matrices_independently_recomputed": 54,
+    "independent_conic_weight_tolerance": 5e-06,
+    "new_policy_count": 874,
+    "original15tasks_preserved": true,
+    "passed": true,
+    "portfolio": {
+      "absolute_objective_difference": 1.562981966074517e-10,
+      "independent_conic": {
+        "attempts": [
+          {
+            "iterations": 12,
+            "options": {
+              "max_iter": 500,
+              "max_step_fraction": 0.9,
+              "static_regularization_constant": 1e-12,
+              "static_regularization_enable": true,
+              "tol_feas": 1e-09,
+              "tol_gap_abs": 1e-09,
+              "tol_gap_rel": 1e-09
+            },
+            "status": "optimal"
+          }
+        ],
+        "raw_checks": {
+          "MGK_weight": 0.0,
+          "effective_assets": 3.575588584390203,
+          "eligible_assets": [
+            "SPY",
+            "VTV",
+            "IWM",
+            "VEA",
+            "VWO",
+            "VSS",
+            "EWX",
+            "BND",
+            "IEF",
+            "LQD",
+            "HYG",
+            "BNDX",
+            "VWOB",
+            "HYEM"
+          ],
+          "eligible_score_ranks": [
+            9.0,
+            7.0,
+            13.0,
+            10.0,
+            12.0,
+            11.0,
+            14.0,
+            2.0,
+            1.0,
+            4.0,
+            5.0,
+            3.0,
+            6.0,
+            8.0
+          ],
+          "equity_cap": null,
+          "equity_weight": 0.9252146110310436,
+          "maximum_weight": 0.4520618686863914,
+          "minimum_effective_assets": 3.0,
+          "minimum_weight": -1.1144879587789728e-10,
+          "position_cap": null,
+          "predicted_variance": 0.0008223728987327948,
+          "rank_objective": 0.8984216005295472,
+          "raw_weights_changed": false,
+          "sum_squared_weights": 0.27967423443671846,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_to_ceiling": 1.0000000007701084,
+          "weight_sum": 1.0
+        },
+        "solver_status": "optimal",
+        "weights": [
+          9.853949348128649e-09,
+          0.0,
+          1.8557487713263544e-10,
+          0.14431993556098685,
+          0.03962107767483354,
+          0.19705423490554458,
+          0.09215748416376301,
+          0.4520618686863914,
+          -7.502211117477423e-11,
+          -1.1144879587789728e-10,
+          6.755525076561795e-11,
+          1.9530047527937837e-10,
+          4.9067547538911256e-11,
+          3.077761108783219e-10,
+          0.07478538853572801
+        ]
+      },
+      "maximum_absolute_weight_difference": 2.297556586955407e-06,
+      "no_postsolve_repairs": true,
+      "passed": true,
+      "raw_checks": {
+        "MGK_weight": 0.0,
+        "effective_assets": 3.575580031473296,
+        "eligible_assets": [
+          "SPY",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "eligible_score_ranks": [
+          9.0,
+          7.0,
+          13.0,
+          10.0,
+          12.0,
+          11.0,
+          14.0,
+          2.0,
+          1.0,
+          4.0,
+          5.0,
+          3.0,
+          6.0,
+          8.0
+        ],
+        "equity_cap": null,
+        "equity_weight": 0.9252131362932606,
+        "maximum_weight": 0.4520624826209816,
+        "minimum_effective_assets": 3.0,
+        "minimum_weight": -7.532024468738572e-11,
+        "position_cap": null,
+        "predicted_variance": 0.0008223728991704161,
+        "rank_objective": 0.8984216006858454,
+        "raw_weights_changed": false,
+        "sum_squared_weights": 0.27967490342761425,
+        "variance_ceiling": 0.0008223728980994785,
+        "variance_to_ceiling": 1.000000001302253,
+        "weight_sum": 1.0000000000000002
+      },
+      "supplied_analytic_certificate": null,
+      "supplied_numerical_attempts": [
+        {
+          "iterations": 11,
+          "max_step_fraction": 0.95,
+          "raw_checks": {
+            "concentration_binding": false,
+            "effective_assets": 3.575580031473296,
+            "equity_binding": false,
+            "equity_cap": null,
+            "equity_weight": 0.9252131362932606,
+            "minimum_weight": -7.532024468738572e-11,
+            "passed": true,
+            "predicted_variance": 0.000822372899170416,
+            "sum_squared_weights": 0.27967490342761425,
+            "variance_binding": true,
+            "variance_ceiling": 0.0008223728980994785,
+            "variance_ratio": 1.000000001302253,
+            "weight_sum": 1.0000000000000002
+          },
+          "static_regularization_constant": 1e-10,
+          "status": "optimal"
+        }
+      ],
+      "supplied_status": "optimal",
+      "weight_parity_absolute_tolerance": 5e-06
+    },
+    "protected_hash_counts": {
+      "data_artifacts": 92,
+      "data_inputs": 40,
+      "fitcontract": 45,
+      "fits": 52,
+      "math": 6,
+      "prereg": 20,
+      "shortlist": 8,
+      "v1_artifacts": 375,
+      "v1_environment": 2
+    },
+    "rounds": 4,
+    "scope": "Independent final audit of fixed10already-scored finalists and selectedliveportfolio. No additionalGPfits, policies or search.",
+    "selected_id": "policy_b71ce3fe84ee69f58247",
+    "selected_policy_matches_frozen_case": true,
+    "source_derived_live_eligible14_EW_variance": 0.0008223728980994785,
+    "source_moment_cache_bitwise_checks_passed": true,
+    "source_sha256": {
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/COMPARISON.json": "1ad98b96806bdf79bf1f75a6b9e9930897c3338efdd4bc2695d27a17c99a879a",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/CONFIG.json": "39e5fc393e6691140dec274927d76dc8eb11c9559975d355a2912c4bdc201e95",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/FINAL_SELECTION.json": "8dd53357814c8f8cfbbc31902a6469a654d5e6455e38ae034ae443e6cc91fb80",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/FITS_COMPLETED.json": "219af14549c6b68dafbe4bb269217dc5d3b746394c86bebb1dc084a08e9bd4d9",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/FIT_CONTRACT.json": "32a19ade01acbe4164fe34311f8a3920568f891918572c82efc37e85287a9c3f",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/NOVEMBER_WEIGHTS.csv": "5b20f49cbf1d82ab474a9919d3fe1db1ce907ed4ff226f63ef4b8f8f792b5bde",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/ROOT_VALIDATION.json": "ff38339752302c2878278dcfa49096bca25a5349a71378afc50be36d510f3dc2",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/SHORTLIST_FROZEN.json": "397244bab5505bfc445fe8bb7f7ef4b405da355257e642bb4921e6217fde7f75",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/outputs/NOVEMBER_MOMENTS.npz": "228cf3b963294b6dcf58fd6018c3d96cfec6c9166339793c08a468c3f720e8aa",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/outputs/NOVEMBER_OPTIMIZER.json": "6d3db3f07813597710e07bc1eb1cd03e46501decf6d7c88872110950d528c226",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/outputs/NUMERICAL_PARITY_NOTE.json": "5664bf5fbea37ba30d9aeff53a27c01168d679db0d77cf4bf4e3404ac65a651f",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/v2_independent_validation.py": "bb15ebaaa0790e69a9a4150a7aea624d58b41711e77074570286e7973984495f"
+    }
+  },
+  "fit_attempts_used": 6,
+  "frozen_confirmation_respected": true,
+  "independent_conic_weight_parity_tolerance": 5e-06,
+  "minimum_raw_weight_tolerance": -1e-08,
+  "new_fit_settings": [
+    {
+      "all15_training_tasks_required": true,
+      "date": "2026-09-30",
+      "live_November_target_used": false,
+      "maxiter": 15,
+      "passed": true,
+      "rank": 1,
+      "seed": 127,
+      "train_end": "2026-08-31",
+      "train_months": 112,
+      "train_start": "2017-05-31"
+    },
+    {
+      "all15_training_tasks_required": true,
+      "date": "2026-10-30",
+      "live_November_target_used": false,
+      "maxiter": 15,
+      "passed": true,
+      "rank": 1,
+      "seed": 127,
+      "train_end": "2026-09-30",
+      "train_months": 113,
+      "train_start": "2017-05-31"
+    },
+    {
+      "all15_training_tasks_required": true,
+      "date": "2026-09-30",
+      "live_November_target_used": false,
+      "maxiter": 15,
+      "passed": true,
+      "rank": 1,
+      "seed": 227,
+      "train_end": "2026-08-31",
+      "train_months": 112,
+      "train_start": "2017-05-31"
+    },
+    {
+      "all15_training_tasks_required": true,
+      "date": "2026-10-30",
+      "live_November_target_used": false,
+      "maxiter": 15,
+      "passed": true,
+      "rank": 1,
+      "seed": 227,
+      "train_end": "2026-09-30",
+      "train_months": 113,
+      "train_start": "2017-05-31"
+    },
+    {
+      "all15_training_tasks_required": true,
+      "date": "2026-09-30",
+      "live_November_target_used": false,
+      "maxiter": 15,
+      "passed": true,
+      "rank": 1,
+      "seed": 27,
+      "train_end": "2026-08-31",
+      "train_months": 112,
+      "train_start": "2017-05-31"
+    },
+    {
+      "all15_training_tasks_required": true,
+      "date": "2026-10-30",
+      "live_November_target_used": false,
+      "maxiter": 15,
+      "passed": true,
+      "rank": 1,
+      "seed": 27,
+      "train_end": "2026-09-30",
+      "train_months": 113,
+      "train_start": "2017-05-31"
+    }
+  ],
+  "no_trades_git_or_production_changes": true,
+  "passed": true,
+  "portfolio": {
+    "absolute_objective_difference": 1.5629830762975416e-10,
+    "independent_conic": {
+      "attempts": [
+        {
+          "iterations": 12,
+          "options": {
+            "max_iter": 500,
+            "max_step_fraction": 0.9,
+            "static_regularization_constant": 1e-12,
+            "static_regularization_enable": true,
+            "tol_feas": 1e-09,
+            "tol_gap_abs": 1e-09,
+            "tol_gap_rel": 1e-09
+          },
+          "status": "optimal"
+        }
+      ],
+      "raw_checks": {
+        "MGK_weight": 0.0,
+        "effective_assets": 3.575588584388823,
+        "eligible_assets": [
+          "SPY",
+          "VTV",
+          "IWM",
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX",
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG",
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "eligible_score_ranks": [
+          9.0,
+          7.0,
+          13.0,
+          10.0,
+          12.0,
+          11.0,
+          14.0,
+          2.0,
+          1.0,
+          4.0,
+          5.0,
+          3.0,
+          6.0,
+          8.0
+        ],
+        "equity_cap": null,
+        "equity_weight": 0.9252146110308539,
+        "maximum_weight": 0.45206186868652226,
+        "minimum_effective_assets": 3.0,
+        "minimum_weight": -1.1144919205874228e-10,
+        "position_cap": null,
+        "predicted_variance": 0.0008223728987327968,
+        "rank_objective": 0.8984216005295471,
+        "raw_weights_changed": false,
+        "sum_squared_weights": 0.27967423443682643,
+        "variance_ceiling": 0.0008223728980994785,
+        "variance_to_ceiling": 1.0000000007701109,
+        "weight_sum": 1.0
+      },
+      "solver_status": "optimal",
+      "weights": [
+        9.853982943617758e-09,
+        0.0,
+        1.855754959055066e-10,
+        0.14431993556097794,
+        0.039621077674568406,
+        0.19705423490554466,
+        0.09215748416368227,
+        0.45206186868652226,
+        -7.502238319074983e-11,
+        -1.1144919205874228e-10,
+        6.755546474189999e-11,
+        1.9530112469319471e-10,
+        4.9067698498897424e-11,
+        3.0777714367885354e-10,
+        0.0747853885359162
+      ]
+    },
+    "maximum_absolute_weight_difference": 2.297556321820271e-06,
+    "no_postsolve_repairs": true,
+    "passed": true,
+    "raw_checks": {
+      "MGK_weight": 0.0,
+      "effective_assets": 3.575580031473296,
+      "eligible_assets": [
+        "SPY",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "eligible_score_ranks": [
+        9.0,
+        7.0,
+        13.0,
+        10.0,
+        12.0,
+        11.0,
+        14.0,
+        2.0,
+        1.0,
+        4.0,
+        5.0,
+        3.0,
+        6.0,
+        8.0
+      ],
+      "equity_cap": null,
+      "equity_weight": 0.9252131362932606,
+      "maximum_weight": 0.4520624826209816,
+      "minimum_effective_assets": 3.0,
+      "minimum_weight": -7.532024468738572e-11,
+      "position_cap": null,
+      "predicted_variance": 0.000822372899170416,
+      "rank_objective": 0.8984216006858454,
+      "raw_weights_changed": false,
+      "sum_squared_weights": 0.27967490342761425,
+      "variance_ceiling": 0.0008223728980994785,
+      "variance_to_ceiling": 1.000000001302253,
+      "weight_sum": 1.0000000000000002
+    },
+    "supplied_analytic_certificate": null,
+    "supplied_numerical_attempts": [
+      {
+        "iterations": 11,
+        "max_step_fraction": 0.95,
+        "raw_checks": {
+          "concentration_binding": false,
+          "effective_assets": 3.575580031473296,
+          "equity_binding": false,
+          "equity_cap": null,
+          "equity_weight": 0.9252131362932606,
+          "minimum_weight": -7.532024468738572e-11,
+          "passed": true,
+          "predicted_variance": 0.000822372899170416,
+          "sum_squared_weights": 0.27967490342761425,
+          "variance_binding": true,
+          "variance_ceiling": 0.0008223728980994785,
+          "variance_ratio": 1.000000001302253,
+          "weight_sum": 1.0000000000000002
+        },
+        "static_regularization_constant": 1e-10,
+        "status": "optimal"
+      }
+    ],
+    "supplied_status": "optimal",
+    "weight_parity_absolute_tolerance": 5e-06
+  },
+  "protected_inputs_unchanged": true,
+  "raw_weights_repaired": false,
+  "retained_failed_design_coverage_leaves": 16,
+  "root_checks_only_external_final_audit_required_before_completion": false,
+  "unresolved_fit_or_allocation_failures": [],
+  "weight_sum_tolerance": 1e-07
+}

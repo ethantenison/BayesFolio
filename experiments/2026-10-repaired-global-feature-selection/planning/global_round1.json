@@ -1,0 +1,29 @@
+{
+  "family": "global",
+  "round_index": 1,
+  "study_stage": "global_refinement",
+  "round_interpretation": "The initial actual fifteen-task comparison is complete and all 21 joint seed runs pass independent objective/allocation arithmetic verification. Only the ten-input density core and fifteen-input international-exception mask are nondominated; the latter beats the 27-input control on all three objectives in all three seeds. Literal and reduced family unions are dominated, demonstrating that component importance does not transfer automatically. U.S.-equity and international-debt within-family IC decline despite overall gains, while family NLL improves for all four. Lag improves its matched fourteen-input parent in aggregate but that branch is dominated; its usefulness on the stronger front remains unknown. This round uses both frontier branches to test rank/annual-momentum/ratio reductions, conditional lag transfer, absolute HY level and an isolated dealer-proxy bridge. No family metric or interval width is a hidden objective.",
+  "default_expected_tradeoff": "Report pooled IC, Gaussian NLL and actual joint conventional Sharpe, paired seed effects, within-family forecast quality, allocation and calibrated uncertainty. Preserve genuine tradeoffs and report input savings separately.",
+  "default_falsification": "A dominated result does not support the proposed simplification/transfer in this context. A pooled gain is not proof that every family improved; context conflicts and seed instability must remain explicit. Reused score dates are adaptive research, not untouched confirmation.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/global_round0.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/joint_objective_audit.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/conditional_feature_evidence.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/frontier_monthly_diagnostics.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/GLOBAL_INITIAL_INTERPRETATION.md"
+  ],
+  "candidates": [
+    {"name":"international_exception_front_without_global_rank","category":"exploitation_local_pruning","base_configuration":"global_389a69848aa0","etf_drop":["cs_mom_rank"],"hypothesis":"Global rank may contribute to the fifteen-input branch's density cost or weaker U.S.-equity ordering. Directly test rank in the actual shared GP rather than transferring either family's inclusion result."},
+    {"name":"international_exception_front_without_unskipped_annual_momentum","category":"exploration_shared_momentum_representation","base_configuration":"global_389a69848aa0","etf_drop":["mom12m"],"hypothesis":"Corrected skip and intermediate momentum may suffice globally despite annual momentum's value to the separately fit debt families. A failure would establish a concrete shared exception rather than a presumed universal local basis."},
+    {"name":"international_exception_front_without_gold_oil_ratio","category":"exploration_commodity_interaction","base_configuration":"global_389a69848aa0","macro_drop":["gold_crude_ratio"],"hypothesis":"Oil-only may be sufficient in this compact risk/credit shared context, even though removing the ratio damaged the broad separate international-equity model. This is a new matched global context, not a claim that the earlier result was wrong."},
+    {"name":"international_exception_front_plus_lag","category":"exploration_conditional_lag_transfer","base_configuration":"global_389a69848aa0","etf_add":["lag_y_excess_lead"],"hypothesis":"The newly observed lag benefit in the fourteen-input rate-exception core may transfer to the stronger fifteen-input frontier, or may again add noise under a different representation. Test all three objectives and family effects without forcing the result."},
+    {"name":"ten_input_density_core_plus_absolute_credit_level","category":"exploration_cross_family_credit_transfer","base_configuration":"global_b48732adb186","macro_add":["hy_spread"],"hypothesis":"Absolute HY level helped the compact U.S.-equity high-IC branch and may restore some lost U.S. ordering while retaining the ten-input joint core's density advantage. Its usefulness in foreign debt was different, so actual joint evidence is required."},
+    {"name":"ten_input_density_core_plus_dealer_proxy","category":"frontier_bridge_single_risk_axis","base_configuration":"global_b48732adb186","macro_add":["dealer_gamma_proxy"],"hypothesis":"Dealer proxy alone might capture part of the international-exception block's IC/Sharpe benefit without adding rank, trend, VIX level and the gold/oil ratio together. A successful eleven-input bridge would support a more concise shared representation; failure remains informative."}
+  ]
+}

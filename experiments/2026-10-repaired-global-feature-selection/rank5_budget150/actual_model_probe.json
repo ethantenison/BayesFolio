@@ -1,0 +1,9 @@
+{
+  "lkj_eta": 2,
+  "rank": 5,
+  "task_factor_shape": [
+    15,
+    5
+  ],
+  "task_kernel": "IndexKernel"
+}

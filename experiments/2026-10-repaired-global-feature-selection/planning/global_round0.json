@@ -1,0 +1,80 @@
+{
+  "family": "global",
+  "round_index": 0,
+  "study_stage": "global_initial",
+  "round_interpretation": "All four family searches completed three twelve-mask rounds under the repaired common history. Their final fronts retain competing local and macro representations: skip momentum/credit/curve in U.S. equity; compact risk/FX/oil and broader commodity/rate representations internationally; genuine nominal/TIPS state with oil in U.S. debt; annual momentum, FX/oil and market/risk state in foreign debt. Lag is harmful in some contexts but improves IC/Sharpe in the final U.S.-FI oil/rate branch. No universal feature set has been established. This initial actual 15-task comparison tests a mechanism-based ten-input core, a literal 29-input selected-family union, a 22-input reduced union, fixed-income and international exceptions, and an exact lag pair. All-input global control has pooled IC 0.108780, NLL -2.141413, Sharpe 1.127881 but negative U.S.-FI within-family IC. Family diagnostics remain descriptive, not new objective vetoes.",
+  "family_representatives_for_literal_union": {
+    "us_equity": "us_equity_8b0e1b779842",
+    "international_equity": "international_equity_f7933f4054ed",
+    "us_fixed_income": "us_fixed_income_78c395992b67",
+    "international_fixed_income": "international_fixed_income_ade5ca6498cf"
+  },
+  "default_expected_tradeoff": "Evaluate actual pooled IC, Gaussian NLL and joint portfolio conventional Sharpe, with within-family IC/NLL, allocation and coverage/width diagnostics. Count and width are not selection objectives; lower width alone is not better uncertainty.",
+  "default_falsification": "A dominated result does not support the corresponding shared-core/union/exception hypothesis. Family success does not guarantee joint success, and a better pooled score cannot establish improvement in each family. Reused dates remain adaptive research rather than untouched confirmation.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/global/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/feature_family_matrix.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/conditional_feature_evidence.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/component_exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/frontier_by_family.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/round_hypothesis_effects.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/frontier_monthly_diagnostics.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/component_synthesis/manifest.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/CROSS_FAMILY_SYNTHESIS.md",
+    "experiments/2026-10-repaired-global-feature-selection/planning/GLOBAL_SELECTION_POLICY.md"
+  ],
+  "candidates": [
+    {
+      "name": "shared_mechanism_core_10",
+      "category": "shared_core_hypothesis",
+      "base_configuration": "global_c55e49933d10",
+      "etf_replace": ["mom12m", "mom12m_skip1m", "mom6m"],
+      "macro_replace": ["cpi_chg_12p", "hy_spread_z_12p", "term_spread", "oil_ret", "em_fx_ret", "dxy", "vix_ts_z_12p"],
+      "hypothesis": "Two annual momentum definitions plus intermediate momentum retain distinct equity/debt representations; compact inflation, credit, curve, oil, FX and normalized risk state may suffice jointly. This is a ten-input falsifiable core, not the proven intersection or a feature-frequency winner. It deliberately omits some family exceptions to test their incremental value."
+    },
+    {
+      "name": "literal_selected_family_union_29",
+      "category": "family_union_hypothesis",
+      "base_configuration": "global_c55e49933d10",
+      "etf_replace": ["chmom", "cs_mom_rank", "lag_y_excess_lead", "ma_signal", "mom12m", "mom12m_skip1m", "mom6m", "trend_slope"],
+      "macro_replace": ["breakeven_proxy", "copper_ret", "cpi_chg_12p", "cpi_chg_1p", "dxy", "em_fx_ret", "gold_crude_ratio", "hy_spread", "hy_spread_z_12p", "oil_ret", "pct_above_50dma", "schp_ret", "spy_flow_z_12p", "spy_ret", "term_spread", "tnote10y", "vix", "vix_slope", "vix_ts_z_12p", "y10_nominal", "y10_real_proxy"],
+      "hypothesis": "Use the exact union of four disclosed Pareto representatives spanning compact high-IC U.S. equity, broad high-IC/Sharpe international equity, the high-IC oil/rate/lag U.S.-FI branch, and the eleven-input high-IC foreign-debt branch. This preserves exceptions and redundant names as a genuine literal-union control; it is larger than the 27-input production-feature comparator and is not assumed superior."
+    },
+    {
+      "name": "evidence_reduced_union_22",
+      "category": "reduced_union_hypothesis",
+      "base_configuration": "global_c55e49933d10",
+      "etf_replace": ["cs_mom_rank", "ma_signal", "mom12m", "mom12m_skip1m", "mom6m", "trend_slope"],
+      "macro_replace": ["cpi_chg_12p", "dxy", "em_fx_ret", "gold_crude_ratio", "hy_spread", "hy_spread_z_12p", "oil_ret", "pct_above_50dma", "schp_ret", "spy_ret", "term_spread", "vix", "vix_slope", "vix_ts_z_12p", "y10_nominal", "y10_real_proxy"],
+      "hypothesis": "Relative to the literal union, remove reconstructible acceleration and duplicate Treasury naming, omit lag as one competing representation, and remove breakeven, monthly CPI, copper and market flow. The latter axes have context-specific pruning tradeoffs rather than proven irrelevance. Retain the gold/oil ratio because its removal was consistently harmful in the broad international context. This block reduction tests joint feasibility; it cannot individually attribute any success or failure to all seven removed axes."
+    },
+    {
+      "name": "shared_core_plus_fixed_income_exceptions_14",
+      "category": "fixed_income_exception_hypothesis",
+      "base_configuration": "global_c55e49933d10",
+      "etf_replace": ["ma_signal", "mom12m", "mom12m_skip1m", "mom6m"],
+      "macro_replace": ["cpi_chg_12p", "hy_spread_z_12p", "term_spread", "oil_ret", "em_fx_ret", "dxy", "vix_ts_z_12p", "schp_ret", "y10_nominal", "y10_real_proxy"],
+      "hypothesis": "Add MA signal and the three nominal/TIPS axes whose deletions harmed U.S.-FI oil/rate forecasts in every seed. The core already contains annual/intermediate momentum, which algebraically contain acceleration, but finite-budget kernel geometry remains testable. These shared inputs are available to all tasks; no family-masked kernel or zero columns are introduced."
+    },
+    {
+      "name": "shared_core_plus_international_risk_exceptions_15",
+      "category": "international_exception_hypothesis",
+      "base_configuration": "global_c55e49933d10",
+      "etf_replace": ["cs_mom_rank", "trend_slope", "mom12m", "mom12m_skip1m", "mom6m"],
+      "macro_replace": ["cpi_chg_12p", "hy_spread_z_12p", "term_spread", "oil_ret", "em_fx_ret", "dxy", "vix_ts_z_12p", "dealer_gamma_proxy", "vix", "gold_crude_ratio"],
+      "hypothesis": "Restore the compact international equity local/risk basis and test the gold/oil representation supported in the broader branch, without importing all rate/commodity axes. These exceptions may compete with, rather than dominate, the fixed-income-exception branch."
+    },
+    {
+      "name": "shared_core_plus_fixed_income_exceptions_and_lag_15",
+      "category": "matched_global_lag_contrast",
+      "base_configuration": "global_c55e49933d10",
+      "etf_replace": ["lag_y_excess_lead", "ma_signal", "mom12m", "mom12m_skip1m", "mom6m"],
+      "macro_replace": ["cpi_chg_12p", "hy_spread_z_12p", "term_spread", "oil_ret", "em_fx_ret", "dxy", "vix_ts_z_12p", "schp_ret", "y10_nominal", "y10_real_proxy"],
+      "hypothesis": "Exactly the fourteen-input fixed-income-exception mask plus recent excess-return lag. Compare these two matched global configurations directly in the conditional-pair report. The final U.S.-FI oil/rate branch reversed earlier lag findings; actual joint evidence must decide whether its gains outweigh noise in other tasks, without forcing a lag-free answer."
+    }
+  ]
+}

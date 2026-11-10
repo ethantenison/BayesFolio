@@ -1,0 +1,45 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/gp_scenarios_2025-05-30.csv": "d13aa085ee5f2a85e0d1a93074e1ac5fabf528e0dfb3ddcf53310f87f302c0cd",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/scenario_cache/gp_predictions_2025-05-30.csv": "54a51bfec80a8dc32a73074c8bc155369590f9fad873706b5c38c28f68e752de",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/scenario_cache/model_diagnostics_2025-05-30.csv": "f883a5e33a21eefa0c81e4e8a80c25ed5ef27040862905114c9f62da5bd6aa2a",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/scenario_cache/task_covariance_diagnostics_2025-05-30.csv": "701d026a586a3afbb32437501a97ee4d1d0d8a04a4a8867a0cb5dd2a1723aa07"
+  },
+  "result": {
+    "date": "2025-05-30",
+    "fit_seed": 13118,
+    "input_columns": [
+      "t_index",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "trend_slope",
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_chg_1p",
+      "hy_spread_z_12p",
+      "oil_ret",
+      "spy_ret",
+      "term_spread",
+      "vix_ts_z_12p"
+    ],
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/scenario_cache/model_diagnostics_2025-05-30.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/scenario_cache/gp_predictions_2025-05-30.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/gp_scenarios_2025-05-30.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/scenario_cache/task_covariance_diagnostics_2025-05-30.csv"
+    },
+    "peak_rss_bytes": 1771929600,
+    "pid": 11326,
+    "seconds": 188.49591416699695,
+    "seed": 27,
+    "status": "fit",
+    "train_dates": 96,
+    "train_rows": 1440,
+    "window_index": 12
+  },
+  "signature": "1e6a905326ba6129b56a5dd9c30780ce5329e2f6331ede0b85d6bd15d083e747"
+}

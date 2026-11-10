@@ -1,0 +1,113 @@
+{
+  "after_configurations": 13,
+  "before_configurations": 7,
+  "competitive_simplification": false,
+  "equal_objective_simplifications": [],
+  "family": "global",
+  "frontier_improved": true,
+  "hypervolume_after": 0.8774506496229015,
+  "hypervolume_before": 0.8222583816990986,
+  "hypervolume_delta": 0.05519226792380294,
+  "hypothesis_comparisons": [
+    {
+      "base_configuration": "global_389a69848aa0",
+      "category": "exploitation_local_pruning",
+      "configuration": "global_15b18df4a34b",
+      "delta_ic": 0.008184523809523789,
+      "delta_nll": -0.01399887378842942,
+      "delta_sharpe": 0.04485123839512221,
+      "hypothesis_name": "international_exception_front_without_global_rank",
+      "input_count_change": -1,
+      "on_cumulative_front": true,
+      "seed_ic_wins": 2,
+      "seed_nll_wins": 2,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "base_configuration": "global_389a69848aa0",
+      "category": "exploration_shared_momentum_representation",
+      "configuration": "global_20d835629365",
+      "delta_ic": -0.0019345238095238304,
+      "delta_nll": -0.001496623584676134,
+      "delta_sharpe": -0.002184452389222639,
+      "hypothesis_name": "international_exception_front_without_unskipped_annual_momentum",
+      "input_count_change": -1,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 1,
+      "seed_nll_wins": 2,
+      "seed_sharpe_wins": 0
+    },
+    {
+      "base_configuration": "global_389a69848aa0",
+      "category": "exploration_commodity_interaction",
+      "configuration": "global_67eeea779f2d",
+      "delta_ic": -0.051488095238095194,
+      "delta_nll": 0.01857540690622776,
+      "delta_sharpe": -0.08448658408057093,
+      "hypothesis_name": "international_exception_front_without_gold_oil_ratio",
+      "input_count_change": -1,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 0,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 0
+    },
+    {
+      "base_configuration": "global_389a69848aa0",
+      "category": "exploration_conditional_lag_transfer",
+      "configuration": "global_43cd2137e85f",
+      "delta_ic": 0.003621031746031752,
+      "delta_nll": -0.020388920570313534,
+      "delta_sharpe": 0.04339934727148479,
+      "hypothesis_name": "international_exception_front_plus_lag",
+      "input_count_change": 1,
+      "on_cumulative_front": true,
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 3,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "base_configuration": "global_b48732adb186",
+      "category": "exploration_cross_family_credit_transfer",
+      "configuration": "global_d019284686e8",
+      "delta_ic": 0.05669642857142856,
+      "delta_nll": 0.017501045648650848,
+      "delta_sharpe": 0.007805261274083171,
+      "hypothesis_name": "ten_input_density_core_plus_absolute_credit_level",
+      "input_count_change": 1,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "base_configuration": "global_b48732adb186",
+      "category": "frontier_bridge_single_risk_axis",
+      "configuration": "global_300876dbdd56",
+      "delta_ic": -0.017212301587301564,
+      "delta_nll": 0.039724501098912235,
+      "delta_sharpe": 0.015444371118132313,
+      "hypothesis_name": "ten_input_density_core_plus_dealer_proxy",
+      "input_count_change": 1,
+      "on_cumulative_front": false,
+      "seed_ic_wins": 0,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 2
+    }
+  ],
+  "interpretation_boundary": "Seed repeats measure optimization variability on the same reused dates, not independent economic samples or an untouched holdout.",
+  "new_configurations": 6,
+  "new_frontier_points": [
+    "global_15b18df4a34b",
+    "global_43cd2137e85f"
+  ],
+  "plan_sha256": "fa398f0b9dca03d9d000842c484200cae491d2851440872ed40b2460992f0b7e",
+  "round_index": 1,
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "stalled": false,
+  "study_stage": "global_refinement",
+  "two_consecutive_stalled_rounds": false
+}

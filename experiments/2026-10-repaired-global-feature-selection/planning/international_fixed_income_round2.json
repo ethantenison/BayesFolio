@@ -1,0 +1,31 @@
+{
+  "family": "international_fixed_income",
+  "round_index": 2,
+  "study_stage": "family_refinement",
+  "round_interpretation": "Round one increased hypervolume by 27.78%. Dropping both HY axes improved all three aggregate objectives; individual flow, rank and acceleration removals generated different sparse tradeoffs. Removing VIX-slope z-score was harmful and annual CPI was not dispensable in the original context. Combine promising removals on the no-HY parent, test remaining local/macro axes directly, and contrast the HY-level-retaining branch. The three-target allocation cap makes small Sharpe differences especially weak evidence.",
+  "default_expected_tradeoff": "Evaluate complete three-objective and per-seed results; record input savings, calibration and width separately. Do not call a tiny Sharpe difference robust economic improvement.",
+  "default_falsification": "A dominated result does not support the specified conditional reduction. Keep nondominated tradeoffs and report context dependence rather than compelling one fixed family winner.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_fixed_income/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_fixed_income/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_fixed_income/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_fixed_income/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_fixed_income/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_fixed_income/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/international_fixed_income_round1.json"
+  ],
+  "candidates": [
+    {"name":"no_hy_without_flow","category":"exploitation_combined_pruning","base_configuration":"international_fixed_income_775c0e6b8de9","macro_drop":["spy_flow_z_12p"],"hypothesis":"The individually useful HY and flow removals may combine into a smaller competitive model."},
+    {"name":"no_hy_without_global_rank","category":"exploitation_combined_pruning","base_configuration":"international_fixed_income_775c0e6b8de9","etf_drop":["cs_mom_rank"],"hypothesis":"Rank removal may retain its Sharpe advantage without the original HY block."},
+    {"name":"no_hy_without_acceleration","category":"exploitation_combined_pruning","base_configuration":"international_fixed_income_775c0e6b8de9","etf_drop":["chmom"],"hypothesis":"Test acceleration removal in the stronger no-HY context rather than extrapolating its original-parent tradeoff."},
+    {"name":"no_hy_without_long_momentum","category":"exploitation_local_pruning","base_configuration":"international_fixed_income_775c0e6b8de9","etf_drop":["mom36m"],"hypothesis":"Long momentum may be less important after removing credit axes; preserve annual momentum and acceleration."},
+    {"name":"no_hy_without_flow_or_rank","category":"exploration_pruning_interaction","base_configuration":"international_fixed_income_775c0e6b8de9","macro_drop":["spy_flow_z_12p"],"etf_drop":["cs_mom_rank"],"hypothesis":"Flow and cross-sectional rank might both be dispensable, or their joint deletion may reveal substitutability."},
+    {"name":"no_hy_without_flow_or_acceleration","category":"exploration_pruning_interaction","base_configuration":"international_fixed_income_775c0e6b8de9","macro_drop":["spy_flow_z_12p"],"etf_drop":["chmom"],"hypothesis":"Combine the flow and local-acceleration simplifications while retaining global rank."},
+    {"name":"no_hy_without_rank_or_acceleration","category":"exploration_pruning_interaction","base_configuration":"international_fixed_income_775c0e6b8de9","etf_drop":["cs_mom_rank","chmom"],"hypothesis":"A two-horizon local momentum basis may suffice in the no-HY macro context."},
+    {"name":"no_hy_without_monthly_inflation","category":"exploration_macro_pruning","base_configuration":"international_fixed_income_775c0e6b8de9","macro_drop":["cpi_chg_1p"],"hypothesis":"Retain the annual CPI signal that resisted deletion, while testing the incremental monthly signal."},
+    {"name":"no_hy_without_em_fx","category":"exploration_fx_pruning","base_configuration":"international_fixed_income_775c0e6b8de9","macro_drop":["em_fx_ret"],"hypothesis":"The remaining market/risk/commodity state may substitute for EM FX returns despite foreign bond exposure."},
+    {"name":"no_hy_without_oil","category":"exploration_commodity_pruning","base_configuration":"international_fixed_income_775c0e6b8de9","macro_drop":["oil_ret"],"hypothesis":"Test oil's conditional contribution directly on the stronger reduced parent; no gold/oil ratio is added."},
+    {"name":"no_hy_plus_lag","category":"conditional_lag_addition","base_configuration":"international_fixed_income_775c0e6b8de9","etf_add":["lag_y_excess_lead"],"hypothesis":"Removing noisy macro axes could change recent-return lag's usefulness; lag remains eligible rather than predetermined."},
+    {"name":"hy_level_only_without_flow","category":"frontier_bridge","base_configuration":"international_fixed_income_b62ac17a6009","macro_drop":["spy_flow_z_12p"],"hypothesis":"Retaining absolute HY state may preserve the higher-IC branch while obtaining the flow-removal Sharpe benefit."}
+  ]
+}

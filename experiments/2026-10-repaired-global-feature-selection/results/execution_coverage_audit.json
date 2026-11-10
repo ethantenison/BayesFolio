@@ -1,0 +1,369 @@
+{
+  "adaptive_closure": {
+    "global": {
+      "closed": true,
+      "reason": "Reached the 3-round cap; no convergence claim",
+      "verified_rounds": [
+        1,
+        2,
+        3
+      ]
+    },
+    "international_equity": {
+      "closed": true,
+      "reason": "Reached the 3-round cap; no convergence claim",
+      "verified_rounds": [
+        1,
+        2,
+        3
+      ]
+    },
+    "international_fixed_income": {
+      "closed": true,
+      "reason": "Reached the 3-round cap; no convergence claim",
+      "verified_rounds": [
+        1,
+        2,
+        3
+      ]
+    },
+    "us_equity": {
+      "closed": true,
+      "reason": "Reached the 3-round cap; no convergence claim",
+      "verified_rounds": [
+        1,
+        2,
+        3
+      ]
+    },
+    "us_fixed_income": {
+      "closed": true,
+      "reason": "Reached the 3-round cap; no convergence claim",
+      "verified_rounds": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "batches": [
+    {
+      "configurations": 1,
+      "family": "global",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_global_all_input_control.json",
+      "plan_sha256": "586a5f67db93aa3a3f7c6c45549e50feba4b5f515ef22d068f41bca5c4ed735e",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 56,
+      "family": "international_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_july_extension.json",
+      "plan_sha256": "d10fe0a6f9732fdd5d950fe3a32edc9f3037695f84a2fd1a26789e7c928e6673",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 68,
+      "family": "international_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_july_pool_extension.json",
+      "plan_sha256": "de5f933f8ec3d8130d4f8df5815b3838b855867607a2ed3bb69c3e236c4d6872",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 1,
+      "family": "international_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_macro_only_historical_extension.json",
+      "plan_sha256": "cc33f0594137c53e7dc78a5015af6c44052c6d515a548bbf127cb89d3a6ec7cc",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 25,
+      "family": "international_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_rebaseline.json",
+      "plan_sha256": "f7930f07238d454c69692ae1b965625bbf0819fe383efaab31db0ffd0c4b95ae",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 89,
+      "family": "international_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_international_fixed_income_rebaseline.json",
+      "plan_sha256": "29448fd14bde4d9e8e21c60c47b376fbf39c7a763081f07b1a0f34c890301d77",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 2,
+      "family": "us_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_july_extension.json",
+      "plan_sha256": "73e67145c334093fef57e5c88fd202829995e7e9090694e594d4ae2057511149",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 2,
+      "family": "us_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_july_pool_extension.json",
+      "plan_sha256": "db416ed5c756c839615daf819bf7c4a8bda0f2806c3f61da9282230f1bfb38dd",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 1,
+      "family": "us_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_macro_only_historical_extension.json",
+      "plan_sha256": "f0aa04d2b545db5bb161c31f02eff8f513fd78497da90f8f117444524bd9326c",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 7,
+      "family": "us_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_rebaseline.json",
+      "plan_sha256": "3b87831e8029ecad14c165d293f311c0fcde7f9518d6ff0e6bb87e50c98f00c3",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 69,
+      "family": "us_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/00_us_fixed_income_rebaseline.json",
+      "plan_sha256": "7f8b1d06a8b157dbc24a30e01d9bde9e5de355d1209a758132913d5a6289d7e8",
+      "stage": "historical_rebaseline",
+      "verified_complete": true
+    },
+    {
+      "configurations": 6,
+      "family": "global",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/05_global_round0.json",
+      "plan_sha256": "9fd5174ee33f44749ddfc4042180cbcdc2717a8a36fad551537d2ccebaa1e4e1",
+      "stage": "global_initial",
+      "verified_complete": true
+    },
+    {
+      "configurations": 6,
+      "family": "global",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_global_round1.json",
+      "plan_sha256": "fa398f0b9dca03d9d000842c484200cae491d2851440872ed40b2460992f0b7e",
+      "stage": "global_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 6,
+      "family": "global",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_global_round2.json",
+      "plan_sha256": "b8e284eecd7c670784a0afb88485e3bad33d102c8777e524ef9e443f6c13c9db",
+      "stage": "global_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 6,
+      "family": "global",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_global_round3.json",
+      "plan_sha256": "0167f785e54c4bda3baab3c44643e987d1dc1ee7cb1964f0633efffcbfaf8596",
+      "stage": "global_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "international_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_international_equity_round1.json",
+      "plan_sha256": "7a80b03e4f0d4f195534e55a6e91f045c335f68154e64a8bee868e4e72bd0df1",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "international_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_international_equity_round2.json",
+      "plan_sha256": "4ab57888bdc302e2e72d5d834abe1f1bb8f04c806bb8170943e6a8320c87b5cf",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "international_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_international_equity_round3.json",
+      "plan_sha256": "41b7bbc8a8a97188367d7fa2236c33cb3b6cf4031a2a7ec5ffde0e4f8c4a10ca",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "international_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_international_fixed_income_round1.json",
+      "plan_sha256": "2ff1cc2ed1fb9f81fccbf7f57bc096acff98a9a890fc5314faafba6aba919216",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "international_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_international_fixed_income_round2.json",
+      "plan_sha256": "9057ae1b01dd6417febe4571acbb5baf93aa01855b5ad2e1d3bf1fb49ffa5fb3",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "international_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_international_fixed_income_round3.json",
+      "plan_sha256": "d16162801fb8c6274cee1fcc2db3d784c615077967d9188f877f8a7adbd5a054",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "us_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_us_equity_round1.json",
+      "plan_sha256": "f79211f21ea0f6a1a578aaa18d7ccbfde50de71267683687605640042d04cba0",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "us_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_us_equity_round2.json",
+      "plan_sha256": "acc1860297b3caaad5ca5dee7c41028e2ea3cce139d70f8d6f56f03d5216a124",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "us_equity",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_us_equity_round3.json",
+      "plan_sha256": "1f6c88e52761245000f3281bdd61c6291662ec54224266f66789f859f46c1d96",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "us_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_us_fixed_income_round1.json",
+      "plan_sha256": "91de0df6aed27c5bfbd8d3e30f2f3cb027407e05412cc2128464cb4f3e1412bd",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "us_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_us_fixed_income_round2.json",
+      "plan_sha256": "4eb39311d3708d509d155be1e65bf01b0fb0b1e9eca65068e7c64a487b3ae7eb",
+      "stage": "family_refinement",
+      "verified_complete": true
+    },
+    {
+      "configurations": 12,
+      "family": "us_fixed_income",
+      "plan": "experiments/2026-10-repaired-global-feature-selection/plans/10_us_fixed_income_round3.json",
+      "plan_sha256": "391322f75b18585ae021248171cbe181b56797121679cdce5cc378210af0fd27",
+      "stage": "family_refinement",
+      "verified_complete": true
+    }
+  ],
+  "execution_scope_complete": true,
+  "historical_coverage": {
+    "global": {
+      "missing_ids": [],
+      "registered": 1,
+      "required": 1,
+      "unaudited_ids": []
+    },
+    "international_equity": {
+      "missing_ids": [],
+      "registered": 150,
+      "required": 150,
+      "unaudited_ids": []
+    },
+    "international_fixed_income": {
+      "missing_ids": [],
+      "registered": 89,
+      "required": 89,
+      "unaudited_ids": []
+    },
+    "us_equity": {
+      "missing_ids": [],
+      "registered": 12,
+      "required": 12,
+      "unaudited_ids": []
+    },
+    "us_fixed_income": {
+      "missing_ids": [],
+      "registered": 69,
+      "required": 69,
+      "unaudited_ids": []
+    }
+  },
+  "limits": [
+    "This proves execution scope only, not scientific recommendations or goal completion.",
+    "Partial batches are deliberately not counted as complete scope.",
+    "Global concurrent-worker compliance also needs the recorded scheduler/native evidence; per-pool ceilings alone are insufficient."
+  ],
+  "registered_configurations": 489,
+  "source_sha256": {
+    "bayesfolio/engine/forecast/gp/extra_model_info.py": "cae674e75c81ebcab503678cd89cf1b3ea809aaae9db8c8083d29863312b6963",
+    "bayesfolio/engine/forecast/gp/feature_catalog.py": "2801d948e7bd5342a517657660f0747d9ea0f30ccb7b0fe40563c43c86d86120",
+    "bayesfolio/engine/forecast/gp/kernels.py": "c82f71e78b8eabd73a833e692ac76dc3541892b52b63aabe653bbc81fa0e55cc",
+    "bayesfolio/engine/forecast/gp/multitask_builder.py": "803e09f22d49ec23d4ee387cd871328e30075fc2dcdcd053fe01558e818b48cc",
+    "bayesfolio/engine/forecast/gp/planner_compiler.py": "80ed4bb8a713ce4857758a90e0c0a5c77a4b13f7ea2fb075f90d3aa0eefe413e",
+    "bayesfolio/engine/forecast/gp/reporting.py": "9e4c43330d44807ccbeb7899d63625c5a15bdb2875918f62f7eb3328d0cc070d",
+    "bayesfolio/engine/forecast/gp/time_varying_kernel.py": "9b5302bf7967f3cb2e945652e1a634d6791385ab51df05d22a3daea0e352da41",
+    "bayesfolio/engine/forecast/gp/workflow.py": "1e1490c82799a69cbac2c55cb47d830725121ed799e610570f96abd4b9d6f7e0",
+    "experiments/2026-06-portfolio-optimization/run_monthly_optimization_walkforward.py": "5288fac624d1681cc47d5a11fd3e8759e0c2c3d676426f7fa8bc51a4083b0bf9",
+    "experiments/2026-06-task-covariance/run_outputscale_floor_prior.py": "49be9702464a29db92949ed1f08ef968b42b4c540282cc0bdbf32207a00b73cf",
+    "experiments/2026-06-task-covariance/run_outputscale_structure_ablation.py": "dfbf1bb223cb2f2c8ef344d110d3cd1cf27efba0cb7f6e3b4f501e79e3ef38c8",
+    "experiments/2026-06-task-covariance/run_task_covariance_rollforward.py": "85c25492e9f5c878210b18b4d9ea253b0e20f2a3a66c7bd0b1abbb1da48aa3a6",
+    "experiments/2026-06-task-covariance/run_time_modulation_ablation.py": "608090d47c3a3b01a37941cee666c77b9c1acf21dcffed382d49620357eab059",
+    "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py": "35290317ded538f8adc672e9e967ab95dc0d43580e19ebdb6589ef81018d766e",
+    "experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py": "a1bb2806cc275c29869cc51a48d026262fb872736a96a5b3048944f27fb3d988",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py": "7db00e00d678bc59bdee89c2ea99785a51bac341848dd9a03707317ce17443f4",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_us_confirmation.py": "8ada7ccdf64f0db6dd772ef8bf3bb174757efc354fc3e519d37f797925a5fd37",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_us_pilots.py": "1633194983f1143d03cf3efe38fde1f12e7291913576f16badc1add84cedc749",
+    "experiments/2026-10-repaired-global-feature-selection/GOAL_CONTRACT.md": "d2093643629cd64da59710ad6cadd17ba286296522a58a1e7ea96fb93c928ac7",
+    "experiments/2026-10-repaired-global-feature-selection/audit_execution_coverage.py": "77ae6c87ca0c6fd86fc67734d5caeaa35fe1b02fa7b5b3dc8ca436026e3246ba",
+    "experiments/2026-10-repaired-global-feature-selection/candidate_masks.py": "4b458a5504c70135329e379fee09723c09c2462d3a5ff7b46024236fde7c1fa5",
+    "experiments/2026-10-repaired-global-feature-selection/compare_round.py": "5ddbd0ac62d2336c65fb0fc641c552e27b35c6e47d1007a233eda5de06efd7fc",
+    "experiments/2026-10-repaired-global-feature-selection/historical_inventory.json": "7549bfd65e03180ecd654de5e093958a135191e16fa55d1ff4448eaee7630b4d",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_global_all_input_control.json": "586a5f67db93aa3a3f7c6c45549e50feba4b5f515ef22d068f41bca5c4ed735e",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_july_extension.json": "d10fe0a6f9732fdd5d950fe3a32edc9f3037695f84a2fd1a26789e7c928e6673",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_july_pool_extension.json": "de5f933f8ec3d8130d4f8df5815b3838b855867607a2ed3bb69c3e236c4d6872",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_macro_only_historical_extension.json": "cc33f0594137c53e7dc78a5015af6c44052c6d515a548bbf127cb89d3a6ec7cc",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_rebaseline.json": "f7930f07238d454c69692ae1b965625bbf0819fe383efaab31db0ffd0c4b95ae",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_international_fixed_income_rebaseline.json": "29448fd14bde4d9e8e21c60c47b376fbf39c7a763081f07b1a0f34c890301d77",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_july_extension.json": "73e67145c334093fef57e5c88fd202829995e7e9090694e594d4ae2057511149",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_july_pool_extension.json": "db416ed5c756c839615daf819bf7c4a8bda0f2806c3f61da9282230f1bfb38dd",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_macro_only_historical_extension.json": "f0aa04d2b545db5bb161c31f02eff8f513fd78497da90f8f117444524bd9326c",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_rebaseline.json": "3b87831e8029ecad14c165d293f311c0fcde7f9518d6ff0e6bb87e50c98f00c3",
+    "experiments/2026-10-repaired-global-feature-selection/plans/00_us_fixed_income_rebaseline.json": "7f8b1d06a8b157dbc24a30e01d9bde9e5de355d1209a758132913d5a6289d7e8",
+    "experiments/2026-10-repaired-global-feature-selection/plans/05_global_round0.json": "9fd5174ee33f44749ddfc4042180cbcdc2717a8a36fad551537d2ccebaa1e4e1",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_global_round1.json": "fa398f0b9dca03d9d000842c484200cae491d2851440872ed40b2460992f0b7e",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_global_round2.json": "b8e284eecd7c670784a0afb88485e3bad33d102c8777e524ef9e443f6c13c9db",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_global_round3.json": "0167f785e54c4bda3baab3c44643e987d1dc1ee7cb1964f0633efffcbfaf8596",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_international_equity_round1.json": "7a80b03e4f0d4f195534e55a6e91f045c335f68154e64a8bee868e4e72bd0df1",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_international_equity_round2.json": "4ab57888bdc302e2e72d5d834abe1f1bb8f04c806bb8170943e6a8320c87b5cf",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_international_equity_round3.json": "41b7bbc8a8a97188367d7fa2236c33cb3b6cf4031a2a7ec5ffde0e4f8c4a10ca",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_international_fixed_income_round1.json": "2ff1cc2ed1fb9f81fccbf7f57bc096acff98a9a890fc5314faafba6aba919216",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_international_fixed_income_round2.json": "9057ae1b01dd6417febe4571acbb5baf93aa01855b5ad2e1d3bf1fb49ffa5fb3",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_international_fixed_income_round3.json": "d16162801fb8c6274cee1fcc2db3d784c615077967d9188f877f8a7adbd5a054",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_us_equity_round1.json": "f79211f21ea0f6a1a578aaa18d7ccbfde50de71267683687605640042d04cba0",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_us_equity_round2.json": "acc1860297b3caaad5ca5dee7c41028e2ea3cce139d70f8d6f56f03d5216a124",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_us_equity_round3.json": "1f6c88e52761245000f3281bdd61c6291662ec54224266f66789f859f46c1d96",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_us_fixed_income_round1.json": "91de0df6aed27c5bfbd8d3e30f2f3cb027407e05412cc2128464cb4f3e1412bd",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_us_fixed_income_round2.json": "4eb39311d3708d509d155be1e65bf01b0fb0b1e9eca65068e7c64a487b3ae7eb",
+    "experiments/2026-10-repaired-global-feature-selection/plans/10_us_fixed_income_round3.json": "391322f75b18585ae021248171cbe181b56797121679cdce5cc378210af0fd27",
+    "experiments/2026-10-repaired-global-feature-selection/results/historical_macro_only_audit.json": "b72e3f6a1453d53f7a8b2347431b63c109b30d37f57cebf73e2d1f5b949a2679",
+    "experiments/2026-10-repaired-global-feature-selection/results/historical_pool_scope_audit.json": "6b3c7bd01e777a816829796d1e8c74eae19743d065afaed32a4500e40b263d90",
+    "experiments/2026-10-repaired-global-feature-selection/results/historical_scope_audit.json": "63d5cf4e15fc83a155f8400166926393f57cdc5034f700559ba552513461ce88",
+    "experiments/2026-10-repaired-global-feature-selection/run_study.py": "c3e25326f62b1016e8fcd8637a3b266f8613a24caa2cf00f9417ed5a34d43241",
+    "experiments/2026-10-repaired-global-feature-selection/study.json": "e38375a2d8a8213060c682ad78c6a069e89818f8438409be67783ba4da44dc97",
+    "experiments/2026-10-repaired-global-feature-selection/workflow.py": "553d11656a3b11095a7af2b4000fa081f2a12565de4444873996a7f277493bea",
+    "uv.lock": "64cb2fe285b144d212bb589b5cb6826abd680f60031a9e9874e91980def99457"
+  },
+  "unresolved": [],
+  "verified_configurations_in_complete_batches": 489,
+  "verified_scored_gp_windows_in_complete_batches": 35208,
+  "verified_seed_runs_in_complete_batches": 1467
+}

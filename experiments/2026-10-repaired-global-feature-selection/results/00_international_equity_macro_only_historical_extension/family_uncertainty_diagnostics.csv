@@ -1,0 +1,4 @@
+configuration,seed,family,within_family_ic,coverage_95,mean_predictive_std
+international_equity_32e6597d0b79,27,international_equity,0.075,0.9375,0.04228337210031369
+international_equity_32e6597d0b79,127,international_equity,0.08333333333333333,0.9479166666666666,0.04316501853482776
+international_equity_32e6597d0b79,227,international_equity,0.075,0.9375,0.043467541043278296

@@ -1,0 +1,31 @@
+{
+  "family": "international_equity",
+  "round_index": 2,
+  "study_stage": "family_refinement",
+  "round_interpretation": "Round one increased hypervolume by 15.49%. MOVE removal improved all three objectives in the risk-state parent; VIX slope-change removal increased IC/NLL, while oil and local volatility generated alternative tradeoffs. The broad high-Sharpe model benefited from removing HY change but was harmed by removing the gold/oil ratio. Combine successful risk removals and selected transfers, distinguish FX and risk-state contributions, and prune remaining credit axes in the broad model. Do not assume oil-only or one shared local basis wins in every context.",
+  "default_expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+  "default_falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/international_equity_round1.json"
+  ],
+  "candidates": [
+    {"name":"risk_without_move_or_slope_change","category":"exploitation_combined_pruning","base_configuration":"international_equity_4c2b72c2c055","macro_drop":["vix_ts_chg_1p"],"hypothesis":"The two individually useful risk removals may combine rather than substitute for one another."},
+    {"name":"risk_without_move_or_slope_change_plus_oil","category":"frontier_bridge","base_configuration":"international_equity_4c2b72c2c055","macro_drop":["vix_ts_chg_1p"],"macro_add":["oil_ret"],"hypothesis":"Oil's density benefit may complement the compact risk representation after both successful removals."},
+    {"name":"risk_without_move_plus_oil","category":"frontier_bridge","base_configuration":"international_equity_4c2b72c2c055","macro_add":["oil_ret"],"hypothesis":"Test oil transfer independently of the slope-change removal to resolve the interaction."},
+    {"name":"risk_without_move_plus_local_volatility","category":"frontier_bridge","base_configuration":"international_equity_4c2b72c2c055","etf_add":["vol_1m"],"hypothesis":"Task-local volatility may retain the higher-Sharpe branch after MOVE is removed."},
+    {"name":"risk_without_move_or_global_rank","category":"exploitation_local_pruning","base_configuration":"international_equity_4c2b72c2c055","etf_drop":["cs_mom_rank"],"hypothesis":"Rank removal helped U.S. equity but requires a direct international test in a competitive compact context."},
+    {"name":"risk_without_move_or_trend_slope","category":"exploitation_local_pruning","base_configuration":"international_equity_4c2b72c2c055","etf_drop":["trend_slope"],"hypothesis":"The prior trend-removal IC/NLL benefit might survive after MOVE removal without the same Sharpe cost."},
+    {"name":"risk_without_move_or_dealer_proxy","category":"exploration_risk_pruning","base_configuration":"international_equity_4c2b72c2c055","macro_drop":["dealer_gamma_proxy"],"hypothesis":"VIX representations may make the dealer proxy redundant in the already improved risk parent."},
+    {"name":"risk_without_move_or_dollar_level","category":"exploration_fx_pruning","base_configuration":"international_equity_4c2b72c2c055","macro_drop":["dxy"],"hypothesis":"EM FX returns might suffice without the dollar-level axis; broad-parent effects need not transfer."},
+    {"name":"risk_without_move_or_em_fx","category":"exploration_fx_pruning","base_configuration":"international_equity_4c2b72c2c055","macro_drop":["em_fx_ret"],"hypothesis":"Reciprocal FX test separates dollar-level from EM-return contributions."},
+    {"name":"risk_without_move_or_vix_slope_level","category":"exploration_risk_representation","base_configuration":"international_equity_4c2b72c2c055","macro_drop":["vix_slope"],"hypothesis":"Slope change and z-score may retain useful term-structure information without the slope level."},
+    {"name":"broad_without_either_hy_transform","category":"exploitation_credit_pruning","base_configuration":"international_equity_baaff7ca24fa","macro_drop":["hy_spread_z_12p"],"hypothesis":"After successful HY-change removal, other macro/credit axes may also substitute for the HY z-score."},
+    {"name":"broad_without_hy_change_or_credit_change","category":"exploitation_credit_pruning","base_configuration":"international_equity_baaff7ca24fa","macro_drop":["credit_spread_chg_1p"],"hypothesis":"Retain normalized HY state while removing the other credit-change axis to test a different sparse credit representation."}
+  ]
+}

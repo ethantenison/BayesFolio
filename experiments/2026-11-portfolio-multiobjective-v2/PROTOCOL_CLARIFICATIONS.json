@@ -1,0 +1,12 @@
+{
+  "registered_before_new_candidate_scoring": true,
+  "cost_sensitivity_guardrail": "The frozen ten-bps distance threshold is a sensitivity guardrail, not a turnover objective or an estimated brokerage fee.",
+  "best_control": "One actual unchanged control with minimum fixed-anchor distance in the applicable panel, deterministic ID ties; never componentwise best metrics from different controls.",
+  "bootstrap_and_leave_one_out_control": "Fix the original development-best control identity for every replicate; do not switch controls inside resamples.",
+  "raw_numerical_acceptance": {"minimum_weight": -1e-8, "weight_sum_error": 1e-7, "MGK_weight": 0, "postsolve_repairs": false},
+  "NE14": "The equal eligible-weight portfolio is unique regardless of mean ties; test its registered extra constraints directly.",
+  "resolved_setup_failures": [
+    {"stage": "context assembly", "error": "pandas Timestamp rejects numpy.str_", "repair": "Explicit string conversion; identical intended date axis, no scores or fits affected"},
+    {"stage": "synthetic conic parity test", "error": "Overtight default solver tolerances produced optimal_inaccurate", "repair": "Independent centered-rank SOC validation with declared strict acceptance, no investment constraint relaxation"}
+  ]
+}

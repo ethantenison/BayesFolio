@@ -1,0 +1,883 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "ma_signal,mom12m",
+        "--custom-macro-cols",
+        "oil_ret,schp_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_89293fc088d7",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "ma_signal",
+        "mom12m",
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "The successful acceleration removal may transfer to the new oil/rate branch.",
+      "hypothesis_name": "oil_rate_without_acceleration",
+      "id": "us_fixed_income_b4b6de59299e",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_b4b6de59299e",
+      "macro_columns": [
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_89293fc088d7"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,lag_y_excess_lead,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "oil_ret,schp_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_89293fc088d7",
+      "category": "conditional_lag_addition",
+      "etf_columns": [
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Oil can change lag's conditional value; test a matched addition rather than assuming the earlier rate-model effect transfers.",
+      "hypothesis_name": "oil_rate_plus_lag",
+      "id": "us_fixed_income_78c395992b67",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_78c395992b67",
+      "macro_columns": [
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_89293fc088d7"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p,oil_ret,schp_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_89293fc088d7",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Credit and oil state may combine complementary density/ranking information on the pruned rate basis.",
+      "hypothesis_name": "oil_rate_plus_credit_zscore",
+      "id": "us_fixed_income_bfbfdcc83885",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_bfbfdcc83885",
+      "macro_columns": [
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_89293fc088d7"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "oil_ret,schp_ret,y10_nominal",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_89293fc088d7",
+      "category": "exploration_rate_pruning",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Oil may substitute for some inflation-linked state that was important before oil was added.",
+      "hypothesis_name": "oil_rate_without_three_month_tips_proxy",
+      "id": "us_fixed_income_e9e58816c053",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_e9e58816c053",
+      "macro_columns": [
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_89293fc088d7"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "oil_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_89293fc088d7",
+      "category": "exploration_rate_pruning",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "oil_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "The trailing TIPS-return proxy and oil might suffice without the one-month SCHP axis.",
+      "hypothesis_name": "oil_rate_without_one_month_tips_return",
+      "id": "us_fixed_income_4ec4ea3a4985",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_4ec4ea3a4985",
+      "macro_columns": [
+        "oil_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_89293fc088d7"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "oil_ret,schp_ret,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_89293fc088d7",
+      "category": "exploration_rate_interaction",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "oil_ret",
+        "schp_ret",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Re-test the nominal yield after oil addition to distinguish rate information from general macro-state substitution.",
+      "hypothesis_name": "oil_rate_without_nominal_yield",
+      "id": "us_fixed_income_5f3d435c615e",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_5f3d435c615e",
+      "macro_columns": [
+        "oil_ret",
+        "schp_ret",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_89293fc088d7"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m_skip1m",
+        "--custom-macro-cols",
+        "oil_ret,schp_ret,y10_nominal,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_89293fc088d7",
+      "category": "exploration_shared_local_representation",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m_skip1m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m_skip1m",
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "A single corrected momentum substitution may bridge equity and debt representations without the prior failed whole-basis transfer.",
+      "hypothesis_name": "oil_rate_with_skip_annual_momentum",
+      "id": "us_fixed_income_3199c073b636",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_3199c073b636",
+      "macro_columns": [
+        "oil_ret",
+        "schp_ret",
+        "y10_nominal",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_89293fc088d7"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "ma_signal,mom12m,mom36m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_c2fef69db5f6",
+      "category": "conditional_lag_ablation",
+      "etf_columns": [
+        "ma_signal",
+        "mom12m",
+        "mom36m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "ma_signal",
+        "mom12m",
+        "mom36m",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Test lag directly after acceleration and rank removal; the previous lag-removal result involved a different local basis.",
+      "hypothesis_name": "five_input_credit_without_lag",
+      "id": "us_fixed_income_ec28732828b9",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_ec28732828b9",
+      "macro_columns": [
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_c2fef69db5f6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,ma_signal,mom12m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_c2fef69db5f6",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "The highest-Sharpe compact credit model may retain a competitive tradeoff without long-horizon momentum.",
+      "hypothesis_name": "five_input_credit_without_long_momentum",
+      "id": "us_fixed_income_4eaa93896507",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_4eaa93896507",
+      "macro_columns": [
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_c2fef69db5f6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,ma_signal,mom12m,mom36m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p,oil_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_c2fef69db5f6",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "mom36m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "mom36m",
+        "hy_spread_z_12p",
+        "oil_ret"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Oil may improve the compact credit branch without importing the full rate/TIPS block.",
+      "hypothesis_name": "five_input_credit_plus_oil",
+      "id": "us_fixed_income_1847dce24fe4",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_1847dce24fe4",
+      "macro_columns": [
+        "hy_spread_z_12p",
+        "oil_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_c2fef69db5f6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,ma_signal,mom12m,mom36m,vol_1m",
+        "--custom-macro-cols",
+        "hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_c2fef69db5f6",
+      "category": "exploration_uncertainty_information",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "mom36m",
+        "vol_1m"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "ma_signal",
+        "mom12m",
+        "mom36m",
+        "vol_1m",
+        "hy_spread_z_12p"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Local volatility may transfer the separate rate/volatility Sharpe advantage to the compact credit model.",
+      "hypothesis_name": "five_input_credit_plus_local_volatility",
+      "id": "us_fixed_income_4e8b02eef7f0",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_4e8b02eef7f0",
+      "macro_columns": [
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_c2fef69db5f6"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "chmom,ma_signal,mom12m,ret_autocorr",
+        "--custom-macro-cols",
+        "breakeven_proxy,oil_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_fixed_income_4eba1636f6c5",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr"
+      ],
+      "expected_feature_sha256": "b3b33537e682b234f8eb4b3f3f91d5a9f13425f7bdb25af856d2e012721e84fa",
+      "expected_input_columns": [
+        "t_index",
+        "chmom",
+        "ma_signal",
+        "mom12m",
+        "ret_autocorr",
+        "breakeven_proxy",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+      "hypothesis": "Oil may preserve the no-lag density branch's NLL while improving its lower IC/Sharpe; this tests context rather than declaring oil universal.",
+      "hypothesis_name": "no_lag_reduced_curve_density_plus_oil",
+      "id": "us_fixed_income_efb8a2a0fb12",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_fixed_income_efb8a2a0fb12",
+      "macro_columns": [
+        "breakeven_proxy",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json",
+        "base_configuration=us_fixed_income_4eba1636f6c5"
+      ]
+    }
+  ],
+  "cross_version_equality_audit": "experiments/2026-10-repaired-global-feature-selection/results/feature_pool_extension_audit.json",
+  "dataset_version": "v2",
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json"
+  ],
+  "evidence_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/conditional_feature_pairs.csv": "33bdcd86ab20a685e9e2d4f35e8834a43377f1c4c6f6417e17ddc2fe687c8b9e",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/configuration_aggregates.csv": "686ac30a4235cfe364995cae84941a0a2838b1ee0126e6f7e9b337ccbdb21c5a",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/exact_inputs.json": "14c8b5eb741f340840a88bf4c96fad813b00f45e5cb634744c3807947939a6c3",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/family_diagnostics_by_seed.csv": "50048af221f0bed317efddc2478e4421b17ad02e07687b13d58ce05966ececbf",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/hypervolume.json": "6fe9cc0524911ca97b5d1706e80caa27e298d060e715ff7730d390ed2dc5fa0d",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/objectives_by_seed.csv": "f8ed5674636c37b5b36066ccd8a462ed4e771aad44859d3a5e165569b67555e2",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_fixed_income_round3/us_fixed_income_round2.json": "ddc3cc816e61036864687d4319ac987e47d210142063ee2f9947b153a2d95d32"
+  },
+  "family": "us_fixed_income",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_fixed_income.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_fixed_income.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/runs",
+  "phase": "refinement",
+  "planning_method": "Hosted Codex hypothesis generation",
+  "proposal_path": "experiments/2026-10-repaired-global-feature-selection/planning/us_fixed_income_round3.json",
+  "proposal_sha256": "88a9100d12265889427517966e8ddb81c103aaf7b8ec8d089c35168cef37f69d",
+  "results_prefix": "10_us_fixed_income_round3",
+  "round_index": 3,
+  "round_interpretation": "Round two increased hypervolume by 11.92%. Adding oil alone to the pruned no-lag rate model improved aggregate IC, NLL and Sharpe; IC and NLL improved in all three seeds, Sharpe in one. The seven-input oil/rate front has IC 0.311111, NLL -2.639529 and Sharpe 0.553264. Removing acceleration from the rank-free credit model produced a five-input front with lag and higher Sharpe 0.597448. Lag removal from the reduced density model raised IC/Sharpe in every seed with a small NLL cost; adding lag to the pruned rate model hurt IC/Sharpe in every seed despite improving density. The final family round tests oil/rate pruning, credit/oil bridges, exact lag contrasts on the changed parents, and one annual-momentum transfer.",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/executions",
+  "study_stage": "family_refinement",
+  "tickers": [
+    "BND",
+    "IEF",
+    "LQD",
+    "HYG"
+  ]
+}

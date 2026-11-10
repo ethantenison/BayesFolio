@@ -1,0 +1,2 @@
+configuration,seed_count,seeds,mean_ic,std_ic,mean_gaussian_nll,std_gaussian_nll,sharpe,std_sharpe,cumulative_return_diagnostic_only,rmse_diagnostic_only,validation_passed,pareto_nondominated,input_count_excluding_time
+global_c55e49933d10,3,"27,127,227",0.1087797619047619,0.002436116896390594,-2.141413469561682,0.015577267740236829,1.1278812614365563,0.08539576368320644,0.34707684795551436,0.03357606825152673,True,True,27

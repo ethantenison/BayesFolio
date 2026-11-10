@@ -1,0 +1,23 @@
+{
+  "schema": "bayesfolio.paired_portfolio_policy_spec.v1",
+  "configuration_count": 499,
+  "new_GP_fits": 0,
+  "risk_budget_only_minimum_effective": null,
+  "risk_budget_plus_effective_joint_minimum": 10,
+  "risk_budget_plus_effective_family_conditional_portfolio_minimum": 3,
+  "allocation_universe": "same_15_ETFs_in_both_variants",
+  "ETF_position_cap": null,
+  "CVaR": false,
+  "long_only": true,
+  "fully_invested": true,
+  "fallback_weights": false,
+  "constraint_relaxation": false,
+  "risk_budget": "same_absolute_training_historical_equal_weight_variance",
+  "record_all_monthly_weights_and_failures": true,
+  "performance_requires_all_24_months": true,
+  "GP_covariance_available_for_full_portfolio": "joint_models_only",
+  "cross_family_covariance_fabrication": false,
+  "turnover_objective": false,
+  "automatic_promotion": false,
+  "evaluation_status": "reused_exploratory_months_not_untouched_holdout"
+}

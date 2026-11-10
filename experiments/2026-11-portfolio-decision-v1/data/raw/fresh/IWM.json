@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:07.309731+00:00",
+  "rows": 64,
+  "sha256": "5943c3c0c0abdf71192a9779b9af5bf0939c6f2eac55376e164bcbe9c7ddf443",
+  "symbol": "IWM"
+}

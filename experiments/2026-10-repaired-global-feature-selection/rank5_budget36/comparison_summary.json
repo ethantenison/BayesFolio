@@ -1,0 +1,36 @@
+{
+  "boundary": "Budget sensitivity within rank five, not compute-matched rank comparison.",
+  "contract_sha256": "c66c0bd193d945fd13afac5d3bf21d97baf848479604c95d6d7b092af170dea7",
+  "convergence": {
+    "caveat": "SUCCESS is optimizer stopping-criterion convergence, not proof of a global optimum.",
+    "final_iterations_max": 36,
+    "final_iterations_median": 36.0,
+    "final_iterations_min": 36,
+    "final_status_counts": {
+      "STOPPED": 72
+    },
+    "optimizer_attempts": 72,
+    "windows": 72,
+    "windows_using_full_cap": 72
+  },
+  "dates_per_run": 24,
+  "means_by_maxiter": {
+    "15": {
+      "cumulative_return_diagnostic_only": 0.47844957562395685,
+      "mean_gaussian_nll": -2.2350805929027984,
+      "mean_ic": 0.28536706349206337,
+      "rmse_diagnostic_only": 0.0313413066269033,
+      "sharpe": 1.4570624994483812
+    },
+    "36": {
+      "cumulative_return_diagnostic_only": 0.39545574181305243,
+      "mean_gaussian_nll": -2.237612100992285,
+      "mean_ic": 0.21785714285714275,
+      "rmse_diagnostic_only": 0.0319945249046848,
+      "sharpe": 1.1752891247536557
+    }
+  },
+  "new_seed_runs": 3,
+  "passed": true,
+  "seed_runs": 6
+}

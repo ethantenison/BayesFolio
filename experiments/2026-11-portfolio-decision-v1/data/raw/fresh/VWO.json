@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:07.986699+00:00",
+  "rows": 64,
+  "sha256": "4c7acb0e7cce10a3a8b54e9f15479a390bebd8b9d4536c777856a0c50509532e",
+  "symbol": "VWO"
+}

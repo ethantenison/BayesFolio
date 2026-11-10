@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:08.328905+00:00",
+  "rows": 64,
+  "sha256": "ab196d72aa881db4e178811b0e506f60e9aeb16817c750c628428092fba86655",
+  "symbol": "VSS"
+}

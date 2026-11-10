@@ -1,0 +1,79 @@
+{
+  "schema": "bayesfolio.gp_tuning.track2_static_asymmetric.v1",
+  "track": "track2_asymmetric",
+  "component_registry": {
+    "families": ["broad", "compact"],
+    "ranks": [1, 2, 5],
+    "maxiter": [5, 15, 36, 75],
+    "training": "expanding_84_to_111_months",
+    "component_count": 24,
+    "original_cached_components": 2,
+    "fits_owned_by_shared_parent_queue": true,
+    "independent_fit_launch_allowed": false
+  },
+  "seeds": [27, 127, 227],
+  "forecast_origins": 28,
+  "selection": {
+    "period": "tuning_first16",
+    "origin_months": ["2024-05", "2025-08"],
+    "seed_aggregation": "arithmetic_mean_of_each_seed_metric",
+    "maximize": ["sharpe", "total_return", "rank_ic"],
+    "shortlist_method": "retain_original_control_then_normalized_Pareto_ideal_proximity_and_farthest_first_coverage",
+    "maximum_component_pairs_including_original_control": 3,
+    "maximum_mean_finalists_per_pair": 3,
+    "validation_outcomes_may_choose_candidates": false,
+    "full_window_outcomes_may_choose_claimed_validation_candidates": false
+  },
+  "reporting": {
+    "periods": ["tuning_first16", "validation_last12", "exploratory_all28"],
+    "validation_origin_months": ["2025-09", "2026-08"],
+    "pristine_holdout": false,
+    "explanation": "All historical months have already been inspected in earlier research.",
+    "nll_role": "diagnostic_only",
+    "additional_diagnostics": ["drawdown", "volatility", "seed_consistency", "feasibility", "covariance_risk", "actual_iterations_and_fit_status"]
+  },
+  "fixed_blend_screen": {
+    "case_count": 144,
+    "alpha_family_order": ["us_equity", "international_equity", "us_fixed_income", "international_fixed_income"],
+    "compact_mean_fractions": [0.5, 0.0, 0.375, 0.25],
+    "compact_covariance_fraction": 0.5
+  },
+  "mean_retuning": {
+    "case_count_per_pair": 97,
+    "incremental_case_count_after_screen_reuse": 96,
+    "coarse_family_fractions": [0.0, 0.5, 1.0],
+    "coarse_cartesian_case_count": 81,
+    "also_include_approved_leader_and_compromise": true,
+    "single_family_local_deltas_from_approved_leader": [-0.125, -0.0625, 0.0625, 0.125],
+    "clip_and_deduplicate": true,
+    "compact_covariance_fraction": 0.5
+  },
+  "covariance_retuning": {
+    "maximum_incremental_cases_per_pair": 12,
+    "new_compact_fractions": [0.0, 0.25, 0.75, 1.0],
+    "existing_compact_fraction_control": 0.5,
+    "hold_selected_mean_fractions_unchanged": true,
+    "formula": "(1-c)*observed_broad_covariance+c*observed_compact_covariance",
+    "likelihood_noise_included": true,
+    "mixture_disagreement_term": false,
+    "independence_assumed": false,
+    "covariance_repair": false
+  },
+  "budget": {
+    "maximum_unique_hard_rank_recipes": 468,
+    "maximum_monthly_hard_rank_allocations_before_other_cache_reuse": 39312,
+    "additional_gp_fits_beyond_shared_registry": 0,
+    "full_menu_scenario_replication_allowed": false
+  },
+  "allocator_invariants": {
+    "primary": "hard_rank",
+    "minimum_effective_assets": 7,
+    "position_cap": null,
+    "risk_budget": "unchanged_training_only_historical_equal_weight_variance",
+    "scenario_comparison": {"minimum_effective_assets": 10, "position_cap": 0.25, "risk_measure": "MV", "objective": "signed_Sharpe"},
+    "CVaR": false,
+    "fallback": false,
+    "constraint_relaxation": false,
+    "monthly_changing_blend_weights": false
+  }
+}

@@ -1,0 +1,1058 @@
+{
+  "constructed_unfitted_models": [
+    {
+      "actual_model_repr": "MultiTaskGP(\n  (likelihood): HadamardGaussianLikelihood(\n    (noise_covar): MultitaskHomoskedasticNoise(\n      (noise_prior): LogNormalPrior()\n      (raw_noise_constraint): GreaterThan(5.000E-03)\n    )\n  )\n  (mean_module): MultitaskMean(\n    (base_means): ModuleList(\n      (0-14): 15 x ConstantMean()\n    )\n  )\n  (covar_module): ProductKernel(\n    (kernels): ModuleList(\n      (0): AdditiveKernel(\n        (kernels): ModuleList(\n          (0): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (1): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(7.071E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (2): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.146E-01)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (3): ScaleKernel(\n            (base_kernel): RQKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.146E-01)\n              (raw_alpha_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (4): ScaleKernel(\n            (base_kernel): LinearKernel(\n              (raw_variance_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (5): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(7.071E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (6): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.146E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.146E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (7): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.146E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.146E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(7.071E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n        )\n      )\n      (1): IndexKernel(\n        (IndexKernelPrior): LKJCovariancePrior()\n        (raw_var_constraint): Positive()\n      )\n    )\n  )\n  (input_transform): Normalize()\n  (outcome_transform): StratifiedStandardize()\n)",
+      "completed_seed27_first_window_likelihood_and_transform_match": true,
+      "configuration": "global_3745593ecc26",
+      "covariance_config": {
+        "blocks": [
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  0
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "time",
+            "use_outputscale": false,
+            "variable_type": "time"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "etf",
+            "use_outputscale": false,
+            "variable_type": "etf"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              },
+              {
+                "ard": true,
+                "dims": [
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29
+                ],
+                "kind": "rq",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "use_outputscale": true
+              },
+              {
+                "dims": [
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29
+                ],
+                "kind": "linear",
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "macro",
+            "use_outputscale": false,
+            "variable_type": "macro"
+          }
+        ],
+        "custom_interactions": [
+          {
+            "blocks": [
+              "time",
+              "etf"
+            ],
+            "name": "time_x_etf",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "time",
+              "macro"
+            ],
+            "name": "time_x_macro",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "macro",
+              "etf"
+            ],
+            "name": "macro_x_etf",
+            "use_outputscale": true
+          }
+        ],
+        "global_structure": "hierarchical",
+        "interaction_policy": "custom",
+        "terms": null
+      },
+      "evaluation_cannot_update_learned_bounds_or_outcome_scaling": true,
+      "evaluation_features_and_targets_cannot_change_training_tensors": true,
+      "family": "global",
+      "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/global.parquet",
+      "feature_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+      "initial_training_months": 84,
+      "input_bounds_fit_on_training_only": true,
+      "input_transform": "Normalize",
+      "legacy_recorded_prior_label": "BetaPrior(2.5, 1.5)",
+      "likelihood": "HadamardGaussianLikelihood",
+      "likelihood_noise_prior": "LogNormal(-4,1)",
+      "mean_module": "MultitaskMean",
+      "noise_floor_standardized_variance": 0.005,
+      "optimizer_called": false,
+      "outcome_transform": "StratifiedStandardize",
+      "plan_path": "experiments/2026-10-repaired-global-feature-selection/plans/05_global_round0.json",
+      "plan_sha256": "9fd5174ee33f44749ddfc4042180cbcdc2717a8a36fad551537d2ccebaa1e4e1",
+      "task_kernel": "IndexKernel",
+      "task_prior": "LKJCovariancePrior(eta=2, sd_prior=LogNormal(0,0.5))",
+      "task_rank": 2,
+      "tasks": 15,
+      "training_rows": 1260
+    },
+    {
+      "actual_model_repr": "MultiTaskGP(\n  (likelihood): HadamardGaussianLikelihood(\n    (noise_covar): MultitaskHomoskedasticNoise(\n      (noise_prior): LogNormalPrior()\n      (raw_noise_constraint): GreaterThan(5.000E-03)\n    )\n  )\n  (mean_module): MultitaskMean(\n    (base_means): ModuleList(\n      (0-3): 4 x ConstantMean()\n    )\n  )\n  (covar_module): ProductKernel(\n    (kernels): ModuleList(\n      (0): AdditiveKernel(\n        (kernels): ModuleList(\n          (0): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (1): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (2): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (3): ScaleKernel(\n            (base_kernel): RQKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n              (raw_alpha_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (4): ScaleKernel(\n            (base_kernel): LinearKernel(\n              (raw_variance_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (5): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (6): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (7): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n        )\n      )\n      (1): IndexKernel(\n        (IndexKernelPrior): LKJCovariancePrior()\n        (raw_var_constraint): Positive()\n      )\n    )\n  )\n  (input_transform): Normalize()\n  (outcome_transform): StratifiedStandardize()\n)",
+      "completed_seed27_first_window_likelihood_and_transform_match": true,
+      "configuration": "international_equity_642db2c8937b",
+      "covariance_config": {
+        "blocks": [
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  0
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "time",
+            "use_outputscale": false,
+            "variable_type": "time"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "etf",
+            "use_outputscale": false,
+            "variable_type": "etf"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              },
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "rq",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "use_outputscale": true
+              },
+              {
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "linear",
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "macro",
+            "use_outputscale": false,
+            "variable_type": "macro"
+          }
+        ],
+        "custom_interactions": [
+          {
+            "blocks": [
+              "time",
+              "etf"
+            ],
+            "name": "time_x_etf",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "time",
+              "macro"
+            ],
+            "name": "time_x_macro",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "macro",
+              "etf"
+            ],
+            "name": "macro_x_etf",
+            "use_outputscale": true
+          }
+        ],
+        "global_structure": "hierarchical",
+        "interaction_policy": "custom",
+        "terms": null
+      },
+      "evaluation_cannot_update_learned_bounds_or_outcome_scaling": true,
+      "evaluation_features_and_targets_cannot_change_training_tensors": true,
+      "family": "international_equity",
+      "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/international_equity.parquet",
+      "feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "initial_training_months": 84,
+      "input_bounds_fit_on_training_only": true,
+      "input_transform": "Normalize",
+      "legacy_recorded_prior_label": "BetaPrior(2.5, 1.5)",
+      "likelihood": "HadamardGaussianLikelihood",
+      "likelihood_noise_prior": "LogNormal(-4,1)",
+      "mean_module": "MultitaskMean",
+      "noise_floor_standardized_variance": 0.005,
+      "optimizer_called": false,
+      "outcome_transform": "StratifiedStandardize",
+      "plan_path": "experiments/2026-10-repaired-global-feature-selection/plans/00_international_equity_rebaseline.json",
+      "plan_sha256": "f7930f07238d454c69692ae1b965625bbf0819fe383efaab31db0ffd0c4b95ae",
+      "task_kernel": "IndexKernel",
+      "task_prior": "LKJCovariancePrior(eta=2, sd_prior=LogNormal(0,0.5))",
+      "task_rank": 2,
+      "tasks": 4,
+      "training_rows": 336
+    },
+    {
+      "actual_model_repr": "MultiTaskGP(\n  (likelihood): HadamardGaussianLikelihood(\n    (noise_covar): MultitaskHomoskedasticNoise(\n      (noise_prior): LogNormalPrior()\n      (raw_noise_constraint): GreaterThan(5.000E-03)\n    )\n  )\n  (mean_module): MultitaskMean(\n    (base_means): ModuleList(\n      (0-2): 3 x ConstantMean()\n    )\n  )\n  (covar_module): ProductKernel(\n    (kernels): ModuleList(\n      (0): AdditiveKernel(\n        (kernels): ModuleList(\n          (0): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (1): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (2): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (3): ScaleKernel(\n            (base_kernel): RQKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n              (raw_alpha_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (4): ScaleKernel(\n            (base_kernel): LinearKernel(\n              (raw_variance_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (5): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (6): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (7): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n        )\n      )\n      (1): IndexKernel(\n        (IndexKernelPrior): LKJCovariancePrior()\n        (raw_var_constraint): Positive()\n      )\n    )\n  )\n  (input_transform): Normalize()\n  (outcome_transform): StratifiedStandardize()\n)",
+      "completed_seed27_first_window_likelihood_and_transform_match": true,
+      "configuration": "international_fixed_income_0311693f134c",
+      "covariance_config": {
+        "blocks": [
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  0
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "time",
+            "use_outputscale": false,
+            "variable_type": "time"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "etf",
+            "use_outputscale": false,
+            "variable_type": "etf"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              },
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "rq",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "use_outputscale": true
+              },
+              {
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "linear",
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "macro",
+            "use_outputscale": false,
+            "variable_type": "macro"
+          }
+        ],
+        "custom_interactions": [
+          {
+            "blocks": [
+              "time",
+              "etf"
+            ],
+            "name": "time_x_etf",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "time",
+              "macro"
+            ],
+            "name": "time_x_macro",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "macro",
+              "etf"
+            ],
+            "name": "macro_x_etf",
+            "use_outputscale": true
+          }
+        ],
+        "global_structure": "hierarchical",
+        "interaction_policy": "custom",
+        "terms": null
+      },
+      "evaluation_cannot_update_learned_bounds_or_outcome_scaling": true,
+      "evaluation_features_and_targets_cannot_change_training_tensors": true,
+      "family": "international_fixed_income",
+      "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/international_fixed_income.parquet",
+      "feature_sha256": "29bbaa8eb2b99f31329404cc4aad2d88c00e9d1ec8cb73bf989b4d3f60d76a9a",
+      "initial_training_months": 84,
+      "input_bounds_fit_on_training_only": true,
+      "input_transform": "Normalize",
+      "legacy_recorded_prior_label": "BetaPrior(2.5, 1.5)",
+      "likelihood": "HadamardGaussianLikelihood",
+      "likelihood_noise_prior": "LogNormal(-4,1)",
+      "mean_module": "MultitaskMean",
+      "noise_floor_standardized_variance": 0.005,
+      "optimizer_called": false,
+      "outcome_transform": "StratifiedStandardize",
+      "plan_path": "experiments/2026-10-repaired-global-feature-selection/plans/00_international_fixed_income_rebaseline.json",
+      "plan_sha256": "29448fd14bde4d9e8e21c60c47b376fbf39c7a763081f07b1a0f34c890301d77",
+      "task_kernel": "IndexKernel",
+      "task_prior": "LKJCovariancePrior(eta=2, sd_prior=LogNormal(0,0.5))",
+      "task_rank": 2,
+      "tasks": 3,
+      "training_rows": 252
+    },
+    {
+      "actual_model_repr": "MultiTaskGP(\n  (likelihood): HadamardGaussianLikelihood(\n    (noise_covar): MultitaskHomoskedasticNoise(\n      (noise_prior): LogNormalPrior()\n      (raw_noise_constraint): GreaterThan(5.000E-03)\n    )\n  )\n  (mean_module): MultitaskMean(\n    (base_means): ModuleList(\n      (0-3): 4 x ConstantMean()\n    )\n  )\n  (covar_module): ProductKernel(\n    (kernels): ModuleList(\n      (0): AdditiveKernel(\n        (kernels): ModuleList(\n          (0): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (1): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (2): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (3): ScaleKernel(\n            (base_kernel): RQKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n              (raw_alpha_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (4): ScaleKernel(\n            (base_kernel): LinearKernel(\n              (raw_variance_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (5): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (6): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (7): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n        )\n      )\n      (1): IndexKernel(\n        (IndexKernelPrior): LKJCovariancePrior()\n        (raw_var_constraint): Positive()\n      )\n    )\n  )\n  (input_transform): Normalize()\n  (outcome_transform): StratifiedStandardize()\n)",
+      "completed_seed27_first_window_likelihood_and_transform_match": true,
+      "configuration": "us_equity_77e1f7f1f070",
+      "covariance_config": {
+        "blocks": [
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  0
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "time",
+            "use_outputscale": false,
+            "variable_type": "time"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "etf",
+            "use_outputscale": false,
+            "variable_type": "etf"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              },
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "rq",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "use_outputscale": true
+              },
+              {
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "linear",
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "macro",
+            "use_outputscale": false,
+            "variable_type": "macro"
+          }
+        ],
+        "custom_interactions": [
+          {
+            "blocks": [
+              "time",
+              "etf"
+            ],
+            "name": "time_x_etf",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "time",
+              "macro"
+            ],
+            "name": "time_x_macro",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "macro",
+              "etf"
+            ],
+            "name": "macro_x_etf",
+            "use_outputscale": true
+          }
+        ],
+        "global_structure": "hierarchical",
+        "interaction_policy": "custom",
+        "terms": null
+      },
+      "evaluation_cannot_update_learned_bounds_or_outcome_scaling": true,
+      "evaluation_features_and_targets_cannot_change_training_tensors": true,
+      "family": "us_equity",
+      "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/us_equity.parquet",
+      "feature_sha256": "874432bc7110c5341c818c412ff0866588d3f876622bb8248435884c0885e4c2",
+      "initial_training_months": 84,
+      "input_bounds_fit_on_training_only": true,
+      "input_transform": "Normalize",
+      "legacy_recorded_prior_label": "BetaPrior(2.5, 1.5)",
+      "likelihood": "HadamardGaussianLikelihood",
+      "likelihood_noise_prior": "LogNormal(-4,1)",
+      "mean_module": "MultitaskMean",
+      "noise_floor_standardized_variance": 0.005,
+      "optimizer_called": false,
+      "outcome_transform": "StratifiedStandardize",
+      "plan_path": "experiments/2026-10-repaired-global-feature-selection/plans/00_us_equity_rebaseline.json",
+      "plan_sha256": "3b87831e8029ecad14c165d293f311c0fcde7f9518d6ff0e6bb87e50c98f00c3",
+      "task_kernel": "IndexKernel",
+      "task_prior": "LKJCovariancePrior(eta=2, sd_prior=LogNormal(0,0.5))",
+      "task_rank": 2,
+      "tasks": 4,
+      "training_rows": 336
+    },
+    {
+      "actual_model_repr": "MultiTaskGP(\n  (likelihood): HadamardGaussianLikelihood(\n    (noise_covar): MultitaskHomoskedasticNoise(\n      (noise_prior): LogNormalPrior()\n      (raw_noise_constraint): GreaterThan(5.000E-03)\n    )\n  )\n  (mean_module): MultitaskMean(\n    (base_means): ModuleList(\n      (0-3): 4 x ConstantMean()\n    )\n  )\n  (covar_module): ProductKernel(\n    (kernels): ModuleList(\n      (0): AdditiveKernel(\n        (kernels): ModuleList(\n          (0): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (1): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (2): ScaleKernel(\n            (base_kernel): MaternKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (3): ScaleKernel(\n            (base_kernel): RQKernel(\n              (lengthscale_prior): LogNormalPrior()\n              (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n              (raw_alpha_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (4): ScaleKernel(\n            (base_kernel): LinearKernel(\n              (raw_variance_constraint): Positive()\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (5): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (6): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(2.500E-02)\n                )\n                (1): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n          (7): ScaleKernel(\n            (base_kernel): ProductKernel(\n              (kernels): ModuleList(\n                (0): AdditiveKernel(\n                  (kernels): ModuleList(\n                    (0): MaternKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                    )\n                    (1): RQKernel(\n                      (lengthscale_prior): LogNormalPrior()\n                      (raw_lengthscale_constraint): GreaterThan(1.000E-01)\n                      (raw_alpha_constraint): Positive()\n                    )\n                    (2): LinearKernel(\n                      (raw_variance_constraint): Positive()\n                    )\n                  )\n                )\n                (1): MaternKernel(\n                  (lengthscale_prior): LogNormalPrior()\n                  (raw_lengthscale_constraint): GreaterThan(8.292E-02)\n                )\n              )\n            )\n            (raw_outputscale_constraint): Positive()\n          )\n        )\n      )\n      (1): IndexKernel(\n        (IndexKernelPrior): LKJCovariancePrior()\n        (raw_var_constraint): Positive()\n      )\n    )\n  )\n  (input_transform): Normalize()\n  (outcome_transform): StratifiedStandardize()\n)",
+      "completed_seed27_first_window_likelihood_and_transform_match": true,
+      "configuration": "us_fixed_income_2ad11ac7fb0d",
+      "covariance_config": {
+        "blocks": [
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  0
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "time",
+            "use_outputscale": false,
+            "variable_type": "time"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "etf",
+            "use_outputscale": false,
+            "variable_type": "etf"
+          },
+          {
+            "block_structure": "additive",
+            "components": [
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "matern",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "matern_nu": 0.5,
+                "use_outputscale": true
+              },
+              {
+                "ard": true,
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "rq",
+                "lengthscale_policy": {
+                  "manual": null,
+                  "policy": "adaptive"
+                },
+                "use_outputscale": true
+              },
+              {
+                "dims": [
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27
+                ],
+                "kind": "linear",
+                "use_outputscale": true
+              }
+            ],
+            "include_as_main_effect": true,
+            "name": "macro",
+            "use_outputscale": false,
+            "variable_type": "macro"
+          }
+        ],
+        "custom_interactions": [
+          {
+            "blocks": [
+              "time",
+              "etf"
+            ],
+            "name": "time_x_etf",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "time",
+              "macro"
+            ],
+            "name": "time_x_macro",
+            "use_outputscale": true
+          },
+          {
+            "blocks": [
+              "macro",
+              "etf"
+            ],
+            "name": "macro_x_etf",
+            "use_outputscale": true
+          }
+        ],
+        "global_structure": "hierarchical",
+        "interaction_policy": "custom",
+        "terms": null
+      },
+      "evaluation_cannot_update_learned_bounds_or_outcome_scaling": true,
+      "evaluation_features_and_targets_cannot_change_training_tensors": true,
+      "family": "us_fixed_income",
+      "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/us_fixed_income.parquet",
+      "feature_sha256": "ad03586be8d7ad4b10c94603ae38502ed58c55707a4727d23b6525d926a5a893",
+      "initial_training_months": 84,
+      "input_bounds_fit_on_training_only": true,
+      "input_transform": "Normalize",
+      "legacy_recorded_prior_label": "BetaPrior(2.5, 1.5)",
+      "likelihood": "HadamardGaussianLikelihood",
+      "likelihood_noise_prior": "LogNormal(-4,1)",
+      "mean_module": "MultitaskMean",
+      "noise_floor_standardized_variance": 0.005,
+      "optimizer_called": false,
+      "outcome_transform": "StratifiedStandardize",
+      "plan_path": "experiments/2026-10-repaired-global-feature-selection/plans/00_us_fixed_income_rebaseline.json",
+      "plan_sha256": "7f8b1d06a8b157dbc24a30e01d9bde9e5de355d1209a758132913d5a6289d7e8",
+      "task_kernel": "IndexKernel",
+      "task_prior": "LKJCovariancePrior(eta=2, sd_prior=LogNormal(0,0.5))",
+      "task_rank": 2,
+      "tasks": 4,
+      "training_rows": 336
+    }
+  ],
+  "metadata_caveats": [
+    "Legacy manifest modeling.task_covar_prior incorrectly says BetaPrior(2.5,1.5) for signed LKJ. Actual construction above uses LKJ eta 2; original manifests and fit sources are preserved.",
+    "Legacy wrapper assigns every task the us_equity label only in its ASSET_GROUPS correlation diagnostics. Do not interpret its within/between-group correlations as four-family results. Selection reports independently use the approved four-family ticker map."
+  ],
+  "optimizer_calls": 0,
+  "passed": true,
+  "runtime": {
+    "packages": {
+      "Riskfolio-Lib": "7.2.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "numpy": "2.4.2",
+      "pandas": "2.3.3",
+      "scipy": "1.17.1",
+      "torch": "2.10.0"
+    },
+    "python": "3.13.12 (v3.13.12:1cbe4818347, Feb  3 2026, 13:36:53) [Clang 16.0.0 (clang-1600.0.26.6)]"
+  },
+  "source_sha256": {
+    "bayesfolio/engine/forecast/gp/extra_model_info.py": "cae674e75c81ebcab503678cd89cf1b3ea809aaae9db8c8083d29863312b6963",
+    "bayesfolio/engine/forecast/gp/feature_catalog.py": "2801d948e7bd5342a517657660f0747d9ea0f30ccb7b0fe40563c43c86d86120",
+    "bayesfolio/engine/forecast/gp/kernels.py": "c82f71e78b8eabd73a833e692ac76dc3541892b52b63aabe653bbc81fa0e55cc",
+    "bayesfolio/engine/forecast/gp/multitask_builder.py": "803e09f22d49ec23d4ee387cd871328e30075fc2dcdcd053fe01558e818b48cc",
+    "bayesfolio/engine/forecast/gp/planner_compiler.py": "80ed4bb8a713ce4857758a90e0c0a5c77a4b13f7ea2fb075f90d3aa0eefe413e",
+    "bayesfolio/engine/forecast/gp/reporting.py": "9e4c43330d44807ccbeb7899d63625c5a15bdb2875918f62f7eb3328d0cc070d",
+    "bayesfolio/engine/forecast/gp/time_varying_kernel.py": "9b5302bf7967f3cb2e945652e1a634d6791385ab51df05d22a3daea0e352da41",
+    "bayesfolio/engine/forecast/gp/workflow.py": "1e1490c82799a69cbac2c55cb47d830725121ed799e610570f96abd4b9d6f7e0",
+    "experiments/2026-06-portfolio-optimization/run_monthly_optimization_walkforward.py": "5288fac624d1681cc47d5a11fd3e8759e0c2c3d676426f7fa8bc51a4083b0bf9",
+    "experiments/2026-06-task-covariance/run_outputscale_floor_prior.py": "49be9702464a29db92949ed1f08ef968b42b4c540282cc0bdbf32207a00b73cf",
+    "experiments/2026-06-task-covariance/run_outputscale_structure_ablation.py": "dfbf1bb223cb2f2c8ef344d110d3cd1cf27efba0cb7f6e3b4f501e79e3ef38c8",
+    "experiments/2026-06-task-covariance/run_task_covariance_rollforward.py": "85c25492e9f5c878210b18b4d9ea253b0e20f2a3a66c7bd0b1abbb1da48aa3a6",
+    "experiments/2026-06-task-covariance/run_time_modulation_ablation.py": "608090d47c3a3b01a37941cee666c77b9c1acf21dcffed382d49620357eab059",
+    "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py": "35290317ded538f8adc672e9e967ab95dc0d43580e19ebdb6589ef81018d766e",
+    "experiments/2026-10-etf-family-feature-confirmation/orchestrate_international_experiments.py": "a1bb2806cc275c29869cc51a48d026262fb872736a96a5b3048944f27fb3d988",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_international_experiments.py": "7db00e00d678bc59bdee89c2ea99785a51bac341848dd9a03707317ce17443f4",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_us_confirmation.py": "8ada7ccdf64f0db6dd772ef8bf3bb174757efc354fc3e519d37f797925a5fd37",
+    "experiments/2026-10-etf-family-feature-confirmation/summarize_us_pilots.py": "1633194983f1143d03cf3efe38fde1f12e7291913576f16badc1add84cedc749",
+    "experiments/2026-10-repaired-global-feature-selection/audit_model_contract.py": "b305f17c1321711d8ee3f6b121651e4ef54a41adc12a7a10af3f6d7fad51c9ff",
+    "experiments/2026-10-repaired-global-feature-selection/run_study.py": "c3e25326f62b1016e8fcd8637a3b266f8613a24caa2cf00f9417ed5a34d43241",
+    "experiments/2026-10-repaired-global-feature-selection/study.json": "e38375a2d8a8213060c682ad78c6a069e89818f8438409be67783ba4da44dc97",
+    "uv.lock": "64cb2fe285b144d212bb589b5cb6826abd680f60031a9e9874e91980def99457"
+  }
+}

@@ -1,0 +1,7902 @@
+{
+  "anchors_sha256": "0f0fb4c4f5f5e3b477633dd2c9344ba436f15e000c54e0577ec88f7ccf72a921",
+  "cases": [
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e8dded0ca2372e962b41",
+      "label": "R3_local0_2",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.125,
+          0.875,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_23cfd00eb12a6b199470",
+      "label": "R3_local0_3",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          0.875,
+          0.125
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_86c3c58aed0c4bd8c0e5",
+      "label": "R3_local0_6",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.17708333333333334,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_d2f17ef142fbe49943f9",
+      "label": "R3_local0_7",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.052083333333333336,
+          0.13020833333333334
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_c291be860cbce077dd6e",
+      "label": "R3_local0_8",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9947916666666667,
+          0.0,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_765dc6449105c465babe",
+      "label": "R3_local0_9",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.0,
+          0.05729166666666667
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_25bf76f846ca90028972",
+      "label": "R3_local0_10",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9479166666666667,
+          0.052083333333333336,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_654da38ecb24ba608857",
+      "label": "R3_local0_11",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.05729166666666667,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_25f94a832b2529d91c5c",
+      "label": "R3_local0_14",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.07291666666666667,
+          0.0,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_14b5209d7492df9cee63",
+      "label": "R3_local0_15",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_ababfc68eedeb9b7e38a",
+      "label": "R3_local0_16",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.125,
+          0.07291666666666667,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6fd994b95905534b15ec",
+      "label": "R3_local0_17",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.19791666666666669,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6b4118e29387ecf0d6b6",
+      "label": "R3_local0_18",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.046875,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e41599e6df70e34433d0",
+      "label": "R3_local0_19",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.020833333333333332,
+          0.9791666666666666
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_2952751dacb26c5c8d9b",
+      "label": "R3_local0_20",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.046875,
+          0.0,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6ea5f79f97ba0c218a6d",
+      "label": "R3_local0_21",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.0,
+          0.9739583333333334
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_cf8b0a4b8766aad54742",
+      "label": "R3_local0_22",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.15104166666666666,
+          0.020833333333333332,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_a5ac76676d9e3a76b746",
+      "label": "R3_local0_23",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.14583333333333334,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_56df39310c3e16423348",
+      "label": "R3_local0_24",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.012475799365860605,
+          0.9608715194213792,
+          0.026652681212760418
+        ],
+        [
+          0.9596496489365034,
+          0.03686291027160282,
+          0.003487440791893916
+        ],
+        [
+          4.3804911425540984e-10,
+          0.04272872396864419,
+          0.9572712755933067
+        ],
+        [
+          0.05233755440047927,
+          0.07131383023631992,
+          0.8763486153632009
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_bd2764e8fea449e5eb71",
+      "label": "R3_local0_25",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0007935449491370633,
+          0.9991408182212327,
+          6.56368296302944e-05
+        ],
+        [
+          0.9565366939274694,
+          0.03773020690670054,
+          0.00573309916583001
+        ],
+        [
+          3.789288260907705e-05,
+          0.09230462469595983,
+          0.9076574824214311
+        ],
+        [
+          0.014022452669297468,
+          0.006737821932334657,
+          0.9792397253983678
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e6f9b661fb20a88f7715",
+      "label": "R3_local0_26",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0020072024758359714,
+          0.9752544461953536,
+          0.0227383513288104
+        ],
+        [
+          0.9565440744381726,
+          0.02617809011192099,
+          0.017277835449906288
+        ],
+        [
+          0.00032684882335252437,
+          0.028851017562700546,
+          0.970822133613947
+        ],
+        [
+          0.02656021013651433,
+          0.026133084282071874,
+          0.9473067055814137
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_cc5612bc81c7bc829b38",
+      "label": "R3_local0_27",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.00888862266959161,
+          0.9891491886726708,
+          0.0019621886577376796
+        ],
+        [
+          0.9611624631666857,
+          0.03626402752237595,
+          0.002573509310938101
+        ],
+        [
+          0.004031328557481307,
+          0.09100423630701657,
+          0.9049644351355021
+        ],
+        [
+          0.042564611500951866,
+          0.007304052350664539,
+          0.9501313361483835
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_c71c6597447a59690c6f",
+      "label": "R3_local0_28",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.001371896520261326,
+          0.9973285687797235,
+          0.0012995347000151238
+        ],
+        [
+          0.8602316011422491,
+          0.13940792144296626,
+          0.0003604774147846069
+        ],
+        [
+          7.13325490109562e-07,
+          0.036072318223306775,
+          0.9639269684512032
+        ],
+        [
+          0.03655495112309491,
+          0.0316819245575442,
+          0.9317631243193608
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_90053c1468e119dc968a",
+      "label": "R3_local0_29",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          5.41579382456823e-07,
+          0.9936946645373983,
+          0.006304793883219284
+        ],
+        [
+          0.9657041771267445,
+          0.033714265417766974,
+          0.0005815574554884089
+        ],
+        [
+          0.000609287657871223,
+          0.07369835015352075,
+          0.925692362188608
+        ],
+        [
+          0.023095434018311833,
+          0.016395678454431704,
+          0.9605088875272564
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_d4b341de0713af4b4069",
+      "label": "R3_local0_30",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.01155106961441185,
+          0.975829656986011,
+          0.012619273399577167
+        ],
+        [
+          0.9513326317643246,
+          0.04695751742207144,
+          0.001709850813603906
+        ],
+        [
+          0.000297000098346659,
+          0.10832035117478266,
+          0.8913826487268707
+        ],
+        [
+          0.004046491265754008,
+          0.050756474440278025,
+          0.9451970342939678
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_d3c772a56224a6ffb3f1",
+      "label": "R3_local0_31",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          5.937321488172658e-06,
+          0.999993583565443,
+          4.791130689815715e-07
+        ],
+        [
+          0.9348131503595736,
+          0.06315907813173208,
+          0.0020277715086945355
+        ],
+        [
+          0.0070027015895590934,
+          0.017300422277641118,
+          0.9756968761327999
+        ],
+        [
+          0.03501313573293546,
+          0.009070858967079423,
+          0.955916005299985
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.75,
+        0.25,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_5c179ac52471eff350ba",
+      "label": "R3_cov0_[0.75, 0.25, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.75,
+        0.25,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_f14d179d4927e2b3cec5",
+      "label": "R3_cov0_[0.75, 0.25, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.75,
+        0.25,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_61091a43933a92b0f8ea",
+      "label": "R3_cov0_[0.75, 0.25, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_5f02afe1a737a169beee",
+      "label": "R3_cov0_[0.25, 0.75, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_f510c8e876569b033402",
+      "label": "R3_cov0_[0.25, 0.75, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_56a2f04a05fffc43937f",
+      "label": "R3_cov0_[0.25, 0.75, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_5b91f4a2b72c1a3fc341",
+      "label": "R3_cov0_[0, 1, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_dd16e578b05d437bd541",
+      "label": "R3_cov0_[0, 1, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_2439a2a2df1f09c479bc",
+      "label": "R3_cov0_[0, 1, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_08bd87d97a826ebc3dce",
+      "label": "R3_cov0_[1, 0, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_a332585bf4c907057142",
+      "label": "R3_cov0_[1, 0, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_f64a904bf05900f523c6",
+      "label": "R3_cov0_[1, 0, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0.25,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_84865ffc8e2a42a68cf2",
+      "label": "R3_cov0_[0.375, 0.375, 0.25, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0.25,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_51ec47e64c787616c0a3",
+      "label": "R3_cov0_[0.375, 0.375, 0.25, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0.25,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_35b49d0fdb78c52990ea",
+      "label": "R3_cov0_[0.375, 0.375, 0.25, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0,
+        0.25
+      ],
+      "equity_cap": null,
+      "id": "policy_f535f6b0133594e3ffa3",
+      "label": "R3_cov0_[0.375, 0.375, 0, 0.25]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0,
+        0.25
+      ],
+      "equity_cap": null,
+      "id": "policy_9f017ccdf85b4b8041a6",
+      "label": "R3_cov0_[0.375, 0.375, 0, 0.25]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0,
+        0.25
+      ],
+      "equity_cap": null,
+      "id": "policy_06ef84ab25fd6125529b",
+      "label": "R3_cov0_[0.375, 0.375, 0, 0.25]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.25,
+        0,
+        0.5
+      ],
+      "equity_cap": null,
+      "id": "policy_714208c507fbfd697e72",
+      "label": "R3_cov0_[0.25, 0.25, 0, 0.5]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.25,
+        0,
+        0.5
+      ],
+      "equity_cap": null,
+      "id": "policy_243ed1aca38364053c6e",
+      "label": "R3_cov0_[0.25, 0.25, 0, 0.5]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.25,
+        0,
+        0.5
+      ],
+      "equity_cap": null,
+      "id": "policy_11faff718c768fc28f2b",
+      "label": "R3_cov0_[0.25, 0.25, 0, 0.5]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "equity_cap": null,
+      "id": "policy_bffebed65d9d74291d0a",
+      "label": "R3_cov0_[0, 0, 0, 1]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "equity_cap": null,
+      "id": "policy_a6837ae731dc2d236ae6",
+      "label": "R3_cov0_[0, 0, 0, 1]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "equity_cap": null,
+      "id": "policy_835850aca5c5c39ad997",
+      "label": "R3_cov0_[0, 0, 0, 1]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_28b3eb6bc38754b5d671",
+      "label": "R3_local1_0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.875,
+          0.125,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_f44e1b87e470dd9bb1e7",
+      "label": "R3_local1_1",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.875,
+          0.0,
+          0.125
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_14bbeb67ab1545469140",
+      "label": "R3_local1_6",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.17708333333333334,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e485731d863fb075f7e1",
+      "label": "R3_local1_7",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.052083333333333336,
+          0.13020833333333334
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_162ab4d1105b4f5d39ad",
+      "label": "R3_local1_8",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9947916666666667,
+          0.0,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_9bd9de82361a29fb86ff",
+      "label": "R3_local1_9",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.0,
+          0.05729166666666667
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_2786cf5e4d9e3e4d9216",
+      "label": "R3_local1_10",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9479166666666667,
+          0.052083333333333336,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_8531a9d984349454a037",
+      "label": "R3_local1_11",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.05729166666666667,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_924f208d889c2121cecf",
+      "label": "R3_local1_14",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.07291666666666667,
+          0.0,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_dc86ae5e2dd7376bd1b1",
+      "label": "R3_local1_15",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_2f35baf81078b9f77a42",
+      "label": "R3_local1_16",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.125,
+          0.07291666666666667,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_3c39b434036780f0477a",
+      "label": "R3_local1_17",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.19791666666666669,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_98304676332641c7981d",
+      "label": "R3_local1_18",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.046875,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_579fcc5615079da506b6",
+      "label": "R3_local1_19",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.020833333333333332,
+          0.9791666666666666
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_38d028eb484fd8148a87",
+      "label": "R3_local1_20",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.046875,
+          0.0,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_255d336b02c6899d5963",
+      "label": "R3_local1_21",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.0,
+          0.9739583333333334
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_93d42a9609aba499f7fa",
+      "label": "R3_local1_22",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.15104166666666666,
+          0.020833333333333332,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_ed5c91d2a636e701046e",
+      "label": "R3_local1_23",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.14583333333333334,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_03b02b91337c92edd31f",
+      "label": "R3_local1_24",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.999962354828396,
+          2.0161093260871846e-05,
+          1.748407834302869e-05
+        ],
+        [
+          0.9567557718634362,
+          0.018720181818440484,
+          0.02452404631812329
+        ],
+        [
+          0.0014431790919951146,
+          0.10023808105376636,
+          0.8983187398542386
+        ],
+        [
+          0.05784923700459556,
+          0.01605140035788012,
+          0.9260993626375243
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_91ec9b251ae5d03ab910",
+      "label": "R3_local1_25",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.9606572967902858,
+          0.039334198496444844,
+          8.50471326944647e-06
+        ],
+        [
+          0.9626300495831686,
+          0.006661136754804599,
+          0.030708813662026904
+        ],
+        [
+          0.003375505560988136,
+          0.09162210677223072,
+          0.905002387666781
+        ],
+        [
+          0.022901599298685557,
+          0.028064996966541255,
+          0.9490334037347732
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_ade107db0ce97df064f3",
+      "label": "R3_local1_26",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.9807088431206323,
+          2.7486900103706878e-05,
+          0.019263669979263837
+        ],
+        [
+          0.9365103131787657,
+          0.02794505171844318,
+          0.03554463510279104
+        ],
+        [
+          6.54029129287289e-05,
+          0.07465750759857875,
+          0.9252770894884925
+        ],
+        [
+          0.10260276493007678,
+          0.026856393943380855,
+          0.8705408411265423
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_4cc1c80068f81c168d86",
+      "label": "R3_local1_27",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.9956298750817217,
+          5.691840863965298e-07,
+          0.004369555734191814
+        ],
+        [
+          0.9444096611137646,
+          0.05351571761296581,
+          0.002074621273269605
+        ],
+        [
+          0.00027589208570129867,
+          0.07782567197796901,
+          0.9218984359363296
+        ],
+        [
+          0.01564546076024823,
+          0.03835972055912398,
+          0.9459948186806278
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_ae33772fc493287f576d",
+      "label": "R3_local1_28",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.9985542493622684,
+          0.0013364459702190836,
+          0.00010930466751241674
+        ],
+        [
+          0.9195129975116114,
+          0.07728883338376137,
+          0.0031981691046273583
+        ],
+        [
+          0.000838306818474135,
+          0.04627250890411252,
+          0.9528891842774132
+        ],
+        [
+          0.0403575974891402,
+          0.032313530855042766,
+          0.9273288716558169
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e6a1a8e846932df4fa2f",
+      "label": "R3_local1_29",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.935110121865947,
+          0.064445416718298,
+          0.0004444614157548775
+        ],
+        [
+          0.9102961061494838,
+          0.0893189802954603,
+          0.00038491355505586587
+        ],
+        [
+          0.0001812086958399705,
+          0.08082754807487613,
+          0.9189912432292839
+        ],
+        [
+          0.004075778328707723,
+          0.05378476387839791,
+          0.9421394577928944
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6431a9ac3363b5d6a9d8",
+      "label": "R3_local1_30",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.9993015505948059,
+          0.00046870065268921583,
+          0.00022974875250499684
+        ],
+        [
+          0.9733632614060602,
+          0.023998247427776325,
+          0.002638491166163384
+        ],
+        [
+          0.0005199672169985239,
+          0.03636611115361627,
+          0.9631139216293853
+        ],
+        [
+          0.0110623304825056,
+          0.03825334713238226,
+          0.9506843223851121
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_656e66abf3a0b0e882ef",
+      "label": "R3_local1_31",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.9971641096708642,
+          8.411044168678046e-09,
+          0.0028358819180915617
+        ],
+        [
+          0.9347861506991078,
+          0.05943811434140063,
+          0.005775734959491492
+        ],
+        [
+          0.000203360675360326,
+          0.07634848763836127,
+          0.9234481516862784
+        ],
+        [
+          0.040670104298306156,
+          0.01144449442869162,
+          0.9478854012730021
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.75,
+        0.25,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_01d29c534a636a50e487",
+      "label": "R3_cov1_[0.75, 0.25, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.75,
+        0.25,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_8426190e0a903f800551",
+      "label": "R3_cov1_[0.75, 0.25, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.75,
+        0.25,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_511e29f47a563b7aca92",
+      "label": "R3_cov1_[0.75, 0.25, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_56b3610ec78905cdb12d",
+      "label": "R3_cov1_[0.25, 0.75, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_db685a92539e0a7bb9aa",
+      "label": "R3_cov1_[0.25, 0.75, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_2465c4eb0196b6c13f4b",
+      "label": "R3_cov1_[0.25, 0.75, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_ba01741a2c7a5baa72d6",
+      "label": "R3_cov1_[0, 1, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_b9ff1a7557c3a6779e0f",
+      "label": "R3_cov1_[0, 1, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_b981b9b60a000d26c55f",
+      "label": "R3_cov1_[0, 1, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_53e3f848054a3e988be5",
+      "label": "R3_cov1_[1, 0, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_63b3b88081759914e135",
+      "label": "R3_cov1_[1, 0, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_3b76e0f86f7ebb56fd49",
+      "label": "R3_cov1_[1, 0, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0.25,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_e0c3b4a35b6411e7cbee",
+      "label": "R3_cov1_[0.375, 0.375, 0.25, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0.25,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_ab954a384ab6823bf240",
+      "label": "R3_cov1_[0.375, 0.375, 0.25, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0.25,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_8cb28f09eca3f00e1b49",
+      "label": "R3_cov1_[0.375, 0.375, 0.25, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0,
+        0.25
+      ],
+      "equity_cap": null,
+      "id": "policy_0819c296f15466fd6531",
+      "label": "R3_cov1_[0.375, 0.375, 0, 0.25]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0,
+        0.25
+      ],
+      "equity_cap": null,
+      "id": "policy_dcf3cf44489a8f96cf14",
+      "label": "R3_cov1_[0.375, 0.375, 0, 0.25]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.375,
+        0.375,
+        0,
+        0.25
+      ],
+      "equity_cap": null,
+      "id": "policy_e76fef7cd233e51a9794",
+      "label": "R3_cov1_[0.375, 0.375, 0, 0.25]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.25,
+        0,
+        0.5
+      ],
+      "equity_cap": null,
+      "id": "policy_8edaa7643f42b72b773d",
+      "label": "R3_cov1_[0.25, 0.25, 0, 0.5]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.25,
+        0,
+        0.5
+      ],
+      "equity_cap": null,
+      "id": "policy_50cca6638e24e3011bf8",
+      "label": "R3_cov1_[0.25, 0.25, 0, 0.5]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.25,
+        0,
+        0.5
+      ],
+      "equity_cap": null,
+      "id": "policy_c672956fbf31b861a8d0",
+      "label": "R3_cov1_[0.25, 0.25, 0, 0.5]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "equity_cap": null,
+      "id": "policy_4b6666adaa1c5e6aada3",
+      "label": "R3_cov1_[0, 0, 0, 1]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "equity_cap": null,
+      "id": "policy_f4ab0a0fe438ba293de8",
+      "label": "R3_cov1_[0, 0, 0, 1]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "equity_cap": null,
+      "id": "policy_b527a9eef368c26c10a5",
+      "label": "R3_cov1_[0, 0, 0, 1]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_2e53a2168d6172e5d8a1",
+      "label": "R3_r1_prediction_and_cov1_[0.5, 0.5, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_bef838d68ea7f8e09e3f",
+      "label": "R3_r1_prediction_and_cov1_[0.5, 0.5, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_39104343ad5470fc5995",
+      "label": "R3_r1_prediction_and_cov1_[0.5, 0.5, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_fbe42543bc4d9b434751",
+      "label": "R3_r1_prediction_and_cov1_[0.25, 0.75, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_ccf434c7e88cc4f2fc50",
+      "label": "R3_r1_prediction_and_cov1_[0.25, 0.75, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.25,
+        0.75,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_2152be3a208f5d61cafc",
+      "label": "R3_r1_prediction_and_cov1_[0.25, 0.75, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_a87d435e1b5d253a916a",
+      "label": "R3_r1_prediction_and_cov1_[0, 1, 0, 0]_0.5",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_4e184f5ed20920bd9f34",
+      "label": "R3_r1_prediction_and_cov1_[0, 1, 0, 0]_0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "equity_cap": null,
+      "id": "policy_c7a3fbab0dd9daa91a35",
+      "label": "R3_r1_prediction_and_cov1_[0, 1, 0, 0]_1.0",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r1_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6d421211b8b43307c63c",
+      "label": "R3_local2_2",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.125,
+          0.875,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_08d8c15ff44811576415",
+      "label": "R3_local2_3",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          0.875,
+          0.125
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_8b69517b5f9a279d7841",
+      "label": "R3_local2_6",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.17708333333333334,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_1add34447307de36839c",
+      "label": "R3_local2_7",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.052083333333333336,
+          0.13020833333333334
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_88caf38a43d2e6ff9d11",
+      "label": "R3_local2_8",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9947916666666667,
+          0.0,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_40dec99160512dea77ba",
+      "label": "R3_local2_9",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.0,
+          0.05729166666666667
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_f9f9fd021d9c856a0a9f",
+      "label": "R3_local2_10",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9479166666666667,
+          0.052083333333333336,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_aead5403863d2395feb1",
+      "label": "R3_local2_11",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.05729166666666667,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_9a252236d721e2cc0ff2",
+      "label": "R3_local2_14",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.07291666666666667,
+          0.0,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_2987d76eae6bb06af076",
+      "label": "R3_local2_15",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_7109d3f5bccab30564fe",
+      "label": "R3_local2_16",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.125,
+          0.07291666666666667,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_a48355129dedd463231e",
+      "label": "R3_local2_17",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.19791666666666669,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_2d467eac2b5e21c3b59d",
+      "label": "R3_local2_18",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.046875,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_72cd29140ba30a6594ee",
+      "label": "R3_local2_19",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.020833333333333332,
+          0.9791666666666666
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_5d650f07e471cc06c775",
+      "label": "R3_local2_20",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.046875,
+          0.0,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_8f1919f3394e28894bf5",
+      "label": "R3_local2_21",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.0,
+          0.9739583333333334
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_5197525578ebe763da90",
+      "label": "R3_local2_22",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.15104166666666666,
+          0.020833333333333332,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_1758c8a81d9e3919b5b8",
+      "label": "R3_local2_23",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.14583333333333334,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_8a8ea31f5b8ccc8a349e",
+      "label": "R3_local2_24",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          3.718587390061241e-06,
+          0.987941265874808,
+          0.012055015537801948
+        ],
+        [
+          0.9475015666814544,
+          0.046611302916538574,
+          0.0058871304020070864
+        ],
+        [
+          3.166468368254026e-08,
+          0.07560584092615283,
+          0.9243941274091635
+        ],
+        [
+          0.02730656950557466,
+          0.029098213781960428,
+          0.9435952167124649
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_535c85bfe2a261ea87ae",
+      "label": "R3_local2_25",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.00029350709807917486,
+          0.9993647642171282,
+          0.00034172868479268135
+        ],
+        [
+          0.9167087012388999,
+          0.08228929962704733,
+          0.001001999134052768
+        ],
+        [
+          0.0004653109042308574,
+          0.06501127368860063,
+          0.9345234154071685
+        ],
+        [
+          0.00525282299008333,
+          0.04935201338134669,
+          0.94539516362857
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e3d25aa2efb0feeb9e44",
+      "label": "R3_local2_26",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.00010241913692148033,
+          0.9997468285776263,
+          0.00015075228545220268
+        ],
+        [
+          0.9527742805018877,
+          0.03689694691544984,
+          0.01032877258266239
+        ],
+        [
+          8.758515349074214e-05,
+          0.048130425470791695,
+          0.9517819893757176
+        ],
+        [
+          0.08716855347580095,
+          0.051675878852592186,
+          0.861155567671607
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6d71664b23c65ea015b4",
+      "label": "R3_local2_27",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          1.738404661028338e-05,
+          0.9997858255765071,
+          0.00019679037688271868
+        ],
+        [
+          0.9188120951401486,
+          0.07568785974369736,
+          0.005500045116154088
+        ],
+        [
+          6.421646900610903e-08,
+          0.033705868419290984,
+          0.96629406736424
+        ],
+        [
+          0.013701550902015655,
+          0.0024498813832227006,
+          0.9838485677147617
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6f911c5331bff7a8fd90",
+      "label": "R3_local2_28",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.003689459551992872,
+          0.9880900334226693,
+          0.008220507025337753
+        ],
+        [
+          0.8999631138278419,
+          0.09039114909286856,
+          0.009645737079289571
+        ],
+        [
+          0.00019484853439556894,
+          0.08105684557362798,
+          0.9187483058919764
+        ],
+        [
+          0.010884784938991535,
+          0.007809603741377244,
+          0.9813056113196311
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e3090bd8120a9fc85190",
+      "label": "R3_local2_29",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0016801543570034783,
+          0.9983100530803944,
+          9.792562602111691e-06
+        ],
+        [
+          0.9604506975486019,
+          0.026650834076907968,
+          0.012898468374490279
+        ],
+        [
+          8.937074457468241e-07,
+          0.0657847225651895,
+          0.9342143837273648
+        ],
+        [
+          0.05811517237293917,
+          0.044390011066646855,
+          0.8974948165604141
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_e4790bc59723cadba6f0",
+      "label": "R3_local2_30",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0004925384765622243,
+          0.9988004913751537,
+          0.0007069701482840463
+        ],
+        [
+          0.9611428673214572,
+          0.03637003034482405,
+          0.0024871023337187073
+        ],
+        [
+          0.0018525191336114296,
+          0.03177329601677907,
+          0.9663741848496095
+        ],
+        [
+          0.05020355217256326,
+          0.013679467731742615,
+          0.936116980095694
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_94c01122e9faba415e79",
+      "label": "R3_local2_31",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0001403899497633955,
+          0.9998349897873504,
+          2.462026288614199e-05
+        ],
+        [
+          0.9373697388579768,
+          0.061848345815524786,
+          0.0007819153264985184
+        ],
+        [
+          0.0022136771976671975,
+          0.03478889254627125,
+          0.9629974302560617
+        ],
+        [
+          0.098671987659535,
+          0.009769675721063402,
+          0.8915583366194016
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_4b9f1fc495720be6f8ef",
+      "label": "R3_local3_2",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.125,
+          0.875,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_70b001c83ceb84795d2b",
+      "label": "R3_local3_3",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          0.875,
+          0.125
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_1edf359fabca605dbf3f",
+      "label": "R3_local3_6",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.17708333333333334,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_d3b2e65e3967a86969c8",
+      "label": "R3_local3_7",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.8177083333333334,
+          0.052083333333333336,
+          0.13020833333333334
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_fafcd2561bce6e5dbf46",
+      "label": "R3_local3_8",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9947916666666667,
+          0.0,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_69b26c4be446348439d7",
+      "label": "R3_local3_9",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.0,
+          0.05729166666666667
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_4e848e7b2fb7b47b8631",
+      "label": "R3_local3_10",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9479166666666667,
+          0.052083333333333336,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_ee1e8c5b4bff4abcd430",
+      "label": "R3_local3_11",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.05729166666666667,
+          0.0
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_0b083b84fc785186c3d5",
+      "label": "R3_local3_14",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.07291666666666667,
+          0.0,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_74957efa3611542fe839",
+      "label": "R3_local3_15",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_a0468ff0c025b1fc8244",
+      "label": "R3_local3_16",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.125,
+          0.07291666666666667,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_46c37c03697a4b49a703",
+      "label": "R3_local3_17",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.19791666666666669,
+          0.8020833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_812040753a09c06ea134",
+      "label": "R3_local3_18",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.046875,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_025d936323c2907f8cb7",
+      "label": "R3_local3_19",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.0,
+          0.020833333333333332,
+          0.9791666666666666
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_62158bfbfa3bcd255bda",
+      "label": "R3_local3_20",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.046875,
+          0.0,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_b9ad75aa05aa7de67b4f",
+      "label": "R3_local3_21",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.0,
+          0.9739583333333334
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6ef5cd2967d4a4529dd9",
+      "label": "R3_local3_22",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.15104166666666666,
+          0.020833333333333332,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_f5dba3c2653a5cd832cb",
+      "label": "R3_local3_23",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.14583333333333334,
+          0.828125
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_d547ad8629d7ca613e23",
+      "label": "R3_local3_24",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.000618662888094717,
+          0.9877178165466559,
+          0.011663520565249347
+        ],
+        [
+          0.9151731241736875,
+          0.08453951266939666,
+          0.0002873631569158705
+        ],
+        [
+          0.03560541762411124,
+          0.09709594188695504,
+          0.8672986404889338
+        ],
+        [
+          0.04096685730581634,
+          0.009290740552079119,
+          0.9497424021421045
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_6ba229cc56f3e7b6b46b",
+      "label": "R3_local3_25",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0002957094366750902,
+          0.9892752993671033,
+          0.010428991196221437
+        ],
+        [
+          0.8119903959031503,
+          0.184218224476427,
+          0.003791379620422683
+        ],
+        [
+          0.007696051042936912,
+          0.11350422408037344,
+          0.8787997248766896
+        ],
+        [
+          0.027009249358569534,
+          0.023006455971026286,
+          0.9499842946704041
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_c022fed4350829e6cb68",
+      "label": "R3_local3_26",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.016197563561469258,
+          0.9838024101805518,
+          2.6257978999789654e-08
+        ],
+        [
+          0.9591388500048651,
+          0.040857980529286006,
+          3.16946584880137e-06
+        ],
+        [
+          1.7513222249888684e-09,
+          0.08859499001430698,
+          0.9114050082343709
+        ],
+        [
+          0.06787084929705235,
+          0.029604035417065144,
+          0.9025251152858824
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_4faee45509c41b62354b",
+      "label": "R3_local3_27",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.006816435605691642,
+          0.9931015788136673,
+          8.19855806411025e-05
+        ],
+        [
+          0.9826514268032339,
+          0.013509783966845768,
+          0.0038387892299203336
+        ],
+        [
+          0.04499547361077258,
+          0.09816536179854267,
+          0.8568391645906848
+        ],
+        [
+          0.03546733220702464,
+          0.03398291660811799,
+          0.9305497511848573
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_8549e2061c13e1cc3bcf",
+      "label": "R3_local3_28",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.0056410213607411015,
+          0.9931651577426365,
+          0.0011938208966224637
+        ],
+        [
+          0.9511769494824436,
+          0.04772437964403895,
+          0.0010986708735175224
+        ],
+        [
+          0.0015177406295024739,
+          0.15492469561780026,
+          0.8435575637526973
+        ],
+        [
+          0.03134983540900977,
+          0.0016371885152167546,
+          0.9670129760757736
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_69a35ad9aea703ec4028",
+      "label": "R3_local3_29",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.019028704975479403,
+          0.9221517965201804,
+          0.05881949850434016
+        ],
+        [
+          0.9261938767215033,
+          0.029628828262182737,
+          0.044177295016314115
+        ],
+        [
+          7.129823554416547e-05,
+          0.09305554722497072,
+          0.906873154539485
+        ],
+        [
+          0.005010594661730209,
+          0.018447370171233667,
+          0.9765420351670361
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_3bbc749969be962631c3",
+      "label": "R3_local3_30",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          3.2089017316761727e-09,
+          0.9999735056465594,
+          2.649114453874307e-05
+        ],
+        [
+          0.9329747318447806,
+          0.041061351821644464,
+          0.02596391633357489
+        ],
+        [
+          0.00039008022423268516,
+          0.07289320579252856,
+          0.9267167139832387
+        ],
+        [
+          0.017087184450718572,
+          0.03428675854134289,
+          0.9486260570079385
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_5dd3a9cbf985ad3b4b77",
+      "label": "R3_local3_31",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.00031154755650816856,
+          0.9996097333982955,
+          7.871904519627145e-05
+        ],
+        [
+          0.9672880112666356,
+          0.031537881258073136,
+          0.0011741074752912757
+        ],
+        [
+          0.004271557319395407,
+          0.06655917052519718,
+          0.9291692721554073
+        ],
+        [
+          0.03411269746236377,
+          0.038004498850628385,
+          0.9278828036870079
+        ]
+      ],
+      "risk_multiplier": 0.5,
+      "seed_pooling": "equal_moments_before_one_solve"
+    }
+  ],
+  "development_only": true,
+  "hypothesis": "Round2 development evidence guides local12.5pp familycoefficient transfers plusjointDirichlet refinements and active-constraint covariance mixtures. Explicitly separate compactrank1 prediction-only and prediction+covariance proposals; fixeddates/seeds. No kernel/prior change justified by low amplitude alone or unoptimized15iteration telemetry.",
+  "input_sha256": "52dd102f759b25eb5cfad74d9c7a30e2ad73a1ed91ee9fd40b7a8dd3a36e0478",
+  "new_configurations": 161,
+  "prior_new_configurations": 468,
+  "registered_at_utc": "2026-10-31T14:28:53.764384+00:00",
+  "round": 3,
+  "selection_rule_sha256": "eaa874cc377501a3b195fc1b73f0a54c5fe6869d2e8b007046340ca1635f4050"
+}

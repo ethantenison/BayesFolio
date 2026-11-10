@@ -1,0 +1,12 @@
+{
+  "caveat": "SUCCESS is optimizer stopping-criterion convergence, not proof of a global optimum.",
+  "final_iterations_max": 36,
+  "final_iterations_median": 36.0,
+  "final_iterations_min": 36,
+  "final_status_counts": {
+    "STOPPED": 72
+  },
+  "optimizer_attempts": 72,
+  "windows": 72,
+  "windows_using_full_cap": 72
+}

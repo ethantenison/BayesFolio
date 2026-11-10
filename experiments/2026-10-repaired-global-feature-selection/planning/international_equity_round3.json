@@ -1,0 +1,31 @@
+{
+  "family": "international_equity",
+  "round_index": 3,
+  "study_stage": "family_refinement",
+  "round_interpretation": "Round two increased hypervolume by 4.27%. Combining MOVE and slope-change removal with oil created an eleven-input front (IC 0.188889, NLL -1.798295, Sharpe 1.380586). Removing either FX axis damaged IC in all three seeds. Removing rank or dealer proxy also failed to improve this frontier. In the broad model, dropping the remaining HY z-score or the other credit change separately improved IC/Sharpe but traded density. This final bounded family round tests local/risk pruning and modest macro transfers on the compact oil front, and combined block reductions on the broad front. It does not claim family or global optimality.",
+  "default_expected_tradeoff": "Report IC, NLL and conventional Sharpe jointly with seed stability and calibration. Frontier expansion, not a hidden weighted score, determines progress; input savings remain descriptive.",
+  "default_falsification": "Dominated results do not support the proposed conditional simplification. The family round cap ends this search even if further improvements remain plausible, and all score dates remain adaptively reused.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/international_equity_round2.json"
+  ],
+  "candidates": [
+    {"name":"compact_oil_without_six_month_momentum","category":"exploitation_local_pruning","base_configuration":"international_equity_41d789e7d4d7","etf_drop":["mom6m"],"hypothesis":"Corrected skip momentum and trend may suffice on the combined-pruning oil branch."},
+    {"name":"compact_oil_without_rank","category":"exploration_local_interaction","base_configuration":"international_equity_41d789e7d4d7","etf_drop":["cs_mom_rank"],"hypothesis":"Oil and removal of slope change may change rank's conditional value; the earlier rank-free branch was not competitive."},
+    {"name":"compact_oil_without_trend","category":"exploration_local_interaction","base_configuration":"international_equity_41d789e7d4d7","etf_drop":["trend_slope"],"hypothesis":"Test whether the two momentum horizons suffice after the combined risk/oil change."},
+    {"name":"compact_oil_without_vix_level","category":"exploration_risk_pruning","base_configuration":"international_equity_41d789e7d4d7","macro_drop":["vix"],"hypothesis":"Term structure and dealer proxy may retain risk information without the absolute VIX level."},
+    {"name":"compact_oil_without_vix_slope_zscore","category":"exploration_risk_pruning","base_configuration":"international_equity_41d789e7d4d7","macro_drop":["vix_ts_z_12p"],"hypothesis":"Test whether the remaining VIX level/slope can substitute for normalized slope on the improved oil branch."},
+    {"name":"compact_oil_without_vix_slope_level","category":"exploration_risk_pruning","base_configuration":"international_equity_41d789e7d4d7","macro_drop":["vix_slope"],"hypothesis":"The reciprocal slope test distinguishes level and normalized term-structure contributions after slope change is removed."},
+    {"name":"compact_oil_plus_annual_inflation","category":"exploration_cross_family_transfer","base_configuration":"international_equity_41d789e7d4d7","macro_add":["cpi_chg_12p"],"hypothesis":"Annual inflation helped compact U.S. equity and may complement oil/risk/FX without importing a broad macro block."},
+    {"name":"compact_oil_plus_credit_zscore","category":"exploration_cross_family_transfer","base_configuration":"international_equity_41d789e7d4d7","macro_add":["hy_spread_z_12p"],"hypothesis":"Credit state may help the compact risk branch even though its deletion helped a much broader model."},
+    {"name":"broad_without_hy_or_credit_change","category":"exploitation_combined_credit_pruning","base_configuration":"international_equity_54880a9ae051","macro_drop":["credit_spread_chg_1p"],"hypothesis":"Combine both successful credit removals and determine whether other macro axes make the entire tested credit block dispensable."},
+    {"name":"broad_no_hy_without_gold_oil_ratio","category":"exploration_commodity_interaction","base_configuration":"international_equity_54880a9ae051","macro_drop":["gold_crude_ratio"],"hypothesis":"Re-test oil-only against oil-plus-ratio after credit pruning; a previous ratio removal was harmful in the HY-containing context."},
+    {"name":"broad_no_hy_without_monthly_inflation_or_copper","category":"exploration_macro_block_pruning","base_configuration":"international_equity_54880a9ae051","macro_drop":["cpi_chg_1p","copper_ret"],"hypothesis":"Annual CPI and oil may substitute for monthly inflation and copper in a smaller broad-model representation."},
+    {"name":"broad_no_hy_without_tips_proxy_block","category":"exploration_rate_block_pruning","base_configuration":"international_equity_54880a9ae051","macro_drop":["breakeven_proxy","schp_ret","y10_real_proxy"],"hypothesis":"Nominal yield, curve, inflation and commodities may retain useful state without three TIPS-derived proxy axes; this is a block test, not individual attribution."}
+  ]
+}

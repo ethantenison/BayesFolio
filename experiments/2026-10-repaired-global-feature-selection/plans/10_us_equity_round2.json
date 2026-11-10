@@ -1,0 +1,895 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Rank removal may change the incremental value of six-month momentum; test the interaction instead of transferring the ranked-parent ablation.",
+      "hypothesis_name": "rank_free_without_six_month_momentum",
+      "id": "us_equity_6bba78566e06",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_6bba78566e06",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "The two momentum horizons may suffice when global rank is absent.",
+      "hypothesis_name": "rank_free_without_trend_slope",
+      "id": "us_equity_d0a35b28f60b",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_d0a35b28f60b",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Re-test corrected skip momentum in the rank-free context; a failure establishes context-specific need, not a universal rule.",
+      "hypothesis_name": "rank_free_without_skip_momentum",
+      "id": "us_equity_f9ec66acb71f",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_f9ec66acb71f",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "conditional_lag_bridge",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Lag's density benefit may coexist with the rank-free parent's stronger Sharpe rather than reproducing its ranked-parent ranking loss.",
+      "hypothesis_name": "rank_free_plus_lag",
+      "id": "us_equity_fc5807bf3a73",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_fc5807bf3a73",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploitation_macro_pruning",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "The normalized credit state may suffice after rank removal, although the same removal was harmful in the ranked context.",
+      "hypothesis_name": "rank_free_without_credit_change",
+      "id": "us_equity_617e8bd4bada",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_617e8bd4bada",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploration_credit_representation",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Level plus normalized state may represent repaired credit conditions better than change plus normalized state.",
+      "hypothesis_name": "rank_free_credit_level_instead_of_change",
+      "id": "us_equity_23a11358aeee",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_23a11358aeee",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread,hy_spread_chg_1p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploration_credit_representation",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_chg_1p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Distinguish the need for genuine credit information from dependence on its rolling z-score representation.",
+      "hypothesis_name": "rank_free_credit_level_instead_of_zscore",
+      "id": "us_equity_07841223ab03",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_07841223ab03",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread",
+        "hy_spread_chg_1p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_1p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploration_inflation_representation",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Monthly inflation may preserve useful macro state with a more responsive signal; latest-vintage/staleness caveats remain unchanged.",
+      "hypothesis_name": "rank_free_monthly_instead_of_annual_inflation",
+      "id": "us_equity_46cc53338e30",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_46cc53338e30",
+      "macro_columns": [
+        "cpi_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,y10_nominal",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploration_rate_representation",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "y10_nominal"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Separate yield-level information from curve shape rather than inferring a universal curve feature from one context.",
+      "hypothesis_name": "rank_free_nominal_yield_instead_of_curve",
+      "id": "us_equity_35ccd91a15a2",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_35ccd91a15a2",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "y10_nominal"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploration_local_substitution",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Recent-return lag could replace one intermediate momentum horizon rather than simply increasing model dimension.",
+      "hypothesis_name": "rank_free_without_six_month_momentum_plus_lag",
+      "id": "us_equity_ee8ad358e762",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_ee8ad358e762",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope,vol_1m",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploration_uncertainty_information",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "vol_1m"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "vol_1m",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "Task-local volatility may be more useful after rank removal, despite not improving the ranked parent's frontier.",
+      "hypothesis_name": "rank_free_plus_local_volatility",
+      "id": "us_equity_85d409a7acad",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_85d409a7acad",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,spy_flow_z_12p,term_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "us_equity_5fba6b4b201b",
+      "category": "exploration_cross_family_transfer",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "aa9138333a56e1dc22b5618f1b4f8ce3bf6eecf8316e4cc63c13ec1865fd37f8",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "spy_flow_z_12p",
+        "term_spread"
+      ],
+      "expected_tradeoff": "Report all three objectives and paired three-seed effects, plus coverage and width; input count and interval width are descriptive, not objectives.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support this simplification or transfer. Preserve genuine new objective tradeoffs; three seeds do not supply independent economic replication.",
+      "hypothesis": "A single market-activity signal may complement compact credit/curve state without importing a large risk block.",
+      "hypothesis_name": "rank_free_plus_market_flow",
+      "id": "us_equity_51b0f3f6c657",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "us_equity_51b0f3f6c657",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "spy_flow_z_12p",
+        "term_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json",
+        "base_configuration=us_equity_5fba6b4b201b"
+      ]
+    }
+  ],
+  "cross_version_equality_audit": "experiments/2026-10-repaired-global-feature-selection/results/feature_pool_extension_audit.json",
+  "dataset_version": "v2",
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json"
+  ],
+  "evidence_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/conditional_feature_pairs.csv": "49ef2fd0645c1576b4f47250a53dd16881d7205ed3ce301f8c6e890cc0529484",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/configuration_aggregates.csv": "0ec722993269344435d59926c70972f4927e55c8a8ab99bb3e83e02f023c0b61",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/exact_inputs.json": "cb6ca6812ef76f1d34ca34000d5024ee6bff62dc9e357242377bd750433ba840",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/family_diagnostics_by_seed.csv": "34551c6725519340d3ddb5448f78550596795a8e39afd3a8d20299f87ba456ba",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/hypervolume.json": "55a9d3342883b488240267f845b3d0ec31877309e5c36b17ab679663cf4d8dea",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/objectives_by_seed.csv": "7f3779d13fd295b72446e37bb03a9b9941e32b0c1a270bed3743c9187c1cd5f5",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/us_equity_round2/us_equity_round1.json": "9a203ea01793dab207ed5da820c20451254d08907f2bf5b83ffb891546ec4000"
+  },
+  "family": "us_equity",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_equity.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/us_equity.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/runs",
+  "phase": "refinement",
+  "planning_method": "Hosted Codex hypothesis generation",
+  "proposal_path": "experiments/2026-10-repaired-global-feature-selection/planning/us_equity_round2.json",
+  "proposal_sha256": "ecad6df0141afb84733409dcfb0d9305e65696cf4fd748057527a4ca68f44962",
+  "results_prefix": "10_us_equity_round2",
+  "round_index": 2,
+  "round_interpretation": "Round one increased fixed-reference hypervolume by 6.65%. Removing rank created a seven-input front with higher Sharpe and lower NLL but lower IC. Adding lag to the ranked parent improved density while hurting ranking and Sharpe. HY-z and curve removal were strongly harmful in the original compact context. Round two uses the rank-free front to test local simplification, conditional lag rescue, alternative credit/inflation/curve representations, and small volatility/flow transfers. These are conditional hypotheses, not an imposed universal core.",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/executions",
+  "study_stage": "family_refinement",
+  "tickers": [
+    "SPY",
+    "MGK",
+    "VTV",
+    "IWM"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "family": "us_fixed_income",
+  "round_index": 3,
+  "study_stage": "family_refinement",
+  "round_interpretation": "Round two increased hypervolume by 11.92%. Adding oil alone to the pruned no-lag rate model improved aggregate IC, NLL and Sharpe; IC and NLL improved in all three seeds, Sharpe in one. The seven-input oil/rate front has IC 0.311111, NLL -2.639529 and Sharpe 0.553264. Removing acceleration from the rank-free credit model produced a five-input front with lag and higher Sharpe 0.597448. Lag removal from the reduced density model raised IC/Sharpe in every seed with a small NLL cost; adding lag to the pruned rate model hurt IC/Sharpe in every seed despite improving density. The final family round tests oil/rate pruning, credit/oil bridges, exact lag contrasts on the changed parents, and one annual-momentum transfer.",
+  "default_expected_tradeoff": "Report all three objective deltas, per-seed effects and calibrated interval diagnostics. Lag usefulness remains context-dependent; do not use a density improvement as a veto against IC/Sharpe gains.",
+  "default_falsification": "A dominated result does not support the proposed conditional simplification or addition. The bounded family cap is a stopping budget, not proof that the retained inputs are universally necessary.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_fixed_income/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/us_fixed_income_round2.json"
+  ],
+  "candidates": [
+    {"name":"oil_rate_without_acceleration","category":"exploitation_local_pruning","base_configuration":"us_fixed_income_89293fc088d7","etf_drop":["chmom"],"hypothesis":"The successful acceleration removal may transfer to the new oil/rate branch."},
+    {"name":"oil_rate_plus_lag","category":"conditional_lag_addition","base_configuration":"us_fixed_income_89293fc088d7","etf_add":["lag_y_excess_lead"],"hypothesis":"Oil can change lag's conditional value; test a matched addition rather than assuming the earlier rate-model effect transfers."},
+    {"name":"oil_rate_plus_credit_zscore","category":"frontier_bridge","base_configuration":"us_fixed_income_89293fc088d7","macro_add":["hy_spread_z_12p"],"hypothesis":"Credit and oil state may combine complementary density/ranking information on the pruned rate basis."},
+    {"name":"oil_rate_without_three_month_tips_proxy","category":"exploration_rate_pruning","base_configuration":"us_fixed_income_89293fc088d7","macro_drop":["y10_real_proxy"],"hypothesis":"Oil may substitute for some inflation-linked state that was important before oil was added."},
+    {"name":"oil_rate_without_one_month_tips_return","category":"exploration_rate_pruning","base_configuration":"us_fixed_income_89293fc088d7","macro_drop":["schp_ret"],"hypothesis":"The trailing TIPS-return proxy and oil might suffice without the one-month SCHP axis."},
+    {"name":"oil_rate_without_nominal_yield","category":"exploration_rate_interaction","base_configuration":"us_fixed_income_89293fc088d7","macro_drop":["y10_nominal"],"hypothesis":"Re-test the nominal yield after oil addition to distinguish rate information from general macro-state substitution."},
+    {"name":"oil_rate_with_skip_annual_momentum","category":"exploration_shared_local_representation","base_configuration":"us_fixed_income_89293fc088d7","etf_drop":["mom12m"],"etf_add":["mom12m_skip1m"],"hypothesis":"A single corrected momentum substitution may bridge equity and debt representations without the prior failed whole-basis transfer."},
+    {"name":"five_input_credit_without_lag","category":"conditional_lag_ablation","base_configuration":"us_fixed_income_c2fef69db5f6","etf_drop":["lag_y_excess_lead"],"hypothesis":"Test lag directly after acceleration and rank removal; the previous lag-removal result involved a different local basis."},
+    {"name":"five_input_credit_without_long_momentum","category":"exploitation_local_pruning","base_configuration":"us_fixed_income_c2fef69db5f6","etf_drop":["mom36m"],"hypothesis":"The highest-Sharpe compact credit model may retain a competitive tradeoff without long-horizon momentum."},
+    {"name":"five_input_credit_plus_oil","category":"frontier_bridge","base_configuration":"us_fixed_income_c2fef69db5f6","macro_add":["oil_ret"],"hypothesis":"Oil may improve the compact credit branch without importing the full rate/TIPS block."},
+    {"name":"five_input_credit_plus_local_volatility","category":"exploration_uncertainty_information","base_configuration":"us_fixed_income_c2fef69db5f6","etf_add":["vol_1m"],"hypothesis":"Local volatility may transfer the separate rate/volatility Sharpe advantage to the compact credit model."},
+    {"name":"no_lag_reduced_curve_density_plus_oil","category":"frontier_bridge","base_configuration":"us_fixed_income_4eba1636f6c5","macro_add":["oil_ret"],"hypothesis":"Oil may preserve the no-lag density branch's NLL while improving its lower IC/Sharpe; this tests context rather than declaring oil universal."}
+  ]
+}

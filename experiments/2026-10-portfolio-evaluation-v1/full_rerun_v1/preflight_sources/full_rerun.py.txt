@@ -1,0 +1,476 @@
+"""Refit all 499 eligible configurations with exact covariance and no ETF cap.
+
+Usage from repository root:
+  .venv/bin/python experiments/2026-10-portfolio-evaluation-v1/full_rerun_v1/full_rerun.py --execute
+Use --smoke-only for representative parity gates, --status for read-only progress,
+and --verify-only after completion. No old fit reuse, shortlist gate, production
+changes, network refresh, fallback weights, or automatic promotion. All forecasts
+and risk limits are in raw discounted-excess decimal and decimal-squared units.
+"""
+
+# Thread controls and experiment import paths must precede numerical imports,
+# including when multiprocessing spawn imports this main module.
+# ruff: noqa: E402
+
+from __future__ import annotations
+
+import argparse
+import fcntl
+import hashlib
+import json
+import multiprocessing
+import os
+import shutil
+import sys
+import time
+from collections import Counter
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+FRAMEWORK = HERE.parent
+SELECTION = FRAMEWORK / "selection_refresh_v1"
+REPO = HERE.parents[2]
+LEGACY = REPO / "experiments/2026-10-repaired-global-feature-selection"
+PARALLEL = FRAMEWORK / "parallel_pipeline_v1"
+ROOT = HERE / "outputs"
+SEEDS = [27, 127, 227]
+
+for _name in [
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+]:
+    os.environ[_name] = "1"
+sys.path.extend([str(FRAMEWORK), str(SELECTION)])
+
+import numpy as np
+import pandas as pd
+import refresh
+import refresh_workers
+from full_workers import evaluate_job, initialize_evaluation
+
+from artifacts import Reader, load_context, verify_legacy_audit
+
+
+def _save(path: Path, value: object, *, immutable: bool = False) -> None:
+    payload = (json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n").encode()
+    if immutable and path.exists():
+        if path.read_bytes() != payload:
+            raise ValueError(f"Conflicting immutable artifact: {path}")
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp = path.with_suffix(path.suffix + ".tmp")
+    temp.write_bytes(payload)
+    temp.replace(path)
+
+
+def _hashes(paths: list[Path]) -> dict[str, str]:
+    return {str(path.resolve()): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+
+
+def _verify(hashes: dict[str, str]) -> None:
+    for name, expected in hashes.items():
+        if _hashes([Path(name)])[name] != expected:
+            raise ValueError(f"Frozen source or artifact changed: {name}")
+
+
+def _status(stage: str, **kwargs) -> None:
+    payload = {"stage": stage, "updated_unix": time.time(), **kwargs}
+    _save(ROOT / "status.json", payload)
+    print(json.dumps(payload), flush=True)
+
+
+def _worker_limit(peak: int) -> int:
+    return max(1, min(14, (os.cpu_count() or 16) - 2, int(48 * 1024**3 / (peak * 1.25))))
+
+
+def _context_save(context: dict, anchor: np.ndarray) -> None:
+    arrays = {key: context[key] for key in ["actual", "baseline_mean", "historical_covariance", "risk_free"]}
+    equal = np.ones(15) / 15
+    arrays["risk_budget"] = np.einsum("a,tab,b->t", equal, context["historical_covariance"], equal)
+    arrays["anchor"] = anchor
+    arrays.update({f"probe_{key}": value for key, value in context["fixed_probes"].items()})
+    np.savez(ROOT / "context_arrays.npz", **arrays)
+    _save(
+        ROOT / "context.json",
+        {key: context[key] for key in ["assets", "dates", "families", "return_convention"]},
+        immutable=True,
+    )
+
+
+def _context_load() -> tuple[dict, np.ndarray]:
+    context = json.loads((ROOT / "context.json").read_text())
+    with np.load(ROOT / "context_arrays.npz", allow_pickle=False) as values:
+        context.update(
+            {
+                key: values[key].copy()
+                for key in ["actual", "baseline_mean", "historical_covariance", "risk_free", "risk_budget"]
+            }
+        )
+        context["fixed_probes"] = {
+            key.removeprefix("probe_"): values[key].copy() for key in values.files if key.startswith("probe_")
+        }
+        anchor = values["anchor"].copy()
+    return context, anchor
+
+
+def _prepare() -> dict:
+    contract_path = ROOT / "contract.json"
+    if contract_path.exists():
+        contract = json.loads(contract_path.read_text())
+        _verify(contract["source_sha256"])
+        return contract
+    if shutil.disk_usage(HERE).free < 10 * 1024**3:
+        raise ValueError("Less than 10 GiB free; no fits launched")
+    reader = Reader()
+    verify_legacy_audit(reader, LEGACY)
+    context = load_context(reader, LEGACY)
+    # Reuse only the audited catalog/parser, not its shortlist or execution.
+    refresh.ROOT = ROOT
+    catalog = refresh._catalog(reader, context)
+    eligible = [row for row in catalog if row["eligible"]]
+    if len(catalog) != 501 or len(eligible) != 499:
+        raise ValueError("Approved 501 minus two HY-change joint masks no longer matches")
+    excluded = [
+        {key: row[key] for key in ["configuration", "family", "inputs"]} for row in catalog if not row["eligible"]
+    ]
+    # Keep the already-documented anchors fixed; this does not screen candidates.
+    previous = reader.read(SELECTION / "outputs/shortlist.json")
+    anchors = previous["anchors"]
+    anchor = np.zeros((3, 24, 15))
+    lookup = {row["configuration"]: row for row in eligible}
+    for family, name in anchors.items():
+        indices = [context["assets"].index(a) for a in context["families"][family]]
+        anchor[:, :, indices] = lookup[name]["mean"]
+    configs, candidates = {}, []
+    for row in eligible:
+        name, config = row["configuration"], row["config"]
+        # The legacy entrypoint only fits/exports here. It never constructs
+        # portfolios, but eliminate its stale 35% flag as well for clarity.
+        command = config["command"]
+        command[command.index("--upperlng") + 1] = "1.0"
+        configs[name] = config
+        candidates.append({key: row[key] for key in ["configuration", "family", "inputs", "tickers"]})
+    _context_save(context, anchor)
+    for path in [
+        *HERE.glob("*.py"),
+        *FRAMEWORK.glob("*.py"),
+        *SELECTION.glob("*.py"),
+        PARALLEL / "workers.py",
+        LEGACY / "ranking_architecture_worker.py",
+        HERE / "specification.json",
+        ROOT / "context.json",
+        ROOT / "context_arrays.npz",
+    ]:
+        reader.read(path)
+    old_timing = reader.read(SELECTION / "outputs/timing.json")
+    observed_peak = int(old_timing["peak_worker_rss_bytes"])
+    contract = {
+        "schema": "bayesfolio.full_covariance_rerun.v1",
+        "configs": configs,
+        "candidates": candidates,
+        "excluded_configurations": excluded,
+        "family_counts": dict(Counter(row["family"] for row in candidates)),
+        "rank": 2,
+        "maxiter": 15,
+        "seeds": SEEDS,
+        "scored_months": 24,
+        "initial_training_months": 84,
+        "required_fresh_fits": 499 * 72,
+        "reused_old_fits": 0,
+        "shortlist_gate": False,
+        "ETF_position_cap": None,
+        "long_only": True,
+        "fully_invested": True,
+        "minimum_effective_assets": 3,
+        "risk_budget": "same_absolute_training_historical_equal_weight_variance_all_models_and_policies",
+        "allocation_policies": ["historical_risk_no_cap", "gp_risk_no_cap_for_full15_joint_only", "linear_rank"],
+        "GP_covariance": "exact_observed_predictive_raw_units_including_likelihood_noise",
+        "cross_family_GP_covariance_assembly": "prohibited",
+        "conditional_family_anchors": anchors,
+        "posterior_scenarios": 256,
+        "legacy_portfolio_optimizer_invoked": False,
+        "fallback_weights": False,
+        "constraint_relaxation": False,
+        "turnover_objective": False,
+        "worker_ceiling": _worker_limit(observed_peak),
+        "observed_previous_peak_bytes": observed_peak,
+        "memory_budget_gib": 48,
+        "memory_safety_multiplier": 1.25,
+        "numerical_threads_per_process": 1,
+        "evaluation_status": "exploratory_reused_months_not_holdout",
+        "automatic_promotion": False,
+        "source_sha256": reader.hashes,
+    }
+    reader.verify()
+    _save(contract_path, contract, immutable=True)
+    return contract
+
+
+def _jobs(contract: dict) -> list[dict]:
+    configs = contract["configs"]
+    families = {row["configuration"]: row["family"] for row in contract["candidates"]}
+    # Expensive full15 jobs first; short family jobs avoid an expensive last tail.
+    names = sorted(configs, key=lambda name: (-len(configs[name]["tickers"]), families[name], name))
+    return [
+        {"component": name, "seed": seed, "index": index, "date": date, "run": str(ROOT / f"runs/{name}_s{seed}")}
+        for name in names
+        for seed in SEEDS
+        for index, date in enumerate(configs[name]["dates"])
+    ]
+
+
+def _smoke_jobs(contract: dict, jobs: list[dict]) -> list[dict]:
+    names = set()
+    for family in contract["family_counts"]:
+        candidates = [row for row in contract["candidates"] if row["family"] == family]
+        ordered = sorted(candidates, key=lambda row: (len(row["inputs"]), row["configuration"]))
+        names.update([ordered[0]["configuration"], ordered[-1]["configuration"]])
+    largest = max(
+        (row for row in contract["candidates"] if row["family"] == "joint"), key=lambda row: len(row["inputs"])
+    )["configuration"]
+    return [
+        job
+        for job in jobs
+        if job["seed"] == 27
+        and ((job["component"] in names and job["index"] == 0) or (job["component"] == largest and job["index"] == 23))
+    ]
+
+
+def _checkpoint(job: dict) -> Path:
+    return ROOT / "checkpoints" / job["component"] / f"s{job['seed']}_{job['date']}.json"
+
+
+def _fit_stage(pool: ProcessPoolExecutor, jobs: list[dict], contract: dict, signature: str) -> dict:
+    completed, group_counts, pending = 0, Counter(), []
+    lookup = {row["configuration"]: row["family"] for row in contract["candidates"]}
+    peak = 0
+    for job in jobs:
+        path = _checkpoint(job)
+        if path.exists():
+            stamp = json.loads(path.read_text())
+            if stamp["signature"] != signature:
+                raise ValueError("Checkpoint belongs to a different contract")
+            _verify(stamp["artifact_sha256"])
+            peak = max(peak, stamp["result"]["peak_rss_bytes"])
+            completed += 1
+            group_counts[lookup[job["component"]]] += 1
+        else:
+            pending.append(job)
+    iterator, futures = iter(pending), {}
+
+    def submit() -> bool:
+        job = next(iterator, None)
+        if job is None:
+            return False
+        futures[pool.submit(refresh_workers.fit_job, job)] = job
+        return True
+
+    for _ in range(contract["worker_ceiling"] * 4):
+        if not submit():
+            break
+    last_update = 0.0
+    try:
+        while futures:
+            done, _ = wait(futures, timeout=30, return_when=FIRST_COMPLETED)
+            for future in done:
+                job = futures.pop(future)
+                result = future.result()
+                if (result["rank"], result["maxiter"], result["train_dates"], result["task_count"]) != (
+                    2,
+                    15,
+                    84 + job["index"],
+                    len(contract["configs"][job["component"]]["tickers"]),
+                ):
+                    raise ValueError("Actual fit controls/coverage differ from the contract")
+                paths = [Path(value).resolve() for value in result["paths"].values()]
+                if not all(path.is_relative_to(ROOT.resolve()) for path in paths):
+                    raise ValueError("Fit attempted to write outside its new run folder")
+                _save(
+                    _checkpoint(job),
+                    {"signature": signature, "result": result, "artifact_sha256": _hashes(paths)},
+                    immutable=True,
+                )
+                completed += 1
+                group_counts[lookup[job["component"]]] += 1
+                peak = max(peak, result["peak_rss_bytes"])
+                submit()
+            if time.monotonic() - last_update >= 2 or not futures:
+                _status(
+                    "fitting",
+                    completed_in_stage=completed,
+                    stage_total=len(jobs),
+                    required_fresh_fits=contract["required_fresh_fits"],
+                    completed_by_family=dict(group_counts),
+                    workers=contract["worker_ceiling"],
+                    peak_worker_rss_bytes=peak,
+                    ETF_position_cap=None,
+                )
+                last_update = time.monotonic()
+    except BaseException:
+        for future in futures:
+            future.cancel()
+        raise
+    return {"fits": completed, "peak_worker_rss_bytes": peak}
+
+
+def _evaluate(contract: dict, context: dict, anchor: np.ndarray, signature: str) -> None:
+    rows, pending = [], []
+    for candidate in contract["candidates"]:
+        stamp = ROOT / "evaluation_checkpoints" / f"{candidate['configuration']}.json"
+        if stamp.exists():
+            value = json.loads(stamp.read_text())
+            if value["signature"] != signature:
+                raise ValueError("Evaluation contract mismatch")
+            _verify(value["result"]["artifact_sha256"])
+            rows.append(value["result"]["summary"])
+        else:
+            pending.append(candidate)
+    with ProcessPoolExecutor(
+        max_workers=contract["worker_ceiling"],
+        mp_context=multiprocessing.get_context("spawn"),
+        initializer=initialize_evaluation,
+        initargs=(context, anchor),
+    ) as pool:
+        # Only 499 lightweight evaluations follow the entire independent fit stage.
+        futures = {pool.submit(evaluate_job, {"candidate": c, "root": str(ROOT)}): c for c in pending}
+        while futures:
+            done, _ = wait(futures, timeout=30, return_when=FIRST_COMPLETED)
+            for future in done:
+                candidate = futures.pop(future)
+                value = future.result()
+                _save(
+                    ROOT / "evaluation_checkpoints" / f"{candidate['configuration']}.json",
+                    {"signature": signature, "result": value},
+                    immutable=True,
+                )
+                rows.append(value["summary"])
+            _status("batch_evaluation", completed_configurations=len(rows), total=499, ETF_position_cap=None)
+    frame = pd.DataFrame(rows).sort_values(["family", "configuration"])
+    frame["inputs"] = frame.inputs.map(json.dumps)
+    frame.to_csv(ROOT / "all_499_configuration_metrics.csv", index=False)
+    if len(frame) != 499 or frame.configuration.nunique() != 499:
+        raise ValueError("Incomplete all-configuration table")
+    _save(
+        ROOT / "evaluation_summary.json",
+        {
+            "configurations": len(frame),
+            "fresh_fits": 35928,
+            "family_counts": contract["family_counts"],
+            "ETF_position_cap": None,
+            "historical_complete_three_seed_configurations": int(
+                frame.historical_risk_no_cap_complete_seeds.eq(3).sum()
+            ),
+            "GP_native_complete_three_seed_joint_configurations": int(frame.gp_risk_no_cap_complete_seeds.eq(3).sum()),
+            "GP_native_family_status": "not_applicable_no_cross_family_GP_covariance",
+            "evaluation_status": contract["evaluation_status"],
+            "automatic_promotion": False,
+        },
+        immutable=True,
+    )
+
+
+def _verify_complete() -> None:
+    contract = json.loads((ROOT / "contract.json").read_text())
+    seal = json.loads((ROOT / "COMPLETED.json").read_text())
+    if hashlib.sha256((ROOT / "contract.json").read_bytes()).hexdigest() != seal["signature"]:
+        raise ValueError("Completed contract signature differs")
+    _verify(contract["source_sha256"])
+    _verify(seal["artifact_sha256"])
+    count = 0
+    for path in (ROOT / "checkpoints").glob("*/*.json"):
+        stamp = json.loads(path.read_text())
+        if stamp["signature"] != seal["signature"]:
+            raise ValueError("Fit signature mismatch")
+        _verify(stamp["artifact_sha256"])
+        count += 1
+    if count != contract["required_fresh_fits"]:
+        raise ValueError("Fresh fit count differs")
+    for path in (ROOT / "evaluation_checkpoints").glob("*.json"):
+        stamp = json.loads(path.read_text())
+        _verify(stamp["result"]["artifact_sha256"])
+    print(
+        "Verified: all 35,928 fresh fits, 499 evaluations, exact covariance, source/output hashes and no-cap contract"
+    )
+
+
+def _execute(smoke_only: bool) -> None:
+    contract = _prepare()
+    signature = hashlib.sha256((ROOT / "contract.json").read_bytes()).hexdigest()
+    jobs = _jobs(contract)
+    smokes = _smoke_jobs(contract, jobs)
+    started = time.perf_counter()
+    initargs = (contract["configs"], str(LEGACY), str(PARALLEL))
+    with ProcessPoolExecutor(
+        max_workers=contract["worker_ceiling"],
+        mp_context=multiprocessing.get_context("spawn"),
+        initializer=refresh_workers.initialize_fit,
+        initargs=initargs,
+    ) as pool:
+        smoke = _fit_stage(pool, smokes, contract, signature)
+        _save(
+            ROOT / "smoke_gate.json",
+            {"passed": True, "monthly_fits": smoke["fits"], "signature": signature},
+            immutable=True,
+        )
+        if smoke_only:
+            _status("smoke_complete", **smoke, required_fresh_fits=35928, ETF_position_cap=None)
+            return
+        _verify(contract["source_sha256"])
+        fits = _fit_stage(pool, jobs, contract, signature)
+    _verify(contract["source_sha256"])
+    context, anchor = _context_load()
+    _evaluate(contract, context, anchor, signature)
+    _verify(contract["source_sha256"])
+    _save(
+        ROOT / "timing.json",
+        {"seconds_this_invocation": time.perf_counter() - started, "workers": contract["worker_ceiling"], **fits},
+        immutable=True,
+    )
+    paths = [
+        *ROOT.glob("checkpoints/*/*.json"),
+        *ROOT.glob("evaluation_checkpoints/*.json"),
+        *ROOT.glob("*.csv"),
+        ROOT / "evaluation_summary.json",
+        ROOT / "timing.json",
+        ROOT / "smoke_gate.json",
+    ]
+    _save(
+        ROOT / "COMPLETED.json",
+        {"passed": True, "signature": signature, "artifact_sha256": _hashes(paths)},
+        immutable=True,
+    )
+    _status("completed", fresh_monthly_fits=35928, configurations=499, ETF_position_cap=None)
+    _verify_complete()
+
+
+def _main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--smoke-only", action="store_true")
+    parser.add_argument("--status", action="store_true")
+    parser.add_argument("--verify-only", action="store_true")
+    args = parser.parse_args()
+    if args.status:
+        print((ROOT / "status.json").read_text() if (ROOT / "status.json").exists() else "Not started")
+        return
+    if not (args.execute or args.smoke_only or args.verify_only):
+        parser.error("Choose --execute, --smoke-only, --status, or --verify-only")
+    ROOT.mkdir(parents=True, exist_ok=True)
+    with (ROOT / "run.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if args.verify_only or (ROOT / "COMPLETED.json").exists():
+            _verify_complete()
+            return
+        try:
+            _execute(args.smoke_only)
+        except BaseException as error:
+            _status("failed", error=str(error), fallback_weights=False)
+            raise
+
+
+if __name__ == "__main__":
+    _main()

@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:13.570422+00:00",
+  "rows": 64,
+  "sha256": "48b4a4a21b2f78b7ae7f7291b1d17ca1e976a14830872370ec025227f925cfdf",
+  "symbol": "^TNX"
+}

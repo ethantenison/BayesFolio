@@ -1,0 +1,14 @@
+{
+  "batches_used": 1,
+  "decision": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/DECISION.md",
+  "finalists": 15,
+  "fit_attempts_remaining": 110,
+  "fit_attempts_used": 18,
+  "new_configurations": 25,
+  "next_action": "Delivered validated November target weights; no trades executed",
+  "phase": "complete",
+  "selected_recipe": "average_prior48_sharpe_prior48_return_prior48_ranking",
+  "unresolved_failures": [],
+  "updated_at": "2026-10-31T12:41:56.495323+00:00",
+  "weights": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/NOVEMBER_WEIGHTS.csv"
+}

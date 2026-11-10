@@ -1,0 +1,14 @@
+{
+  "fit_wall_seconds": 1020.0454616250063,
+  "fits_per_minute": 4.235105358067009,
+  "fresh_gp_jobs": 72,
+  "fresh_portfolio_jobs": 72,
+  "is_cold_replay": true,
+  "parity": null,
+  "phase": "plus_hy_change",
+  "portfolio_wall_seconds": 0.440248333994532,
+  "sum_fit_job_seconds": 13324.935354292029,
+  "total_wall_seconds": 1021.4374592499953,
+  "worker_peak_rss_bytes": 3029254144,
+  "workers": 14
+}

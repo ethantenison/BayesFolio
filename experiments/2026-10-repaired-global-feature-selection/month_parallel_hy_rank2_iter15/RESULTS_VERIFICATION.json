@@ -1,0 +1,13 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/SPY_hy_rank2_vs5_iter15.png": "686b362050e4beed8c5eb7fd3ef3dd31e88f8ad72366e821f8f6fdcd0f13dc62",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/comparison.json": "6e315549bf29b44882119769e03cf8f7eeb7ea62240799c91287945a7c9b275d",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/completed.json": "d4db637b53049495a4d4569fb354582c2dac294d15bc7b46c5d7de3c483b4230",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/etf_metrics_by_seed.csv": "720737279f0c9c75d12af73dcdf348f9e5ad046c49bb77dc2782d5a30ee1f254",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_rank2_iter15/objectives_by_seed.csv": "a67fda00fc482bb06e39fd8001de636eef85f1fd05626ad63c262a76d6d67a98"
+  },
+  "independent_reconstruction": true,
+  "new_fit_windows": 72,
+  "passed": true,
+  "seed_runs": 3
+}

@@ -1,0 +1,32 @@
+{
+  "global_c55e49933d10": [
+    "t_index",
+    "baspread",
+    "chmom",
+    "cs_mom_rank",
+    "lag_y_excess_lead",
+    "ma_signal",
+    "max_dd_6m",
+    "mom12m",
+    "mom36m",
+    "ret_autocorr",
+    "ret_kurt",
+    "vol_z",
+    "copper_ret",
+    "cpi_chg_12p",
+    "cpi_chg_1p",
+    "em_fx_ret",
+    "erp",
+    "gold_crude_ratio",
+    "hy_spread",
+    "hy_spread_chg_1p",
+    "hy_spread_z_12p",
+    "oil_ret",
+    "pct_above_50dma",
+    "spy_flow_z_12p",
+    "spy_ret",
+    "vix",
+    "vix_slope",
+    "vix_ts_z_12p"
+  ]
+}

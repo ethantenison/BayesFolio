@@ -1,0 +1,10 @@
+{
+  "completion_requires_all_remaining_delivery_gates": true,
+  "data_or_correctness_blocker": false,
+  "new_fit_attempts": 6,
+  "new_policies": 874,
+  "no_unspent_budget_expansion": true,
+  "reason": "four registered adaptive rounds complete; required cached and allowed-GP tracks assessed; no further search after frozen confirmation",
+  "remaining_fit_attempts": 1194,
+  "rounds": 4
+}

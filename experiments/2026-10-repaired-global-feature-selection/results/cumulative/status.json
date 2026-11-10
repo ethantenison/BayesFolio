@@ -1,0 +1,32 @@
+{
+  "global": {
+    "complete_configurations": 25,
+    "conditional_pairs": 25,
+    "hypervolume": 1.0167784594446578,
+    "pareto_configurations": 7
+  },
+  "international_equity": {
+    "complete_configurations": 186,
+    "conditional_pairs": 132,
+    "hypervolume": 0.7017994934597059,
+    "pareto_configurations": 8
+  },
+  "international_fixed_income": {
+    "complete_configurations": 125,
+    "conditional_pairs": 156,
+    "hypervolume": 1.0574686080067464,
+    "pareto_configurations": 5
+  },
+  "us_equity": {
+    "complete_configurations": 48,
+    "conditional_pairs": 46,
+    "hypervolume": 0.8616776284467738,
+    "pareto_configurations": 9
+  },
+  "us_fixed_income": {
+    "complete_configurations": 105,
+    "conditional_pairs": 129,
+    "hypervolume": 0.5445610351068735,
+    "pareto_configurations": 6
+  }
+}

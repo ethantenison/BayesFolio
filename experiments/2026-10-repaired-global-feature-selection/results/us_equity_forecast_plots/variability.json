@@ -1,0 +1,83 @@
+{
+  "configuration": "us_equity_5fba6b4b201b",
+  "selection": "7-input U.S.-equity-only model + t_index | Highest mean portfolio Sharpe",
+  "inputs": [
+    "t_index",
+    "mom12m_skip1m",
+    "mom6m",
+    "trend_slope",
+    "cpi_chg_12p",
+    "hy_spread_chg_1p",
+    "hy_spread_z_12p",
+    "term_spread"
+  ],
+  "source_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/runs/us_equity_5fba6b4b201b_s27/gp_window_predictions.csv": "805b43c8af0a8500003c55c868c0759721a655a7b6f344001081f960a398400f",
+    "experiments/2026-10-repaired-global-feature-selection/runs/us_equity_5fba6b4b201b_s127/gp_window_predictions.csv": "be8a22385a183c0f0042c6b0bcfb8b0da9c02ce6ee15d31f589bdc25d7637a09",
+    "experiments/2026-10-repaired-global-feature-selection/runs/us_equity_5fba6b4b201b_s227/gp_window_predictions.csv": "97e68f595ac43fbab316755b5fe141378a91f07695833a8fbe33abaaab1cef04"
+  },
+  "x_axis": "Saved forecast-origin date, not following-month realization date",
+  "units": "Source decimals; chart axes percent",
+  "diagnostics": [
+    {
+      "etf": "SPY",
+      "seed": 27,
+      "months": 24,
+      "actual_time_sd_decimal": 0.035873182192584376,
+      "predicted_time_sd_decimal": 0.02704018482228546,
+      "predicted_to_actual_time_sd": 0.753771568887333,
+      "predicted_min_decimal": -0.0405781162944882,
+      "predicted_max_decimal": 0.0602983048686964
+    },
+    {
+      "etf": "SPY",
+      "seed": 127,
+      "months": 24,
+      "actual_time_sd_decimal": 0.035873182192584376,
+      "predicted_time_sd_decimal": 0.027379902143888298,
+      "predicted_to_actual_time_sd": 0.7632415211145727,
+      "predicted_min_decimal": -0.0470378593803183,
+      "predicted_max_decimal": 0.0667612435113945
+    },
+    {
+      "etf": "SPY",
+      "seed": 227,
+      "months": 24,
+      "actual_time_sd_decimal": 0.035873182192584376,
+      "predicted_time_sd_decimal": 0.028028321896210295,
+      "predicted_to_actual_time_sd": 0.7813168551856057,
+      "predicted_min_decimal": -0.0464847020732068,
+      "predicted_max_decimal": 0.0575770357747478
+    },
+    {
+      "etf": "IWM",
+      "seed": 27,
+      "months": 24,
+      "actual_time_sd_decimal": 0.05388774302598039,
+      "predicted_time_sd_decimal": 0.035748304503929594,
+      "predicted_to_actual_time_sd": 0.6633847048798203,
+      "predicted_min_decimal": -0.0697162923217016,
+      "predicted_max_decimal": 0.0657857469647043
+    },
+    {
+      "etf": "IWM",
+      "seed": 127,
+      "months": 24,
+      "actual_time_sd_decimal": 0.05388774302598039,
+      "predicted_time_sd_decimal": 0.03718005524410232,
+      "predicted_to_actual_time_sd": 0.6899538402671095,
+      "predicted_min_decimal": -0.068477045459378,
+      "predicted_max_decimal": 0.0639581939592138
+    },
+    {
+      "etf": "IWM",
+      "seed": 227,
+      "months": 24,
+      "actual_time_sd_decimal": 0.05388774302598039,
+      "predicted_time_sd_decimal": 0.037156293535442295,
+      "predicted_to_actual_time_sd": 0.6895128919674457,
+      "predicted_min_decimal": -0.0728900813186079,
+      "predicted_max_decimal": 0.0652953300456612
+    }
+  ]
+}

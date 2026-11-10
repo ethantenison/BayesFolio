@@ -1,0 +1,47 @@
+{
+  "schema": "bayesfolio.research_benchmark_defaults.v1",
+  "version": 1,
+  "approved_date": "2026-10-24",
+  "purpose": "Use only these two standing benchmarks alongside future BayesFolio portfolio comparisons, superseding the five-benchmark reporting preference.",
+  "paths_relative_to": "experiments/2026-10-portfolio-evaluation-v1",
+  "active_benchmark_ids": ["schwab_aggressive", "momentum_top7"],
+  "shared_policy": {
+    "rebalance": "monthly",
+    "return_accounting": "same dates, realized total returns and cash RF convention as the BayesFolio comparison",
+    "external_cash_flows": 0,
+    "distributions": "reinvested",
+    "comparison_risk": "report realized risk differences; do not impose BayesFolio-specific allocation constraints on standalone benchmarks"
+  },
+  "benchmarks": {
+    "schwab_aggressive": {
+      "label": "Charles Schwab aggressive ETF proxy",
+      "initial_proxy_weights": {"SPY": 0.5, "IWM": 0.2, "VEA": 0.25, "CASH": 0.05},
+      "cash_return": "shared realized risk-free proxy, not a verified Schwab sweep rate",
+      "source_schedule": "schwab_benchmark_v1/weights_schedule.json",
+      "weight_updates": "Use only verified publication and effective dates, at the first eligible monthly rebalance; never invent annual changes or backfill future announcements. Preserve sealed schedules by versioning any revision."
+    },
+    "momentum_top7": {
+      "label": "Simple momentum ranking",
+      "definition": "Original standalone momentum benchmark from the five-benchmark suite, not the GP-covariance-matched diagnostic.",
+      "universe": "same approved ETF investment universe as the BayesFolio comparison; currently the 15 ETFs in CURRENT_BASELINES.json",
+      "signal": "adjusted_price[t-1] / adjusted_price[t-12] - 1",
+      "lookback_months": 12,
+      "skip_months": 1,
+      "holdings": 7,
+      "selection": "highest momentum scores, with alphabetical ticker tie-breaking",
+      "weights": "equal among the selected seven",
+      "all_scores_negative": "still hold the highest-ranked seven; no added cash-timing rule",
+      "GP_forecasts_used": false,
+      "GP_covariance_used": false,
+      "extra_variance_budget": null,
+      "source_definition": "benchmark_suite_v1/suite.json"
+    }
+  },
+  "not_default": ["equal_weight", "fixed_80_20", "inverse_volatility"],
+  "matched_momentum": {
+    "role": "optional signal-attribution diagnostic only, not a standing independent benchmark",
+    "evidence": "matched_signal_v1/outputs/FINDINGS.md"
+  },
+  "preservation": "Do not delete or rewrite existing five-benchmark results, matched diagnostics, or current GP baselines.",
+  "execution_note": "This records the future reporting policy. The sealed benchmark_suite_v1 runner remains an unchanged historical five-benchmark implementation; future comparison implementations must honor active_benchmark_ids rather than automatically reporting all five. No new backtest is requested by this decision."
+}

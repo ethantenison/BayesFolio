@@ -1,0 +1,119 @@
+{
+  "schema": "bayesfolio.research_baselines.v1",
+  "version": 1,
+  "approved_date": "2026-10-24",
+  "purpose": "The two user-approved reference configurations for subsequent research comparisons.",
+  "scope": "Research baselines only; production settings and sealed experiments are unchanged.",
+  "paths_relative_to": "experiments/2026-10-portfolio-evaluation-v1",
+  "source_models": {
+    "broad": {
+      "id": "global_e6c41f2020fd",
+      "non_time_input_count": 14,
+      "all_15_ETFs_jointly": true
+    },
+    "compact": {
+      "id": "joint_existing_us_mask",
+      "non_time_input_count": 5,
+      "all_15_ETFs_jointly": true
+    }
+  },
+  "GP_settings": {
+    "rank": 2,
+    "maxiter": 15,
+    "t_index_retained": true,
+    "initial_training_months": 84
+  },
+  "assets_in_order": [
+    "SPY", "MGK", "VTV", "IWM", "VEA", "VWO", "VSS", "EWX",
+    "BND", "IEF", "LQD", "HYG", "BNDX", "VWOB", "HYEM"
+  ],
+  "family_order": [
+    "us_equity",
+    "international_equity",
+    "us_fixed_income",
+    "international_fixed_income"
+  ],
+  "prediction_blend": "mu_i = (1 - alpha_family) * mu_broad_i + alpha_family * mu_compact_i",
+  "covariance": {
+    "method": "arithmetic_blend",
+    "broad_fraction": 0.5,
+    "compact_fraction": 0.5,
+    "formula": "Sigma = 0.5 * Sigma_broad + 0.5 * Sigma_compact",
+    "kind": "complete_observed_return_predictive_covariance_including_likelihood_noise",
+    "family_dependent_covariance_weights": false
+  },
+  "allocator": {
+    "method": "hard_rank",
+    "score": "ascending_average_rank(blended_mean) / 15; highest_mean_gets_highest_score",
+    "objective": "maximize score @ weights - 1e-8 * sum(weights_squared)",
+    "concentration_tie_breaker": 1e-8,
+    "continuous_risk_penalty": 0,
+    "expected_rank_scores": false,
+    "long_only": true,
+    "fully_invested": true,
+    "minimum_effective_assets": 7,
+    "absolute_variance_ceiling": "unchanged_expanding_training_only_historical_equal_weight_15_ETF_variance",
+    "ETF_position_cap": null,
+    "fixed_equity_allocation": null,
+    "CVaR": false,
+    "turnover_objective": false,
+    "fallback_weights": false,
+    "constraint_relaxation": false,
+    "uncertainty_recalibration_fitted": false
+  },
+  "baselines": [
+    {
+      "id": "sharpe_leader",
+      "label": "Sharpe leader",
+      "compact_mean_fraction_by_family": {
+        "us_equity": 0.5,
+        "international_equity": 0,
+        "us_fixed_income": 0.375,
+        "international_fixed_income": 0.25
+      },
+      "reference_case": "sharpe__hard_rank",
+      "evidence": {
+        "json": "uncertainty_rank_v1/outputs/cases/sharpe__hard_rank.json",
+        "json_sha256": "a79a70352a703764650e32a48e329b4c4a9187c191b1f78c5b4fec52abdc53a2",
+        "npz": "uncertainty_rank_v1/outputs/cases/sharpe__hard_rank.npz",
+        "npz_sha256": "4a431d0aada65cff568e212244820641f65f432d535c09439dff9ab0a96de98a"
+      },
+      "recorded_three_seed_mean_metrics": {
+        "conventional_sharpe": 1.8972515286730072,
+        "compounded_total_return": 0.6026322699457968,
+        "decision_IC": 0.3489087301587302
+      }
+    },
+    {
+      "id": "ranking_sharpe_compromise",
+      "label": "Ranking and Sharpe compromise",
+      "compact_mean_fraction_by_family": {
+        "us_equity": 0.375,
+        "international_equity": 0,
+        "us_fixed_income": 0.25,
+        "international_fixed_income": 0.0625
+      },
+      "reference_case": "compromise__hard_rank",
+      "evidence": {
+        "json": "uncertainty_rank_v1/outputs/cases/compromise__hard_rank.json",
+        "json_sha256": "6da99d834123d3e43b7b3924be75c8c963809da1868195970b20a7205e35f420",
+        "npz": "uncertainty_rank_v1/outputs/cases/compromise__hard_rank.npz",
+        "npz_sha256": "02fce098f192828b04ca29e0853437920e0b8f1c95563f72cab47fe0c3ae174c"
+      },
+      "recorded_three_seed_mean_metrics": {
+        "conventional_sharpe": 1.8831082380184527,
+        "compounded_total_return": 0.6019959727164702,
+        "decision_IC": 0.35659722222222223
+      }
+    }
+  ],
+  "evaluation_reference": {
+    "seeds": [27, 127, 227],
+    "forecast_origins": "May 2024 through April 2026",
+    "forecast_months": 24,
+    "target": "following_month_discounted_excess_return",
+    "recorded_returns_are": "gross_cumulative_total_returns_in_decimal_units",
+    "limitations": "Reused exploratory market window; seeds are initialization replicates, not independent histories.",
+    "verification": ".venv/bin/python experiments/2026-10-portfolio-evaluation-v1/uncertainty_rank_v1/run_uncertainty_rank.py --verify"
+  }
+}

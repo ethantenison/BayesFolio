@@ -1,0 +1,51 @@
+{
+  "new_historical_masks": {
+    "international_equity": 1,
+    "us_equity": 1
+  },
+  "reason": "The goal does not mandate a nonempty ETF-local block. The existing wrapper can omit it under the same default covariance construction rule. This repairs inventory scope, not the data or model code; original results and adaptive caps remain unchanged.",
+  "records": [
+    {
+      "disposition": "valid_macro_only_historical_mask",
+      "family": "us_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/20260705T1915Z_stage_b_macro_risk_12w_gpmaxret/manifest.json",
+      "manifest_sha256": "c8658eb595d2cb70c1331da8083079a8ed6995e15a2b31b2fb3920f6e5c913fb",
+      "previous_exclusion_not_authorized_by_goal": true,
+      "repaired_mask_id": "us_equity_cb0ff7bcfbc2"
+    },
+    {
+      "disposition": "valid_macro_only_historical_mask",
+      "family": "us_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/broad_kernel_search_20260706T0056Z/full_runs/full_c052_space_filling/manifest.json",
+      "manifest_sha256": "932b4141612d1ad54216bac974c441cba50f7e29694e6079532a06d3c2063cd9",
+      "previous_exclusion_not_authorized_by_goal": true,
+      "repaired_mask_id": "us_equity_cb0ff7bcfbc2"
+    },
+    {
+      "disposition": "valid_macro_only_historical_mask",
+      "family": "us_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/broad_kernel_search_20260706T0056Z/full_runs/full_c085_novel_or_sensitivity/manifest.json",
+      "manifest_sha256": "f859c78e852bddb113bfc37e5358da0df89eb79b39e90ed983ff919a1c783fa5",
+      "previous_exclusion_not_authorized_by_goal": true,
+      "repaired_mask_id": "us_equity_cb0ff7bcfbc2"
+    },
+    {
+      "disposition": "valid_macro_only_historical_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-us-equity-etf-features/runs/international_equity_block_screen_20260707T1725Z/full_runs/full_b005_macro_risk/manifest.json",
+      "manifest_sha256": "65e4d3cc4f33ffa9187d9e2324486fb77223d5b524584fb5099426c431db9a32",
+      "previous_exclusion_not_authorized_by_goal": true,
+      "repaired_mask_id": "international_equity_32e6597d0b79"
+    },
+    {
+      "disposition": "valid_macro_only_historical_mask",
+      "family": "international_equity",
+      "manifest": "experiments/2026-07-international-equity-etf-features/runs/international_equity_block_screen_20260707T1725Z/full_runs/full_b005_macro_risk/manifest.json",
+      "manifest_sha256": "65e4d3cc4f33ffa9187d9e2324486fb77223d5b524584fb5099426c431db9a32",
+      "previous_exclusion_not_authorized_by_goal": true,
+      "repaired_mask_id": "international_equity_32e6597d0b79"
+    }
+  ],
+  "source_audit_path": "experiments/2026-10-repaired-global-feature-selection/results/historical_scope_audit.json",
+  "source_audit_sha256": "63d5cf4e15fc83a155f8400166926393f57cdc5034f700559ba552513461ce88"
+}

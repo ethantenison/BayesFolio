@@ -1,0 +1,45 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/gp_scenarios_2025-03-31.csv": "2fe53ea2be2e0aa8b57ab804f09b0a8979bbeafeea05e95643b52f0782a1fc05",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/scenario_cache/gp_predictions_2025-03-31.csv": "6aa0087bd3e8eb70d1a7f79e3dea36018b25d6299d8413fe9195d63e3c8843b5",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/scenario_cache/model_diagnostics_2025-03-31.csv": "c248959116efe52134259678ba71e71a33f0906f6b59a3fef3ccd1144e2adf48",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/scenario_cache/task_covariance_diagnostics_2025-03-31.csv": "ec8621dc4f8e5cc61b9df3c9a61a1d836d4b7482b6cdb691d52fcce16e24316f"
+  },
+  "result": {
+    "date": "2025-03-31",
+    "fit_seed": 13316,
+    "input_columns": [
+      "t_index",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "trend_slope",
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_chg_1p",
+      "hy_spread_z_12p",
+      "oil_ret",
+      "spy_ret",
+      "term_spread",
+      "vix_ts_z_12p"
+    ],
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/scenario_cache/model_diagnostics_2025-03-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/scenario_cache/gp_predictions_2025-03-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/gp_scenarios_2025-03-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel_hy_iter15/hy_iter15/runs/s227/scenario_cache/task_covariance_diagnostics_2025-03-31.csv"
+    },
+    "peak_rss_bytes": 2693414912,
+    "pid": 29896,
+    "seconds": 43.03563058299187,
+    "seed": 227,
+    "status": "fit",
+    "train_dates": 94,
+    "train_rows": 1410,
+    "window_index": 10
+  },
+  "signature": "34417072be3ebc0fe783a6422d085bcf5afadd9a8f5946981080686837bc03c4"
+}

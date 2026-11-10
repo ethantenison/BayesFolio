@@ -1,0 +1,6 @@
+{
+  "no_GP_fits": true,
+  "settings_unchanged": true,
+  "timestamp_utc": "2026-10-31T12:23:15.178130+00:00",
+  "traceback": "Traceback (most recent call last):\n  File \"/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data_extension.py\", line 387, in main\n    result = prepare_data(args.output, fetch=args.fetch_and_build)\n  File \"/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data_extension.py\", line 353, in prepare_data\n    source_audit = _combine(output)\n  File \"/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data_extension.py\", line 208, in _combine\n    combined, evidence = math.splice_market(pd.read_parquet(original), pd.read_parquet(fresh),\n                         ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                                            symbol=symbol, completed=MARKET_ORIGIN)\n                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/et/Documents/BayesFolio/experiments/2026-10-monthly-data-extension-v1/extension_math.py\", line 67, in splice_market\n    raise ValueError(f\"Nonconstant historical price revisions require investigation: {symbol}, {relative.max()}\")\nValueError: Nonconstant historical price revisions require investigation: MGK, 0.0008247325188370791\n"
+}

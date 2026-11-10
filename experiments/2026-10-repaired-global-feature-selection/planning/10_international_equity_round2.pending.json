@@ -1,0 +1,1007 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,em_fx_ret,vix,vix_slope,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "exploitation_combined_pruning",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "The two individually useful risk removals may combine rather than substitute for one another.",
+      "hypothesis_name": "risk_without_move_or_slope_change",
+      "id": "international_equity_c5be1947ee1b",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_c5be1947ee1b",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,em_fx_ret,oil_ret,vix,vix_slope,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "oil_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "Oil's density benefit may complement the compact risk representation after both successful removals.",
+      "hypothesis_name": "risk_without_move_or_slope_change_plus_oil",
+      "id": "international_equity_41d789e7d4d7",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_41d789e7d4d7",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "oil_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,em_fx_ret,oil_ret,vix,vix_slope,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "oil_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "Test oil transfer independently of the slope-change removal to resolve the interaction.",
+      "hypothesis_name": "risk_without_move_plus_oil",
+      "id": "international_equity_ed4ce751392c",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_ed4ce751392c",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "oil_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope,vol_1m",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,em_fx_ret,vix,vix_slope,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "frontier_bridge",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "vol_1m"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "vol_1m",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "Task-local volatility may retain the higher-Sharpe branch after MOVE is removed.",
+      "hypothesis_name": "risk_without_move_plus_local_volatility",
+      "id": "international_equity_d32b62e7dd7c",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_d32b62e7dd7c",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,em_fx_ret,vix,vix_slope,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "Rank removal helped U.S. equity but requires a direct international test in a competitive compact context.",
+      "hypothesis_name": "risk_without_move_or_global_rank",
+      "id": "international_equity_88902e75894f",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_88902e75894f",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,em_fx_ret,vix,vix_slope,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "exploitation_local_pruning",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "The prior trend-removal IC/NLL benefit might survive after MOVE removal without the same Sharpe cost.",
+      "hypothesis_name": "risk_without_move_or_trend_slope",
+      "id": "international_equity_78bf31d00d4b",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_78bf31d00d4b",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dxy,em_fx_ret,vix,vix_slope,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "exploration_risk_pruning",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "VIX representations may make the dealer proxy redundant in the already improved risk parent.",
+      "hypothesis_name": "risk_without_move_or_dealer_proxy",
+      "id": "international_equity_6a30de6c710d",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_6a30de6c710d",
+      "macro_columns": [
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,em_fx_ret,vix,vix_slope,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "exploration_fx_pruning",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dealer_gamma_proxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "EM FX returns might suffice without the dollar-level axis; broad-parent effects need not transfer.",
+      "hypothesis_name": "risk_without_move_or_dollar_level",
+      "id": "international_equity_7f66d5419f06",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_7f66d5419f06",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "em_fx_ret",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,vix,vix_slope,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "exploration_fx_pruning",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dealer_gamma_proxy",
+        "dxy",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "Reciprocal FX test separates dollar-level from EM-return contributions.",
+      "hypothesis_name": "risk_without_move_or_em_fx",
+      "id": "international_equity_ebfded375c99",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_ebfded375c99",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "vix",
+        "vix_slope",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dealer_gamma_proxy,dxy,em_fx_ret,vix,vix_ts_chg_1p,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_4c2b72c2c055",
+      "category": "exploration_risk_representation",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "Slope change and z-score may retain useful term-structure information without the slope level.",
+      "hypothesis_name": "risk_without_move_or_vix_slope_level",
+      "id": "international_equity_c38267888036",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_c38267888036",
+      "macro_columns": [
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "vix",
+        "vix_ts_chg_1p",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_4c2b72c2c055"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,gold_crude_ratio,oil_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_baaff7ca24fa",
+      "category": "exploitation_credit_pruning",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "After successful HY-change removal, other macro/credit axes may also substitute for the HY z-score.",
+      "hypothesis_name": "broad_without_either_hy_transform",
+      "id": "international_equity_54880a9ae051",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_54880a9ae051",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_baaff7ca24fa"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,cpi_chg_12p,cpi_chg_1p,dxy,em_fx_ret,gold_crude_ratio,hy_spread_z_12p,oil_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "international_equity_baaff7ca24fa",
+      "category": "exploitation_credit_pruning",
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "45db5a85d51fc7a9f057a9687c21ad61c0c3b824b61e00e481fc7c26206b229f",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_tradeoff": "Compare three-objective results and paired seed dispersion; report uncertainty calibration alongside width without using width as an objective.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result rejects the proposed conditional improvement; a new tradeoff remains eligible. Broad and compact models are alternative representations, not a reason to silently weight NLL against IC/Sharpe.",
+      "hypothesis": "Retain normalized HY state while removing the other credit-change axis to test a different sparse credit representation.",
+      "hypothesis_name": "broad_without_hy_change_or_credit_change",
+      "id": "international_equity_3f07351cc740",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_3f07351cc740",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json",
+        "base_configuration=international_equity_baaff7ca24fa"
+      ]
+    }
+  ],
+  "cross_version_equality_audit": "experiments/2026-10-repaired-global-feature-selection/results/feature_pool_extension_audit.json",
+  "dataset_version": "v2",
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json"
+  ],
+  "evidence_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/conditional_feature_pairs.csv": "926ee6bf3a1f3dab94ae857eb12c033dc4ecaf5ea8fcbb806fa15b4482e2e4bc",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/configuration_aggregates.csv": "814d862e6e4c292036f4e37cdc5467416694dc3c474f838951fe4ab32af7ba6b",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/exact_inputs.json": "3487f82cd56e2a051412e7f051efa00800094109a95f7d1106d5687ec18ff0a2",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/family_diagnostics_by_seed.csv": "9f4065fffcfb1191518768de8103a776b4858e01b354f483a3f43214019cf88d",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/hypervolume.json": "05e2d94dcca7f38733a07a66b0dfa86978c8a77d0a66b8b7b0424c8158009fac",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/international_equity_round1.json": "b49fd6f5f3146f88961d02f68f7331db5737445afeb00628bebfd09b8899263f",
+    "experiments/2026-10-repaired-global-feature-selection/planning/evidence/international_equity_round2/objectives_by_seed.csv": "b252f8a3193fa7a493d96d7e8a816438fd82a809635e8527c5e21b6112674cef"
+  },
+  "family": "international_equity",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/international_equity.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/international_equity.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/runs",
+  "phase": "refinement",
+  "planning_method": "Hosted Codex hypothesis generation",
+  "proposal_path": "experiments/2026-10-repaired-global-feature-selection/planning/international_equity_round2.json",
+  "proposal_sha256": "fa3f3647fb77829e55538692275c7a25d7b9c8db423ef2837c7d1e4f4a1a1439",
+  "results_prefix": "10_international_equity_round2",
+  "round_index": 2,
+  "round_interpretation": "Round one increased hypervolume by 15.49%. MOVE removal improved all three objectives in the risk-state parent; VIX slope-change removal increased IC/NLL, while oil and local volatility generated alternative tradeoffs. The broad high-Sharpe model benefited from removing HY change but was harmed by removing the gold/oil ratio. Combine successful risk removals and selected transfers, distinguish FX and risk-state contributions, and prune remaining credit axes in the broad model. Do not assume oil-only or one shared local basis wins in every context.",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/executions",
+  "study_stage": "family_refinement",
+  "tickers": [
+    "VEA",
+    "VWO",
+    "VSS",
+    "EWX"
+  ]
+}

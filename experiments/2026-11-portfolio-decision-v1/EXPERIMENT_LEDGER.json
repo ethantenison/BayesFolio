@@ -1,0 +1,50 @@
+{
+  "batch1": {
+    "controls": 5,
+    "finalists": 15,
+    "historically_scored": 30,
+    "new_configurations": 25
+  },
+  "batch2": {
+    "reason": "Frozen selection and checks were sufficient; no search expansion",
+    "used": false
+  },
+  "candidate_menu": "PREREGISTRATION.json",
+  "checkpoints": "outputs/fit_checkpoints/",
+  "failures": [
+    {
+      "evidence": "data/failures/data_attempt_initial_sandbox_dns.json",
+      "resolution": "Authorized scoped network access",
+      "resolved": true,
+      "stage": "data download"
+    },
+    {
+      "evidence": "data/failures/data_attempt_20261031T122315178114Z.json",
+      "resolution": "Verified MGK dividend revision; preserved frozen history and appended October only",
+      "resolved": true,
+      "stage": "data vintage"
+    },
+    {
+      "error": "ValueError: special directives must be the first entry",
+      "resolution": "Replace numpy r_ string shorthand with explicit concatenation; no changed experiment",
+      "resolved": true,
+      "stage": "report integration"
+    },
+    {
+      "error": "KeyError: benchmarks",
+      "resolution": "Align renderer with actual benchmark and dates schema; no changed experiment",
+      "resolved": true,
+      "stage": "report integration"
+    }
+  ],
+  "fits": {
+    "attempts": 18,
+    "cap": 128,
+    "completed": 18,
+    "remaining": 110,
+    "single_thread_per_worker": true,
+    "workers": 14
+  },
+  "selection": "HISTORICAL_DECISION.json",
+  "unresolved_fit_or_allocation_failures": []
+}

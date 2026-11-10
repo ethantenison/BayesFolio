@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:06.240621+00:00",
+  "rows": 64,
+  "sha256": "f7e02d874d0db20b5795760a01d91d5418d6a406fc450baa40fcb9685194b949",
+  "symbol": "SPY"
+}

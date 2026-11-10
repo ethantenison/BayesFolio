@@ -1,0 +1,21 @@
+{
+  "schema": "bayesfolio.standing_benchmarks.v1",
+  "approved_on": "2026-10-24",
+  "benchmark_ids": ["schwab_aggressive", "equal_weight", "fixed_80_20", "inverse_volatility", "momentum_top7"],
+  "initial_dollars": 10000,
+  "rebalance": "monthly",
+  "external_cash_flows": 0,
+  "equal_weight": "1/N across the complete fixed ETF universe",
+  "fixed_80_20": {"equity_fraction": 0.8, "within_sleeves": "equal_weight"},
+  "inverse_volatility": {"lookback_months": 36, "ddof": 1, "return_type": "monthly_adjusted_total_return", "weight": "(1/sigma_i) / sum_j(1/sigma_j)"},
+  "momentum_top7": {"lookback_months": 12, "skip_months": 1, "top_k": 7, "score": "adjusted_price[t-1] / adjusted_price[t-12] - 1", "ties": "alphabetical_ticker", "weights": "equal_among_top7", "all_scores_negative": "still_hold_top7; no_unapproved_cash_timing"},
+  "schwab_aggressive": {"schedule": "../schwab_benchmark_v1/weights_schedule.json", "profile": "aggressive", "cash_return": "frozen_shared_RF_proxy_not_verified_Schwab_sweep"},
+  "additional_benchmark_constraints": {"variance_ceiling": null, "effective_asset_floor": null, "position_cap": null, "CVaR": false, "leverage": false, "shorting": false, "turnover_objective": false},
+  "failure_policy": "raise; no_filled_returns_no_weight_repair_no_fallback",
+  "selection": "fixed_approved_rules; no_search_or_parameter_tuning",
+  "comparison_window": "June_2024_through_May_2026_realized_monthly_returns",
+  "signal_timing": "monthly_closes_available_by_decision_t; next_month_return_is_outcome_only",
+  "execution_limitation": "frictionless_month_end_rebalance_convention_same_as_existing_GP_comparison; not_verified_next_open_execution",
+  "data_vintage": "frozen_retrospective_adjusted_prices; not_point_in_time_vendor_archive",
+  "costs": "gross_of_explicit_trading_costs_and_taxes; reinvested_distributions"
+}

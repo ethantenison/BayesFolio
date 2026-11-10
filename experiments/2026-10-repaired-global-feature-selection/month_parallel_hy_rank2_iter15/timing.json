@@ -1,0 +1,10 @@
+{
+  "cold_run": true,
+  "fit_wall_seconds": 247.84599083301146,
+  "fresh_gp_jobs": 72,
+  "fresh_portfolio_jobs": 72,
+  "portfolio_wall_seconds": 0.438492707995465,
+  "total_wall_seconds": 249.20794733299408,
+  "worker_peak_rss_bytes": 3064659968,
+  "workers": 14
+}

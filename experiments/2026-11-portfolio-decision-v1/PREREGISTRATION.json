@@ -1,0 +1,915 @@
+{
+  "as_of_date": "2026-10-31",
+  "batch1_new_recipes": 25,
+  "batch2": "not required; only a documented unresolved mechanism, never absence of a win",
+  "blocks": [
+    [
+      0,
+      12
+    ],
+    [
+      12,
+      24
+    ],
+    [
+      24,
+      31
+    ],
+    [
+      31,
+      38
+    ],
+    [
+      38,
+      45
+    ],
+    [
+      45,
+      52
+    ]
+  ],
+  "candidate_menu": [
+    {
+      "control": true,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.625,
+          0.375,
+          0.0
+        ],
+        [
+          0.75,
+          0.25,
+          0.0
+        ]
+      ],
+      "id": "recipe_f09d1700fb1a2ba6da42",
+      "label": "incumbent"
+    },
+    {
+      "control": true,
+      "fractions": [
+        [
+          0.625,
+          0.375,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.75,
+          0.25,
+          0.0
+        ],
+        [
+          0.9375,
+          0.0625,
+          0.0
+        ]
+      ],
+      "id": "recipe_ef6812dd33a4e17b40a5",
+      "label": "compromise"
+    },
+    {
+      "control": true,
+      "fractions": [
+        [
+          0.375,
+          0.59375,
+          0.03125
+        ],
+        [
+          0.984375,
+          0.0,
+          0.015625
+        ],
+        [
+          0.0,
+          0.0625,
+          0.9375
+        ],
+        [
+          0.015625,
+          0.046875,
+          0.9375
+        ]
+      ],
+      "id": "recipe_01fb9cbfca1b8469e77d",
+      "label": "prior48_sharpe"
+    },
+    {
+      "control": true,
+      "fractions": [
+        [
+          0.296875,
+          0.515625,
+          0.1875
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0625,
+          0.9375
+        ],
+        [
+          0.0625,
+          0.015625,
+          0.921875
+        ]
+      ],
+      "id": "recipe_21e8092b56d2f04e8d2a",
+      "label": "prior48_return"
+    },
+    {
+      "control": true,
+      "fractions": [
+        [
+          0.609375,
+          0.390625,
+          0.0
+        ],
+        [
+          0.84375,
+          0.15625,
+          0.0
+        ],
+        [
+          0.0,
+          0.09375,
+          0.90625
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "id": "recipe_e0decf1c5db298bf453d",
+      "label": "prior48_ranking"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.46875,
+          0.5234375,
+          0.0078125
+        ],
+        [
+          0.99609375,
+          0.0,
+          0.00390625
+        ],
+        [
+          0.46875,
+          0.296875,
+          0.234375
+        ],
+        [
+          0.56640625,
+          0.19921875,
+          0.234375
+        ]
+      ],
+      "id": "recipe_d91975ae73d0b35c177b",
+      "label": "shrink_prior48_sharpe_0.25"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.4375,
+          0.546875,
+          0.015625
+        ],
+        [
+          0.9921875,
+          0.0,
+          0.0078125
+        ],
+        [
+          0.3125,
+          0.21875,
+          0.46875
+        ],
+        [
+          0.3828125,
+          0.1484375,
+          0.46875
+        ]
+      ],
+      "id": "recipe_b5ea4f5cbb2289c3bf3b",
+      "label": "shrink_prior48_sharpe_0.5"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.40625,
+          0.5703125,
+          0.0234375
+        ],
+        [
+          0.98828125,
+          0.0,
+          0.01171875
+        ],
+        [
+          0.15625,
+          0.140625,
+          0.703125
+        ],
+        [
+          0.19921875,
+          0.09765625,
+          0.703125
+        ]
+      ],
+      "id": "recipe_64046f4eba75de4830e7",
+      "label": "shrink_prior48_sharpe_0.75"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.44921875,
+          0.50390625,
+          0.046875
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.46875,
+          0.296875,
+          0.234375
+        ],
+        [
+          0.578125,
+          0.19140625,
+          0.23046875
+        ]
+      ],
+      "id": "recipe_ffcb13dd3cf161cc3eee",
+      "label": "shrink_prior48_return_0.25"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.3984375,
+          0.5078125,
+          0.09375
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.3125,
+          0.21875,
+          0.46875
+        ],
+        [
+          0.40625,
+          0.1328125,
+          0.4609375
+        ]
+      ],
+      "id": "recipe_6c5b3f75d568d00d927b",
+      "label": "shrink_prior48_return_0.5"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.34765625,
+          0.51171875,
+          0.140625
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.15625,
+          0.140625,
+          0.703125
+        ],
+        [
+          0.234375,
+          0.07421875,
+          0.69140625
+        ]
+      ],
+      "id": "recipe_0bbba08d3f2d23a4cd52",
+      "label": "shrink_prior48_return_0.75"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.52734375,
+          0.47265625,
+          0.0
+        ],
+        [
+          0.9609375,
+          0.0390625,
+          0.0
+        ],
+        [
+          0.46875,
+          0.3046875,
+          0.2265625
+        ],
+        [
+          0.5625,
+          0.1875,
+          0.25
+        ]
+      ],
+      "id": "recipe_756cec8508aa0c4d57de",
+      "label": "shrink_prior48_ranking_0.25"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5546875,
+          0.4453125,
+          0.0
+        ],
+        [
+          0.921875,
+          0.078125,
+          0.0
+        ],
+        [
+          0.3125,
+          0.234375,
+          0.453125
+        ],
+        [
+          0.375,
+          0.125,
+          0.5
+        ]
+      ],
+      "id": "recipe_20fafbd82bda715606fd",
+      "label": "shrink_prior48_ranking_0.5"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.58203125,
+          0.41796875,
+          0.0
+        ],
+        [
+          0.8828125,
+          0.1171875,
+          0.0
+        ],
+        [
+          0.15625,
+          0.1640625,
+          0.6796875
+        ],
+        [
+          0.1875,
+          0.0625,
+          0.75
+        ]
+      ],
+      "id": "recipe_ada0ce56993a656ad52a",
+      "label": "shrink_prior48_ranking_0.75"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.3359375,
+          0.5546875,
+          0.109375
+        ],
+        [
+          0.9921875,
+          0.0,
+          0.0078125
+        ],
+        [
+          0.0,
+          0.0625,
+          0.9375
+        ],
+        [
+          0.0390625,
+          0.03125,
+          0.9296875
+        ]
+      ],
+      "id": "recipe_190ffecc6206b371b0cb",
+      "label": "average_prior48_sharpe_prior48_return"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.4921875,
+          0.4921875,
+          0.015625
+        ],
+        [
+          0.9140625,
+          0.078125,
+          0.0078125
+        ],
+        [
+          0.0,
+          0.078125,
+          0.921875
+        ],
+        [
+          0.0078125,
+          0.0234375,
+          0.96875
+        ]
+      ],
+      "id": "recipe_2f63a2be32d1020bef1f",
+      "label": "average_prior48_sharpe_prior48_ranking"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.453125,
+          0.453125,
+          0.09375
+        ],
+        [
+          0.921875,
+          0.078125,
+          0.0
+        ],
+        [
+          0.0,
+          0.078125,
+          0.921875
+        ],
+        [
+          0.03125,
+          0.0078125,
+          0.9609375
+        ]
+      ],
+      "id": "recipe_55f129939582555ea645",
+      "label": "average_prior48_return_prior48_ranking"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.4270833333333333,
+          0.5,
+          0.07291666666666667
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "id": "recipe_04daf5fc6b9240560445",
+      "label": "average_prior48_sharpe_prior48_return_prior48_ranking"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.4817708333333333,
+          0.5,
+          0.018229166666666668
+        ],
+        [
+          0.9856770833333334,
+          0.013020833333333334,
+          0.0013020833333333333
+        ],
+        [
+          0.46875,
+          0.2994791666666667,
+          0.23177083333333334
+        ],
+        [
+          0.5690104166666666,
+          0.19270833333333334,
+          0.23828125
+        ]
+      ],
+      "id": "recipe_5492046eb3d9b55239de",
+      "label": "shrink_average48_0.25"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.46354166666666663,
+          0.5,
+          0.036458333333333336
+        ],
+        [
+          0.9713541666666667,
+          0.026041666666666668,
+          0.0026041666666666665
+        ],
+        [
+          0.3125,
+          0.22395833333333334,
+          0.4635416666666667
+        ],
+        [
+          0.3880208333333333,
+          0.13541666666666666,
+          0.4765625
+        ]
+      ],
+      "id": "recipe_18188ff906509f34f29a",
+      "label": "shrink_average48_0.5"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.4453125,
+          0.5,
+          0.0546875
+        ],
+        [
+          0.95703125,
+          0.0390625,
+          0.00390625
+        ],
+        [
+          0.15625,
+          0.1484375,
+          0.6953125
+        ],
+        [
+          0.20703125,
+          0.078125,
+          0.71484375
+        ]
+      ],
+      "id": "recipe_f0a98446541628085ef0",
+      "label": "shrink_average48_0.75"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5625,
+          0.4375,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.6875,
+          0.3125,
+          0.0
+        ],
+        [
+          0.84375,
+          0.15625,
+          0.0
+        ]
+      ],
+      "id": "recipe_c06f5fa059774cf65333",
+      "label": "average_incumbent_compromise"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333
+        ]
+      ],
+      "id": "recipe_917e955e07aba2a62a1d",
+      "label": "uniform_three_experts"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          0.5,
+          0.5,
+          0.0
+        ]
+      ],
+      "id": "recipe_0e52621e842c026710a4",
+      "label": "uniform_broad_compact"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.46875,
+          0.28125,
+          0.25
+        ],
+        [
+          0.75,
+          0.25,
+          0.0
+        ]
+      ],
+      "id": "recipe_2aea0b1c042b8df845f4",
+      "label": "FI48_[2]_0.25"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.3125,
+          0.1875,
+          0.5
+        ],
+        [
+          0.75,
+          0.25,
+          0.0
+        ]
+      ],
+      "id": "recipe_9c01c344309399b7ddcf",
+      "label": "FI48_[2]_0.5"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.625,
+          0.375,
+          0.0
+        ],
+        [
+          0.5625,
+          0.1875,
+          0.25
+        ]
+      ],
+      "id": "recipe_c5ef65408cdba1bc1b5f",
+      "label": "FI48_[3]_0.25"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.625,
+          0.375,
+          0.0
+        ],
+        [
+          0.375,
+          0.125,
+          0.5
+        ]
+      ],
+      "id": "recipe_71650c959e052e0f82c5",
+      "label": "FI48_[3]_0.5"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.46875,
+          0.28125,
+          0.25
+        ],
+        [
+          0.5625,
+          0.1875,
+          0.25
+        ]
+      ],
+      "id": "recipe_7fe6680e20a04303d1eb",
+      "label": "FI48_[2, 3]_0.25"
+    },
+    {
+      "control": false,
+      "fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.3125,
+          0.1875,
+          0.5
+        ],
+        [
+          0.375,
+          0.125,
+          0.5
+        ]
+      ],
+      "id": "recipe_a351efcdfca5dff2698f",
+      "label": "FI48_[2, 3]_0.5"
+    }
+  ],
+  "caps": {
+    "batches": 2,
+    "finalists": 15,
+    "fit_workers": 14,
+    "monthly_fit_attempts": 128,
+    "new_recipes_per_batch": 48
+  },
+  "components": [
+    "broad_r2_i15_exp",
+    "compact_r2_i15_exp",
+    "broad_roll48_r2_i15"
+  ],
+  "covariance": "0.5 broad + 0.5 compact observed covariance; no third/seed disagreement term",
+  "deadline": "2026-11-01T18:00:00-06:00",
+  "exploration_stop": "2026-11-01T16:30:00-06:00",
+  "finalist_selection": "five controls plus up to10 ranked by worst normalized gate slack, Sharpe/IC/return",
+  "forecast_month": "2026-11",
+  "fresh_outcomes": "October is a separately reported diagnostic after historical selection freezes",
+  "frozen_at_utc": "2026-10-31T12:22:32.578363+00:00",
+  "historical_origins": "2022-05-31 through 2026-08-31",
+  "historical_realized_months": "June2022 through September2026",
+  "live_policy": "static family blend then equal seed mean/covariance pooling then one allocation",
+  "mandatory_controls": [
+    "recipe_f09d1700fb1a2ba6da42",
+    "recipe_ef6812dd33a4e17b40a5",
+    "recipe_01fb9cbfca1b8469e77d",
+    "recipe_21e8092b56d2f04e8d2a",
+    "recipe_e0decf1c5db298bf453d"
+  ],
+  "market_origin": "2026-10-30",
+  "promotion_gates": {
+    "all52_IC_delta_min": 0.01,
+    "all52_return_delta_min": -1e-10,
+    "all52_sharpe_delta_min": 0.05,
+    "all_leave_one_month_out_sharpe_deltas_positive": true,
+    "any_family_IC_delta_min": -0.05,
+    "interpretation": "conservative operational gates, not significance tests",
+    "later28_IC_delta_min": -0.01,
+    "later28_return_delta_min": -0.01,
+    "later28_sharpe_delta_min": -0.05,
+    "max_drawdown_delta_min": -0.01,
+    "nonnegative_excess_advantage_blocks_min": 4
+  },
+  "protected_sha256": {
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/COMPLETED.json": "7e5a8c2752c1b591a6c1cc1cae54f4ba2e9721077c16eaf44bc1f6648bb24b64",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/CONTRACT.json": "ea30393bc205538b917259256c629ab7a2b87d5a3d0321e8efff5277fba629ac",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/RESULTS.md": "e06c375d6ffb13614b0569e1946e6d09351a82d42dadce470baa622e49e18bf7",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_r2_i15_exp.npz": "c0bf7025f3bc89bf3f1341aeb0643d1176f621cf612bc7f8ba6ac786a1a1cc02",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_roll48_r2_i15.npz": "3305e7c6ea1f6df5da8e7db6fcd98741688e71f13324eafe57a37bf8963382f9",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/compact_r2_i15_exp.npz": "3a4648432c26c18e7c644dcf11dacfbaca4ace7bb700b9afcecdec535dbbbcb3",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/context52.npz": "516927b71de27998fed394eb69f382bfac277469b770a5b750d9ba0e4b0670a7",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/scenario_ne7_uncapped_v1/outputs/RESULTS.md": "a90fe6c43d02aa78af229d4fdd7d9105cc4dd3b7adc8e60ee3ab8f29066304ae",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/scenario_numerics_v2/outputs/RESULTS.md": "c939d75f7340a856b17a6905ee6f0bd4808eed571797709ccf8f4d1c5ff19492",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/three_way_joint_v1/outputs/RESULTS.md": "973cf0fb696c1e6cd272cd8e1e996221352a9ee8bc117fa9f465f3a4c9dd87ff",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-monthly-data-extension-v1/outputs/dataset/global.parquet": "ff6732be1b5430f54e6cca5b9a6aad45bcb3d1dcf0c56f248decb85de3df8664",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-monthly-data-extension-v1/outputs/dataset/unscored_september_origin.parquet": "ec7b24332f7513e1ac8cf77d7a595cb1df2799c6bf0cc4aa70a5d99a8dd95691",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/CURRENT_BASELINES.json": "f17916550aa6a8d4c03f4c2615108ba4817d45945141cd4eb667707c30c8d5bc",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/CURRENT_BENCHMARKS.json": "3ef393f102160105ef2bc01935c74e28dff9fd931978bf557e6154a3c3aa33ff",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/PLAN.md": "3df84ca48c6ff79e1a7ceca914629943455cdbc1be472d771787477ea9ba7fd0"
+  },
+  "provenance_limitations": [
+    "All52 historical outcomes and candidate ideas were already inspected.",
+    "Macro sources preserve latest-vintage limitations and existing extra feature lag.",
+    "Returns are gross; Friday closing assumptions differ from Monday execution."
+  ],
+  "schema": "bayesfolio.november_decision.preregistration.v1",
+  "seeds": [
+    27,
+    127,
+    227
+  ],
+  "winner_selection": "eligible Pareto set then minimum coefficient distance from incumbent; ties higher Sharpe, IC, return, then ID; otherwise incumbent"
+}

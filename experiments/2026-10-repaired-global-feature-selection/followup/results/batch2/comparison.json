@@ -1,0 +1,74 @@
+{
+  "competitive_simplification": false,
+  "equal_objective_simplifications": [],
+  "frontier_improved": true,
+  "hypervolume_after": 1.2286939940959776,
+  "hypervolume_before": 1.1876180528715201,
+  "hypothesis_comparisons": [
+    {
+      "configuration": "global_4397c0b6828e",
+      "delta_ic": 0.021527777777777812,
+      "delta_nll": 0.007148754792890788,
+      "delta_sharpe": 0.18480325913827111,
+      "hypothesis": "add_market_inflation_pair",
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 3
+    },
+    {
+      "configuration": "global_9254a1b37349",
+      "delta_ic": -0.08313492063492059,
+      "delta_nll": 0.04695951944656714,
+      "delta_sharpe": -0.22557121535015448,
+      "hypothesis": "add_nominal_tips_pair",
+      "seed_ic_wins": 0,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 0
+    },
+    {
+      "configuration": "global_d8737126b4e7",
+      "delta_ic": 0.004414682539682561,
+      "delta_nll": 0.0005040480932289407,
+      "delta_sharpe": -0.08282914200116649,
+      "hypothesis": "remove_intermediate_momentum",
+      "seed_ic_wins": 2,
+      "seed_nll_wins": 1,
+      "seed_sharpe_wins": 0
+    },
+    {
+      "configuration": "global_a6fab4154c69",
+      "delta_ic": -0.004017857142857091,
+      "delta_nll": 0.011078016561724358,
+      "delta_sharpe": -0.12256535296490563,
+      "hypothesis": "annual_for_intermediate_momentum",
+      "seed_ic_wins": 1,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 0
+    },
+    {
+      "configuration": "global_32cfb52cf8ac",
+      "delta_ic": 0.0006944444444444975,
+      "delta_nll": 0.00023728922584694465,
+      "delta_sharpe": -0.08777379826209852,
+      "hypothesis": "ma_for_trend",
+      "seed_ic_wins": 2,
+      "seed_nll_wins": 2,
+      "seed_sharpe_wins": 0
+    },
+    {
+      "configuration": "global_bb1b8f9500f2",
+      "delta_ic": 0.01656746031746037,
+      "delta_nll": -0.05728676182436029,
+      "delta_sharpe": -0.23231193553736137,
+      "hypothesis": "remove_dollar_level",
+      "seed_ic_wins": 2,
+      "seed_nll_wins": 3,
+      "seed_sharpe_wins": 0
+    }
+  ],
+  "new_frontier_points": [
+    "global_4397c0b6828e",
+    "global_bb1b8f9500f2"
+  ],
+  "stalled": false
+}

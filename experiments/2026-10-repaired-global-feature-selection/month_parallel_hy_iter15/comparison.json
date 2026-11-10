@@ -1,0 +1,73 @@
+{
+  "boundary": "Adaptive reused-date research; capped fits, not convergence or holdout confirmation",
+  "completed": true,
+  "means": {
+    "15": {
+      "cumulative_return_diagnostic_only": 0.5496834790680059,
+      "mean_gaussian_nll": -2.2262476017330095,
+      "mean_ic": 0.3190972222222222,
+      "rmse_diagnostic_only": 0.0314327052306374,
+      "sharpe": 1.6667312649325197
+    },
+    "36": {
+      "cumulative_return_diagnostic_only": 0.40605699851503557,
+      "mean_gaussian_nll": -2.23671504093397,
+      "mean_ic": 0.1893849206349206,
+      "rmse_diagnostic_only": 0.031957294205410706,
+      "sharpe": 1.2010986275284694
+    }
+  },
+  "new_gp_windows": 72,
+  "only_change": "maxiter 36 -> 15; HY change retained",
+  "paired_deltas_15_minus_36": {
+    "cumulative_return_diagnostic_only": 0.14362648055297025,
+    "mean_gaussian_nll": 0.010467439200959827,
+    "mean_ic": 0.1297123015873016,
+    "rmse_diagnostic_only": -0.0005245889747733009,
+    "sharpe": 0.46563263740405
+  },
+  "previous_timing": {
+    "fit_wall_seconds": 1020.0454616250063,
+    "fits_per_minute": 4.235105358067009,
+    "fresh_gp_jobs": 72,
+    "fresh_portfolio_jobs": 72,
+    "is_cold_replay": true,
+    "parity": null,
+    "phase": "plus_hy_change",
+    "portfolio_wall_seconds": 0.440248333994532,
+    "sum_fit_job_seconds": 13324.935354292029,
+    "total_wall_seconds": 1021.4374592499953,
+    "worker_peak_rss_bytes": 3029254144,
+    "workers": 14
+  },
+  "rank": 5,
+  "seed_runs": 3,
+  "seed_wins_15": {
+    "mean_gaussian_nll": 0,
+    "mean_ic": 3,
+    "sharpe": 3
+  },
+  "spy_means": {
+    "15": {
+      "nll": -1.9292595229311857,
+      "predicted_time_sd": 0.010913333064385166,
+      "rmse": 0.03453054937505016
+    },
+    "36": {
+      "nll": -1.8903381347710422,
+      "predicted_time_sd": 0.007770916242826986,
+      "rmse": 0.035666072347729956
+    }
+  },
+  "strict_portfolios_solved": true,
+  "timing": {
+    "cold_run": true,
+    "fit_wall_seconds": 251.3999354999978,
+    "fresh_gp_jobs": 72,
+    "fresh_portfolio_jobs": 72,
+    "portfolio_wall_seconds": 0.4384471249941271,
+    "total_wall_seconds": 252.71847683298984,
+    "worker_peak_rss_bytes": 3022667776,
+    "workers": 14
+  }
+}

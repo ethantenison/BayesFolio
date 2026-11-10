@@ -1,0 +1,8 @@
+{
+  "source": "Read-only native ps snapshot captured during the baseline fit stage",
+  "fit_workers": 14,
+  "summed_cpu_percent": 1383.3,
+  "summed_rss_gib": 24.2008,
+  "baseline_completed_jobs_at_nearby_status_check": 14,
+  "caveat": "Point-in-time observation, not an average, peak, speedup measurement or strict CPU affinity reservation"
+}

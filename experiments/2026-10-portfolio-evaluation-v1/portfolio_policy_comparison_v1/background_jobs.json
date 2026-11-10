@@ -1,0 +1,30 @@
+{
+  "fits": {
+    "command": [
+      "/usr/bin/caffeinate",
+      "-i",
+      "/Users/et/Documents/BayesFolio/.venv/bin/python",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/full_rerun_v1/full_rerun.py",
+      "--execute"
+    ],
+    "detached_session": true,
+    "log": "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/full_rerun_v1/background.log",
+    "one_shot_job": true,
+    "pid": 15576,
+    "started_unix": 1792580747.382931
+  },
+  "policy_comparison": {
+    "command": [
+      "/usr/bin/caffeinate",
+      "-i",
+      "/Users/et/Documents/BayesFolio/.venv/bin/python",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/portfolio_policy_comparison_v1/run_comparison.py",
+      "--follow"
+    ],
+    "detached_session": true,
+    "log": "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/portfolio_policy_comparison_v1/background.log",
+    "one_shot_job": true,
+    "pid": 16274,
+    "started_unix": 1792580883.1082041
+  }
+}

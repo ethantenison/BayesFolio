@@ -1,0 +1,2607 @@
+{
+  "benchmark": {
+    "momentum_top7": {
+      "all53": {
+        "annualized_excess_vol": 0.12219453161103724,
+        "max_drawdown": -0.09651222160441553,
+        "sharpe": 0.4459741488598487,
+        "total_return": 0.496323048853911
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/benchmarks/momentum_top7.npz",
+      "later29": {
+        "annualized_excess_vol": 0.11113413565716944,
+        "max_drawdown": -0.06423242893052494,
+        "sharpe": 0.768841042520962,
+        "total_return": 0.3411290949166037
+      },
+      "october_return": -0.022157725471618983
+    },
+    "schwab_aggressive": {
+      "all53": {
+        "annualized_excess_vol": 0.1474458638178916,
+        "max_drawdown": -0.13137796149005176,
+        "sharpe": 0.6759237238611251,
+        "total_return": 0.7966076961382695
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/benchmarks/schwab_aggressive.npz",
+      "later29": {
+        "annualized_excess_vol": 0.11077855989928963,
+        "max_drawdown": -0.06024425457532556,
+        "sharpe": 1.051785278962879,
+        "total_return": 0.4445982508187092
+      },
+      "october_return": -0.007459961610511878
+    }
+  },
+  "benchmark_audit": {
+    "input_sha256": {
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/CURRENT_BASELINES.json": "f17916550aa6a8d4c03f4c2615108ba4817d45945141cd4eb667707c30c8d5bc",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/CURRENT_BENCHMARKS.json": "3ef393f102160105ef2bc01935c74e28dff9fd931978bf557e6154a3c3aa33ff",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/monthly_extension_v1/outputs/paths.npz": "66dcb40787514725eb5afeb667a349900da9085c9e7778649a65196fdf27ef09",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/schwab_benchmark_v1/benchmark_math.py": "61cc80ce46f0b9c0ff2a30265c4bbed3288d048ed1702c3a6cd85b9600ee867a",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/schwab_benchmark_v1/weights_schedule.json": "90d16d41c9355fa0a95372ffe3286b388951a82abc62c09ab45c0c59bf7a53b8",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/benchmarks.py": "19a5f43624af22b06e812f5bcfc6376921909246a5b7dd5afe4acaa5e7d00884",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/BND.parquet": "dab41ceb2bc84e1ac8fd9437623a914e8a66e82fd8c390d40d30bfdd8c0b5f95",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/BNDX.parquet": "ea624ca6e58900720dcca3f9b0af387bad8262689c1dadea4006cf99c7e42174",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/EWX.parquet": "0a0683154ec7df3d7496bb983278a48c5a51f7688aa8560aadf8653bb833161b",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/HYEM.parquet": "d4cfbfb4d030a13d3ab1bff38ca118d7a7fa7419a219dc4ad8593a2285f1eda3",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/HYG.parquet": "5e032285b4144925d160d8b9eb921e978408d74ab52e3a0d8525775ac9a8449d",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/IEF.parquet": "0ffd211392dbec6112c94c22b1753e53c5682e7133a1df9eb95c966374001f02",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/IWM.parquet": "06fc9ca8ee212bd5349fcdc7cfc015ef7b288923b4a8f931fa7007bc8541e6c8",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/LQD.parquet": "923aa0edf4594d4fceb898ff4d14ec93f3ed9c77f55d12dbe534cf157c67f079",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/MGK.parquet": "386b5b396198a1a1603d99ff061ed7bef8bc9d8130e61b644c94becd2ecbc029",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/SPY.parquet": "25095c269b1f918127a8e8b1e9ca54e0d041512c2f5b4cdfa6852b61384bd03f",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VEA.parquet": "0705d83933f064cd315c464b17672c9f880a229f61e6e6627552b8541f19a8c3",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VSS.parquet": "febb95e226b5b155e05ef17e32b88bc62c24483a1a5b2760fd417f519c00a95f",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VTV.parquet": "31f2e35b715cb1fa4fa29c6d959d0aac4b3e9edc3c1f339236009f73a0aeb833",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VWO.parquet": "d30b609a238a352a0d0280c02e7d2a1056698097b0b3488fc6a93b558fa08786",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/data/raw/combined/VWOB.parquet": "8df45fc9978b2fc157924e54b9a6845f44ba20d84e6243ae009c9ed518393b54"
+    },
+    "no_GP_covariance_or_extra_variance_budget": true,
+    "old28_month_parity": {
+      "momentum_top7": {
+        "changed_reconstructed_weight_months": 0,
+        "final_old_return_parity_passed": true,
+        "overlap_months": 28,
+        "reconstructed_max_absolute_return_difference": 0.0,
+        "sealed_old_weight_months_preserved": 0
+      },
+      "schwab_aggressive": {
+        "changed_reconstructed_weight_months": 0,
+        "final_old_return_parity_passed": true,
+        "overlap_months": 28,
+        "reconstructed_max_absolute_return_difference": 0.0,
+        "sealed_old_weight_months_preserved": 0
+      }
+    },
+    "price_snapshot_as_of": "2026-10-31",
+    "schwab_verified_revision_count": 0,
+    "standing_benchmark_ids": [
+      "schwab_aggressive",
+      "momentum_top7"
+    ],
+    "vintage_note": "New combined files preserve frozen daily history through September30; October-only prices append without rewriting prior signals. Retrospective adjusted-price vintages are not point-in-time vendor snapshots."
+  },
+  "dates": [
+    "2022-05-31",
+    "2022-06-30",
+    "2022-07-29",
+    "2022-08-31",
+    "2022-09-30",
+    "2022-10-31",
+    "2022-11-30",
+    "2022-12-30",
+    "2023-01-31",
+    "2023-02-28",
+    "2023-03-31",
+    "2023-04-28",
+    "2023-05-31",
+    "2023-06-30",
+    "2023-07-31",
+    "2023-08-31",
+    "2023-09-29",
+    "2023-10-31",
+    "2023-11-30",
+    "2023-12-29",
+    "2024-01-31",
+    "2024-02-29",
+    "2024-03-29",
+    "2024-04-30",
+    "2024-05-31",
+    "2024-06-28",
+    "2024-07-31",
+    "2024-08-30",
+    "2024-09-30",
+    "2024-10-31",
+    "2024-11-29",
+    "2024-12-31",
+    "2025-01-31",
+    "2025-02-28",
+    "2025-03-31",
+    "2025-04-30",
+    "2025-05-30",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-29",
+    "2025-09-30",
+    "2025-10-31",
+    "2025-11-28",
+    "2025-12-31",
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30",
+    "2026-05-29",
+    "2026-06-30",
+    "2026-07-31",
+    "2026-08-31",
+    "2026-09-30"
+  ],
+  "historical_selection_months": 52,
+  "incumbent_id": "recipe_f09d1700fb1a2ba6da42",
+  "latest_check_months": 1,
+  "records": [
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007090469789726873,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.08810892579969931,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903,
+          0.0
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003532313401054659,
+        "rank_objective": 0.8253420731504092,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.08810892579969931,
+          0.0,
+          0.0,
+          0.019102369865463903,
+          0.0,
+          0.0,
+          0.13411329642252295,
+          0.04210455517687571,
+          0.0,
+          0.0651067404882875
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.12227978542618156,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7292108567030856,
+        "family_ic": [
+          0.1076923076923077,
+          0.11153846153846153,
+          0.22692307692307695,
+          -0.028846153846153848
+        ],
+        "max_drawdown": -0.14644516773004013,
+        "rank_ic": 0.11332417582417581,
+        "sharpe": 0.612715649592576,
+        "total_return": 0.62093788333066
+      },
+      "all53": {
+        "annualized_excess_vol": 0.12113052594569268,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7294063695586284,
+        "family_ic": [
+          0.12075471698113208,
+          0.12452830188679245,
+          0.20754716981132076,
+          -0.04716981132075472
+        ],
+        "max_drawdown": -0.14644516773004013,
+        "rank_ic": 0.11307277628032343,
+        "sharpe": 0.6075554896863461,
+        "total_return": 0.6272654611894153
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_f09d1700fb1a2ba6da42.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.8200250978881981,
+        "joint_nll_per_asset": -2.3440186417641615,
+        "marginal_nll": -1.7547419572537815,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.2509793740178856,
+        "rmse": 0.04168412860570204
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13617142875240573,
+        "effective_assets": 7.0,
+        "equity_weight": 0.6386300221624392,
+        "family_ic": [
+          0.07499999999999997,
+          0.09999999999999998,
+          0.075,
+          -0.125
+        ],
+        "max_drawdown": -0.14644516773004013,
+        "rank_ic": -0.09226190476190477,
+        "sharpe": -0.1872146873745303,
+        "total_return": 0.024472528889831535
+      },
+      "id": "recipe_f09d1700fb1a2ba6da42",
+      "label": "incumbent",
+      "later28": {
+        "annualized_excess_vol": 0.10516934445120679,
+        "effective_assets": 7.0,
+        "equity_weight": 0.80685157202364,
+        "family_ic": [
+          0.13571428571428576,
+          0.12142857142857143,
+          0.35714285714285715,
+          0.05357142857142857
+        ],
+        "max_drawdown": -0.06419957921995167,
+        "rank_ic": 0.2895408163265306,
+        "sharpe": 1.530803691258647,
+        "total_return": 0.5822170313216573
+      },
+      "later29": {
+        "annualized_excess_vol": 0.1036145144958961,
+        "effective_assets": 7.0,
+        "equity_weight": 0.8045316225761645,
+        "family_ic": [
+          0.15862068965517245,
+          0.14482758620689656,
+          0.3172413793103448,
+          0.017241379310344827
+        ],
+        "max_drawdown": -0.06419957921995167,
+        "rank_ic": 0.2830049261083744,
+        "sharpe": 1.5016852794378746,
+        "total_return": 0.5883934564383093
+      },
+      "october_return": 0.0039036522767630366,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": false,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": false,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": false,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.0,
+        "positive_blocks": 6
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007002964887197468,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.1111111111111111,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.0651067404882875,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903,
+          0.0
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003490790084123048,
+        "rank_objective": 0.8253420731504092,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.1111111111111111,
+          0.0,
+          0.0,
+          0.04210455517687571,
+          0.0,
+          0.0,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.0651067404882875
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.12321682917913604,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7336343538783571,
+        "family_ic": [
+          0.049999999999999996,
+          0.11153846153846153,
+          0.26153846153846155,
+          -0.009615384615384616
+        ],
+        "max_drawdown": -0.14256080861652953,
+        "rank_ic": 0.12960164835164836,
+        "sharpe": 0.629297625680373,
+        "total_return": 0.6384858714907631
+      },
+      "all53": {
+        "annualized_excess_vol": 0.1220777502151285,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7337464045230456,
+        "family_ic": [
+          0.0641509433962264,
+          0.12452830188679245,
+          0.24150943396226413,
+          -0.02830188679245283
+        ],
+        "max_drawdown": -0.14256080861652953,
+        "rank_ic": 0.13005390835579517,
+        "sharpe": 0.6213562269411543,
+        "total_return": 0.6426553632169925
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_ef6812dd33a4e17b40a5.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.830105404281683,
+        "joint_nll_per_asset": -2.3462907194656903,
+        "marginal_nll": -1.7578837339374251,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.2500535747797255,
+        "rmse": 0.04158341934165269
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.1376279173892614,
+        "effective_assets": 6.999999999999997,
+        "equity_weight": 0.6413428030161178,
+        "family_ic": [
+          0.016666666666666663,
+          0.09999999999999998,
+          0.11666666666666668,
+          -0.08333333333333333
+        ],
+        "max_drawdown": -0.14256080861652953,
+        "rank_ic": -0.071875,
+        "sharpe": -0.1531013400171374,
+        "total_return": 0.03317538373424478
+      },
+      "id": "recipe_ef6812dd33a4e17b40a5",
+      "label": "compromise",
+      "later28": {
+        "annualized_excess_vol": 0.10585284720508506,
+        "effective_assets": 7.0,
+        "equity_weight": 0.8127413974745624,
+        "family_ic": [
+          0.07857142857142858,
+          0.12142857142857143,
+          0.3857142857142857,
+          0.05357142857142857
+        ],
+        "max_drawdown": -0.06450015433110412,
+        "rank_ic": 0.3022959183673469,
+        "sharpe": 1.5310295593119423,
+        "total_return": 0.5858738964228141
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10436258905077951,
+        "effective_assets": 7.0,
+        "equity_weight": 0.8102183505977447,
+        "family_ic": [
+          0.10344827586206896,
+          0.14482758620689656,
+          0.34482758620689646,
+          0.017241379310344827
+        ],
+        "max_drawdown": -0.06450015433110412,
+        "rank_ic": 0.29716748768472906,
+        "sharpe": 1.4954342359616362,
+        "total_return": 0.589909505276714
+      },
+      "october_return": 0.002544722416456313,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": false,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": false
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.011022594949167908,
+        "positive_blocks": 5
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007057644599905504,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.18011766704534654,
+          0.04210455517687571,
+          0.1111111111111111,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.20311985235675833,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.00031066408433734315,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.1111111111111111,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.0,
+          0.0651067404882875,
+          0.04210455517687571,
+          0.0,
+          0.15711548173393475,
+          0.0,
+          0.0,
+          0.08810892579969931
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.1184402290309435,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7071086288022771,
+        "family_ic": [
+          0.15384615384615383,
+          0.11923076923076925,
+          0.17692307692307688,
+          0.07692307692307693
+        ],
+        "max_drawdown": -0.12015892824230667,
+        "rank_ic": 0.1616758241758242,
+        "sharpe": 0.7264979848449423,
+        "total_return": 0.7038684879505888
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11729585223481752,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7059851508399926,
+        "family_ic": [
+          0.1660377358490566,
+          0.13207547169811323,
+          0.15849056603773579,
+          0.05660377358490566
+        ],
+        "max_drawdown": -0.12015892824230667,
+        "rank_ic": 0.16570080862533695,
+        "sharpe": 0.733568330362329,
+        "total_return": 0.7220866748822572
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_01fb9cbfca1b8469e77d.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7723236917202952,
+        "joint_nll_per_asset": -2.3468949887549764,
+        "marginal_nll": -1.7409734772946583,
+        "portfolio_95pct_coverage": 0.7358490566037735,
+        "portfolio_mean_squared_standardized_error": 3.282301863093636,
+        "rmse": 0.04195316227240429
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.12979466528102207,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6224992998771037,
+        "family_ic": [
+          0.11666666666666664,
+          0.09999999999999998,
+          0.09166666666666667,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12015892824230667,
+        "rank_ic": -0.03586309523809524,
+        "sharpe": -0.04919441305399596,
+        "total_return": 0.06624105649911205
+      },
+      "id": "recipe_01fb9cbfca1b8469e77d",
+      "label": "prior48_sharpe",
+      "later28": {
+        "annualized_excess_vol": 0.10474412005242757,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7796309107381404,
+        "family_ic": [
+          0.18571428571428575,
+          0.13571428571428573,
+          0.25000000000000006,
+          0.17857142857142858
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.33099489795918363,
+        "sharpe": 1.57788151323894,
+        "total_return": 0.5980143304039123
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10294457023639872,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7750768895679012,
+        "family_ic": [
+          0.20689655172413796,
+          0.15862068965517243,
+          0.2137931034482759,
+          0.13793103448275862
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.33251231527093594,
+        "sharpe": 1.578889131126694,
+        "total_return": 0.6151006982760012
+      },
+      "october_return": 0.01069224946673053,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": false
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.06494090315348178,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007168124922715295,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.1111111111111111,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.00031066408433734315,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.1111111111111111,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.0,
+          0.0651067404882875,
+          0.04210455517687571,
+          0.0,
+          0.15711548173393475,
+          0.0,
+          0.0,
+          0.08810892579969931
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11942786495421488,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7145535775493551,
+        "family_ic": [
+          0.1076923076923077,
+          0.11153846153846153,
+          0.17692307692307688,
+          0.07692307692307693
+        ],
+        "max_drawdown": -0.12361437125591579,
+        "rank_ic": 0.16146978021978023,
+        "sharpe": 0.7183553790841917,
+        "total_return": 0.7011094411687988
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11827394561861004,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7132896288559937,
+        "family_ic": [
+          0.12075471698113208,
+          0.12452830188679245,
+          0.15849056603773579,
+          0.05660377358490566
+        ],
+        "max_drawdown": -0.12361437125591579,
+        "rank_ic": 0.16549865229110514,
+        "sharpe": 0.7253870975645745,
+        "total_return": 0.7192981276839858
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_21e8092b56d2f04e8d2a.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7731413260188459,
+        "joint_nll_per_asset": -2.349018163692308,
+        "marginal_nll": -1.7425037110388384,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.3065956614685508,
+        "rmse": 0.04191116134093514
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13114432341920151,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6244161486530547,
+        "family_ic": [
+          0.05833333333333333,
+          0.09999999999999998,
+          0.09166666666666667,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12361437125591579,
+        "rank_ic": -0.04419642857142856,
+        "sharpe": -0.07314273729477738,
+        "total_return": 0.05905688087069705
+      },
+      "id": "recipe_21e8092b56d2f04e8d2a",
+      "label": "prior48_return",
+      "later28": {
+        "annualized_excess_vol": 0.10506570903042253,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7918142308890415,
+        "family_ic": [
+          0.14999999999999997,
+          0.12142857142857143,
+          0.25000000000000006,
+          0.17857142857142858
+        ],
+        "max_drawdown": -0.06448186737321548,
+        "rank_ic": 0.3377551020408164,
+        "sharpe": 1.5947094703575524,
+        "total_return": 0.6062493638398747
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10326519129886015,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7868400952308401,
+        "family_ic": [
+          0.17241379310344823,
+          0.14482758620689656,
+          0.2137931034482759,
+          0.13793103448275862
+        ],
+        "max_drawdown": -0.06448186737321548,
+        "rank_ic": 0.33903940886699513,
+        "sharpe": 1.5952623244141728,
+        "total_return": 0.6234237827438278
+      },
+      "october_return": 0.01069224946673053,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": false
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.06893810497766206,
+        "positive_blocks": 5
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0006968052582603594,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.13411329642252295,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.0651067404882875,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.1111111111111111,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.00027707313833385557,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.15711548173393475,
+          0.0,
+          0.20311985235675833,
+          0.0,
+          0.18011766704534654,
+          0.0651067404882875,
+          0.0,
+          0.0,
+          0.08810892579969931,
+          0.04210455517687571,
+          0.0,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.1111111111111111
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11991082156594107,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7054739648583868,
+        "family_ic": [
+          0.06538461538461539,
+          0.08076923076923077,
+          0.17307692307692304,
+          0.07692307692307693
+        ],
+        "max_drawdown": -0.12041012779680726,
+        "rank_ic": 0.16497252747252744,
+        "sharpe": 0.713627496388838,
+        "total_return": 0.6991910586528851
+      },
+      "all53": {
+        "annualized_excess_vol": 0.1187633662890611,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7035869040426499,
+        "family_ic": [
+          0.07924528301886793,
+          0.09433962264150944,
+          0.15471698113207544,
+          0.05660377358490566
+        ],
+        "max_drawdown": -0.12041012779680726,
+        "rank_ic": 0.16805929919137466,
+        "sharpe": 0.7140079426150017,
+        "total_return": 0.7115012556367404
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_e0decf1c5db298bf453d.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7902598330748984,
+        "joint_nll_per_asset": -2.352390518557778,
+        "marginal_nll": -1.7475307209042683,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.5246483371846455,
+        "rmse": 0.04162978457381798
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13209913692453396,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6191365497824338,
+        "family_ic": [
+          0.06666666666666665,
+          0.03333333333333335,
+          0.04999999999999999,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12041012779680726,
+        "rank_ic": -0.045833333333333316,
+        "sharpe": -0.05116710727338425,
+        "total_return": 0.064836850693198
+      },
+      "id": "recipe_e0decf1c5db298bf453d",
+      "label": "prior48_ranking",
+      "later28": {
+        "annualized_excess_vol": 0.10546027582740221,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7794774634949181,
+        "family_ic": [
+          0.06428571428571431,
+          0.12142857142857147,
+          0.2785714285714286,
+          0.17857142857142858
+        ],
+        "max_drawdown": -0.0641689327306042,
+        "rank_ic": 0.34566326530612246,
+        "sharpe": 1.5618424597792016,
+        "total_return": 0.595729014775108
+      },
+      "later29": {
+        "annualized_excess_vol": 0.1037600102952567,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7734768523959322,
+        "family_ic": [
+          0.08965517241379312,
+          0.1448275862068966,
+          0.2413793103448276,
+          0.13793103448275862
+        ],
+        "max_drawdown": -0.0641689327306042,
+        "rank_ic": 0.3450738916256158,
+        "sharpe": 1.54750750291674,
+        "total_return": 0.6072896561783818
+      },
+      "october_return": 0.007244739737281236,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": false
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.05562886558229119,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0006974676464831372,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.18011766704534654,
+          0.04210455517687571,
+          0.08810892579969931,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.20311985235675833,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003463348211940459,
+        "rank_objective": 0.8253420731504092,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.0651067404882875,
+          0.0,
+          0.0,
+          0.04210455517687571,
+          0.0,
+          0.0,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.08810892579969931
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.12065901358446164,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7248699849664724,
+        "family_ic": [
+          0.12307692307692308,
+          0.11538461538461539,
+          0.19230769230769226,
+          -0.028846153846153848
+        ],
+        "max_drawdown": -0.13387393812190607,
+        "rank_ic": 0.1331043956043956,
+        "sharpe": 0.6726269296997816,
+        "total_return": 0.6665060445139421
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11951403374725551,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7247133975658868,
+        "family_ic": [
+          0.13584905660377358,
+          0.12830188679245283,
+          0.17358490566037732,
+          -0.04716981132075472
+        ],
+        "max_drawdown": -0.13387393812190607,
+        "rank_ic": 0.13483827493261455,
+        "sharpe": 0.6701863164100779,
+        "total_return": 0.6758455997716941
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_b5ea4f5cbb2289c3bf3b.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7980849103681114,
+        "joint_nll_per_asset": -2.349607970298203,
+        "marginal_nll": -1.7530907620258926,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.246223584056947,
+        "rmse": 0.041776985384595414
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13299405600323289,
+        "effective_assets": 7.0,
+        "equity_weight": 0.6378340900847116,
+        "family_ic": [
+          0.09166666666666666,
+          0.09999999999999998,
+          0.10833333333333332,
+          -0.14583333333333334
+        ],
+        "max_drawdown": -0.13387393812190607,
+        "rank_ic": -0.07127976190476189,
+        "sharpe": -0.12095741254843395,
+        "total_return": 0.044868236284336005
+      },
+      "id": "recipe_b5ea4f5cbb2289c3bf3b",
+      "label": "shrink_prior48_sharpe_0.5",
+      "later28": {
+        "annualized_excess_vol": 0.10550641143593595,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7994721805794104,
+        "family_ic": [
+          0.15000000000000005,
+          0.1285714285714286,
+          0.26428571428571423,
+          0.07142857142857142
+        ],
+        "max_drawdown": -0.06388664457734039,
+        "rank_ic": 0.3082908163265305,
+        "sharpe": 1.5592555801529921,
+        "total_return": 0.5949437322740492
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10387526258297779,
+        "effective_assets": 7.0,
+        "equity_weight": 0.796613514102032,
+        "family_ic": [
+          0.17241379310344832,
+          0.1517241379310345,
+          0.22758620689655168,
+          0.034482758620689655
+        ],
+        "max_drawdown": -0.06388664457734039,
+        "rank_ic": 0.30541871921182256,
+        "sharpe": 1.5373884760105758,
+        "total_return": 0.6038822327791122
+      },
+      "october_return": 0.005604273256912151,
+      "promotion": {
+        "eligible": true,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.03113260766886705,
+        "positive_blocks": 5
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007065007576181339,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.1111111111111111,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.08810892579969931,
+          0.0651067404882875,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003087901839327998,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.019102369865463903,
+          0.0,
+          0.0,
+          0.0651067404882875,
+          0.04210455517687571,
+          0.0,
+          0.13411329642252295,
+          0.0,
+          0.0,
+          0.1111111111111111
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11897956292353791,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.709320377389913,
+        "family_ic": [
+          0.09999999999999999,
+          0.10769230769230768,
+          0.1807692307692307,
+          0.07692307692307693
+        ],
+        "max_drawdown": -0.12247041803654934,
+        "rank_ic": 0.16092032967032968,
+        "sharpe": 0.721349574360143,
+        "total_return": 0.7017733495219396
+      },
+      "all53": {
+        "annualized_excess_vol": 0.1178304016198279,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7081551683222015,
+        "family_ic": [
+          0.11320754716981131,
+          0.12075471698113206,
+          0.16226415094339616,
+          0.05660377358490566
+        ],
+        "max_drawdown": -0.12247041803654934,
+        "rank_ic": 0.16462264150943398,
+        "sharpe": 0.7271041748374538,
+        "total_return": 0.718819314490887
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_04daf5fc6b9240560445.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7789504071630861,
+        "joint_nll_per_asset": -2.3504970997844237,
+        "marginal_nll": -1.7445015025036241,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.3101567327083847,
+        "rmse": 0.041797214300461516
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13053270661571123,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6205824511011527,
+        "family_ic": [
+          0.06666666666666665,
+          0.050000000000000024,
+          0.09166666666666667,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12247041803654934,
+        "rank_ic": -0.04285714285714284,
+        "sharpe": -0.06632096631309027,
+        "total_return": 0.06121040528927857
+      },
+      "id": "recipe_04daf5fc6b9240560445",
+      "label": "average_prior48_sharpe_prior48_return_prior48_ranking",
+      "later28": {
+        "annualized_excess_vol": 0.10486558206031707,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7853814570659934,
+        "family_ic": [
+          0.1285714285714286,
+          0.15714285714285717,
+          0.2571428571428572,
+          0.17857142857142858
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.3355867346938775,
+        "sharpe": 1.5907145815072654,
+        "total_return": 0.6036154009044492
+      },
+      "later29": {
+        "annualized_excess_vol": 0.1030863719343944,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7806291411947938,
+        "family_ic": [
+          0.1517241379310345,
+          0.1793103448275862,
+          0.22068965517241382,
+          0.13793103448275862
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.33633004926108373,
+        "sharpe": 1.5884045831434335,
+        "total_return": 0.6196781580014274
+      },
+      "october_return": 0.010016589444026724,
+      "promotion": {
+        "eligible": true,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.06831548399517307,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0006968052582603594,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.13411329642252295,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.0651067404882875,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.1111111111111111,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003087901839327998,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.019102369865463903,
+          0.0,
+          0.0,
+          0.0651067404882875,
+          0.04210455517687571,
+          0.0,
+          0.13411329642252295,
+          0.0,
+          0.0,
+          0.1111111111111111
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11951725950674565,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7121168396090687,
+        "family_ic": [
+          0.06538461538461537,
+          0.10384615384615385,
+          0.1807692307692307,
+          0.07692307692307693
+        ],
+        "max_drawdown": -0.1230764143736155,
+        "rank_ic": 0.15494505494505495,
+        "sharpe": 0.7100309817047656,
+        "total_return": 0.6943125845325524
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11836280471103106,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7108988671032599,
+        "family_ic": [
+          0.0792452830188679,
+          0.1169811320754717,
+          0.16226415094339616,
+          0.05660377358490566
+        ],
+        "max_drawdown": -0.1230764143736155,
+        "rank_ic": 0.1587601078167116,
+        "sharpe": 0.715835374407388,
+        "total_return": 0.711283818081663
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_55f129939582555ea645.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7819751379818416,
+        "joint_nll_per_asset": -2.351622569169334,
+        "marginal_nll": -1.745750373512377,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.3274044632193105,
+        "rmse": 0.041742285229884005
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13123027928273298,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6223368075668559,
+        "family_ic": [
+          0.04166666666666666,
+          0.03333333333333336,
+          0.09166666666666667,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.1230764143736155,
+        "rank_ic": -0.05074404761904763,
+        "sharpe": -0.07146602889756704,
+        "total_return": 0.05950707936037203
+      },
+      "id": "recipe_55f129939582555ea645",
+      "label": "average_prior48_return_prior48_ranking",
+      "later28": {
+        "annualized_excess_vol": 0.10530808467345519,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7890711527881082,
+        "family_ic": [
+          0.08571428571428573,
+          0.16428571428571428,
+          0.2571428571428572,
+          0.17857142857142858
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.33125,
+        "sharpe": 1.5728862704689637,
+        "total_return": 0.5991517353101732
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10351755776658533,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7841916060299391,
+        "family_ic": [
+          0.11034482758620691,
+          0.18620689655172412,
+          0.22068965517241382,
+          0.13793103448275862
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.3321428571428572,
+        "sharpe": 1.570842349335015,
+        "total_return": 0.6151697817014781
+      },
+      "october_return": 0.010016589444026724,
+      "promotion": {
+        "eligible": true,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.054819470492038946,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007065007576181339,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.1111111111111111,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.08810892579969931,
+          0.0651067404882875,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.00029238637710073524,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.0651067404882875,
+          0.15711548173393475,
+          0.019102369865463903,
+          0.0,
+          0.0,
+          0.08810892579969931,
+          0.04210455517687571,
+          0.0,
+          0.13411329642252295,
+          0.0,
+          0.0,
+          0.1111111111111111
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11907878506253723,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7074759820689208,
+        "family_ic": [
+          0.1,
+          0.10384615384615385,
+          0.1807692307692307,
+          0.07692307692307693
+        ],
+        "max_drawdown": -0.12389859492662014,
+        "rank_ic": 0.1585164835164835,
+        "sharpe": 0.7097020072388592,
+        "total_return": 0.6921303868928124
+      },
+      "all53": {
+        "annualized_excess_vol": 0.1179282546514784,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7059115694164845,
+        "family_ic": [
+          0.11320754716981132,
+          0.1169811320754717,
+          0.16226415094339616,
+          0.05660377358490566
+        ],
+        "max_drawdown": -0.12389859492662014,
+        "rank_ic": 0.16239892183288407,
+        "sharpe": 0.7163763250598068,
+        "total_return": 0.7098018449089569
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_2f63a2be32d1020bef1f.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7815307507106936,
+        "joint_nll_per_asset": -2.350961866626953,
+        "marginal_nll": -1.745244162391649,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.321074072527182,
+        "rmse": 0.04175027300404799
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.1307079149468148,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6234577242650793,
+        "family_ic": [
+          0.06666666666666665,
+          0.03333333333333336,
+          0.09166666666666667,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12389859492662014,
+        "rank_ic": -0.04776785714285712,
+        "sharpe": -0.0678888182593916,
+        "total_return": 0.06070685317482005
+      },
+      "id": "recipe_2f63a2be32d1020bef1f",
+      "label": "average_prior48_sharpe_prior48_ranking",
+      "later28": {
+        "annualized_excess_vol": 0.10502768899340578,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7794916316150707,
+        "family_ic": [
+          0.12857142857142861,
+          0.16428571428571428,
+          0.2571428571428572,
+          0.17857142857142858
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.3353316326530612,
+        "sharpe": 1.5667671373912875,
+        "total_return": 0.5952856171599801
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10322787129432646,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7741492343693714,
+        "family_ic": [
+          0.15172413793103454,
+          0.18620689655172412,
+          0.22068965517241382,
+          0.13793103448275862
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.33633004926108373,
+        "sharpe": 1.5668249268003922,
+        "total_return": 0.6119456943181993
+      },
+      "october_return": 0.010443319352354319,
+      "promotion": {
+        "eligible": true,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.05539258530880631,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0006968052582603594,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.13411329642252295,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.0651067404882875,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.1111111111111111,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.00032938442876259867,
+        "rank_objective": 0.8253420731504092,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.0651067404882875,
+          0.15711548173393475,
+          0.08810892579969931,
+          0.0,
+          0.0,
+          0.04210455517687571,
+          0.0,
+          0.0,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.1111111111111111
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.12001123295730078,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7101224513863093,
+        "family_ic": [
+          0.06923076923076922,
+          0.08846153846153845,
+          0.19230769230769226,
+          0.028846153846153848
+        ],
+        "max_drawdown": -0.12677856692327927,
+        "rank_ic": 0.15185439560439562,
+        "sharpe": 0.6905191658671158,
+        "total_return": 0.6794548806434781
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11889255595736223,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7098101158398511,
+        "family_ic": [
+          0.0830188679245283,
+          0.10188679245283018,
+          0.17358490566037732,
+          0.009433962264150943
+        ],
+        "max_drawdown": -0.12677856692327927,
+        "rank_ic": 0.15343665768194073,
+        "sharpe": 0.6845395586755483,
+        "total_return": 0.6859795333346426
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_ada0ce56993a656ad52a.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7989247576321594,
+        "joint_nll_per_asset": -2.3541599734544536,
+        "marginal_nll": -1.7536656340653378,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.428427489177916,
+        "rmse": 0.04159953916852182
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13219307951191686,
+        "effective_assets": 6.999999999999997,
+        "equity_weight": 0.6191365497824337,
+        "family_ic": [
+          0.06666666666666665,
+          0.03333333333333336,
+          0.10000000000000002,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12677856692327927,
+        "rank_ic": -0.05535714285714285,
+        "sharpe": -0.0896830634704744,
+        "total_return": 0.05400179307287334
+      },
+      "id": "recipe_ada0ce56993a656ad52a",
+      "label": "shrink_prior48_ranking_0.75",
+      "later28": {
+        "annualized_excess_vol": 0.10528343505594062,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7881103670467738,
+        "family_ic": [
+          0.07142857142857147,
+          0.1357142857142857,
+          0.27142857142857146,
+          0.08928571428571429
+        ],
+        "max_drawdown": -0.06356146135616403,
+        "rank_ic": 0.32946428571428565,
+        "sharpe": 1.5583018701901676,
+        "total_return": 0.5934079919799158
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10374061326881677,
+        "effective_assets": 7.0,
+        "equity_weight": 0.784850308439093,
+        "family_ic": [
+          0.09655172413793106,
+          0.1586206896551724,
+          0.23448275862068968,
+          0.05172413793103448
+        ],
+        "max_drawdown": -0.06356146135616403,
+        "rank_ic": 0.326231527093596,
+        "sharpe": 1.5283557731423545,
+        "total_return": 0.599598354021087
+      },
+      "october_return": 0.003884982422787564,
+      "promotion": {
+        "eligible": true,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.03634631374040931,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007085222942771483,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.08810892579969931,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003333829446381027,
+        "rank_objective": 0.8253420731504092,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.0651067404882875,
+          0.0,
+          0.0,
+          0.04210455517687571,
+          0.0,
+          0.0,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.1111111111111111
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.12032551561225323,
+        "effective_assets": 7.0,
+        "equity_weight": 0.724944981417356,
+        "family_ic": [
+          0.1076923076923077,
+          0.11153846153846153,
+          0.18846153846153843,
+          0.028846153846153848
+        ],
+        "max_drawdown": -0.1323447048191545,
+        "rank_ic": 0.1388736263736264,
+        "sharpe": 0.6691615810662387,
+        "total_return": 0.662216976123718
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11918447034213271,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7243529754929535,
+        "family_ic": [
+          0.12075471698113208,
+          0.12452830188679245,
+          0.16981132075471694,
+          0.009433962264150943
+        ],
+        "max_drawdown": -0.1323447048191545,
+        "rank_ic": 0.14110512129380057,
+        "sharpe": 0.6665203439112609,
+        "total_return": 0.6713224837780498
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_a351efcdfca5dff2698f.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.8023129608109398,
+        "joint_nll_per_asset": -2.351230831568555,
+        "marginal_nll": -1.7542586501711057,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.2396615279139036,
+        "rmse": 0.041710037715353976
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13265949856054088,
+        "effective_assets": 7.0,
+        "equity_weight": 0.6330419681448342,
+        "family_ic": [
+          0.07499999999999997,
+          0.09999999999999998,
+          0.10833333333333332,
+          -0.0625
+        ],
+        "max_drawdown": -0.1323447048191545,
+        "rank_ic": -0.05982142857142856,
+        "sharpe": -0.11367704815469933,
+        "total_return": 0.04706833772794927
+      },
+      "id": "recipe_a351efcdfca5dff2698f",
+      "label": "FI48_[2, 3]_0.5",
+      "later28": {
+        "annualized_excess_vol": 0.10535280763845223,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.8037189927938033,
+        "family_ic": [
+          0.13571428571428576,
+          0.12142857142857143,
+          0.2571428571428571,
+          0.10714285714285714
+        ],
+        "max_drawdown": -0.06419957921995156,
+        "rank_ic": 0.30918367346938774,
+        "sharpe": 1.5420374186149373,
+        "total_return": 0.5874961702409893
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10372274461683155,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.799920705712087,
+        "family_ic": [
+          0.15862068965517245,
+          0.14482758620689656,
+          0.22068965517241376,
+          0.06896551724137931
+        ],
+        "max_drawdown": -0.06419957921995156,
+        "rank_ic": 0.3073891625615764,
+        "sharpe": 1.5200298916199784,
+        "total_return": 0.5961923625774799
+      },
+      "october_return": 0.005477929647647928,
+      "promotion": {
+        "eligible": true,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.02814319335361748,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007168124922715295,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.1111111111111111,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.00031066408433734315,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.1111111111111111,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.0,
+          0.0651067404882875,
+          0.04210455517687571,
+          0.0,
+          0.15711548173393475,
+          0.0,
+          0.0,
+          0.08810892579969931
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11931907895366141,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7123418289617194,
+        "family_ic": [
+          0.13846153846153844,
+          0.11538461538461539,
+          0.17692307692307688,
+          0.07692307692307693
+        ],
+        "max_drawdown": -0.12374286025111814,
+        "rank_ic": 0.16002747252747257,
+        "sharpe": 0.7169341030597873,
+        "total_return": 0.6994083602215007
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11816621160316486,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7111196113737851,
+        "family_ic": [
+          0.1509433962264151,
+          0.12830188679245283,
+          0.15849056603773579,
+          0.05660377358490566
+        ],
+        "max_drawdown": -0.12374286025111814,
+        "rank_ic": 0.1640835579514825,
+        "sharpe": 0.7239915269318774,
+        "total_return": 0.7175788583548366
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_190ffecc6206b371b0cb.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7730637401279177,
+        "joint_nll_per_asset": -2.348109956469933,
+        "marginal_nll": -1.7418858220385693,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.2875193309866813,
+        "rmse": 0.04192463969514017
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13102108544230376,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6242536563428068,
+        "family_ic": [
+          0.09999999999999999,
+          0.09999999999999998,
+          0.09166666666666667,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12374286025111814,
+        "rank_ic": -0.04285714285714285,
+        "sharpe": -0.07288325667493684,
+        "total_return": 0.05918291068440373
+      },
+      "id": "recipe_190ffecc6206b371b0cb",
+      "label": "average_prior48_sharpe_prior48_return",
+      "later28": {
+        "annualized_excess_vol": 0.10499945260775943,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7878459769207875,
+        "family_ic": [
+          0.17142857142857143,
+          0.1285714285714286,
+          0.25000000000000006,
+          0.17857142857142858
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.3339285714285714,
+        "sharpe": 1.5909829600831746,
+        "total_return": 0.6044522084702133
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10319906139018624,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7830086776063191,
+        "family_ic": [
+          0.19310344827586207,
+          0.1517241379310345,
+          0.2137931034482759,
+          0.13793103448275862
+        ],
+        "max_drawdown": -0.06416893273060442,
+        "rank_ic": 0.3353448275862069,
+        "sharpe": 1.591635248543128,
+        "total_return": 0.6216074117406236
+      },
+      "october_return": 0.01069224946673053,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": false
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.06513288574349196,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007005925303077085,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.08810892579969931,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.0651067404882875,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003333829446381027,
+        "rank_objective": 0.8253420731504092,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.0651067404882875,
+          0.0,
+          0.0,
+          0.04210455517687571,
+          0.0,
+          0.0,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.1111111111111111
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11985433327333543,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7168403225878743,
+        "family_ic": [
+          0.10769230769230768,
+          0.11923076923076922,
+          0.17692307692307688,
+          0.028846153846153848
+        ],
+        "max_drawdown": -0.12775243777425627,
+        "rank_ic": 0.1499313186813187,
+        "sharpe": 0.6920575580402176,
+        "total_return": 0.6800943011842544
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11871980284513128,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7164012347545942,
+        "family_ic": [
+          0.12075471698113206,
+          0.13207547169811318,
+          0.15849056603773579,
+          0.009433962264150943
+        ],
+        "max_drawdown": -0.12775243777425627,
+        "rank_ic": 0.15195417789757415,
+        "sharpe": 0.689202046489016,
+        "total_return": 0.6892977395675559
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_f0a98446541628085ef0.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7907387443903964,
+        "joint_nll_per_asset": -2.35197824610658,
+        "marginal_nll": -1.7509690903422124,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.2972018836221655,
+        "rmse": 0.04174024179622956
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13170659885964703,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.6264954897392535,
+        "family_ic": [
+          0.06666666666666665,
+          0.075,
+          0.08333333333333333,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12775243777425627,
+        "rank_ic": -0.05595238095238095,
+        "sharpe": -0.09846983927867754,
+        "total_return": 0.051771311605621095
+      },
+      "id": "recipe_f0a98446541628085ef0",
+      "label": "shrink_average48_0.75",
+      "later28": {
+        "annualized_excess_vol": 0.1053170251410596,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.7942787507438355,
+        "family_ic": [
+          0.14285714285714288,
+          0.15714285714285717,
+          0.2571428571428572,
+          0.08928571428571429
+        ],
+        "max_drawdown": -0.06356146135616414,
+        "rank_ic": 0.32640306122448975,
+        "sharpe": 1.5682093833971498,
+        "total_return": 0.5973950635898626
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10369821080296174,
+        "effective_assets": 6.999999999999999,
+        "equity_weight": 0.790805989250049,
+        "family_ic": [
+          0.16551724137931037,
+          0.1793103448275862,
+          0.22068965517241382,
+          0.05172413793103448
+        ],
+        "max_drawdown": -0.06356146135616414,
+        "rank_ic": 0.32401477832512304,
+        "sharpe": 1.5455397210514508,
+        "total_return": 0.6061454813677081
+      },
+      "october_return": 0.005477929647647928,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": false
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.04747825067777689,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999997,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007085222942771483,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.20311985235675833,
+          0.04210455517687571,
+          0.08810892579969931,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.18011766704534654,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003463348211940459,
+        "rank_objective": 0.8253420731504092,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.1111111111111111,
+          0.15711548173393475,
+          0.0651067404882875,
+          0.0,
+          0.0,
+          0.04210455517687571,
+          0.0,
+          0.0,
+          0.13411329642252295,
+          0.019102369865463903,
+          0.0,
+          0.08810892579969931
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.12102219231839069,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7257546844015266,
+        "family_ic": [
+          0.10384615384615385,
+          0.10769230769230768,
+          0.19999999999999998,
+          0.028846153846153848
+        ],
+        "max_drawdown": -0.13606105746553754,
+        "rank_ic": 0.1370879120879121,
+        "sharpe": 0.6608306201324767,
+        "total_return": 0.6577441774125288
+      },
+      "all53": {
+        "annualized_excess_vol": 0.1198727766036801,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7255814045587702,
+        "family_ic": [
+          0.1169811320754717,
+          0.12075471698113206,
+          0.18113207547169807,
+          0.009433962264150943
+        ],
+        "max_drawdown": -0.13606105746553754,
+        "rank_ic": 0.13942048517520217,
+        "sharpe": 0.6584953467579279,
+        "total_return": 0.6670346287728037
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_18188ff906509f34f29a.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.8015139719203516,
+        "joint_nll_per_asset": -2.351392218543921,
+        "marginal_nll": -1.7548316954134346,
+        "portfolio_95pct_coverage": 0.7169811320754716,
+        "portfolio_mean_squared_standardized_error": 3.249164600307716,
+        "rmse": 0.041702373012899925
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13344763055588363,
+        "effective_assets": 7.0,
+        "equity_weight": 0.631125119368883,
+        "family_ic": [
+          0.06666666666666665,
+          0.075,
+          0.10833333333333332,
+          -0.0625
+        ],
+        "max_drawdown": -0.13606105746553754,
+        "rank_ic": -0.06473214285714285,
+        "sharpe": -0.12742864817637842,
+        "total_return": 0.042822540563952405
+      },
+      "id": "recipe_18188ff906509f34f29a",
+      "label": "shrink_average48_0.5",
+      "later28": {
+        "annualized_excess_vol": 0.10583726964262467,
+        "effective_assets": 7.0,
+        "equity_weight": 0.8068657401437926,
+        "family_ic": [
+          0.13571428571428576,
+          0.13571428571428573,
+          0.2785714285714285,
+          0.10714285714285714
+        ],
+        "max_drawdown": -0.06388664457734039,
+        "rank_ic": 0.3100765306122448,
+        "sharpe": 1.5410551986808345,
+        "total_return": 0.5896704500806338
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10419391333154714,
+        "effective_assets": 7.0,
+        "equity_weight": 0.803752123336608,
+        "family_ic": [
+          0.15862068965517245,
+          0.15862068965517243,
+          0.24137931034482757,
+          0.06896551724137931
+        ],
+        "max_drawdown": -0.06388664457734039,
+        "rank_ic": 0.30837438423645314,
+        "sharpe": 1.5196173596384048,
+        "total_return": 0.5985793976713243
+      },
+      "october_return": 0.005604273256912151,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": false,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": true
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.02137270366672872,
+        "positive_blocks": 4
+      }
+    },
+    {
+      "November_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0007057644599905504,
+        "rank_objective": 0.8253420731504093,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.0008833890988355313,
+        "weights": [
+          0.0651067404882875,
+          0.18011766704534654,
+          0.04210455517687571,
+          0.1111111111111111,
+          0.08810892579969931,
+          0.15711548173393475,
+          0.13411329642252295,
+          0.20311985235675833,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.019102369865463903
+        ]
+      },
+      "October_allocation": {
+        "certificate": "KKT optimum on simplex/NE sphere; unchanged risk ceiling is feasible",
+        "clipping_or_normalization_used": false,
+        "effective_assets": 6.999999999999999,
+        "fallback_used": false,
+        "numerical_attempts": [],
+        "predicted_variance": 0.0003344068137011814,
+        "rank_objective": 0.8253420731504091,
+        "solver_status": "analytic_kkt",
+        "variance_budget": 0.000889306198839368,
+        "weights": [
+          0.18011766704534654,
+          0.0,
+          0.20311985235675833,
+          0.1111111111111111,
+          0.13411329642252295,
+          0.0651067404882875,
+          0.0,
+          0.0,
+          0.04210455517687571,
+          0.019102369865463903,
+          0.0,
+          0.15711548173393475,
+          0.0,
+          0.0,
+          0.08810892579969931
+        ]
+      },
+      "October_is_diagnostic_not_selection": true,
+      "all52": {
+        "annualized_excess_vol": 0.11943421544966115,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7178000184738125,
+        "family_ic": [
+          0.13846153846153847,
+          0.11538461538461539,
+          0.17307692307692304,
+          0.019230769230769232
+        ],
+        "max_drawdown": -0.12744680248081108,
+        "rank_ic": 0.1466346153846154,
+        "sharpe": 0.6923576003197601,
+        "total_return": 0.6786099454506216
+      },
+      "all53": {
+        "annualized_excess_vol": 0.11829505733388772,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7173428231709863,
+        "family_ic": [
+          0.1509433962264151,
+          0.12830188679245283,
+          0.15471698113207544,
+          0.0
+        ],
+        "max_drawdown": -0.12744680248081108,
+        "rank_ic": 0.14932614555256066,
+        "sharpe": 0.6914924442992002,
+        "total_return": 0.6894978965839578
+      },
+      "artifact_path": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/finalists/recipe_64046f4eba75de4830e7.npz",
+      "distribution_diagnostics": {
+        "calibration_parameters_fitted": false,
+        "equal_weight_reference_nll": -0.7856819299351695,
+        "joint_nll_per_asset": -2.349289268286248,
+        "marginal_nll": -1.7483403808481939,
+        "portfolio_95pct_coverage": 0.7358490566037735,
+        "portfolio_mean_squared_standardized_error": 3.223653281231428,
+        "rmse": 0.04185471291159387
+      },
+      "earlier24": {
+        "annualized_excess_vol": 0.13123457713556186,
+        "effective_assets": 6.999999999999997,
+        "equity_weight": 0.6349588169207852,
+        "family_ic": [
+          0.10833333333333334,
+          0.09999999999999998,
+          0.08333333333333333,
+          -0.041666666666666664
+        ],
+        "max_drawdown": -0.12744680248081108,
+        "rank_ic": -0.04970238095238092,
+        "sharpe": -0.09051007343144794,
+        "total_return": 0.054194126091786865
+      },
+      "id": "recipe_64046f4eba75de4830e7",
+      "label": "shrink_prior48_sharpe_0.75",
+      "later28": {
+        "annualized_excess_vol": 0.10508465238442803,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7888067626621218,
+        "family_ic": [
+          0.1642857142857143,
+          0.1285714285714286,
+          0.25000000000000006,
+          0.07142857142857142
+        ],
+        "max_drawdown": -0.06356146135616414,
+        "rank_ic": 0.3149234693877551,
+        "sharpe": 1.5582725922563982,
+        "total_return": 0.5923157831221573
+      },
+      "later29": {
+        "annualized_excess_vol": 0.10341996569245229,
+        "effective_assets": 7.0,
+        "equity_weight": 0.7855226904125323,
+        "family_ic": [
+          0.18620689655172415,
+          0.1517241379310345,
+          0.2137931034482759,
+          0.034482758620689655
+        ],
+        "max_drawdown": -0.06356146135616414,
+        "rank_ic": 0.3140394088669951,
+        "sharpe": 1.540581790396683,
+        "total_return": 0.6026440052814865
+      },
+      "october_return": 0.006486290137172501,
+      "promotion": {
+        "eligible": false,
+        "gates": {
+          "all52_IC_improvement_0p01": true,
+          "all52_return_noninferior": true,
+          "all52_sharpe_improvement_0p05": true,
+          "drawdown_noninferior_1pp": true,
+          "every_leave_one_month_out_sharpe_positive": true,
+          "four_of_six_positive_blocks": true,
+          "later28_IC_noninferior_0p01": true,
+          "later28_return_noninferior_1pp": true,
+          "later28_sharpe_noninferior_0p05": true,
+          "no_family_IC_loss_over_0p05": false
+        },
+        "minimum_leave_one_out_sharpe_advantage": 0.04711933044447547,
+        "positive_blocks": 4
+      }
+    }
+  ],
+  "selected_id": "recipe_04daf5fc6b9240560445",
+  "standing_benchmarks_only": true
+}

@@ -1,0 +1,44 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/gp_scenarios_2025-10-31.csv": "3dd73b7e1ea7778a402c6ef5b4da3fc8afed458b9228083d6a2fae032a023468",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/scenario_cache/gp_predictions_2025-10-31.csv": "efc0c295926f2914fd23f9dc86ddad54c9b3a044722e33a4c33763f81d43db43",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/scenario_cache/model_diagnostics_2025-10-31.csv": "4d2cf4b11d5bbd69b34fa742018c0017890e1bb64f991d7a90aea8fe2712bfb8",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/scenario_cache/task_covariance_diagnostics_2025-10-31.csv": "bb1ba923cb73aa1eed843eec7f7e712a223eee65b66800de4a13d85e83a629d0"
+  },
+  "result": {
+    "date": "2025-10-31",
+    "fit_seed": 13223,
+    "input_columns": [
+      "t_index",
+      "lag_y_excess_lead",
+      "mom12m_skip1m",
+      "mom6m",
+      "trend_slope",
+      "cpi_chg_12p",
+      "dealer_gamma_proxy",
+      "dxy",
+      "em_fx_ret",
+      "gold_crude_ratio",
+      "hy_spread_z_12p",
+      "oil_ret",
+      "spy_ret",
+      "term_spread",
+      "vix_ts_z_12p"
+    ],
+    "paths": {
+      "model_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/scenario_cache/model_diagnostics_2025-10-31.csv",
+      "predictions": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/scenario_cache/gp_predictions_2025-10-31.csv",
+      "scenarios": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/gp_scenarios_2025-10-31.csv",
+      "task_diagnostics": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/baseline/runs/s127/scenario_cache/task_covariance_diagnostics_2025-10-31.csv"
+    },
+    "peak_rss_bytes": 2887024640,
+    "pid": 7275,
+    "seconds": 217.41944458300713,
+    "seed": 127,
+    "status": "fit",
+    "train_dates": 101,
+    "train_rows": 1515,
+    "window_index": 17
+  },
+  "signature": "1e6a905326ba6129b56a5dd9c30780ce5329e2f6331ede0b85d6bd15d083e747"
+}

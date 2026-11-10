@@ -1,0 +1,53 @@
+{
+  "broad_r2_i15_exp": {
+    "all_cached_covariances_spd": true,
+    "cached_complete_origins": 54,
+    "cached_month_seed_cells": 162,
+    "missing_fits": 0,
+    "prior28_bitwise_compatible": true,
+    "required_month_seed_cells": 162,
+    "source_sha256": {
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_r2_i15_exp.npz": "c0bf7025f3bc89bf3f1341aeb0643d1176f621cf612bc7f8ba6ac786a1a1cc02",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/broad_r2_i15_exp.npz": "86313e09fc64cf4f7b5c182f81dd9529e5533675403cf8c9d1f700dd66371b39",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_r2_i15_exp.npz": "8462fb7074abf300ac48e351a1d3d59902c19a9a5fbafb481b8d8c062b21b055"
+    }
+  },
+  "broad_roll48_r2_i15": {
+    "all_cached_covariances_spd": true,
+    "cached_complete_origins": 54,
+    "cached_month_seed_cells": 162,
+    "missing_fits": 0,
+    "prior28_bitwise_compatible": true,
+    "required_month_seed_cells": 162,
+    "source_sha256": {
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_roll48_r2_i15.npz": "3305e7c6ea1f6df5da8e7db6fcd98741688e71f13324eafe57a37bf8963382f9",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/broad_roll48_r2_i15.npz": "e8f3b3693926ab6f8ffef70b0abcfb089dff18507d0354f54487e2bdcc0bfd71",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_roll48_r2_i15.npz": "02fa50f7d648fc6d62386ad769bb4fa27574ef2c6e07559e93f74b3dbd316bdb"
+    }
+  },
+  "compact_r1_i15_exp": {
+    "all_cached_covariances_spd": true,
+    "cached_complete_origins": 52,
+    "cached_month_seed_cells": 156,
+    "missing_fits": 6,
+    "prior28_bitwise_compatible": true,
+    "required_month_seed_cells": 162,
+    "source_sha256": {
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/compact_r1_i15_exp.npz": "0a71e689c669f9fe1d62db2df0a4bf8b13be2e1576971095c71c04a0f8600c0a",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/compact_r1_i15_exp.npz": "2efa842e3d0aa9020a3672c9ea24115fde9f421f9655a3db6fe859fab6e9954c"
+    }
+  },
+  "compact_r2_i15_exp": {
+    "all_cached_covariances_spd": true,
+    "cached_complete_origins": 54,
+    "cached_month_seed_cells": 162,
+    "missing_fits": 0,
+    "prior28_bitwise_compatible": true,
+    "required_month_seed_cells": 162,
+    "source_sha256": {
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/compact_r2_i15_exp.npz": "3a4648432c26c18e7c644dcf11dacfbaca4ace7bb700b9afcecdec535dbbbcb3",
+      "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/components/compact_r2_i15_exp.npz": "8d73e8eba98453573ae78cea294c570efb125dc398ad59bc919ed9af9ef76902",
+      "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/compact_r2_i15_exp.npz": "23ad37fd51ffd7b60a0c17edd5fcb223d1123bda2dfb327357df9994d7e06f82"
+    }
+  }
+}

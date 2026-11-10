@@ -1,0 +1,593 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,dealer_gamma_proxy,dxy,em_fx_ret,gold_crude_ratio,hy_spread,hy_spread_z_12p,oil_ret,term_spread,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "global_33e57e1c2370",
+      "category": "authorized_joint_followup",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Report IC/NLL/conventional Sharpe, all seeds and family diagnostics.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the hypothesis; effects remain conditional.",
+      "hypothesis": "Isolate absolute credit state on the current lagged, annual-momentum-free lead; the existing highest-IC joint alternative also changes temporal inputs.",
+      "hypothesis_name": "add_hy_level",
+      "id": "global_a306a45ffc49",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "global_a306a45ffc49",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,dealer_gamma_proxy,dxy,em_fx_ret,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,term_spread,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "global_33e57e1c2370",
+      "category": "authorized_joint_followup",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Report IC/NLL/conventional Sharpe, all seeds and family diagnostics.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the hypothesis; effects remain conditional.",
+      "hypothesis": "Test whether the HY-change axis that helped U.S. equity density and Sharpe transfers to the current joint lead alongside normalized credit state.",
+      "hypothesis_name": "add_hy_change",
+      "id": "global_d77edcc67c1d",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "global_d77edcc67c1d",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,dealer_gamma_proxy,dxy,em_fx_ret,gold_crude_ratio,hy_spread_z_12p,oil_ret,spy_ret,term_spread,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "global_33e57e1c2370",
+      "category": "authorized_joint_followup",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "spy_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Report IC/NLL/conventional Sharpe, all seeds and family diagnostics.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the hypothesis; effects remain conditional.",
+      "hypothesis": "Test transfer of the market proxy that improved international-debt ranking and Sharpe in the final family context, without redefining its saved legacy formula.",
+      "hypothesis_name": "add_spy_proxy",
+      "id": "global_e6c41f2020fd",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "global_e6c41f2020fd",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "spy_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,dealer_gamma_proxy,dxy,em_fx_ret,gold_crude_ratio,hy_spread_z_12p,oil_ret,term_spread,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "global_33e57e1c2370",
+      "category": "authorized_joint_followup",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Report IC/NLL/conventional Sharpe, all seeds and family diagnostics.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the hypothesis; effects remain conditional.",
+      "hypothesis": "Test monthly inflation information beyond annual CPI; international-debt family results suggest ranking/Sharpe gains with a possible NLL cost.",
+      "hypothesis_name": "add_monthly_cpi",
+      "id": "global_ccfa2775bb52",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "global_ccfa2775bb52",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,dealer_gamma_proxy,dxy,em_fx_ret,gold_crude_ratio,hy_spread_z_12p,oil_ret,schp_ret,term_spread,vix_ts_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "global_33e57e1c2370",
+      "category": "authorized_joint_followup",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "expected_tradeoff": "Report IC/NLL/conventional Sharpe, all seeds and family diagnostics.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the hypothesis; effects remain conditional.",
+      "hypothesis": "Test whether the TIPS ETF return axis with strong U.S.-debt matched support transfers when added alone to the strong joint parent.",
+      "hypothesis_name": "add_schp_return",
+      "id": "global_dc10aef417bc",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "global_dc10aef417bc",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "vix_ts_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "lag_y_excess_lead,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,dealer_gamma_proxy,dxy,em_fx_ret,gold_crude_ratio,hy_spread_z_12p,oil_ret,term_spread,vix_ts_z_12p,y10_nominal",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "base_configuration": "global_33e57e1c2370",
+      "category": "authorized_joint_followup",
+      "etf_columns": [
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+      "expected_input_columns": [
+        "t_index",
+        "lag_y_excess_lead",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p",
+        "y10_nominal"
+      ],
+      "expected_tradeoff": "Report IC/NLL/conventional Sharpe, all seeds and family diagnostics.",
+      "expected_training_start": "2017-05-31",
+      "falsification": "A dominated result does not support the hypothesis; effects remain conditional.",
+      "hypothesis": "Test nominal yield-level state beyond the retained term spread, using one Treasury-level name rather than adding identical duplicate columns.",
+      "hypothesis_name": "add_nominal_yield",
+      "id": "global_6a602a86c2b6",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "global_6a602a86c2b6",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "dealer_gamma_proxy",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "term_spread",
+        "vix_ts_z_12p",
+        "y10_nominal"
+      ],
+      "source_evidence": [
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json",
+        "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv"
+      ]
+    }
+  ],
+  "cross_version_equality_audit": "experiments/2026-10-repaired-global-feature-selection/results/feature_pool_extension_audit.json",
+  "dataset_version": "v2",
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv"
+  ],
+  "evidence_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/conditional_feature_pairs.csv": "c1729a277486c464898628060419ca08c6c536c76e006035dd733b217ca24da6",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/configuration_aggregates.csv": "52c78863a23011bc6653b0c0911e3a7ca0213401d46b25396139da4c2a21fc99",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/contract.json": "aeca86b21be9681ac10f43e6bd07d9c1ae85eada143e49cb8324b182bf751e14",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/exact_inputs.json": "ada478f1847ce49b827e93cf4447120b67d14713b61a53be269b4bd298c021fb",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/family_diagnostics_by_seed.csv": "10b8aa390c526c9a217ebdd92922b310d4441ff09b06f694269b742a3de26dd7",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/hypervolume.json": "3e5d907e5fbb95007dd9ccec298c0ca17ed5140296184410cda4e80727912625",
+    "experiments/2026-10-repaired-global-feature-selection/followup/evidence/batch1/objectives_by_seed.csv": "c577a069f872d36b27b157d7a5bb056c369bacd8328971ce39015a4a96bb0e53"
+  },
+  "family": "global",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/global.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v2/global.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/followup/runs",
+  "phase": "refinement",
+  "results_prefix": "10_global_round1",
+  "round_index": 1,
+  "round_interpretation": "Separate authorized follow-up; completed campaign cap stays closed.",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/followup/executions",
+  "study_stage": "global_refinement",
+  "tickers": [
+    "SPY",
+    "MGK",
+    "VTV",
+    "IWM",
+    "VEA",
+    "VWO",
+    "VSS",
+    "EWX",
+    "BND",
+    "IEF",
+    "LQD",
+    "HYG",
+    "BNDX",
+    "VWOB",
+    "HYEM"
+  ]
+}

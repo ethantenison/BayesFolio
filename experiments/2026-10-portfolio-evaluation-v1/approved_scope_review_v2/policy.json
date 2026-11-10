@@ -1,0 +1,18 @@
+{
+  "schema": "bayesfolio.approved_scope_review_policy.v2",
+  "primary_variance_budget_factor": 1.0,
+  "sensitivity_variance_budget_factor": 1.5,
+  "stress_variance_budget_factor": 0.5,
+  "effective_count_floors": [null, 3, 5, 7, 10, 12],
+  "allocator_backend": "allocation_numerics_v2.StableScoreAllocator",
+  "allocation_objective_default_changed": false,
+  "retain_infeasible_cases": true,
+  "require_complete_pair_for_covariance_comparison": true,
+  "training_only_feasibility_check_before_allocation": true,
+  "automatic_budget_relaxation": false,
+  "previous_weight_fallback": false,
+  "CVaR": false,
+  "ETF_position_cap": null,
+  "new_GP_fits": false,
+  "production_promotion": false
+}

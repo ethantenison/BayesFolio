@@ -1,0 +1,42 @@
+{
+  "Pylance": "unavailable; not claimed",
+  "checks": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "check",
+        "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "....................................                                     [100%]\n36 passed in 0.79s\n"
+    }
+  ],
+  "experiment_AST_docstring_check": {
+    "missing": [],
+    "module_and_public_symbols": true,
+    "public_symbols": 40
+  },
+  "passed": true,
+  "repository_docstring_script_scope": "Experiments excluded by repository script; explicit AST check used"
+}

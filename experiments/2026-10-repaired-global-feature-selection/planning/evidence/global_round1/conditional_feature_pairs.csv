@@ -1,0 +1,2 @@
+feature,with_configuration,without_configuration,conditional_finding,delta_ic_with_minus_without,delta_nll_with_minus_without,delta_sharpe_with_minus_without,seed_ic_wins,seed_nll_wins,seed_sharpe_wins
+lag_y_excess_lead,global_1b4304ffe9c1,global_2b66b7fc9390,helpful_in_this_context,0.007390873015873008,-0.06440410384913371,0.01061979961697738,1,3,2

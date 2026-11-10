@@ -1,0 +1,16 @@
+{
+  "decision": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/DECISION.md",
+  "finalists": 10,
+  "fit_attempts_remaining": 1194,
+  "fit_attempts_used": 6,
+  "new_policies": 874,
+  "next_action": "Delivered validated November target weights and reproducible decision; stop research",
+  "overall_policy_budget_remaining": 150,
+  "phase": "complete",
+  "retained_design_coverage_limitations": 16,
+  "rounds_used": 4,
+  "selected_id": "policy_b71ce3fe84ee69f58247",
+  "unresolved_failures": [],
+  "updated_at_utc": "2026-10-31T15:13:30.634329+00:00",
+  "weights": "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/NOVEMBER_WEIGHTS.csv"
+}

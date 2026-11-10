@@ -1,0 +1,20 @@
+{
+  "artifact_sha256": {
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/portfolio_cache/returns_2026-04-30.csv": "26c72550164a5dc69aa5455551de3ead9f8b7fb4f2a8784dcb59f249c4c9cdce",
+    "experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/portfolio_cache/weights_2026-04-30.csv": "47dd867271435bbe20238749e8b459db923eb6309107cb6cc28614916dd89631"
+  },
+  "result": {
+    "constraint_relaxation_used": false,
+    "date": "2026-04-30",
+    "fallback_used": false,
+    "paths": {
+      "returns": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/portfolio_cache/returns_2026-04-30.csv",
+      "weights": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/month_parallel/plus_hy_change/runs/s27/portfolio_cache/weights_2026-04-30.csv"
+    },
+    "pid": 11325,
+    "seconds": 0.10719875000359025,
+    "seed": 27,
+    "status": "solved"
+  },
+  "signature": "1e6a905326ba6129b56a5dd9c30780ce5329e2f6331ede0b85d6bd15d083e747"
+}

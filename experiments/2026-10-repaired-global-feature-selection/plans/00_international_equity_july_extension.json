@@ -1,0 +1,3948 @@
+{
+  "common_args": [
+    "--mtgp-rank",
+    "2",
+    "--maxiter",
+    "15",
+    "--posterior-scenarios",
+    "256",
+    "--resume-scenarios",
+    "--gp-experiment",
+    "signed_lkj_eta_2",
+    "--upperlng",
+    "0.35",
+    "--nea",
+    "3",
+    "--gp-riskfolio-rm",
+    "CVaR",
+    "--gp-riskfolio-obj",
+    "MaxRet",
+    "--scenario-workers",
+    "1",
+    "--torch-num-threads",
+    "1"
+  ],
+  "comparison_configurations": [],
+  "configurations": [
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,spy_ret,term_spread,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "spy_ret",
+        "term_spread",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_4813b183c858",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_4813b183c858",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "spy_ret",
+        "term_spread",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_block_screen_20260707T1725Z/full_runs/full_b006_momentum_plus_macro/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_block_screen_20260707T1725Z/full_runs/full_b006_momentum_plus_macro/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dxy,em_fx_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dxy",
+        "em_fx_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_c4a97e6815b3",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_c4a97e6815b3",
+      "macro_columns": [
+        "dxy",
+        "em_fx_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d001_5a454348/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d001_5a454348/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_f0051258b3bb",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_f0051258b3bb",
+      "macro_columns": [
+        "breakeven_proxy",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d002_a568509b/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d002_a568509b/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,gold_crude_ratio,oil_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_a71550405634",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_a71550405634",
+      "macro_columns": [
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d003_3b1994c5/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d003_3b1994c5/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,hy_spread_chg_1p,hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_dd007e861da1",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_dd007e861da1",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d006_7d5296e9/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d006_7d5296e9/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dxy,em_fx_ret,pct_above_50dma,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dxy",
+        "em_fx_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_fdc740e31301",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_fdc740e31301",
+      "macro_columns": [
+        "dxy",
+        "em_fx_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d007_5b1bb4fe/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d007_5b1bb4fe/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,pct_above_50dma,schp_ret,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_319140fc67de",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_319140fc67de",
+      "macro_columns": [
+        "breakeven_proxy",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d008_87b6645c/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d008_87b6645c/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,gold_crude_ratio,oil_ret,pct_above_50dma,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_68bc737a356b",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_68bc737a356b",
+      "macro_columns": [
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d009_1ad92405/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d009_1ad92405/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "erp,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_a9cae0e504ff",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_a9cae0e504ff",
+      "macro_columns": [
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d011_ccbbae2a/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d011_ccbbae2a/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_5d00c0c3aefd",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_5d00c0c3aefd",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d012_2acc297d/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d012_2acc297d/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,dxy,em_fx_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_999f2e091c3a",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_999f2e091c3a",
+      "macro_columns": [
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d013_5dc22b21/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d013_5dc22b21/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,dxy,em_fx_ret,gold_crude_ratio,oil_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_f32dbd5fccff",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_f32dbd5fccff",
+      "macro_columns": [
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d014_1e288ace/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d014_1e288ace/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,hy_spread_chg_1p,hy_spread_z_12p",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_487b8d07fcd7",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_487b8d07fcd7",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d017_5b7a735a/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d017_5b7a735a/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,gold_crude_ratio,oil_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_332d3e8ea856",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_332d3e8ea856",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d018_94550966/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d018_94550966/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,erp,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_0ac36cbded0a",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_0ac36cbded0a",
+      "macro_columns": [
+        "breakeven_proxy",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d020_9f5bf762/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d020_9f5bf762/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,hy_spread_chg_1p,hy_spread_z_12p,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_177a5b167a72",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_177a5b167a72",
+      "macro_columns": [
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d021_7356b58b/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d021_7356b58b/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_f421b362b742",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_f421b362b742",
+      "macro_columns": [
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d023_38a63bb8/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d023_38a63bb8/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_3ec4810fd67d",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_3ec4810fd67d",
+      "macro_columns": [
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d024_73f127b8/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d024_73f127b8/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,erp,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_b03be98cbb25",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_b03be98cbb25",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d027_0e4a2b61/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d027_0e4a2b61/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,dxy,em_fx_ret,pct_above_50dma,schp_ret,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_b79e8e1b7c3d",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_b79e8e1b7c3d",
+      "macro_columns": [
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d028_fcbaa288/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d028_fcbaa288/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,dxy,em_fx_ret,gold_crude_ratio,oil_ret,pct_above_50dma,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_f903b08aadc4",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_f903b08aadc4",
+      "macro_columns": [
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d029_391ecb5b/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d029_391ecb5b/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "dxy,em_fx_ret,erp,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_5fb5171687b9",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_5fb5171687b9",
+      "macro_columns": [
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d031_a3081d64/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d031_a3081d64/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_a941aa3280a3",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_a941aa3280a3",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d032_9bf333d2/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d032_9bf333d2/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,gold_crude_ratio,oil_ret,pct_above_50dma,schp_ret,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_256efd1ebb13",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_256efd1ebb13",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d033_12212e08/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d033_12212e08/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,erp,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_abe253d16a34",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_abe253d16a34",
+      "macro_columns": [
+        "breakeven_proxy",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d035_6af887d7/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d035_6af887d7/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,schp_ret,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_853fd1bbfdc3",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_853fd1bbfdc3",
+      "macro_columns": [
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d036_559b8256/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d036_559b8256/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_e1311fe0caac",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_e1311fe0caac",
+      "macro_columns": [
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d038_2468bff8/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d038_2468bff8/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_67d1e6119698",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_67d1e6119698",
+      "macro_columns": [
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d039_a6e272e8/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d039_a6e272e8/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,erp,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_ca6783d19458",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_ca6783d19458",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d042_eb92b678/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d042_eb92b678/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,dxy,em_fx_ret,gold_crude_ratio,oil_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_9530f483335e",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_9530f483335e",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d043_19f1edc7/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d043_19f1edc7/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,dxy,em_fx_ret,erp,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_fb20c56aae04",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_fb20c56aae04",
+      "macro_columns": [
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d045_68afca5a/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d045_68afca5a/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,hy_spread_chg_1p,hy_spread_z_12p,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_3a179719ff1f",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_3a179719ff1f",
+      "macro_columns": [
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d046_b7ade822/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d046_b7ade822/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,dxy,em_fx_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_4af3c22a4d40",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_4af3c22a4d40",
+      "macro_columns": [
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d048_4cad1677/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d048_4cad1677/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_9f79aa00f89d",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_9f79aa00f89d",
+      "macro_columns": [
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d049_26f943af/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d049_26f943af/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,erp,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_c7345609b177",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_c7345609b177",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d052_1bd0843c/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d052_1bd0843c/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_fda8f135fd55",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_fda8f135fd55",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d054_caaae5d1/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d054_caaae5d1/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_fc253691d18c",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_fc253691d18c",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d055_e9356452/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d055_e9356452/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,erp,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_8009ae363d65",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_8009ae363d65",
+      "macro_columns": [
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d058_368808a0/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d058_368808a0/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,erp,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_403fa3092dd0",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_403fa3092dd0",
+      "macro_columns": [
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d061_ba8154a4/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d061_ba8154a4/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,dxy,em_fx_ret,gold_crude_ratio,oil_ret,pct_above_50dma,schp_ret,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_5fb0fb478c61",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_5fb0fb478c61",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d063_7edc99ff/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d063_7edc99ff/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,dxy,em_fx_ret,erp,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_bd924621ab6b",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_bd924621ab6b",
+      "macro_columns": [
+        "breakeven_proxy",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d065_8a5a37b2/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d065_8a5a37b2/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,schp_ret,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_c6c6899c3500",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_c6c6899c3500",
+      "macro_columns": [
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d066_1ba96533/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d066_1ba96533/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,dxy,em_fx_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_95be144aacdd",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_95be144aacdd",
+      "macro_columns": [
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d068_48c82d82/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d068_48c82d82/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_025bc63e97a1",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_025bc63e97a1",
+      "macro_columns": [
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d069_a1cae735/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d069_a1cae735/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,erp,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_fc381a8e5128",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_fc381a8e5128",
+      "macro_columns": [
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d072_9c3299d2/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d072_9c3299d2/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_b4d45b5eb168",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_b4d45b5eb168",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d074_7c5ea0ab/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d074_7c5ea0ab/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,schp_ret,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_5d433c889171",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_5d433c889171",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "schp_ret",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d075_b8f363a4/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d075_b8f363a4/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,erp,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_b25d4f6b2419",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_b25d4f6b2419",
+      "macro_columns": [
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d078_a4a76841/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d078_a4a76841/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,erp,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret,vix,vix_slope",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_6eecd78083ce",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_6eecd78083ce",
+      "macro_columns": [
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "vix",
+        "vix_slope"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d081_f05de9c3/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d081_f05de9c3/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,dxy,em_fx_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_d54090b09dbc",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_d54090b09dbc",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d084_61c02d33/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d084_61c02d33/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,schp_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_0d2237db58e8",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_0d2237db58e8",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "schp_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d085_3e70c34d/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d085_3e70c34d/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,erp,hy_spread_chg_1p,hy_spread_z_12p,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_5722d20e63d7",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_5722d20e63d7",
+      "macro_columns": [
+        "breakeven_proxy",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d088_8c38d219/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d088_8c38d219/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,dxy,em_fx_ret,erp,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,rsp_spy_roc_1p,spy_flow_z_12p,spy_ret",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_5abb2d36621c",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_5abb2d36621c",
+      "macro_columns": [
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "spy_flow_z_12p",
+        "spy_ret"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d091_19de98d9/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d091_19de98d9/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,cpi_chg_12p,cpi_chg_1p,credit_spread_chg_1p,erp,gold_crude_ratio,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_c180e76d0b25",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_c180e76d0b25",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "cpi_chg_12p",
+        "cpi_chg_1p",
+        "credit_spread_chg_1p",
+        "erp",
+        "gold_crude_ratio",
+        "hy_spread_chg_1p",
+        "hy_spread_z_12p",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d095_2555145e/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d095_2555145e/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "breakeven_proxy,copper_ret,dxy,em_fx_ret,erp,gold_crude_ratio,oil_ret,pct_above_50dma,rsp_spy_roc_1p,schp_ret,spy_flow_z_12p,spy_ret,term_spread,tnote10y,vix,vix_slope,y10_real_proxy",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_0da0213a78e5",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_0da0213a78e5",
+      "macro_columns": [
+        "breakeven_proxy",
+        "copper_ret",
+        "dxy",
+        "em_fx_ret",
+        "erp",
+        "gold_crude_ratio",
+        "oil_ret",
+        "pct_above_50dma",
+        "rsp_spy_roc_1p",
+        "schp_ret",
+        "spy_flow_z_12p",
+        "spy_ret",
+        "term_spread",
+        "tnote10y",
+        "vix",
+        "vix_slope",
+        "y10_real_proxy"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d099_2993a3cd/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_dynamic_feature_screen_20260708T2115Z/full_runs/full_d099_2993a3cd/manifest.json"
+      ]
+    },
+    {
+      "args": [
+        "--feature-set",
+        "momentum_plus_macro_market",
+        "--custom-etf-cols",
+        "cs_mom_rank,mom12m_skip1m,mom6m,trend_slope",
+        "--custom-macro-cols",
+        "credit_spread",
+        "--covar-grouping-proposal",
+        "default",
+        "--macro-component-proposal",
+        "default",
+        "--time-modulation-mode",
+        "neither"
+      ],
+      "etf_columns": [
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope"
+      ],
+      "expected_feature_sha256": "4889e4cd148473ee2a48fd1097e353db63ff288a0fb67c9e3a893b92c7f4ec6e",
+      "expected_input_columns": [
+        "t_index",
+        "cs_mom_rank",
+        "mom12m_skip1m",
+        "mom6m",
+        "trend_slope",
+        "credit_spread"
+      ],
+      "expected_training_start": "2017-05-31",
+      "id": "international_equity_644e34ac4c59",
+      "kernel_policy": {
+        "grouping": "default",
+        "higher_order_interactions": false,
+        "macro_components": "default",
+        "main_effects": true,
+        "pairwise_interactions": true,
+        "time_modulation": "neither"
+      },
+      "label": "international_equity_644e34ac4c59",
+      "macro_columns": [
+        "credit_spread"
+      ],
+      "source_evidence": [
+        "experiments/2026-07-us-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r004_dccc237a/manifest.json",
+        "experiments/2026-07-international-equity-etf-features/runs/international_equity_remaining_feature_screen_20260708T2320Z/full_runs/full_r004_dccc237a/manifest.json"
+      ]
+    }
+  ],
+  "default_seeds": [
+    27,
+    127,
+    227
+  ],
+  "family": "international_equity",
+  "feature_manifest": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/international_equity.manifest.json",
+  "feature_path": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/international_equity.parquet",
+  "fixed_decisions": {
+    "cached_data_only": true,
+    "include_t_index": true,
+    "production_budget_reference_excluded": true
+  },
+  "historical_scope": "Valid July feature masks supported by frozen repaired v1; metrics not pooled.",
+  "hypervolume": {
+    "fixed_for_subsequent_rounds": true,
+    "objective_transform": {
+      "mean_gaussian_nll": "negate_then_maximize",
+      "mean_ic": "maximize",
+      "sharpe": "maximize"
+    },
+    "reference_point": {
+      "mean_gaussian_nll": 0.0,
+      "mean_ic": 0.0,
+      "sharpe": 0.0
+    },
+    "use_configuration_means_across_seeds": true
+  },
+  "kernel_policy": {
+    "grouping": "default",
+    "higher_order_interactions": false,
+    "macro_components": "default",
+    "main_effects": true,
+    "pairwise_interactions": true,
+    "time_modulation": "neither"
+  },
+  "output_root": "experiments/2026-10-repaired-global-feature-selection/runs",
+  "phase": "refinement",
+  "results_prefix": "00_international_equity_july_extension",
+  "runner": "experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py",
+  "schema": "bayesfolio.etf_family_experiment.v1",
+  "scored_date_file": "experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+  "selection": {
+    "diagnostic_only": [
+      "cumulative_return",
+      "rmse"
+    ],
+    "maximize": [
+      "mean_ic",
+      "sharpe"
+    ],
+    "minimize": [
+      "mean_gaussian_nll"
+    ],
+    "sharpe_definition": "mean(monthly excess return) / sample_std(monthly excess return) * sqrt(12)",
+    "turnover_excluded": true
+  },
+  "snapshot_root": "experiments/2026-10-repaired-global-feature-selection/executions",
+  "tickers": [
+    "VEA",
+    "VWO",
+    "VSS",
+    "EWX"
+  ]
+}

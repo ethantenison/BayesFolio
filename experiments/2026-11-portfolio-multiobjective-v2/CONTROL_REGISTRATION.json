@@ -1,0 +1,104 @@
+{
+  "cases": [
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": true,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_c5f34924606d3b69f1bf",
+      "label": "v1_three_expert_reference_MGK0",
+      "minimum_effective_assets": 7,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.4270833333333333,
+          0.5,
+          0.07291666666666667
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": true,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_56a0b06b63cc63c2913b",
+      "label": "older_two_expert_incumbent_MGK0",
+      "minimum_effective_assets": 7,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.625,
+          0.375,
+          0.0
+        ],
+        [
+          0.75,
+          0.25,
+          0.0
+        ]
+      ],
+      "risk_multiplier": 1.0,
+      "seed_pooling": "equal_moments_before_one_solve"
+    }
+  ],
+  "new_configurations": 0,
+  "registered_at_utc": "2026-10-31T14:14:21.756464+00:00"
+}

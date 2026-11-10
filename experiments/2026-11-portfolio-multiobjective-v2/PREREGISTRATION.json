@@ -1,0 +1,77 @@
+{
+  "caps": {
+    "finalists": 10,
+    "fit_attempts": 1200,
+    "new_expert_specs": 6,
+    "new_policies": 1024,
+    "policies_per_round": 256,
+    "reserved_fit_attempts": 96,
+    "rounds": 4,
+    "workers": 14
+  },
+  "deadline": "2026-11-01T18:00:00-06:00",
+  "exploration_stop": "2026-11-01T16:30:00-06:00",
+  "fixed_GP": {
+    "broad_rank": 2,
+    "compact_ranks": [
+      1,
+      2
+    ],
+    "feature_window_search": false,
+    "maxiter": 15,
+    "seeds": [
+      27,
+      127,
+      227
+    ],
+    "tasks": [
+      "SPY",
+      "MGK",
+      "VTV",
+      "IWM",
+      "VEA",
+      "VWO",
+      "VSS",
+      "EWX",
+      "BND",
+      "IEF",
+      "LQD",
+      "HYG",
+      "BNDX",
+      "VWOB",
+      "HYEM"
+    ]
+  },
+  "frozen_at_utc": "2026-10-31T14:14:21.756464+00:00",
+  "new_GP_scope": [
+    "compact rank1",
+    "registered minimal kernel/prior proposal with development evidence"
+  ],
+  "passed": true,
+  "protected_sha256": {
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/CONTRACT.json": "ea30393bc205538b917259256c629ab7a2b87d5a3d0321e8efff5277fba629ac",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/RESULTS.md": "e06c375d6ffb13614b0569e1946e6d09351a82d42dadce470baa622e49e18bf7",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_r2_i15_exp.npz": "c0bf7025f3bc89bf3f1341aeb0643d1176f621cf612bc7f8ba6ac786a1a1cc02",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/broad_roll48_r2_i15.npz": "3305e7c6ea1f6df5da8e7db6fcd98741688e71f13324eafe57a37bf8963382f9",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/compact_r1_i15_exp.npz": "0a71e689c669f9fe1d62db2df0a4bf8b13be2e1576971095c71c04a0f8600c0a",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/components/compact_r2_i15_exp.npz": "3a4648432c26c18e7c644dcf11dacfbaca4ace7bb700b9afcecdec535dbbbcb3",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-chronological-selection-v1/outputs/context52.npz": "516927b71de27998fed394eb69f382bfac277469b770a5b750d9ba0e4b0670a7",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/outputs/RESULTS.md": "f2b8c23782bc7c16e06ee9639a62e0a1da7d597fdf14e63a19afd48570bb7326",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-gp-tuning-v1/three_way_joint_v1/outputs/RESULTS.md": "973cf0fb696c1e6cd272cd8e1e996221352a9ee8bc117fa9f465f3a4c9dd87ff",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/CURRENT_BASELINES.json": "f17916550aa6a8d4c03f4c2615108ba4817d45945141cd4eb667707c30c8d5bc",
+    "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/CURRENT_BENCHMARKS.json": "3ef393f102160105ef2bc01935c74e28dff9fd931978bf557e6154a3c3aa33ff",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/COMPLETED.json": "8cc828eaa8f3e97e01c54907fc566bc3c15032f3ac81f2ce3e9ca084fddb4841",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/CONFIG.json": "01f623f7e5d1837d0a71d0fc8c7e35af1108c1781d521248238ed45e28a0e28c",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/VALIDATION.json": "4312e9ec8f79c7e68ea735866bf47ce2614a9eec691134ec33509d2f61d88eed",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_r2_i15_exp.npz": "8462fb7074abf300ac48e351a1d3d59902c19a9a5fbafb481b8d8c062b21b055",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_roll48_r2_i15.npz": "02fa50f7d648fc6d62386ad769bb4fa27574ef2c6e07559e93f74b3dbd316bdb",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/compact_r2_i15_exp.npz": "23ad37fd51ffd7b60a0c17edd5fcb223d1123bda2dfb327357df9994d7e06f82",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/GOAL.md": "4518352a71e083321a787187ab6e290c19b8d184bc5bf450b97fd4985832b5f4",
+    "/Users/et/Documents/BayesFolio/pyproject.toml": "ce7f08ed5584952a963cb7c8718cb138317c8ff970bdf61d5ecf9014a4f288fa",
+    "/Users/et/Documents/BayesFolio/uv.lock": "64cb2fe285b144d212bb589b5cb6826abd680f60031a9e9874e91980def99457"
+  },
+  "schema": "bayesfolio.multiobjective.preregistration.v2",
+  "selection_rule_sha256": "eaa874cc377501a3b195fc1b73f0a54c5fe6869d2e8b007046340ca1635f4050",
+  "splits_sha256": "4f788612a4f6640e645ab2cba32c7467ad750a37d99f30186c86f6ac167e1d39",
+  "v1_seal_sha256": "8cc828eaa8f3e97e01c54907fc566bc3c15032f3ac81f2ce3e9ca084fddb4841"
+}

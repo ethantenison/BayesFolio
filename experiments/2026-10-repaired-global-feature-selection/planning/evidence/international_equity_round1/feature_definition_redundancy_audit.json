@@ -1,0 +1,52 @@
+{
+  "canonical_monthly_aliases": {
+    "cpi_mom": "cpi_chg_1p",
+    "cpi_yoy": "cpi_chg_12p",
+    "hy_spread_chg_1m": "hy_spread_chg_1p",
+    "hy_spread_z_12m": "hy_spread_z_12p",
+    "rsp_spy_roc_1m": "rsp_spy_roc_1p",
+    "spy_flow_z_12m": "spy_flow_z_12p",
+    "vix_ts_z_12m": "vix_ts_z_12p"
+  },
+  "dataset_sha256": "ba0973957155639e13012d5e10369ec117be54bbf3ff0c7ad6b05405d7d95156",
+  "identities": {
+    "chmom = mom12m - mom6m": {
+      "max_absolute_residual": 0.0,
+      "passed": true,
+      "rows_checked": 1620
+    },
+    "erp = spy_ret - tbill3m": {
+      "max_absolute_residual": 0.0,
+      "passed": true,
+      "rows_checked": 1620
+    },
+    "gold_crude_ratio = gold / oil": {
+      "max_absolute_residual": 0.0,
+      "passed": true,
+      "rows_checked": 1620
+    },
+    "term_spread = tnote10y - tbill3m": {
+      "max_absolute_residual": 0.0,
+      "passed": true,
+      "rows_checked": 1620
+    },
+    "tnote10y = y10_nominal": {
+      "max_absolute_residual": 0.0,
+      "passed": true,
+      "rows_checked": 1620
+    },
+    "vix_slope = log(vix3m) - log(vix)": {
+      "max_absolute_residual": 0.0,
+      "passed": true,
+      "rows_checked": 1620
+    }
+  },
+  "interpretation": "Exact definitions are not ablation outcomes. Fit paired removals before claiming unchanged IC/NLL/Sharpe; duplicate axes alter GP geometry and optimization at the fixed budget.",
+  "priority_hypotheses": [
+    "Keep only one of the identical Treasury-level columns in broad rate-aware candidates.",
+    "Test chmom versus mom6m/mom12m bases without assuming a nonlinear GP is invariant.",
+    "Test ERP/bill/market-return redundancy where multiple components are present.",
+    "Treat ratio-versus-components tests as representation changes, not independent economic data."
+  ],
+  "schema": "bayesfolio.feature_definition_redundancy.v1"
+}

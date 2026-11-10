@@ -1,0 +1,12 @@
+{
+  "end_exclusive": "2026-10-31",
+  "first_observation": "2026-08-03",
+  "last_observation": "2026-10-30",
+  "provider": "Yahoo Finance via yfinance",
+  "regular_session_daily_bars": true,
+  "requested_start": "2026-08-01",
+  "retrieved_at": "2026-10-31T12:23:10.382664+00:00",
+  "rows": 64,
+  "sha256": "c833d6c8578196d31b7e088343a522e7c02b0f6cb2a66296be3edc41b34934f5",
+  "symbol": "BNDX"
+}

@@ -1,0 +1,31 @@
+{
+  "family": "us_equity",
+  "round_index": 3,
+  "study_stage": "family_refinement",
+  "round_interpretation": "Round two increased hypervolume by 17.89%. Replacing HY change with HY level on the rank-free parent raised IC by 0.075 in all three seeds and nearly retained Sharpe, but worsened NLL by 0.125351. Trend removal yielded a six-input frontier point. Replacing annual CPI with monthly CPI created a density-edge tradeoff with much worse IC/Sharpe. Replacing curve with yield level and adding lag/volatility/flow were not competitive in that context. The final family round prunes and bridges the high-IC credit-level branch and six-input branch; it does not force a lag-free or single-credit representation.",
+  "default_expected_tradeoff": "Evaluate the complete IC/NLL/Sharpe vector, seed stability and calibration; input savings and interval width are diagnostic descriptors, never hidden objectives.",
+  "default_falsification": "A dominated result does not support the proposed conditional improvement. A density cost cannot veto a genuine IC/Sharpe tradeoff, and the family round cap does not establish global optimality.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/us_equity/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/rounds/us_equity_round2.json"
+  ],
+  "candidates": [
+    {"name":"credit_level_front_without_trend","category":"exploitation_combined_pruning","base_configuration":"us_equity_23a11358aeee","etf_drop":["trend_slope"],"hypothesis":"The successful trend simplification may combine with the higher-IC credit-level representation."},
+    {"name":"credit_level_front_without_six_month_momentum","category":"exploration_local_interaction","base_configuration":"us_equity_23a11358aeee","etf_drop":["mom6m"],"hypothesis":"Changing credit representation may alter intermediate momentum's value; keep corrected skip momentum."},
+    {"name":"credit_level_front_without_credit_zscore","category":"exploration_credit_representation","base_configuration":"us_equity_23a11358aeee","macro_drop":["hy_spread_z_12p"],"hypothesis":"Test absolute-credit-only against absolute-plus-normalized credit state rather than assuming every repaired credit transform is required."},
+    {"name":"credit_level_front_plus_credit_change","category":"exploration_credit_complementarity","base_configuration":"us_equity_23a11358aeee","macro_add":["hy_spread_chg_1p"],"hypothesis":"Level/change/normalized state may combine the old parent's density and new parent's ranking advantages, at the cost of one axis."},
+    {"name":"credit_level_front_plus_monthly_inflation","category":"exploration_inflation_complementarity","base_configuration":"us_equity_23a11358aeee","macro_add":["cpi_chg_1p"],"hypothesis":"Monthly CPI may add density information when annual CPI is retained rather than replaced."},
+    {"name":"credit_level_front_plus_nominal_yield","category":"exploration_rate_complementarity","base_configuration":"us_equity_23a11358aeee","macro_add":["y10_nominal"],"hypothesis":"Yield level may complement the useful curve, although replacing the curve was harmful."},
+    {"name":"credit_level_front_with_unskipped_annual_momentum","category":"exploration_shared_local_representation","base_configuration":"us_equity_23a11358aeee","etf_drop":["mom12m_skip1m"],"etf_add":["mom12m"],"hypothesis":"A single annual-momentum substitution may retain information while making the local basis more compatible with fixed income; whole-basis transfer previously failed."},
+    {"name":"credit_level_front_plus_rank","category":"exploration_local_interaction","base_configuration":"us_equity_23a11358aeee","etf_add":["cs_mom_rank"],"hypothesis":"Repaired absolute credit state may change rank's conditional value and restore ranking information without the prior density cost."},
+    {"name":"credit_level_front_plus_lag","category":"conditional_lag_addition","base_configuration":"us_equity_23a11358aeee","etf_add":["lag_y_excess_lead"],"hypothesis":"Lag remains eligible in the changed credit context despite failing in the rank-free change/z-score model."},
+    {"name":"six_input_front_without_six_month_momentum","category":"exploitation_local_pruning","base_configuration":"us_equity_d0a35b28f60b","etf_drop":["mom6m"],"hypothesis":"A single corrected skip-momentum axis plus compact macro state may offer a smaller competitive model."},
+    {"name":"six_input_front_without_credit_change","category":"exploration_macro_interaction","base_configuration":"us_equity_d0a35b28f60b","macro_drop":["hy_spread_chg_1p"],"hypothesis":"Trend removal may alter credit-change dependence; preserve normalized credit and curve state."},
+    {"name":"six_input_front_plus_oil","category":"exploration_cross_family_transfer","base_configuration":"us_equity_d0a35b28f60b","macro_add":["oil_ret"],"hypothesis":"Oil might replace information lost by trend removal without importing a large commodity/risk block; no ratio is added."}
+  ]
+}

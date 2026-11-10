@@ -1,0 +1,29 @@
+{
+  "artifact_sha256": {
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_r2_i15_exp_s127_2026-09-30.json": "6cae7b313f2a8acd75ede4dfd7ff86d486bb0de6f528a7ffee783f755f420ad9",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_r2_i15_exp_s127_2026-10-30.json": "dc7cd839e9decc4a7093ebb8f6abc91e2e9f991f3ed8f8af9dd20400773f4d39",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_r2_i15_exp_s227_2026-09-30.json": "582a9900de7c45bea448055281b6530f1c30292b5ac44f756aa41f7e49135b45",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_r2_i15_exp_s227_2026-10-30.json": "280e893bd9629258715b5af95d23719301e529b4d47f7440942132e8390c9213",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_r2_i15_exp_s27_2026-09-30.json": "651200f4733f7c9661d1b9fe0042e77d5df6b4772995672df16d7e4c525b4e93",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_r2_i15_exp_s27_2026-10-30.json": "5d4bf60ca467766df0c84808d752b31ea85b8c31a0f141b36a781f8a04175eb5",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_roll48_r2_i15_s127_2026-09-30.json": "bc5d6a4cf4bea5a4e29f6e413bf8da71a3803545be4db4e9607cb92b613fe71c",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_roll48_r2_i15_s127_2026-10-30.json": "389bf00e27187c3b1e6a2558f216cd7f4b0c0b2de89449428a49bddfd1200be3",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_roll48_r2_i15_s227_2026-09-30.json": "ab0fff84c128a80df41425b4d57a1b1ef835e22c2c90ac271161059dcc712c4e",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_roll48_r2_i15_s227_2026-10-30.json": "ceb94ff1a355ce08f960760b7c78c3bc58dd45207465beb0e6af68b1dfb82e84",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_roll48_r2_i15_s27_2026-09-30.json": "72110939057c844e1c4e2743b2e63e30ff0b19d3ec6f6521803979c8ca713542",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/broad_roll48_r2_i15_s27_2026-10-30.json": "c4e5a19e41cf7f86f8ed469937c8c9bca2e6d9458aa329fce5356c0ffb9e1a14",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/compact_r2_i15_exp_s127_2026-09-30.json": "5b4cefe0f3445721698513edc3446b431a1be93ed4302ebab0ea634d03c30be6",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/compact_r2_i15_exp_s127_2026-10-30.json": "ac08373e5932793e43d7b49427aa99b37e2fbf4b4ed3c27e3cac4596160ca537",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/compact_r2_i15_exp_s227_2026-09-30.json": "1207ba749cf0e0d3ec01e0febe3441f4f17e8da8919760ee86104bef14436f19",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/compact_r2_i15_exp_s227_2026-10-30.json": "ed159d4b111b9ad781197a56215e966495a397fe1de533a43cb00c12a4ba11ef",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/compact_r2_i15_exp_s27_2026-09-30.json": "ff90281eac9e081f1ea6d6ada399513944ff7e97aa3e56b35459588734db6b33",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/fit_checkpoints/compact_r2_i15_exp_s27_2026-10-30.json": "18bf6729034e1366aa2762d04a9e122d129a7360e689fbeb1b3e29f75482d537",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_r2_i15_exp.npz": "8462fb7074abf300ac48e351a1d3d59902c19a9a5fbafb481b8d8c062b21b055",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/broad_roll48_r2_i15.npz": "02fa50f7d648fc6d62386ad769bb4fa27574ef2c6e07559e93f74b3dbd316bdb",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-decision-v1/outputs/recent_components/compact_r2_i15_exp.npz": "23ad37fd51ffd7b60a0c17edd5fcb223d1123bda2dfb327357df9994d7e06f82"
+  },
+  "completed_fits": 18,
+  "fit_attempts_remaining": 110,
+  "fit_attempts_used": 18,
+  "passed": true
+}

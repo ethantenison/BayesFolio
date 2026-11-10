@@ -1,0 +1,125 @@
+{
+  "family": "international_equity",
+  "round_index": 1,
+  "study_stage": "family_refinement",
+  "round_interpretation": "All 149 historical masks have complete three-seed evidence on the repaired common 84-month initial history. The cumulative front has eight points and hypervolume 0.5152122634950599. Larger rate/credit/commodity masks improve IC and Sharpe but have worse NLL than the compact FX/market-risk anchor. A newly available risk-volatility mask bridges these extremes. Earlier small-context gold-ratio and DXY findings do not establish their value in the new broad front. The novelty gate identified that whole credit/inflation and whole rate/TIPS block removals had already been tested: the former is dominated by the broad parent, while the latter trades lower IC/Sharpe for better NLL. Those repeats were replaced with targeted HY-change and reduced TIPS-representation hypotheses before registration. This round uses eight explicit pruning tests, one frontier bridge, and three genuine representation/information explorations; no weighted score, extra holdout, kernel tuning, or requirement to eliminate lag is introduced.",
+  "evidence_reports": [
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/configuration_aggregates.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/objectives_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/exact_inputs.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/conditional_feature_pairs.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/family_diagnostics_by_seed.csv",
+    "experiments/2026-10-repaired-global-feature-selection/results/cumulative/international_equity/hypervolume.json",
+    "experiments/2026-10-repaired-global-feature-selection/results/feature_definition_redundancy_audit.json"
+  ],
+  "candidates": [
+    {
+      "name": "high_sharpe_without_gold_oil_ratio",
+      "category": "exploitation_pruning",
+      "base_configuration": "international_equity_0d2237db58e8",
+      "macro_drop": ["gold_crude_ratio"],
+      "hypothesis": "The ratio may remain redundant or noisy even in the broad high-Sharpe rate/credit/commodity context; retain oil return and copper return while removing only the ratio.",
+      "expected_tradeoff": "Seek an equally competitive smaller configuration or a new Pareto tradeoff; do not assume the small-context result generalizes.",
+      "falsification": "Consistent degradation across the three objectives or exclusion from the cumulative front without a useful simplification would reject this pruning hypothesis."
+    },
+    {
+      "name": "high_sharpe_without_dxy_level",
+      "category": "exploitation_pruning",
+      "base_configuration": "international_equity_0d2237db58e8",
+      "macro_drop": ["dxy"],
+      "hypothesis": "EM-FX return and the broad macro state may carry the useful currency information without a DXY level input in this richer configuration.",
+      "expected_tradeoff": "Test whether a smaller currency representation retains useful IC/Sharpe and improves NLL, while preserving genuine three-objective tradeoffs.",
+      "falsification": "A material new deterioration or a dominated result would show that the earlier small-context DXY finding does not transfer here."
+    },
+    {
+      "name": "high_sharpe_without_hy_spread_change",
+      "category": "exploitation_credit_pruning",
+      "base_configuration": "international_equity_0d2237db58e8",
+      "macro_drop": ["hy_spread_chg_1p"],
+      "hypothesis": "The full credit/inflation block cannot be removed without losing the broad parent's advantage, but HY change may be redundant with HY z-score and the HYG/LQD change proxy within that useful block.",
+      "expected_tradeoff": "Preserve useful repaired credit information while testing whether one noisy derivative can be removed competitively.",
+      "falsification": "A dominated removal without a useful objective tradeoff would establish conditional value for HY change in this broad equity context."
+    },
+    {
+      "name": "high_sharpe_with_reduced_tips_representation",
+      "category": "exploitation_block_pruning",
+      "base_configuration": "international_equity_0d2237db58e8",
+      "macro_drop": ["schp_ret", "y10_real_proxy"],
+      "hypothesis": "The nominal yield, curve, and breakeven proxy may retain the useful rate state without both direct one-month SCHP return and its trailing three-month average; breakeven still contains TIPS-derived change information.",
+      "expected_tradeoff": "Seek a two-input reduction that preserves more of the broad parent's IC/Sharpe than the already tested full five-input rate-block removal.",
+      "falsification": "If this smaller rate representation is dominated without a useful density benefit, the retained transforms are not sufficient in this context."
+    },
+    {
+      "name": "high_ic_without_six_month_momentum",
+      "category": "exploitation_local_ablation",
+      "base_configuration": "international_equity_c6c6899c3500",
+      "etf_drop": ["mom6m"],
+      "hypothesis": "The six-month momentum input may be redundant with skip-month annual momentum, cross-sectional rank, trend slope, and the rich macro state; directly test the local basis rather than assuming all four momentum inputs matter.",
+      "expected_tradeoff": "Seek a one-input simplification near the high-IC end of the front; retain a nondominated density/portfolio tradeoff if one emerges.",
+      "falsification": "Clear loss of the high-IC advantage without useful NLL/Sharpe improvement rejects this removal."
+    },
+    {
+      "name": "risk_front_without_vix_slope_change",
+      "category": "exploitation_pruning",
+      "base_configuration": "international_equity_d761551f5d77",
+      "macro_drop": ["vix_ts_chg_1p"],
+      "hypothesis": "VIX slope level and its trailing z-score may already provide the useful term-structure state without the one-month change.",
+      "expected_tradeoff": "Reduce a potentially noisy derivative while measuring all three objective changes and predictive coverage.",
+      "falsification": "A dominated result or consistent loss of useful ranking/density evidence would indicate the derivative adds information here."
+    },
+    {
+      "name": "risk_front_without_tlt_volatility_proxy",
+      "category": "exploitation_pruning",
+      "base_configuration": "international_equity_d761551f5d77",
+      "macro_drop": ["move_proxy"],
+      "hypothesis": "The TLT-realized-volatility proxy may be unnecessary when VIX and the SPY realized-minus-implied proxy coexist in this international-equity model.",
+      "expected_tradeoff": "Test a cleaner risk representation without assuming the TLT proxy has the same relevance for fixed-income families.",
+      "falsification": "A noncompetitive objective deterioration would establish conditional value for the rate-volatility proxy in this equity context."
+    },
+    {
+      "name": "risk_front_without_absolute_trend_slope",
+      "category": "exploitation_local_ablation",
+      "base_configuration": "international_equity_d761551f5d77",
+      "etf_drop": ["trend_slope"],
+      "hypothesis": "Dimensionless momentum inputs may carry the useful trend information without the absolute-price slope, simplifying a candidate that already bridges IC and density objectives.",
+      "expected_tradeoff": "Measure ranking, density, portfolio behavior, and uncertainty quality rather than assuming a redundant-looking transform can safely be removed.",
+      "falsification": "Consistent loss of the front position without a competitive simplification rejects this removal."
+    },
+    {
+      "name": "risk_front_plus_oil_return_only",
+      "category": "frontier_bridge",
+      "base_configuration": "international_equity_d761551f5d77",
+      "macro_add": ["oil_ret"],
+      "hypothesis": "Oil return may add the useful commodity state to the new risk-volatility bridge without bringing in copper or the noisy gold/oil ratio.",
+      "expected_tradeoff": "Seek additional frontier hypervolume, preserving cases where IC/NLL/Sharpe trade off rather than forcing the earlier oil result.",
+      "falsification": "A dominated addition or deterioration with no useful objective improvement rejects this cross-front transfer."
+    },
+    {
+      "name": "risk_front_with_alternative_local_basis",
+      "category": "exploration_representation_transfer",
+      "base_configuration": "international_equity_d761551f5d77",
+      "etf_replace": ["chmom", "mom12m", "ma_signal", "ret_autocorr"],
+      "hypothesis": "The compact local basis already used as a fixed-income hypothesis may pair more effectively with the risk macro state than the inherited equity momentum/rank/slope basis; this directly explores a candidate shared representation.",
+      "expected_tradeoff": "Keep the local input count fixed while testing a genuinely different representation; this is a hypothesis, not evidence of universal relevance.",
+      "falsification": "A dominated result would argue against transferring this local basis to international equities under the fixed model policy."
+    },
+    {
+      "name": "risk_front_plus_etf_realized_volatility",
+      "category": "exploration_uncertainty_information",
+      "base_configuration": "international_equity_d761551f5d77",
+      "etf_add": ["vol_1m"],
+      "hypothesis": "Task-specific trailing realized volatility may contribute density information absent from market-wide risk proxies, potentially improving NLL without sacrificing useful ranking and portfolio behavior.",
+      "expected_tradeoff": "Judge uncertainty by NLL and coverage/sharpness diagnostics; a narrower predictive distribution alone does not count as improvement.",
+      "falsification": "A dominated addition or narrower but worse-calibrated forecasts would reject the proposed information benefit."
+    },
+    {
+      "name": "risk_front_plus_recent_excess_return_lag",
+      "category": "exploration_conditional_lag_value",
+      "base_configuration": "international_equity_d761551f5d77",
+      "etf_add": ["lag_y_excess_lead"],
+      "hypothesis": "Lagged realized excess return might have different conditional value in the new richer risk model than in the weak simple-local pair; test the claim rather than requiring lag removal.",
+      "expected_tradeoff": "Evaluate the three objectives and seed consistency, preserving a genuine tradeoff if lag helps density but hurts ranking.",
+      "falsification": "A dominated addition, or an objective tradeoff not competitive with the cumulative front, would not support keeping lag in this context."
+    }
+  ]
+}

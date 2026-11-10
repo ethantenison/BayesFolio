@@ -1,0 +1,17 @@
+{
+  "max_absolute_differences": {
+    "predictions": 0.0,
+    "returns": 0.0,
+    "scenarios": 0.0,
+    "weights": 0.0
+  },
+  "passed": true,
+  "strict_primary_portfolio_policy": true,
+  "tolerances": {
+    "predictions": 1e-08,
+    "returns": 1e-08,
+    "scenarios": 1e-08,
+    "weights": 1e-06
+  },
+  "windows_checked": 72
+}

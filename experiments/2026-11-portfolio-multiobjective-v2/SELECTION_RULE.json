@@ -1,0 +1,76 @@
+{
+  "confirmation_acceptance": {
+    "all53_distance_gain_over_best_control_min": 0.05,
+    "complete_all53_and_November_raw_feasibility": true,
+    "confirmation12_distance_no_worse_than_best_control_plus": 0.5,
+    "confirmation12_drawdown_loss_no_worse_than_best_control_plus": 0.03,
+    "no_retuning_after_unlock": true
+  },
+  "development_eligibility": {
+    "IC_noninferiority_veto": false,
+    "annual_blocks_no_worse_by_distance_0p25_min": 2,
+    "complete_raw_feasible_path": true,
+    "distance_gain_over_best_control_min": 0.05,
+    "leave_one_month_distance_gain_nonnegative_fraction_min": 0.8,
+    "paired_3month_bootstrap_distance_gain_nonnegative_fraction_min": 0.6,
+    "ten_bps_cost_distance_gain_min": -0.1
+  },
+  "final_selection": "Eligible full53 Pareto minimum fixed-anchor distance; ties within1e-8 by development annual-block stability, Sharpe, eligible14IC, recipe complexity, ID. If no accepted challenger, best matched control by same full53 fixed-anchor distance.",
+  "frontier_stopping": {
+    "HV_reference": "reference_CAGR-0.10, reference_DDloss+0.10",
+    "budgets_are_ceilings_not_targets": true,
+    "consecutive_negligible_rounds": 2,
+    "minimum_tracks": [
+      "cached policy investigation",
+      "allowed GP evidence assessment"
+    ],
+    "negligible_round": "HV relative gain<1% AND best distance gain<0.05"
+  },
+  "normalization": {
+    "CAGR_scale": 0.02,
+    "anchors_saved_once_before_new_policy_scoring": true,
+    "aspiration_CAGR": "reference_CAGR + 0.02",
+    "aspiration_drawdown_loss": "max(0, reference_drawdown_loss - 0.02)",
+    "distance": "hypot(max(0,(aspiration_CAGR-CAGR)/0.02), max(0,(drawdown_loss-aspiration_drawdown_loss)/0.02))",
+    "drawdown_scale": 0.02,
+    "interpretation": "Balanced operational aspiration, not a personal loss limit or promised return",
+    "source": "MGK-free fixed v1 three-model reference development41 ONLY"
+  },
+  "primary": [
+    "gross_CAGR",
+    "drawdown_loss_magnitude"
+  ],
+  "robustness": {
+    "block_lengths": [
+      3,
+      6
+    ],
+    "bootstrap_draws": 512,
+    "cost_bps": [
+      0,
+      5,
+      10,
+      20
+    ],
+    "cost_gate_is_sensitivity_only": true,
+    "cost_objective": false,
+    "crash_probabilities_calibrated": false,
+    "seed": 20261101,
+    "seed_sensitivity_is_not_market_evidence": true,
+    "stress_drawdown_thresholds": [
+      0.1,
+      0.15,
+      0.2
+    ]
+  },
+  "schema": "bayesfolio.multiobjective.selection.v2",
+  "secondary": [
+    "Sharpe",
+    "eligible14_rank_IC"
+  ],
+  "shortlist": {
+    "mandatory_controls": 2,
+    "maximum": 10,
+    "remaining": "Development eligible Pareto distance/stability plus return/defensive leaders and matched compact-rank pair when supported; deterministic ID ties"
+  }
+}

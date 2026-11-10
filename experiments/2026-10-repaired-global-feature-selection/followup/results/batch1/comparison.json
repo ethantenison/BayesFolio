@@ -1,0 +1,73 @@
+{
+  "competitive_simplification": false,
+  "equal_objective_simplifications": [],
+  "frontier_improved": true,
+  "hypervolume_after": 1.1876180528715201,
+  "hypervolume_before": 1.0167784594446576,
+  "hypothesis_comparisons": [
+    {
+      "configuration": "global_a306a45ffc49",
+      "delta_ic": -0.0011408730158729747,
+      "delta_nll": 0.009069710196546824,
+      "delta_sharpe": 0.009072209419307198,
+      "hypothesis": "add_hy_level",
+      "seed_ic_wins": 1,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 1
+    },
+    {
+      "configuration": "global_d77edcc67c1d",
+      "delta_ic": 0.012847222222222288,
+      "delta_nll": 0.007239283588642269,
+      "delta_sharpe": 0.02109770304181217,
+      "hypothesis": "add_hy_change",
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 1,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "configuration": "global_e6c41f2020fd",
+      "delta_ic": 0.03164682539682545,
+      "delta_nll": -0.008603229602600551,
+      "delta_sharpe": 0.1488540734624717,
+      "hypothesis": "add_spy_proxy",
+      "seed_ic_wins": 3,
+      "seed_nll_wins": 3,
+      "seed_sharpe_wins": 3
+    },
+    {
+      "configuration": "global_ccfa2775bb52",
+      "delta_ic": 0.0017857142857142978,
+      "delta_nll": 0.012045236921424044,
+      "delta_sharpe": -0.011644321510511313,
+      "hypothesis": "add_monthly_cpi",
+      "seed_ic_wins": 2,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 2
+    },
+    {
+      "configuration": "global_dc10aef417bc",
+      "delta_ic": -0.097172619047619,
+      "delta_nll": 0.08585790678683258,
+      "delta_sharpe": -0.1474891622899844,
+      "hypothesis": "add_schp_return",
+      "seed_ic_wins": 0,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 1
+    },
+    {
+      "configuration": "global_6a602a86c2b6",
+      "delta_ic": -0.011160714285714218,
+      "delta_nll": 0.02454428979055538,
+      "delta_sharpe": -0.1903981538870069,
+      "hypothesis": "add_nominal_yield",
+      "seed_ic_wins": 0,
+      "seed_nll_wins": 0,
+      "seed_sharpe_wins": 0
+    }
+  ],
+  "new_frontier_points": [
+    "global_e6c41f2020fd"
+  ],
+  "stalled": false
+}

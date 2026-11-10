@@ -1,0 +1,41 @@
+{
+  "AST_docstrings": {
+    "missing": [],
+    "public_symbols": 70
+  },
+  "Pylance": "unavailable; no passed editor check claimed",
+  "checks": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "check",
+        "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "........................................................................ [ 60%]\n...............................................                          [100%]\n=============================== warnings summary ===============================\nexperiments/2026-11-portfolio-multiobjective-v2/test_v2_experts.py::test_actual_task_prior_telemetry_does_not_query_distribution_variance\nexperiments/2026-11-portfolio-multiobjective-v2/test_v2_experts.py::test_actual_task_prior_telemetry_does_not_query_distribution_variance\n  /Users/et/Documents/BayesFolio/.venv/lib/python3.13/site-packages/torch/jit/_script.py:1480: DeprecationWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n119 passed, 2 warnings in 1.71s\n"
+    }
+  ],
+  "passed": true,
+  "scope": "isolated experiment only; no production package/public API changes"
+}

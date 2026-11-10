@@ -1,0 +1,280 @@
+"""Cached screening and strict common-universe portfolio evaluation.
+
+Research-only. Raw forecasts are discounted excess decimal returns. Risk is
+the same training-only covariance for every candidate; never a block-diagonal
+assembly of independent family GPs. Usage: imported by refresh.py and tests.
+"""
+
+from __future__ import annotations
+
+import numpy as np
+from metrics import (
+    calibration_summary,
+    forecast_skill,
+    gaussian_scores,
+    joint_gaussian_scores,
+    portfolio_performance,
+    project_portfolios,
+    rank_ic,
+)
+from scipy.stats import rankdata
+
+
+class CommonAllocator:
+    """Cache DPP problems for the immutable monthly historical risk estimates.
+
+    Attributes:
+        covariance: Complete training-only covariance array in decimal squared.
+        cap: Registered largest-position limit, either 0.35 or 1.0.
+        problems: Month-specific parameterized problems and decision variables.
+    """
+
+    def __init__(self, covariance: np.ndarray, *, cap: float = 0.35) -> None:
+        import cvxpy as cp
+
+        if covariance.shape != (24, 15, 15) or cap not in (0.35, 1.0):
+            raise ValueError("Unregistered allocator axes or cap")
+        self.covariance = covariance
+        self.cap = cap
+        self.problems = []
+        equal = np.ones(15) / 15
+        for matrix in covariance:
+            np.linalg.cholesky(matrix)
+            reference = equal @ matrix @ equal
+            weights, score = cp.Variable(15), cp.Parameter(15)
+            constraints = [
+                weights >= 0,
+                weights <= cap,
+                cp.sum(weights) == 1,
+                cp.sum_squares(weights) <= 1 / 3,
+                cp.quad_form(weights, cp.psd_wrap(matrix / reference)) <= 1,
+            ]
+            problem = cp.Problem(cp.Maximize(score @ weights - 1e-8 * cp.sum_squares(weights)), constraints)
+            if not problem.is_dpp():
+                raise ValueError("Allocator compilation cannot be reused")
+            self.problems.append((problem, weights, score, reference))
+
+    def solve(self, mean: np.ndarray) -> np.ndarray:
+        """Return validated weights with independent solves and no fallback.
+
+        Args:
+            mean: Complete 24 by 15 raw expected-return array.
+
+        Returns:
+            Raw solver weights, without clipping or renormalization.
+        """
+        import cvxpy as cp
+
+        if mean.shape != (24, 15) or not np.isfinite(mean).all():
+            raise ValueError("Incomplete common-universe forecasts")
+        ranks = rankdata(mean, axis=1) / 15
+        rows = []
+        for index, (problem, variable, score, reference) in enumerate(self.problems):
+            score.value = ranks[index]
+            problem.solve(
+                solver="CLARABEL", warm_start=False, enforce_dpp=True, tol_gap_abs=1e-9, tol_gap_rel=1e-9, tol_feas=1e-9
+            )
+            if problem.status != cp.OPTIMAL or variable.value is None:
+                raise RuntimeError(f"Strict allocator failed: {problem.status}; no fallback")
+            weights = np.asarray(variable.value).copy()
+            ratio = weights @ self.covariance[index] @ weights / reference
+            if (
+                not np.isfinite(weights).all()
+                or weights.min() < -1e-8
+                or weights.max() > self.cap + 1e-7
+                or abs(weights.sum() - 1) > 1e-7
+                or weights @ weights > 1 / 3 + 1e-7
+                or ratio > 1 + 1e-6
+            ):
+                raise RuntimeError("Strict allocator constraint violation; no repair")
+            rows.append(weights)
+        return np.asarray(rows)
+
+
+def _ranking(actual: np.ndarray, mean: np.ndarray) -> dict:
+    values = rank_ic(actual, mean)
+    if not np.isfinite(values).all():
+        raise ValueError("Incomplete ranking IC; cannot shortlist")
+    return {
+        "mean_ic": float(values.mean()),
+        "first_12_ic": float(values[:12].mean()),
+        "last_12_ic": float(values[12:].mean()),
+        "positive_ic_fraction": float((values > 0).mean()),
+        "monthly_ic": values.tolist(),
+        "defined_ic_months": len(values),
+    }
+
+
+def _forecast(actual: np.ndarray, mean: np.ndarray, std: np.ndarray, baseline: np.ndarray) -> dict:
+    scores = gaussian_scores(actual, mean, std)
+    skill = forecast_skill(actual, mean, baseline)
+    return {
+        "mean_marginal_nll": float(scores["nll"].mean()),
+        "rmse": float(np.sqrt(scores["squared_error"].mean())),
+        "mean_crps": float(scores["crps"].mean()),
+        "coverage_95": float(scores["coverage_95"].mean()),
+        "mean_predicted_sd": float(std.mean()),
+        "error_rms_to_predicted_sd_rms": float(np.sqrt(np.mean((actual - mean) ** 2) / np.mean(std**2))),
+        "mean_oos_r_squared": float(skill["oos_r_squared_vs_expanding_mean"].mean()),
+        **_ranking(actual, mean),
+    }
+
+
+def _portfolio(context: dict, weights: np.ndarray) -> dict:
+    raw = np.sum(weights * context["actual"], axis=1)
+    total = (1 + raw) * (1 + context["risk_free"]) - 1
+    return {
+        "status": "solved",
+        **portfolio_performance(total, context["risk_free"]),
+        "first_12_sharpe": portfolio_performance(total[:12], context["risk_free"][:12])["conventional_sharpe"],
+        "last_12_sharpe": portfolio_performance(total[12:], context["risk_free"][12:])["conventional_sharpe"],
+        "arithmetic_excess": (total - context["risk_free"]).tolist(),
+        "weights": weights.tolist(),
+    }
+
+
+def _failed_portfolio(error: RuntimeError) -> dict:
+    return {
+        "status": "failed_no_weights",
+        "error": str(error),
+        "weights": None,
+        "arithmetic_excess": None,
+        "fallback_used": False,
+        **{
+            key: None
+            for key in [
+                "conventional_sharpe",
+                "compounded_total_return",
+                "annualized_excess_vol",
+                "max_drawdown_total_nav",
+                "first_12_sharpe",
+                "last_12_sharpe",
+            ]
+        },
+    }
+
+
+def _screen_one(candidate: dict, context: dict, anchor: np.ndarray, allocator: CommonAllocator) -> dict:
+    indices = [context["assets"].index(a) for a in candidate["tickers"]]
+    results = []
+    for offset, seed in enumerate([27, 127, 227]):
+        mean, std = candidate["mean"][offset], candidate["std"][offset]
+        full = anchor[offset].copy()
+        full[:, indices] = mean
+        ranks = rankdata(full, axis=1)
+        try:
+            portfolio = _portfolio(context, allocator.solve(full))
+        except RuntimeError as error:
+            portfolio = _failed_portfolio(error)
+        family_values = [
+            rank_ic(
+                context["actual"][:, [context["assets"].index(a) for a in tickers]],
+                full[:, [context["assets"].index(a) for a in tickers]],
+            )
+            for tickers in context["families"].values()
+        ]
+        results.append(
+            {
+                "seed": seed,
+                **_forecast(context["actual"][:, indices], mean, std, context["baseline_mean"][:, indices]),
+                "all_asset_ic": _ranking(context["actual"], full)["mean_ic"],
+                "equal_family_ic": float(np.mean(family_values)),
+                "portfolio": portfolio,
+                "linear_rank_portfolio": _portfolio(context, ranks / ranks.sum(axis=1, keepdims=True)),
+            }
+        )
+    return {
+        "configuration": candidate["configuration"],
+        "family": candidate["family"],
+        "inputs": candidate["inputs"],
+        "eligible": candidate["eligible"],
+        "results": results,
+        "comparison": "direct_joint" if candidate["family"] == "joint" else "conditional_family_replacement",
+    }
+
+
+def _aggregate(screen: dict) -> dict:
+    rows = screen["results"]
+    result = {key: screen[key] for key in ["configuration", "family", "eligible", "comparison"]}
+    result["input_count"] = len(screen["inputs"]) - 1
+    result["complete_portfolio_seeds"] = sum(row["portfolio"]["status"] == "solved" for row in rows)
+    for key in [
+        "mean_ic",
+        "first_12_ic",
+        "last_12_ic",
+        "mean_marginal_nll",
+        "rmse",
+        "mean_crps",
+        "coverage_95",
+        "mean_predicted_sd",
+        "error_rms_to_predicted_sd_rms",
+        "mean_oos_r_squared",
+        "all_asset_ic",
+        "equal_family_ic",
+    ]:
+        values = [row[key] for row in rows]
+        complete = all(value is not None for value in values)
+        result[key] = float(np.mean(values)) if complete else None
+        result[f"seed_sd_{key}"] = float(np.std(values, ddof=1)) if complete else None
+    for key in [
+        "conventional_sharpe",
+        "compounded_total_return",
+        "annualized_excess_vol",
+        "max_drawdown_total_nav",
+        "first_12_sharpe",
+        "last_12_sharpe",
+    ]:
+        values = [row["portfolio"][key] for row in rows]
+        complete = all(value is not None for value in values)
+        result[key] = float(np.mean(values)) if complete else None
+        result[f"seed_sd_{key}"] = float(np.std(values, ddof=1)) if complete else None
+    return result
+
+
+def _shortlist(rows: list[dict], baseline: str) -> list[dict]:
+    selected = []
+    for family in sorted({row["family"] for row in rows}):
+        eligible = [row for row in rows if row["family"] == family and row["eligible"]]
+        ic_key = "equal_family_ic" if family == "joint" else "mean_ic"
+        ranked = sorted(eligible, key=lambda r: (-r[ic_key], r["input_count"], r["configuration"]))
+        choices: dict[str, list[str]] = {}
+        if family == "joint":
+            choices[baseline] = ["accepted_baseline_reused_exact_covariance"]
+        roles = [
+            (ranked[0], "ranking_lead"),
+            (
+                min(
+                    [r for r in eligible if r["conventional_sharpe"] is not None],
+                    key=lambda r: (-r["conventional_sharpe"], r["configuration"]),
+                ),
+                "portfolio_lead",
+            ),
+            (min(eligible, key=lambda r: (r["mean_marginal_nll"], r["configuration"])), "marginal_nll_lead"),
+            (
+                min(ranked[:5], key=lambda r: (r["input_count"], -r[ic_key], r["configuration"])),
+                "compact_among_top_five_ranking",
+            ),
+        ]
+        for row, role in roles:
+            if row["configuration"] not in choices and len(choices) >= 4:
+                continue
+            choices.setdefault(row["configuration"], []).append(role)
+        for row in ranked:
+            if len(choices) >= 4:
+                break
+            choices.setdefault(row["configuration"], ["ranking_diversity_fill"])
+        selected.extend(
+            {"configuration": key, "family": family, "roles": roles, "reuse": key == baseline}
+            for key, roles in choices.items()
+        )
+    return selected
+
+
+def _density(actual: np.ndarray, mean: np.ndarray, covariance: np.ndarray) -> dict:
+    joint = joint_gaussian_scores(actual, mean, covariance)
+    weights = np.ones((len(actual), 1, actual.shape[1])) / actual.shape[1]
+    projected = project_portfolios(actual, mean, covariance, weights)
+    return {
+        **{key: float(value.mean()) for key, value in joint.items()},
+        "equal_weight_reference": calibration_summary({key: value[:, 0] for key, value in projected.items()}),
+    }

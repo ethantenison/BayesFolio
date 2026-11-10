@@ -1,0 +1,10 @@
+{
+  "runs": {
+    "127": "cancelled_by_user",
+    "227": "cancelled_by_user",
+    "27": "cancelled_by_user"
+  },
+  "signature": "187b4f583c09457e8b359e8ad8780c506ca2bc9f4673834c32ce1a038dbfcec4",
+  "state": "cancelled_by_user",
+  "workers": 3
+}

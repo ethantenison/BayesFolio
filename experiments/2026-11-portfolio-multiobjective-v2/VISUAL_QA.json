@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "Selected curve and both controls visible",
+    "Only two standing benchmark curves",
+    "Full53 and latest12 axes/legends legible",
+    "Gross-cost and retrospective-window labels explicit",
+    "Stitched drawdown includes original peak",
+    "Pareto axes use growth and positive drawdown loss; numbered table explains clustered points"
+  ],
+  "image_sha256": {
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/COMPARISON.png": "6f7528bd2e50f082088e9d1de83a80877cb3dd294c9ee1ad8150f5fd6093721e",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/DRAWDOWN.png": "9930fd5ccd22c03468da19b003c44bb7c64a55d25eaf66bd769731c639061d66",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/PARETO.png": "5b37096f0de8a005084f94531c44bd950f0a93189b25e7fc29754812f1711d69"
+  },
+  "images": [
+    "COMPARISON.png",
+    "DRAWDOWN.png",
+    "PARETO.png"
+  ],
+  "passed": true,
+  "reviewer": "root"
+}

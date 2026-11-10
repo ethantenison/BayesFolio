@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "scope": "Deterministic offline evaluation framework, not another model search or GP fit batch",
+  "metric_hierarchy": {
+    "forecast_skill": ["monthly_pooled_rank_ic", "within_family_rank_ic", "equal_family_average_ic", "chronological_and_seed_stability"],
+    "portfolio_usefulness": ["conventional_arithmetic_excess_sharpe", "benchmark_relative_return", "compounded_total_return"],
+    "risk_adequacy": ["portfolio_error_calibration", "total_nav_drawdown", "realized_volatility", "joint_observed_predictive_nll", "fixed_probe_nll_and_crps", "marginal_nll", "interval_coverage_and_width"],
+    "parsimony": "Input count breaks economically indistinguishable ties; no automatic threshold is invented"
+  },
+  "required_covariance": "Complete predictive observed-return covariance, raw target units, including likelihood noise; task-kernel B and marginal variances alone are insufficient",
+  "precision_policy": "Exact analytic and Gaussian plug-in scenario covariance scores are labeled separately; no covariance independence assumption, repair or silent fallback",
+  "fixed_probes": ["equal_weight_all_15", "equal_weight_each_family", "fixed_60_percent_equity_40_percent_fixed_income"],
+  "fixed_probe_policy": "Same deterministic weights across models and seeds, never chosen based on realized returns",
+  "risk_calibration": "Errors about ex-ante predicted means: mean z, mean z squared, error RMS to predicted SD RMS, PIT bins, 50/80/95 coverage and widths",
+  "return_units": "Decimal discounted-excess targets for forecast scores; explicit frozen-RF conversion for arithmetic-excess Sharpe and total-return NAV",
+  "bootstrap": {"seed": 20261020, "samples": 2000, "circular_block_months": 3, "resampling_unit": "month shared across all seeds"},
+  "cost_policy": "Primitive functions support explicit beginning-wealth costs. CLI cached study is gross because no cost series is supplied",
+  "turnover_objective": false,
+  "hypervolume_selection": false,
+  "automatic_promotion": false,
+  "production_changes": false,
+  "new_gp_fits": false,
+  "evaluation_status": "Exploratory reused months, not untouched holdout"
+}

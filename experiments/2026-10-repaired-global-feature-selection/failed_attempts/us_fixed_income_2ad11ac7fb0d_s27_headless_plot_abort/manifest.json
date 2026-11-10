@@ -1,0 +1,184 @@
+{
+  "command": "/Users/et/Documents/BayesFolio/experiments/2026-07-international-equity-etf-features/run_first_round_walkforward.py --feature-path /Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/artifacts/v1/us_fixed_income.parquet --output-root /Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs --run-id us_fixed_income_2ad11ac7fb0d_s27 --tickers BND,IEF,LQD,HYG --scored-date-file /Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt --seed 27 --mtgp-rank 2 --maxiter 15 --posterior-scenarios 256 --resume-scenarios --gp-experiment signed_lkj_eta_2 --upperlng 0.35 --nea 3 --gp-riskfolio-rm CVaR --gp-riskfolio-obj MaxRet --scenario-workers 1 --torch-num-threads 1 --feature-set momentum_plus_macro_market --custom-etf-cols baspread,chmom,cs_mom_rank,lag_y_excess_lead,ma_signal,max_dd_6m,mom12m,mom36m,ret_autocorr,ret_kurt,vol_z --custom-macro-cols copper_ret,cpi_chg_12p,cpi_chg_1p,em_fx_ret,erp,gold_crude_ratio,hy_spread,hy_spread_chg_1p,hy_spread_z_12p,oil_ret,pct_above_50dma,spy_flow_z_12p,spy_ret,vix,vix_slope,vix_ts_z_12p --covar-grouping-proposal default --macro-component-proposal default --time-modulation-mode neither",
+  "created_at_utc": "2026-10-18T14:28:38.306148+00:00",
+  "data": {
+    "date_max": "2026-04-30",
+    "date_min": "2017-05-31",
+    "final_portfolio_universe": [
+      "BND",
+      "IEF",
+      "LQD",
+      "HYG"
+    ],
+    "helper_assets_fit_but_excluded": [],
+    "min_feature_date_filter": null,
+    "min_scored_date_filter": null,
+    "rows": 432,
+    "scored_date_file": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/artifacts/v1/scored_dates_24.txt",
+    "target_col": "y_excess_lead",
+    "training_universe": [
+      "BND",
+      "IEF",
+      "LQD",
+      "HYG"
+    ]
+  },
+  "feature_path": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/artifacts/v1/us_fixed_income.parquet",
+  "feature_sha256": "ad03586be8d7ad4b10c94603ae38502ed58c55707a4727d23b6525d926a5a893",
+  "git_dirty_summary_at_start": "?? .learnings/\n?? experiments/2026-10-repaired-global-feature-selection/",
+  "git_sha": "baea382a81a84e7b51a2afe3ed62ba922c0839c7",
+  "live_rebalance_date": null,
+  "modeling": {
+    "experiment": "signed_lkj_eta_2",
+    "input_transform": "BoTorch Normalize on non-task feature columns",
+    "kernel_composition_proposal": {
+      "components": null,
+      "name": "none"
+    },
+    "kernel_proposal": {
+      "changepoint_date": null,
+      "changepoint_width_months": null,
+      "half_life_months": null,
+      "name": "none"
+    },
+    "lengthscale_floor": null,
+    "maxiter": 15,
+    "mean_kind": "multitask_constant",
+    "min_inferred_noise_level": 0.005,
+    "outcome_transform": "StratifiedStandardize by ETF task",
+    "outputscale_floor": null,
+    "outputscale_prior_median": null,
+    "outputscale_prior_sigma": null,
+    "posterior_scenarios_per_rebalance": 256,
+    "rank": 2,
+    "recency_observation_noise": {
+      "enabled": false
+    },
+    "resume_scenarios": true,
+    "scenario_mean_scale": 1.0,
+    "scenario_workers": 1,
+    "seed": 27,
+    "task_covar_prior": "BetaPrior(2.5, 1.5)",
+    "task_kernel": "IndexKernel",
+    "task_noise_floor": {
+      "enabled": false
+    },
+    "time_modulation_mode": "neither",
+    "torch_num_threads": 1,
+    "turnover_blend": null,
+    "variant": "signed_lkj_eta_2"
+  },
+  "output_dir": "/Users/et/Documents/BayesFolio/experiments/2026-10-repaired-global-feature-selection/runs/us_fixed_income_2ad11ac7fb0d_s27",
+  "portfolio": {
+    "n_portfolio_construction_dates": 24,
+    "n_realized_rebalances": 24,
+    "periods_per_year": 12.0,
+    "rebalance_frequency": "monthly_bme",
+    "riskfolio_gp": {
+      "alpha": 0.5,
+      "hist": true,
+      "method_cov": "hist",
+      "method_mu": "hist",
+      "model": "Classic",
+      "nea": 3,
+      "obj": "MaxRet",
+      "rm": "CVaR",
+      "upperlng": 0.35
+    },
+    "riskfolio_historical": {
+      "hist": true,
+      "method_cov": "gerber1",
+      "method_mu": "ewma2",
+      "model": "Classic",
+      "nea": 3,
+      "obj": "Sharpe",
+      "rm": "CVaR",
+      "upperlng": 0.35
+    },
+    "starting_value": 10000.0,
+    "static_benchmarks": {
+      "schwab_moderate_aggressive_static": {
+        "cash_asset": "CASH",
+        "cash_weight": 0.05,
+        "description": "Fixed Schwab-style Moderate Aggressive target benchmark.",
+        "rebalance_rule": "rebalance to the same fixed target weights at each construction date",
+        "source_allocation": {
+          "bonds": 0.15,
+          "cash": 0.05,
+          "stocks": 0.8
+        },
+        "weights": {
+          "BND": 0.2375,
+          "HYG": 0.2375,
+          "IEF": 0.2375,
+          "LQD": 0.2375
+        }
+      }
+    },
+    "strategies": [
+      "gp_scenarios_riskfolio",
+      "historical_y_ewma2_gerber1_riskfolio",
+      "equal_weight",
+      "schwab_moderate_aggressive_static"
+    ]
+  },
+  "portfolio_construction_dates": [
+    "2024-05-31",
+    "2024-06-28",
+    "2024-07-31",
+    "2024-08-30",
+    "2024-09-30",
+    "2024-10-31",
+    "2024-11-29",
+    "2024-12-31",
+    "2025-01-31",
+    "2025-02-28",
+    "2025-03-31",
+    "2025-04-30",
+    "2025-05-30",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-29",
+    "2025-09-30",
+    "2025-10-31",
+    "2025-11-28",
+    "2025-12-31",
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30"
+  ],
+  "rebalance_dates": [
+    "2024-05-31",
+    "2024-06-28",
+    "2024-07-31",
+    "2024-08-30",
+    "2024-09-30",
+    "2024-10-31",
+    "2024-11-29",
+    "2024-12-31",
+    "2025-01-31",
+    "2025-02-28",
+    "2025-03-31",
+    "2025-04-30",
+    "2025-05-30",
+    "2025-06-30",
+    "2025-07-31",
+    "2025-08-29",
+    "2025-09-30",
+    "2025-10-31",
+    "2025-11-28",
+    "2025-12-31",
+    "2026-01-30",
+    "2026-02-27",
+    "2026-03-31",
+    "2026-04-30"
+  ],
+  "schema": "bayesfolio.portfolio_optimization_walkforward.manifest.v1",
+  "source_experiment": "/Users/et/Documents/BayesFolio/experiments/2026-06-task-covariance/run_task_covariance_rollforward.py",
+  "training_history": {
+    "mode": "all_available_before_window",
+    "train_months": null,
+    "window_rule": "date < window_date"
+  }
+}

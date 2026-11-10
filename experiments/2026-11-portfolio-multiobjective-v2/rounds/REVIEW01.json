@@ -1,0 +1,233 @@
+{
+  "balanced_leader": {
+    "id": "policy_91b4b9ebe70878b95ef8",
+    "policy": {
+      "MGK_weight": 0,
+      "allocator": "hard_rank",
+      "control": false,
+      "covariance_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "covariance_fractions": [
+        0.5,
+        0.5,
+        0.0,
+        0.0
+      ],
+      "equity_cap": null,
+      "id": "policy_91b4b9ebe70878b95ef8",
+      "label": "v1_three_expert_reference_MGK0_NE3_risk0.75",
+      "minimum_effective_assets": 3,
+      "prediction_experts": [
+        "broad_r2_i15_exp",
+        "compact_r2_i15_exp",
+        "broad_roll48_r2_i15"
+      ],
+      "prediction_fractions": [
+        [
+          0.4270833333333333,
+          0.5,
+          0.07291666666666667
+        ],
+        [
+          0.9427083333333334,
+          0.052083333333333336,
+          0.005208333333333333
+        ],
+        [
+          0.0,
+          0.07291666666666667,
+          0.9270833333333334
+        ],
+        [
+          0.026041666666666668,
+          0.020833333333333332,
+          0.953125
+        ]
+      ],
+      "risk_multiplier": 0.75,
+      "seed_pooling": "equal_moments_before_one_solve"
+    },
+    "summary": {
+      "annualized_excess_vol": 0.10721342734327986,
+      "annualized_total_vol": 0.10771292846541466,
+      "cagr": 0.11448845231404614,
+      "cost_cases": {
+        "0": {
+          "annualized_excess_vol": 0.10721342734327984,
+          "annualized_total_vol": 0.10771292846541464,
+          "bps_per_traded_dollar": 0,
+          "cagr": 0.11448845231404614,
+          "longest_underwater_months": 14,
+          "max_drawdown": -0.10585543822358834,
+          "max_drawdown_recovery_censored": false,
+          "max_drawdown_recovery_months": 14,
+          "mean_traded_notional_fraction": 1.4197302438458268,
+          "months": 41,
+          "ongoing_underwater_months": 0,
+          "sharpe": 0.6370209921219199,
+          "sum_cost_fractions_of_pretrade_wealth": 0.0,
+          "total_return": 0.44824334283608236,
+          "underwater_at_end": false,
+          "worst_12_month_drawdown": -0.10585543822358834,
+          "worst_12_month_return": -0.06329457368089597,
+          "worst_month": -0.05987069137457224
+        },
+        "10": {
+          "annualized_excess_vol": 0.10715767869911035,
+          "annualized_total_vol": 0.10765710901752783,
+          "bps_per_traded_dollar": 10,
+          "cagr": 0.09566123219135259,
+          "longest_underwater_months": 19,
+          "max_drawdown": -0.11179043028845914,
+          "max_drawdown_recovery_censored": false,
+          "max_drawdown_recovery_months": 19,
+          "mean_traded_notional_fraction": 1.4186863202830924,
+          "months": 41,
+          "ongoing_underwater_months": 0,
+          "sharpe": 0.47704830832207584,
+          "sum_cost_fractions_of_pretrade_wealth": 0.058166139131606794,
+          "total_return": 0.36634595523654867,
+          "underwater_at_end": false,
+          "worst_12_month_drawdown": -0.11179043028845925,
+          "worst_12_month_return": -0.07932801528287647,
+          "worst_month": -0.061641377889817606
+        },
+        "20": {
+          "annualized_excess_vol": 0.10712422745070867,
+          "annualized_total_vol": 0.10762347614098489,
+          "bps_per_traded_dollar": 20,
+          "cagr": 0.07715052724233185,
+          "longest_underwater_months": 22,
+          "max_drawdown": -0.11768496648050264,
+          "max_drawdown_recovery_censored": false,
+          "max_drawdown_recovery_months": 22,
+          "mean_traded_notional_fraction": 1.417644256784421,
+          "months": 41,
+          "ongoing_underwater_months": 0,
+          "sharpe": 0.3170785753385092,
+          "sum_cost_fractions_of_pretrade_wealth": 0.11624682905632253,
+          "total_return": 0.2890735411681451,
+          "underwater_at_end": false,
+          "worst_12_month_drawdown": -0.11768496648050264,
+          "worst_12_month_return": -0.09509069558018757,
+          "worst_month": -0.06340853010064484
+        },
+        "5": {
+          "annualized_excess_vol": 0.10718275558517634,
+          "annualized_total_vol": 0.10768223520296216,
+          "bps_per_traded_dollar": 5,
+          "cagr": 0.10503494148193893,
+          "longest_underwater_months": 19,
+          "max_drawdown": -0.108828009661459,
+          "max_drawdown_recovery_censored": false,
+          "max_drawdown_recovery_months": 19,
+          "mean_traded_notional_fraction": 1.4192080492338934,
+          "months": 41,
+          "ongoing_underwater_months": 0,
+          "sharpe": 0.5570405354830814,
+          "sum_cost_fractions_of_pretrade_wealth": 0.029093765009294812,
+          "total_return": 0.4066996196234687,
+          "underwater_at_end": false,
+          "worst_12_month_drawdown": -0.10882800966145889,
+          "worst_12_month_return": -0.07134542610667582,
+          "worst_month": -0.060756477082598126
+        }
+      },
+      "effective_assets": 3.272350314691368,
+      "family_assets": {
+        "international_equity": [
+          "VEA",
+          "VWO",
+          "VSS",
+          "EWX"
+        ],
+        "international_fixed_income": [
+          "BNDX",
+          "VWOB",
+          "HYEM"
+        ],
+        "us_equity": [
+          "SPY",
+          "VTV",
+          "IWM"
+        ],
+        "us_fixed_income": [
+          "BND",
+          "IEF",
+          "LQD",
+          "HYG"
+        ]
+      },
+      "family_ic": {
+        "international_equity": 0.10243902439024391,
+        "international_fixed_income": 0.012195121951219513,
+        "us_equity": 0.15853658536585366,
+        "us_fixed_income": 0.16097560975609757
+      },
+      "family_mean_monthly_return_contribution": {
+        "international_equity": 0.005008205279269024,
+        "international_fixed_income": 6.742328883608655e-06,
+        "us_equity": 0.004393005465657106,
+        "us_fixed_income": 0.00013611110689534477
+      },
+      "family_weights": {
+        "international_equity": 0.3639945497975992,
+        "international_fixed_income": 0.17875740350898697,
+        "us_equity": 0.3221433727832703,
+        "us_fixed_income": 0.13510467391014375
+      },
+      "longest_underwater_months": 14,
+      "max_drawdown": -0.10585543822358834,
+      "max_drawdown_recovery_censored": false,
+      "max_drawdown_recovery_months": 14,
+      "minimum_effective_assets": 2.999999994985484,
+      "months": 41,
+      "ongoing_underwater_months": 0,
+      "rank_ic": 0.10447601179308498,
+      "ranking_assets": [
+        "SPY",
+        "VTV",
+        "IWM",
+        "VEA",
+        "VWO",
+        "VSS",
+        "EWX",
+        "BND",
+        "IEF",
+        "LQD",
+        "HYG",
+        "BNDX",
+        "VWOB",
+        "HYEM"
+      ],
+      "raw_maximum_weight_sum_error": 6.661338147750939e-16,
+      "raw_minimum_weight": -3.2221420427148837e-10,
+      "raw_weight_tolerances": {
+        "maximum_weight_sum_error": 1e-07,
+        "minimum_weight": -1e-08
+      },
+      "sharpe": 0.6370209921219194,
+      "total_return": 0.44824334283608236,
+      "underwater_at_end": false,
+      "worst_12_month_drawdown": -0.10585543822358834,
+      "worst_12_month_return": -0.06329457368089597,
+      "worst_month": -0.05987069137457227
+    }
+  },
+  "best_distance": 0.5596207863115261,
+  "complete": 222,
+  "covariance_constraint_active_cases": 96,
+  "frontier_ids": [
+    "policy_30caf335b5a4d01d4196",
+    "policy_5b5f6ec1a1a1f525c30e",
+    "policy_91b4b9ebe70878b95ef8"
+  ],
+  "hypervolume": 0.014392731067774072,
+  "infeasible": 0,
+  "latest12_scored": false,
+  "round": 1,
+  "scored_total": 222
+}

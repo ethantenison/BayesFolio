@@ -1,0 +1,2 @@
+configuration,seed_count,seeds,mean_ic,std_ic,mean_gaussian_nll,std_gaussian_nll,sharpe,std_sharpe,cumulative_return_diagnostic_only,rmse_diagnostic_only,validation_passed,pareto_nondominated
+us_equity_c10464d00ae6,3,"27,127,227",0.26388888888888884,0.025458753860865758,-1.7532695796486797,0.032808204564864746,1.435085931914298,0.031182541505484468,0.41743901229981034,0.040859117770974444,True,True

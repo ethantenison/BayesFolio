@@ -1,0 +1,9 @@
+{
+  "stage": "first authorized raw-data fetch",
+  "forecast_origin": "2026-10-30",
+  "symbol": "SPY",
+  "error": "yfinance DNSError curl(6): Could not resolve host guce.yahoo.com",
+  "snapshot_files_written": 0,
+  "GP_fit_attempts": 0,
+  "recovery": "Retry identical fetch-and-build command with scoped network permission; do not change sources or settings"
+}

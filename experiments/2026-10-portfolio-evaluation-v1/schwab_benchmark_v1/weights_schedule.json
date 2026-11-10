@@ -1,0 +1,51 @@
+{
+  "schema": "bayesfolio.schwab_classic_weight_schedule.v1",
+  "researched_on": "2026-10-24",
+  "model_family": "Schwab classic five-asset-class investor-profile illustrations, not Intelligent Portfolios",
+  "proxy_order": ["SPY", "IWM", "VEA", "BND", "CASH"],
+  "profiles": {
+    "aggressive": {
+      "initial_weights": [0.5, 0.2, 0.25, 0, 0.05],
+      "verified_revisions": []
+    },
+    "moderately_aggressive": {
+      "initial_weights": [0.45, 0.15, 0.2, 0.15, 0.05],
+      "verified_revisions": []
+    }
+  },
+  "source_evidence": [
+    {
+      "id": "schwab_2018_questionnaire",
+      "title": "Schwab Investor Profile Questionnaire, 2018 edition, final-page allocation charts",
+      "author": "Charles Schwab and Co., Inc.",
+      "source_document_year": 2018,
+      "source_document_code": "1018-8X5W",
+      "local_file": "sources/schwab_investor_profile_2018.pdf",
+      "sha256": "08fc53ac5bcc129ad7a5df5dc8de567a06b3c2bcb36e11adeabc9f971ce4f6af",
+      "url": "https://static1.squarespace.com/static/5d826ac2d8bfd03744fb9f70/t/5e9e204d41128918ac33bedc/1587421262574/SchwabRiskAssessment.pdf",
+      "provenance": "Schwab-authored document hosted by a third party; final page visually inspected locally.",
+      "finding": "Both five-class target mixes match the approved initial weights; the mixes predate the test window."
+    },
+    {
+      "id": "schwab_classic_profile_current",
+      "url": "https://hgtoolsweb.schwab.com/pcu/mp/enRiskProfileAnalysisForClassic.action",
+      "finding": "Current classic profile table still lists both approved five-class target mixes.",
+      "date_limitation": "Current page is corroboration, not an archived monthly revision history."
+    },
+    {
+      "id": "schwab_2026_retirement_article",
+      "url": "https://www.schwab.com/learn/story/beyond-4-rule-how-much-can-you-spend-retirement",
+      "publication_date": "2026-03-27",
+      "finding": "Disclosures still list moderately aggressive weights 45/15/20/15/5. Annual updates discussed concern projected returns and volatility, not a documented change to those target weights."
+    },
+    {
+      "id": "schwab_moneywise_current",
+      "url": "https://www.schwabmoneywise.com/essentials/finding-the-right-asset-allocation",
+      "finding": "Aggressive allocation remains 50/20/25/0/5 in the current Schwab MoneyWise table."
+    }
+  ],
+  "revision_search_result": "No dated 2024-2026 change to these specific classic target weights was verified. This is not a claim that no Schwab product changed or an exhaustive point-in-time archive.",
+  "simulation_policy": "Carry the documented initial weights forward until a verified published revision exists; never invent annual changes or use an unknown 2026 change retroactively.",
+  "revision_entry_fields": ["published_on", "effective_on", "weights", "source_url"],
+  "revision_timing": "Apply at the first monthly rebalance strictly after publication day and on or after effective day; same-day publication is conservatively deferred because time of day is unknown."
+}

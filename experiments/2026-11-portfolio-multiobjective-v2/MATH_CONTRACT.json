@@ -1,0 +1,10 @@
+{
+  "files_sha256": {
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/GP_VARIANTS.json": "f2a8a063c6e598913aebc90b8cf10e99a1e4db8c4ad0653f3f837dff09abb820",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/PROTOCOL_CLARIFICATIONS.json": "67e5c0d006a8841d4a728534de2013ff78845d1fc55144a8b05ede754db86b77",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/v2_common.py": "ffc03b6e7ea0c63f221c729243d53810e5638ec33c7b051b314173c10c4a897a",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/v2_evaluate.py": "75e17a24ee70078b07aa918ef0a82c9f7aff0a308091b11d111e948949b2d4f1",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/v2_metrics.py": "588ce1f670c39106d2c8c284749250e5c274208963bc0e1c22e7db11cb623416",
+    "/Users/et/Documents/BayesFolio/experiments/2026-11-portfolio-multiobjective-v2/v2_policy.py": "70492177e78cefd1f06b29b24a7e7e3e11b85296d804eafb782713dc75908ec6"
+  }
+}

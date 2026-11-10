@@ -1,0 +1,1613 @@
+{
+  "audit": {
+    "budget_residual": 0.0,
+    "effective_assets": 9.999999999971388,
+    "max_weight": 0.18638969524212806,
+    "minimum_weight": 0.0
+  },
+  "best_objective_reproductions": 111,
+  "best_start": 98,
+  "global_optimality_certified": false,
+  "maximum_feasible_mean": -0.004966946907721877,
+  "month_index": 14,
+  "monthly_forecast_sharpe": -0.3651091702667586,
+  "origin": "2025-07-31",
+  "raw_weights": [
+    0.053646771360359634,
+    0.18638969524212806,
+    0.0,
+    0.0038430280759732542,
+    0.09546196462439221,
+    0.08784082876412437,
+    0.10065637208631124,
+    0.058863076440947286,
+    0.07205780029589506,
+    0.10892229262963553,
+    0.03637756270200688,
+    0.04116050248320407,
+    0.10237152244925335,
+    0.023615195678672336,
+    0.02879338716709696
+  ],
+  "scenario_path": "/Users/et/Documents/BayesFolio/experiments/2026-10-portfolio-evaluation-v1/scenario_riskfolio_v1/outputs/failures/s27_2025-07-31.npz",
+  "scenario_sha256": "de2e324d645e4d77baf259ea6027101997c89b44a373376c9853d0d000f78fb8",
+  "seed": 27,
+  "seed_index": 0,
+  "solver_route": "direct_signed_sharpe_multistart",
+  "starts": [
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999998966,
+        "max_weight": 0.18638969347185827,
+        "minimum_weight": 7.330464331996915e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681446,
+      "start": 0,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999966,
+        "max_weight": 0.18638969610602293,
+        "minimum_weight": 0.0
+      },
+      "iterations": 24,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681939,
+      "start": 1,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999696,
+        "max_weight": 0.18638969646980086,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026818035,
+      "start": 2,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999062,
+        "max_weight": 0.18638969637081287,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026814876,
+      "start": 3,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 10.000000000000313,
+        "max_weight": 0.18638969639739902,
+        "minimum_weight": 2.817344047568722e-14
+      },
+      "iterations": 32,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026822104,
+      "start": 4,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999195,
+        "max_weight": 0.18638969685422543,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681551,
+      "start": 5,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999998831,
+        "max_weight": 0.18638969647363465,
+        "minimum_weight": 4.989379687816362e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.365109170268137,
+      "start": 6,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999998275,
+        "max_weight": 0.1863896964654304,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026810885,
+      "start": 7,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 3.3306690738754696e-16,
+        "effective_assets": 9.999999999999988,
+        "max_weight": 0.18638969636664854,
+        "minimum_weight": 1.9019686921787292e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681949,
+      "start": 8,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999028,
+        "max_weight": 0.18638970258990945,
+        "minimum_weight": 0.0
+      },
+      "iterations": 30,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681485,
+      "start": 9,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.99999999999941,
+        "max_weight": 0.18638969369403655,
+        "minimum_weight": 6.330185330198542e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681667,
+      "start": 10,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999990257,
+        "max_weight": 0.18638969714922804,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702677066,
+      "start": 11,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.999999999992546,
+        "max_weight": 0.18638969318143814,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702678239,
+      "start": 12,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.99999999999834,
+        "max_weight": 0.18638969438065953,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.365109170268113,
+      "start": 13,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999497,
+        "max_weight": 0.18638969777047765,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026817086,
+      "start": 14,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999309,
+        "max_weight": 0.18638969656294865,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681611,
+      "start": 15,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.99999999999111,
+        "max_weight": 0.18638970339084557,
+        "minimum_weight": 3.983276852204483e-17
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702677504,
+      "start": 16,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999999769,
+        "max_weight": 0.18638969789559834,
+        "minimum_weight": 1.0255988236643106e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681838,
+      "start": 17,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999994671,
+        "max_weight": 0.18638969541988634,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702679309,
+      "start": 18,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999997474,
+        "max_weight": 0.1863896941945024,
+        "minimum_weight": 1.7191953973248733e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026806966,
+      "start": 19,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999997234,
+        "max_weight": 0.1863896973066345,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026805667,
+      "start": 20,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999998504,
+        "max_weight": 0.18638969735221492,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026812334,
+      "start": 21,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998817,
+        "max_weight": 0.18638969794913626,
+        "minimum_weight": 3.590763961102165e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026813766,
+      "start": 22,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999991,
+        "max_weight": 0.18638969641835829,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681952,
+      "start": 23,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.99999999999923,
+        "max_weight": 0.18638969728909222,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026815687,
+      "start": 24,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999734,
+        "max_weight": 0.18638969409777376,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681826,
+      "start": 25,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999977,
+        "max_weight": 0.18638969642229009,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026819434,
+      "start": 26,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998149,
+        "max_weight": 0.18638969461586977,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681028,
+      "start": 27,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999994241,
+        "max_weight": 0.18638971090761886,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702679304,
+      "start": 28,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999990967,
+        "max_weight": 0.18638969359026655,
+        "minimum_weight": 2.3676585482243693e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702677485,
+      "start": 29,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.99999999999845,
+        "max_weight": 0.1863896982532602,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026811923,
+      "start": 30,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.99999999999313,
+        "max_weight": 0.18638969453005794,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702678511,
+      "start": 31,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999917,
+        "max_weight": 0.1863896972245293,
+        "minimum_weight": 5.065581747627237e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681915,
+      "start": 32,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999911,
+        "max_weight": 0.18638969639317457,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026819145,
+      "start": 33,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.999999999999321,
+        "max_weight": 0.1863896952584802,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026816225,
+      "start": 34,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.99999999999605,
+        "max_weight": 0.18638969573334432,
+        "minimum_weight": 7.948264259724018e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702679987,
+      "start": 35,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999995863,
+        "max_weight": 0.1863896949115722,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702679879,
+      "start": 36,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999742,
+        "max_weight": 0.1863896963443831,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681828,
+      "start": 37,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999797,
+        "max_weight": 0.18638969692008062,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681859,
+      "start": 38,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 10.000000000000014,
+        "max_weight": 0.1863896963420372,
+        "minimum_weight": 1.5097223736797342e-15
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681968,
+      "start": 39,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999994513,
+        "max_weight": 0.18638969543539993,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026793144,
+      "start": 40,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999927,
+        "max_weight": 0.18638969494700558,
+        "minimum_weight": 1.0861200254664087e-15
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681923,
+      "start": 41,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999999186,
+        "max_weight": 0.18638969282842074,
+        "minimum_weight": 2.779014687623438e-16
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026815565,
+      "start": 42,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.99999999999862,
+        "max_weight": 0.18638969531905736,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681262,
+      "start": 43,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999877,
+        "max_weight": 0.18638969427993604,
+        "minimum_weight": 5.870024106724983e-16
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681897,
+      "start": 44,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999803,
+        "max_weight": 0.18638969685568554,
+        "minimum_weight": 1.9978476569860442e-17
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026818573,
+      "start": 45,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999995,
+        "max_weight": 0.1863896962950832,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681952,
+      "start": 46,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.9999999999961,
+        "max_weight": 0.18638969504204442,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026799977,
+      "start": 47,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999999678,
+        "max_weight": 0.1863896966489413,
+        "minimum_weight": 1.536942360882967e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681793,
+      "start": 48,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999997696,
+        "max_weight": 0.18638968293497654,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702680845,
+      "start": 49,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999963,
+        "max_weight": 0.18638969587141896,
+        "minimum_weight": 6.949610727132185e-16
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681936,
+      "start": 50,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999990568,
+        "max_weight": 0.18638970132388757,
+        "minimum_weight": 1.8832343533929494e-16
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026772927,
+      "start": 51,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999941,
+        "max_weight": 0.1863896960036039,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681926,
+      "start": 52,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.999999999997229,
+        "max_weight": 0.18638969598817476,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026805667,
+      "start": 53,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.999999999993829,
+        "max_weight": 0.18638969692643237,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702678866,
+      "start": 54,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.99999999999995,
+        "max_weight": 0.18638969631286015,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026819295,
+      "start": 55,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998833,
+        "max_weight": 0.18638969311607168,
+        "minimum_weight": 2.242095284096901e-16
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026813766,
+      "start": 56,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999996433,
+        "max_weight": 0.1863897072494095,
+        "minimum_weight": 1.9383043792935594e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702680221,
+      "start": 57,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998131,
+        "max_weight": 0.18638969557550125,
+        "minimum_weight": 4.326014570867494e-17
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681016,
+      "start": 58,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999992172,
+        "max_weight": 0.18638969534007657,
+        "minimum_weight": 3.382648873910324e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702678024,
+      "start": 59,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999938,
+        "max_weight": 0.18638969667309668,
+        "minimum_weight": 7.070696754825112e-17
+      },
+      "iterations": 30,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026819256,
+      "start": 60,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999988,
+        "max_weight": 0.18638969642267877,
+        "minimum_weight": 4.945362059582712e-18
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.365109170268195,
+      "start": 61,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999208,
+        "max_weight": 0.18638969470650746,
+        "minimum_weight": 4.408048890281349e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026815604,
+      "start": 62,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999998929,
+        "max_weight": 0.18638969237945047,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026814377,
+      "start": 63,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999996,
+        "max_weight": 0.1863896963495862,
+        "minimum_weight": 0.0
+      },
+      "iterations": 32,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026819534,
+      "start": 64,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999591,
+        "max_weight": 0.18638969665009222,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026817546,
+      "start": 65,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999997337,
+        "max_weight": 0.18638969698264024,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702680636,
+      "start": 66,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998906,
+        "max_weight": 0.18638969226314933,
+        "minimum_weight": 4.587798797029167e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681424,
+      "start": 67,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999996524,
+        "max_weight": 0.1863896950836768,
+        "minimum_weight": 1.3126281079791178e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026802187,
+      "start": 68,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999997032,
+        "max_weight": 0.18638968803728972,
+        "minimum_weight": 1.9306750569559117e-16
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026804796,
+      "start": 69,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 8.881784197001252e-16,
+        "effective_assets": 9.999999999999844,
+        "max_weight": 0.18638969666827307,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026818857,
+      "start": 70,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.999999999999893,
+        "max_weight": 0.18638969454181636,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026819095,
+      "start": 71,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998234,
+        "max_weight": 0.18638969956220117,
+        "minimum_weight": 7.639514417934905e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.365109170268108,
+      "start": 72,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999162,
+        "max_weight": 0.18638969589468038,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026815387,
+      "start": 73,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 3.3306690738754696e-16,
+        "effective_assets": 9.999999999992378,
+        "max_weight": 0.18638969669304334,
+        "minimum_weight": 9.977121285173665e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702678127,
+      "start": 74,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999622,
+        "max_weight": 0.18638969803958236,
+        "minimum_weight": 0.0
+      },
+      "iterations": 30,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681767,
+      "start": 75,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998847,
+        "max_weight": 0.18638969993890986,
+        "minimum_weight": 1.984778148474385e-17
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681398,
+      "start": 76,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.99999999999918,
+        "max_weight": 0.18638969577624753,
+        "minimum_weight": 4.815318497804505e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681544,
+      "start": 77,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 3.3306690738754696e-16,
+        "effective_assets": 9.99999999999972,
+        "max_weight": 0.18638969626427151,
+        "minimum_weight": 3.5287927779753177e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026818124,
+      "start": 78,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999483,
+        "max_weight": 0.18638969891979898,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026817025,
+      "start": 79,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.99999999999997,
+        "max_weight": 0.1863896989484525,
+        "minimum_weight": 0.0
+      },
+      "iterations": 37,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681941,
+      "start": 80,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999996586,
+        "max_weight": 0.1863896974693838,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.365109170268024,
+      "start": 81,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999995453,
+        "max_weight": 0.18638969468318425,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026796774,
+      "start": 82,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999999215,
+        "max_weight": 0.18638969672784644,
+        "minimum_weight": 3.673336192105302e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681559,
+      "start": 83,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999999844,
+        "max_weight": 0.18638969827149546,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681885,
+      "start": 84,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999992546,
+        "max_weight": 0.18638969593942034,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702678213,
+      "start": 85,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999997607,
+        "max_weight": 0.18638969498193403,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026807593,
+      "start": 86,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999414,
+        "max_weight": 0.18638969596761545,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681665,
+      "start": 87,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999992314,
+        "max_weight": 0.18638970887970557,
+        "minimum_weight": 1.485567426151488e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026781387,
+      "start": 88,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999998078,
+        "max_weight": 0.18638970445582495,
+        "minimum_weight": 3.40486365122317e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026810175,
+      "start": 89,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999996795,
+        "max_weight": 0.18638970729841675,
+        "minimum_weight": 4.627957543281258e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026803846,
+      "start": 90,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999703,
+        "max_weight": 0.18638969636180133,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026818096,
+      "start": 91,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 8.881784197001252e-16,
+        "effective_assets": 9.999999999999151,
+        "max_weight": 0.1863896968875102,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681536,
+      "start": 92,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999991546,
+        "max_weight": 0.18638969916738332,
+        "minimum_weight": 3.293351089485059e-16
+      },
+      "iterations": 30,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026779477,
+      "start": 93,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-15,
+        "effective_assets": 9.999999999999005,
+        "max_weight": 0.1863896938278282,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026814815,
+      "start": 94,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.99999999999903,
+        "max_weight": 0.18638969330528793,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026814865,
+      "start": 95,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999996264,
+        "max_weight": 0.18638969683463322,
+        "minimum_weight": 4.849543123206292e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702680081,
+      "start": 96,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 4.440892098500626e-16,
+        "effective_assets": 9.999999999998893,
+        "max_weight": 0.18638969537995848,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026814044,
+      "start": 97,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999971388,
+        "max_weight": 0.18638969524212806,
+        "minimum_weight": 0.0
+      },
+      "iterations": 32,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702667586,
+      "start": 98,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999597,
+        "max_weight": 0.18638969494788507,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026817574,
+      "start": 99,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.99999999999873,
+        "max_weight": 0.1863896966651968,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026813217,
+      "start": 100,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999762,
+        "max_weight": 0.18638969613931863,
+        "minimum_weight": 5.180539923077679e-17
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681836,
+      "start": 101,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999997762,
+        "max_weight": 0.1863896939249407,
+        "minimum_weight": 2.065680586886265e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702680845,
+      "start": 102,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999098,
+        "max_weight": 0.18638969578020326,
+        "minimum_weight": 0.0
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681511,
+      "start": 103,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999893,
+        "max_weight": 0.1863896963451414,
+        "minimum_weight": 2.929982335320418e-17
+      },
+      "iterations": 30,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026819034,
+      "start": 104,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 6.661338147750939e-16,
+        "effective_assets": 9.999999999999808,
+        "max_weight": 0.18638969635159672,
+        "minimum_weight": 0.0
+      },
+      "iterations": 27,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681864,
+      "start": 105,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.99999999999831,
+        "max_weight": 0.1863896940849198,
+        "minimum_weight": 2.767923965958483e-17
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702681133,
+      "start": 106,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.999999999999067,
+        "max_weight": 0.18638969682553705,
+        "minimum_weight": 0.0
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026814943,
+      "start": 107,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 1.1102230246251565e-16,
+        "effective_assets": 9.999999999991564,
+        "max_weight": 0.1863896931563885,
+        "minimum_weight": 2.5842401748423627e-16
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.36510917026777756,
+      "start": 108,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 0.0,
+        "effective_assets": 9.99999999999486,
+        "max_weight": 0.18638968843640133,
+        "minimum_weight": 6.3602970069579e-17
+      },
+      "iterations": 29,
+      "message": "Optimization terminated successfully",
+      "score": -0.3651091702679391,
+      "start": 109,
+      "status": 0,
+      "success": true
+    },
+    {
+      "audit": {
+        "budget_residual": 2.220446049250313e-16,
+        "effective_assets": 9.999999999999028,
+        "max_weight": 0.1863896948204191,
+        "minimum_weight": 6.097188207443356e-16
+      },
+      "iterations": 28,
+      "message": "Optimization terminated successfully",
+      "score": -0.365109170268147,
+      "start": 110,
+      "status": 0,
+      "success": true
+    }
+  ],
+  "status": "allocated",
+  "successful_starts": 111,
+  "wall_seconds": 0.16057545796502382,
+  "weights": [
+    0.053646771360359634,
+    0.18638969524212806,
+    0.0,
+    0.0038430280759732542,
+    0.09546196462439221,
+    0.08784082876412437,
+    0.10065637208631124,
+    0.058863076440947286,
+    0.07205780029589506,
+    0.10892229262963553,
+    0.03637756270200688,
+    0.04116050248320407,
+    0.10237152244925335,
+    0.023615195678672336,
+    0.02879338716709696
+  ]
+}
